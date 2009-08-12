@@ -45,30 +45,50 @@ void Car::draw(CL_GraphicContext &p_gc) {
 
 void Car::update(unsigned int elapsedTime) {
 
-	static const float MAX_TURN_SPEED = 0.8f;
-	static const float MIN_TURN_SPEED = 0.2f;
+	static const float MAX_TURN_SPEED = 3.0f;
+	static const float MIN_TURN_SPEED = 0.5f;
 		
-	static const float BRAKE_POWER = 500.0f;
+	static const float BRAKE_POWER = 400.0f;
 
 	static const float ACCEL_SPEED = 300.0f;
-	static const float MAX_SPEED = 400.0f;
+	static const float MAX_SPEED = 500.0f;
 
 	static const float AIR_RESIST = 0.2f;
 	
 	static const float TURN_RATIO = ( MAX_TURN_SPEED - MIN_TURN_SPEED ) / ( ( 1.0f - MAX_SPEED ) * ( 1.0f - MAX_SPEED ) );
 
+	static const float MAX_ANGLE = 50.0f;
+
 	const float delta = elapsedTime / 1000.0f;
 
-	// turning speed
+	float turn_speed = 1.0f;
 	
-	float turn_speed = TURN_RATIO * ( m_speed - MAX_SPEED ) * ( m_speed - MAX_SPEED ) + MIN_TURN_SPEED;
+	// turning speed
+	if( m_speed > 0.0f )
+		turn_speed = TURN_RATIO * ( m_speed - MAX_SPEED ) * ( m_speed - MAX_SPEED ) + MIN_TURN_SPEED;
+	else 
+		turn_speed = TURN_RATIO * ( -m_speed - MAX_SPEED ) * ( -m_speed - MAX_SPEED ) + MIN_TURN_SPEED;
+	
+	if (m_turn != 0.0f) {
+		m_angle += m_turn * delta * turn_speed * 360.0f * 1.4f;
+		last_turn = m_turn;
+		if( m_angle > MAX_ANGLE ) {
+			m_angle = MAX_ANGLE;
+		} else if ( m_angle < -MAX_ANGLE ) {
+			m_angle = -MAX_ANGLE;
+		}
+	} else {
+		m_angle += -last_turn * delta * turn_speed * 360.0f * 4.0f;
+		if( last_turn == 1.0f && m_angle < 0.0f ) 
+			m_angle = 0.0f;
+		else if( last_turn == -1.0f && m_angle > 0.0f )
+			m_angle = 0.0f;
+	}	
 	
 	// turning
 
-	if (m_turn != 0.0f) {
-		const CL_Angle deltaAngle(m_turn * delta * turn_speed * 360.0f, cl_degrees);
-		m_rotation += deltaAngle;
-	}
+	const CL_Angle deltaAngle(m_angle * delta * turn_speed * ( m_speed / 100.0f ), cl_degrees);
+	m_rotation += deltaAngle;
 
 
 	// acceleration

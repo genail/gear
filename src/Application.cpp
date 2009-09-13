@@ -14,6 +14,8 @@
 #include "graphics/Stage.h"
 #include "race/RaceScene.h"
 
+#include "network/Client.h"
+
 
 class Application
 {
@@ -55,6 +57,8 @@ int Application::main(const std::vector<CL_String> &args)
 	raceScene.getLevel().addCar(car);
 	raceScene.getViewport().attachTo(&car->getPosition());
 	raceScene.getViewport().setScale(2.0f);
+
+	Client client("localhost", 1234, car);
 
 	unsigned int lastTime = CL_System::get_time();
 

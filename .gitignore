@@ -1,0 +1,8 @@
+.cproject
+.project
+MakeFile
+Makefile
+CMakeFiles
+CMakeCache.txt
+#**/CMakeFiles
+cmake_install.cmake

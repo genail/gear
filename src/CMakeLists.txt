@@ -10,7 +10,7 @@ SET(CLIENT_SRCS
     race/Viewport.cpp
 )
 
-@ Server sources
+# Server sources
 SET(SERVER_SRCS
     Server.cpp
 )

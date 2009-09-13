@@ -1,0 +1,38 @@
+<resources>
+    <section name="race">
+        <sprite name="car" base_angle="90">
+            <image file="resources/car.png" />
+            <translation origin="center"/>
+            <rotation origin="center" />
+        </sprite>
+        <sprite name="block">
+            <image file="resources/block.png" />
+            <rotation origin="center" />
+        </sprite>
+        <sprite name="street_vert">
+            <image file="resources/street_straight.png" />
+        </sprite>
+        <sprite name="street_horiz" base_angle="90">
+            <image file="resources/street_straight.png" />
+        </sprite>
+        
+        <!-- Turns -->
+        <sprite name="turn_bottom_right">
+            <image file="resources/street_turn.png" />
+            <rotation origin="center" />
+        </sprite>
+        <sprite name="turn_top_right" base_angle="90">
+            <image file="resources/street_turn.png"/>
+            <rotation origin="center" />
+        </sprite>
+        <sprite name="turn_top_left" base_angle="180">
+            <image file="resources/street_turn.png"/>
+            <rotation origin="center" />
+        </sprite>
+        <sprite name="turn_bottom_left" base_angle="270">
+        <image file="resources/street_turn.png"/>
+            <rotation origin="center" />
+        </sprite>
+        
+    </section>
+</resources>

@@ -22,6 +22,8 @@ class Car: public Drawable {
 
 		const CL_Pointf& getPosition() { return m_position; }
 
+		const float getRotation() { return m_rotation.to_degrees(); }
+
 		void setAcceleration(bool p_value) {
 			m_acceleration = p_value;
 #ifndef NDEBUG
@@ -42,6 +44,10 @@ class Car: public Drawable {
 			Stage::getDebugLayer()->putMessage(CL_String8("turn"),  CL_StringHelp::float_to_local8(p_value));
 #endif
 		}
+
+		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
+
+		void setRotation(float p_rotation) { m_rotation.set_degrees(p_rotation); }
 
 		void update(unsigned int elapsedTime);
 

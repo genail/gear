@@ -58,7 +58,7 @@ int Application::main(const std::vector<CL_String> &args)
 	raceScene.getViewport().attachTo(&car->getPosition());
 	raceScene.getViewport().setScale(2.0f);
 
-	Client client("localhost", 1234, car);
+	Client client(args[1], 1234, car, &raceScene.getLevel());
 
 	unsigned int lastTime = CL_System::get_time();
 
@@ -88,6 +88,7 @@ int Application::main(const std::vector<CL_String> &args)
 			car->setBrake(false);
 		}
 
+		client.update(delta);
 		car->update(delta);
 
 		// Draw some text and lines:

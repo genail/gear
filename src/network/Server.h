@@ -12,6 +12,11 @@
 #include "ClanLib/network.h"
 
 class Server {
+
+		typedef struct {
+				int m_carId;
+		} Player;
+
 	public:
 		Server(int p_port);
 		virtual ~Server();
@@ -23,11 +28,16 @@ class Server {
 		CL_SlotContainer m_slots;
 
 		/** List of active connections */
-		std::vector<CL_NetGameConnection*> m_connections;
+		std::map<CL_NetGameConnection*, Player> m_connections;
+
+		/** Next car id */
+		int m_nextCarId;
 
 		void slotClientConnected(CL_NetGameConnection *p_netGameConnection);
 		void slotClientDisconnected(CL_NetGameConnection *p_netGameConnection);
 		void slotEventArrived(CL_NetGameConnection *p_netGameConnection, const CL_NetGameEvent &p_netGameEvent);
+
+		int nextCarId() { return m_nextCarId++; }
 };
 
 #endif /* SERVER_H_ */

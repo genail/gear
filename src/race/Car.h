@@ -12,6 +12,7 @@
 #include "graphics/Stage.h"
 
 #include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
 class Car: public Drawable {
 	public:
@@ -23,6 +24,9 @@ class Car: public Drawable {
 		const CL_Pointf& getPosition() { return m_position; }
 
 		const float getRotation() { return m_rotation.to_degrees(); }
+
+		int prepareStatusEvent(CL_NetGameEvent &p_event);
+		int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0);
 
 		void setAcceleration(bool p_value) {
 			m_acceleration = p_value;

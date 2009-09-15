@@ -32,12 +32,10 @@ void Client::update(int p_timeElapsed) {
 	m_remoteCar.update(p_timeElapsed);
 
 	for (; m_timeElapsed >= sendEventsInterval; m_timeElapsed -= sendEventsInterval) {
-		const CL_NetGameEventValue carPositionX(m_car->getPosition().x);
-		const CL_NetGameEventValue carPositionY(m_car->getPosition().y);
-		const CL_NetGameEventValue carRotation(m_car->getRotation());
 
-		CL_NetGameEvent carPositionEvent("car_position", carPositionX, carPositionY, carRotation);
-		m_gameClient.send_event(carPositionEvent);
+		CL_NetGameEvent carStatus("car_status");
+		m_car->prepareStatusEvent(carStatus);
+		m_gameClient.send_event(carStatus);
 	}
 }
 
@@ -46,8 +44,7 @@ void Client::slotEventReceived(const CL_NetGameEvent &p_netGameEvent) {
 
 	static bool carAdded = false;
 
-	m_remoteCar.setPosition(CL_Pointf((float) p_netGameEvent.get_argument(0), (float) p_netGameEvent.get_argument(1)));
-	m_remoteCar.setRotation((float) p_netGameEvent.get_argument(2));
+	m_remoteCar.applyStatusEvent(p_netGameEvent, 0);
 
 	if (!carAdded) {
 		m_level->addCar(&m_remoteCar);

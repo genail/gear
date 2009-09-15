@@ -109,3 +109,45 @@ void Car::update(unsigned int elapsedTime) {
 			Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));
 #endif
 }
+
+int Car::prepareStatusEvent(CL_NetGameEvent &p_event) {
+	CL_NetGameEventValue posX(m_position.x);
+	CL_NetGameEventValue posY(m_position.y);
+	CL_NetGameEventValue rotation(m_rotation.to_degrees());
+	CL_NetGameEventValue turn(m_turn);
+	CL_NetGameEventValue accel(m_acceleration);
+	CL_NetGameEventValue brake(m_brake);
+	CL_NetGameEventValue moveX(m_moveVector.x);
+	CL_NetGameEventValue moveY(m_moveVector.y);
+	CL_NetGameEventValue speed(m_speed);
+
+	int c = 0;
+
+	p_event.add_argument(posX);     ++c;
+	p_event.add_argument(posY);     ++c;
+	p_event.add_argument(rotation); ++c;
+	p_event.add_argument(turn);     ++c;
+	p_event.add_argument(accel);    ++c;
+	p_event.add_argument(brake);    ++c;
+	p_event.add_argument(moveX);    ++c;
+	p_event.add_argument(moveY);    ++c;
+	p_event.add_argument(speed);    ++c;
+
+	return c;
+}
+
+int Car::applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex) {
+	int i = p_beginIndex;
+
+	m_position.x =   (float) p_event.get_argument(i++);
+	m_position.y =   (float) p_event.get_argument(i++);
+	m_rotation =     CL_Angle((float) p_event.get_argument(i++), cl_degrees);
+	m_turn =         (float) p_event.get_argument(i++);
+	m_acceleration =  (bool) p_event.get_argument(i++);
+	m_brake =         (bool) p_event.get_argument(i++);
+	m_moveVector.x = (float) p_event.get_argument(i++);
+	m_moveVector.y = (float) p_event.get_argument(i++);
+	m_speed =        (float) p_event.get_argument(i++);
+
+	return i;
+}

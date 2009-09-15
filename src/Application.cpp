@@ -30,6 +30,11 @@ CL_ClanApplication app(&Application::main);
 
 int Application::main(const std::vector<CL_String> &args)
 {
+	if (args.size() < 2) {
+		CL_Console::write_line("usage: ./game server_addr");
+		return 1;
+	}
+
 	Stage::m_width = 800;
 	Stage::m_height = 600;
 

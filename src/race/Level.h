@@ -19,7 +19,7 @@ class Level : public Drawable {
 		Level();
 		virtual ~Level();
 
-		void addCar(Car *p_car) { m_cars.push_back(p_car); }
+		void addCar(Car *p_car) { p_car->m_level = this; m_cars.push_back(p_car); }
 
 		virtual void draw(CL_GraphicContext &p_gc);
 		virtual void load(CL_GraphicContext &p_gc);
@@ -38,6 +38,8 @@ class Level : public Drawable {
 
 		/** All cars */
 		std::vector<Car*> m_cars;
+
+		Level(const Level& p_level);
 
 		Block::BlockType decodeBlock(const CL_String8& p_str);
 		void unload();

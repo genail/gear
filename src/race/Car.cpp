@@ -6,11 +6,13 @@
  */
 
 #include "race/Car.h"
+#include "race/Level.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
 Car::Car(float p_x, float p_y, float p_rotation) :
+	m_level(NULL),
 	m_sprite(),
 	m_position(p_x, p_y),
 	m_rotation(0, cl_degrees),
@@ -96,6 +98,12 @@ void Car::update(unsigned int elapsedTime) {
 	// air resistance
 	m_speed -= delta * AIR_RESIST * m_speed;
 	
+	// ground resistance
+	if (m_level != NULL) {
+		const float groundResist = m_level->getResistance(m_position.x, m_position.y);
+		m_speed -= delta * groundResist * m_speed;
+	}
+
 	// rotation
 
 	const float rad = m_rotation.to_radians();
@@ -114,6 +122,9 @@ void Car::update(unsigned int elapsedTime) {
 
 #ifndef NDEBUG
 			Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));
+			if (m_level != NULL) {
+				Stage::getDebugLayer()->putMessage(CL_String8("resist"), CL_StringHelp::float_to_local8(m_level->getResistance(m_position.x, m_position.y)));
+			}
 #endif
 }
 

@@ -51,7 +51,7 @@ int Application::main(const std::vector<CL_String> &args)
 	CL_InputDevice keyboard = window.get_ic().get_keyboard();
 	CL_Font font(gc, "Tahoma", 30);
 
-	CL_ResourceManager resources("resources.xml");
+	CL_ResourceManager resources("resources/resources.xml");
 	Stage::m_resourceManager = &resources;
 
 	DebugLayer debugLayer;

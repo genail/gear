@@ -14,6 +14,8 @@
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 
+class Level;
+
 class Car: public Drawable {
 	public:
 		Car(float p_x, float p_y, float p_rotation = 0);
@@ -57,6 +59,9 @@ class Car: public Drawable {
 
 	private:
 
+		/** Parent level */
+		Level* m_level;
+
 		/** Car sprite */
 		CL_Sprite m_sprite;
 
@@ -82,6 +87,8 @@ class Car: public Drawable {
 		float m_speed;
 
 		float normalize(float p_value);
+
+		friend class Level;
 
 };
 

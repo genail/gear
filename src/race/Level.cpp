@@ -15,7 +15,9 @@
 #include "graphics/Stage.h"
 
 Level::Level() :
-	m_blocks(NULL)
+	m_blocks(NULL),
+	m_width(0),
+	m_height(0)
 {
 	loadFromFile("resources/level.txt");
 }
@@ -46,8 +48,8 @@ void Level::draw(CL_GraphicContext &p_gc) {
 }
 
 void Level::load(CL_GraphicContext &p_gc) {
-	for (int x = 0; x < 10; ++x) {
-			for (int y = 0; y < 10; ++y) {
+	for (int x = 0; x < m_width; ++x) {
+			for (int y = 0; y < m_height; ++y) {
 				m_blocks[m_width * y + x].load(p_gc);
 			}
 		}
@@ -132,5 +134,15 @@ Block::BlockType Level::decodeBlock(const CL_String8& p_str) {
 }
 
 float Level::getResistance(float p_x, float p_y) {
-	return 0.0f;
+	if (p_x < 0 || p_y < 0 || p_x >= BOX_WIDTH * m_width || p_y >= BOX_WIDTH * m_height) {
+		return 0.0f;
+	}
+
+	int blockX = (int) floor(p_x / BOX_WIDTH);
+	int blockY = (int) floor(p_y / BOX_WIDTH);
+
+	int localX = (int) (p_x - blockX * BOX_WIDTH);
+	int localY = (int) (p_y - blockY * BOX_WIDTH);
+
+	return m_blocks[blockY * m_width + blockX].getResistance(localX, localY);
 }

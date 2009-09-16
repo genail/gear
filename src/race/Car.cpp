@@ -43,21 +43,28 @@ void Car::draw(CL_GraphicContext &p_gc) {
 
 void Car::update(unsigned int elapsedTime) {
 
-	static const float TURN_SPEED = 0.7f;
+	static const float MAX_TURN_SPEED = 0.8f;
+	static const float MIN_TURN_SPEED = 0.2f;
+		
+	static const float BRAKE_POWER = 500.0f;
 
-	static const float BRAKE_POWER = 200.0f;
-
-	static const float ACCEL_SPEED = 100.0f;
-	static const float MAX_SPEED = 200.0f;
+	static const float ACCEL_SPEED = 300.0f;
+	static const float MAX_SPEED = 400.0f;
 
 	static const float AIR_RESIST = 0.2f;
+	
+	static const float TURN_RATIO = ( MAX_TURN_SPEED - MIN_TURN_SPEED ) / ( ( 1.0f - MAX_SPEED ) * ( 1.0f - MAX_SPEED ) );
 
 	const float delta = elapsedTime / 1000.0f;
 
+	// turning speed
+	
+	float turn_speed = TURN_RATIO * ( m_speed - MAX_SPEED ) * ( m_speed - MAX_SPEED ) + MIN_TURN_SPEED;
+	
 	// turning
 
 	if (m_turn != 0.0f) {
-		const CL_Angle deltaAngle(m_turn * delta * TURN_SPEED * 360.0f, cl_degrees);
+		const CL_Angle deltaAngle(m_turn * delta * turn_speed * 360.0f, cl_degrees);
 		m_rotation += deltaAngle;
 	}
 
@@ -88,7 +95,7 @@ void Car::update(unsigned int elapsedTime) {
 
 	// air resistance
 	m_speed -= delta * AIR_RESIST * m_speed;
-
+	
 	// rotation
 
 	const float rad = m_rotation.to_radians();

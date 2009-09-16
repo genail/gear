@@ -22,6 +22,7 @@ class Level : public Drawable {
 		void addCar(Car *p_car) { m_cars.push_back(p_car); }
 
 		virtual void draw(CL_GraphicContext &p_gc);
+		virtual void load(CL_GraphicContext &p_gc);
 
 		void loadFromFile(const CL_String& p_filename);
 
@@ -37,28 +38,6 @@ class Level : public Drawable {
 
 		/** All cars */
 		std::vector<Car*> m_cars;
-
-		/** Block sprite */
-		CL_Sprite m_blockSprite;
-
-		/** Vertical street sprite */
-		CL_Sprite m_streetVert;
-
-		/** Horizontal street sprite */
-		CL_Sprite m_streetHoriz;
-
-		/** Bottom-right turn */
-		CL_Sprite m_turnBottomRight;
-
-		/** Bottom-left turn */
-		CL_Sprite m_turnBottomLeft;
-
-		/** Top-right turn */
-		CL_Sprite m_turnTopRight;
-
-		/** Top-left turn */
-		CL_Sprite m_turnTopLeft;
-
 
 		Block::BlockType decodeBlock(const CL_String8& p_str);
 		void unload();

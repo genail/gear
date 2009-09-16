@@ -5,6 +5,8 @@
  *      Author: chudy
  */
 
+#define BOX_WIDTH 200
+
 #include "Level.h"
 
 #include <assert.h>
@@ -26,51 +28,13 @@ Level::~Level() {
 
 void Level::draw(CL_GraphicContext &p_gc) {
 
-	if (m_blockSprite.is_null()) {
-		m_blockSprite = CL_Sprite(p_gc, "race/block", Stage::getResourceManager());
-		m_streetVert = CL_Sprite(p_gc, "race/street_vert", Stage::getResourceManager());
-		m_streetHoriz = CL_Sprite(p_gc, "race/street_horiz", Stage::getResourceManager());
-		m_turnBottomRight = CL_Sprite(p_gc, "race/turn_bottom_right", Stage::getResourceManager());
-		m_turnBottomLeft = CL_Sprite(p_gc, "race/turn_bottom_left", Stage::getResourceManager());
-		m_turnTopRight = CL_Sprite(p_gc, "race/turn_top_right", Stage::getResourceManager());
-		m_turnTopLeft = CL_Sprite(p_gc, "race/turn_top_left", Stage::getResourceManager());
-	}
-
-	const float boxWidth = 200;
-
 	for (int x = 0; x < 10; ++x) {
 		for (int y = 0; y < 10; ++y) {
+			p_gc.push_translate(x * BOX_WIDTH, y * BOX_WIDTH);
 
-			CL_Rectf drawRect(
-					x * boxWidth,
-					y * boxWidth,
-					CL_Sizef(boxWidth, boxWidth)
-			);
+			m_blocks[m_width * y + x].draw(p_gc);
 
-			m_blockSprite.draw(p_gc, drawRect);
-
-			switch (m_blocks[m_width * y + x].getType()) {
-				case Block::BT_STREET_VERT:
-					m_streetVert.draw(p_gc, drawRect);
-					break;
-				case Block::BT_STREET_HORIZ:
-					m_streetHoriz.draw(p_gc, drawRect);
-					break;
-				case Block::BT_TURN_BOTTOM_RIGHT:
-					m_turnBottomRight.draw(p_gc, drawRect);
-					break;
-				case Block::BT_TURN_BOTTOM_LEFT:
-					m_turnBottomLeft.draw(p_gc, drawRect);
-					break;
-				case Block::BT_TURN_TOP_RIGHT:
-					m_turnTopRight.draw(p_gc, drawRect);
-					break;
-				case Block::BT_TURN_TOP_LEFT:
-					m_turnTopLeft.draw(p_gc, drawRect);
-					break;
-				case Block::BT_NONE:
-					break;
-			}
+			p_gc.pop_modelview();
 		}
 	}
 
@@ -79,6 +43,14 @@ void Level::draw(CL_GraphicContext &p_gc) {
 		(*itor)->draw(p_gc);
 	}
 
+}
+
+void Level::load(CL_GraphicContext &p_gc) {
+	for (int x = 0; x < 10; ++x) {
+			for (int y = 0; y < 10; ++y) {
+				m_blocks[m_width * y + x].load(p_gc);
+			}
+		}
 }
 
 void Level::loadFromFile(const CL_String& p_filename)
@@ -109,7 +81,7 @@ void Level::loadFromFile(const CL_String& p_filename)
 				hasSize = true;
 			} else {
 				for (int i = 0; i < m_width; ++i) {
-					m_blocks[m_width * row + i] = Block(decodeBlock(parts[i]));
+					m_blocks[m_width * row + i] = Block(decodeBlock(parts[i]), BOX_WIDTH);
 				}
 
 				++row;

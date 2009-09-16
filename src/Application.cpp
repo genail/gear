@@ -58,6 +58,8 @@ int Application::main(const std::vector<CL_String> &args)
 	Stage::m_debugLayer = &debugLayer;
 
 	RaceScene raceScene;
+	raceScene.load(gc);
+
 	Car *car = new Car(50, 50);
 	raceScene.getLevel().addCar(car);
 	raceScene.getViewport().attachTo(&car->getPosition());

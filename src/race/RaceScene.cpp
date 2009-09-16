@@ -23,3 +23,7 @@ void RaceScene::draw(CL_GraphicContext &p_gc) {
 
 	m_viewport.finalizeGC(p_gc);
 }
+
+void RaceScene::load(CL_GraphicContext &p_gc) {
+	m_level.load(p_gc);
+}

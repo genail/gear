@@ -18,6 +18,7 @@ class RaceScene: public Drawable {
 		virtual ~RaceScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
+		virtual void load(CL_GraphicContext &p_gc);
 
 		Level& getLevel() { return m_level; }
 		Viewport& getViewport() { return m_viewport; }

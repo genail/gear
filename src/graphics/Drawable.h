@@ -13,6 +13,7 @@
 class Drawable {
 	public:
 		virtual void draw(CL_GraphicContext &p_gc) = 0;
+		virtual void load(CL_GraphicContext &p_gc) {}
 
 };
 

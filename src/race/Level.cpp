@@ -45,6 +45,11 @@ void Level::draw(CL_GraphicContext &p_gc) {
 		(*itor)->draw(p_gc);
 	}
 
+	// draw bounds
+	for (std::vector<Bound>::iterator itor = m_bounds.begin(); itor != m_bounds.end(); ++itor) {
+		(*itor).draw(p_gc);
+	}
+
 }
 
 void Level::load(CL_GraphicContext &p_gc) {
@@ -89,6 +94,11 @@ void Level::loadFromFile(const CL_String& p_filename)
 				++row;
 			}
 		}
+
+		// FIXME: connect bounds
+
+		//	Bound bound(CL_LineSegment2f(CL_Vec2f(0, 0), CL_Vec2f(100, 200)));
+		//	bound.draw(p_gc);
 
 	//	CL_DataBuffer dataBuffer(file.get_size());
 	//	file.read(buffer.get_data(), buffer.get_size());

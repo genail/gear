@@ -4,6 +4,7 @@ SET(CLIENT_SRCS
     graphics/DebugLayer.cpp
     graphics/Stage.cpp
     race/Block.cpp
+    race/Bound.cpp
     race/Car.cpp
     race/Level.cpp
     race/RaceScene.cpp

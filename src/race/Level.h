@@ -11,18 +11,26 @@
 #include <ClanLib/core.h>
 
 #include "graphics/Drawable.h"
+
 #include "race/Car.h"
 #include "race/Block.h"
+#include "race/Bound.h"
 
 class Level : public Drawable {
 	public:
 		Level();
 		virtual ~Level();
 
-		void addCar(Car *p_car) { p_car->m_level = this; m_cars.push_back(p_car); }
-
+		// inherted from Drawable
 		virtual void draw(CL_GraphicContext &p_gc);
 		virtual void load(CL_GraphicContext &p_gc);
+
+
+		void addCar(Car *p_car) { p_car->m_level = this; m_cars.push_back(p_car); }
+
+		const Bound& getBound(int p_index) const { return m_bounds[p_index]; }
+
+		int getBoundCount() const { return m_bounds.size(); }
 
 		void loadFromFile(const CL_String& p_filename);
 
@@ -38,6 +46,9 @@ class Level : public Drawable {
 
 		/** All cars */
 		std::vector<Car*> m_cars;
+
+		/** Level bounds */
+		std::vector<Bound> m_bounds;
 
 		Level(const Level& p_level);
 

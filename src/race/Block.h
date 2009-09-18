@@ -20,7 +20,8 @@ class Block : public Drawable {
 			BT_TURN_BOTTOM_RIGHT,
 			BT_TURN_BOTTOM_LEFT,
 			BT_TURN_TOP_RIGHT,
-			BT_TURN_TOP_LEFT
+			BT_TURN_TOP_LEFT,
+			BT_START_LINE
 		};
 
 		Block() {}
@@ -47,8 +48,11 @@ class Block : public Drawable {
 		/** Background sprite */
 		CL_Sprite m_bgSprite;
 
-		/** Foreground sprite */
+		/** Primary Foreground sprite */
 		CL_Sprite m_fgSprite;
+
+		/** Secondary Foreground sprite */
+		CL_Sprite m_fgSprite2;
 
 };
 

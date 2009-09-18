@@ -153,6 +153,8 @@ Block::BlockType Level::decodeBlock(const CL_String8& p_str) {
 			return Block::BT_TURN_TOP_LEFT;
 		case '4':
 			return Block::BT_TURN_TOP_RIGHT;
+		case '5':
+			return Block::BT_START_LINE;
 		default:
 			assert(0 && "unknown char");
 	}

@@ -34,5 +34,10 @@
             <rotation origin="center" />
         </sprite>
         
+        <!-- Special -->
+        <sprite name="start_line">
+            <image file="start_line.png" />
+        </sprite>
+        
     </section>
 </resources>

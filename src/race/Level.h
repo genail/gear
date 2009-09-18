@@ -53,6 +53,11 @@ class Level : public Drawable {
 		Level(const Level& p_level);
 
 		Block::BlockType decodeBlock(const CL_String8& p_str);
+
+		const Block& getBlock(int x, int y) const { return m_blocks[y * m_width + x]; }
+
+		CL_String8 readLine(CL_File& p_file);
+
 		void unload();
 
 };

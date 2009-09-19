@@ -57,6 +57,8 @@ class Car: public Drawable {
 
 		void update(unsigned int elapsedTime);
 
+		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
+
 	private:
 
 		/** Parent level */
@@ -90,9 +92,17 @@ class Car: public Drawable {
 		/** angle */
 		float m_angle;
 
+		/** Input state changed signal */
+		CL_Signal_v1<Car &> m_statusChangeSignal;
+
+		/** Input checksum */
+		int m_inputChecksum;
+
 		float normalize(float p_value);
 
 		friend class Level;
+
+		int calculateInputChecksum() const;
 
 };
 

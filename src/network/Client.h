@@ -41,6 +41,9 @@ class Client {
 		CL_SlotContainer m_slots;
 
 		void slotEventReceived(const CL_NetGameEvent &p_netGameEvent);
+
+		/** Invoked when something changed in car input */
+		void slotCarInputChanged(Car &p_car);
 };
 
 #endif /* CLIENT_H_ */

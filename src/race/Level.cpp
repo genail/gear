@@ -45,6 +45,11 @@ void Level::draw(CL_GraphicContext &p_gc) {
 		(*itor)->draw(p_gc);
 	}
 
+	// draw bounds
+	for (std::vector<Bound>::iterator itor = m_bounds.begin(); itor != m_bounds.end(); ++itor) {
+		(*itor).draw(p_gc);
+	}
+
 }
 
 void Level::load(CL_GraphicContext &p_gc) {
@@ -55,44 +60,65 @@ void Level::load(CL_GraphicContext &p_gc) {
 		}
 }
 
+CL_String8 Level::readLine(CL_File& p_file) {
+	CL_String8 line = p_file.read_string_text("", "\n", false);
+	p_file.seek(1, CL_File::seek_cur);
+
+	return line;
+}
+
 void Level::loadFromFile(const CL_String& p_filename)
 {
 	try {
 		CL_File file(p_filename, CL_File::open_existing);
 		CL_String8 line;
 
-		bool hasSize = false;
-		int row = 0;
+		line = readLine(file);
 
-		while (true) {
-			line = file.read_string_text("", "\n", false);
-			file.seek(1, CL_File::seek_cur);
+		std::vector<CL_TempString> parts = CL_StringHelp::split_text(line, " ", true);
 
-			if (line.empty()) {
-				break;
+		m_width = CL_StringHelp::text_to_int(parts[0]);
+		m_height = CL_StringHelp::text_to_int(parts[2]);
+
+		m_blocks = new Block[m_width * m_height];
+
+//		int row = 0;
+
+		for (int i = 0; i < m_height; ++i) {
+			line = readLine(file);
+
+			parts = CL_StringHelp::split_text(line, " ", true);
+
+			for (int j = 0; j < m_width; ++j) {
+				m_blocks[m_width * i + j] = Block(decodeBlock(parts[j]), BOX_WIDTH);
 			}
 
-			std::vector<CL_TempString> parts = CL_StringHelp::split_text(line, " ", true);
-
-			if (!hasSize) {
-				m_width = CL_StringHelp::text_to_int(parts[0]);
-				m_height = CL_StringHelp::text_to_int(parts[2]);
-
-				m_blocks = new Block[m_width * m_height];
-
-				hasSize = true;
-			} else {
-				for (int i = 0; i < m_width; ++i) {
-					m_blocks[m_width * row + i] = Block(decodeBlock(parts[i]), BOX_WIDTH);
-				}
-
-				++row;
-			}
+//			++row;
 		}
 
-	//	CL_DataBuffer dataBuffer(file.get_size());
-	//	file.read(buffer.get_data(), buffer.get_size());
+		// read bounds num
+		line = readLine(file);
+		int boundsCount = CL_StringHelp::text_to_int(line);
+
+		float x1, y1, x2, y2;
+
+		for (int i = 0; i < boundsCount; ++i) {
+			line = readLine(file);
+			parts = CL_StringHelp::split_text(line, " ", true);
+
+			x1 = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
+			y1 = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
+			x2 = CL_StringHelp::text_to_float(parts[2]) * BOX_WIDTH;
+			y2 = CL_StringHelp::text_to_float(parts[3]) * BOX_WIDTH;
+
+			Bound bound(CL_LineSegment2f(CL_Vec2f(x1, y1), CL_Vec2f(x2, y2)));
+			m_bounds.push_back(bound);
+		}
+
+
 		file.close();
+
+
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);
 	}
@@ -127,6 +153,8 @@ Block::BlockType Level::decodeBlock(const CL_String8& p_str) {
 			return Block::BT_TURN_TOP_LEFT;
 		case '4':
 			return Block::BT_TURN_TOP_RIGHT;
+		case '5':
+			return Block::BT_START_LINE;
 		default:
 			assert(0 && "unknown char");
 	}

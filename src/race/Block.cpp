@@ -31,6 +31,10 @@ void Block::draw(CL_GraphicContext& p_gc) {
 
 	if (!m_fgSprite.is_null()) {
 		m_fgSprite.draw(p_gc, drawRect);
+
+		if (!m_fgSprite2.is_null()) {
+			m_fgSprite2.draw(p_gc, drawRect);
+		}
 	}
 }
 
@@ -38,6 +42,7 @@ void Block::load(CL_GraphicContext& p_gc) {
 	m_bgSprite = CL_Sprite(p_gc, "race/block", Stage::getResourceManager());
 
 	CL_String8 fgSpriteName;
+	CL_String8 fgSpriteName2;
 	CL_String8 resistanceMapName;
 	PixelTranslator *pixelTranslator;
 
@@ -72,12 +77,21 @@ void Block::load(CL_GraphicContext& p_gc) {
 			resistanceMapName = "resources/res_map_bottom_right.png";
 			pixelTranslator = new PixelTranslator180();
 			break;
+		case Block::BT_START_LINE:
+			fgSpriteName = "race/street_vert";
+			fgSpriteName2 = "race/start_line";
+			resistanceMapName = "resources/res_map_vert.png";
+			pixelTranslator = new PixelTranslator();
 		case Block::BT_NONE:
 			break;
 	}
 
 	if (fgSpriteName.size() > 0) {
 		m_fgSprite = CL_Sprite(p_gc, fgSpriteName, Stage::getResourceManager());
+
+		if (fgSpriteName2.size() > 0) {
+			m_fgSprite2 = CL_Sprite(p_gc, fgSpriteName2, Stage::getResourceManager());
+		}
 
 		// build resistance map
 		CL_PixelBuffer resistanceImage = CL_ImageProviderFactory::load(resistanceMapName);

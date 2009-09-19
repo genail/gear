@@ -63,6 +63,15 @@ void Car::update(unsigned int elapsedTime) {
 
 	float turn_speed = 1.0f;
 	
+	// calculate input checksum and if its different than last one, then
+	// invoke the signal
+	const int inputChecksum = calculateInputChecksum();
+
+	if (inputChecksum != m_inputChecksum) {
+		m_statusChangeSignal.invoke(*this);
+		m_inputChecksum = inputChecksum;
+	}
+
 	// turning speed
 	if( m_speed > 0.0f )
 		turn_speed = TURN_RATIO * ( m_speed - MAX_SPEED ) * ( m_speed - MAX_SPEED ) + MIN_TURN_SPEED;
@@ -188,4 +197,13 @@ int Car::applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex) {
 	m_speed =        (float) p_event.get_argument(i++);
 
 	return i;
+}
+
+int Car::calculateInputChecksum() const {
+	int checksum = 0;
+	checksum |= (int) m_acceleration;
+	checksum |= ((int) m_brake) << 1;
+	checksum += m_turn * 10000.0f;
+
+	return checksum;
 }

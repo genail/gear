@@ -8,8 +8,9 @@
 #ifndef CAR_H_
 #define CAR_H_
 
-#include "graphics/Drawable.h"
 #include "graphics/Stage.h"
+#include "race/Checkpoint.h"
+#include "graphics/Drawable.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
@@ -98,15 +99,25 @@ class Car: public Drawable {
 		/** Input checksum */
 		int m_inputChecksum;
 
-		float normalize(float p_value);
+		/** Lap number */
+		int m_lap;
 
-		friend class Level;
+		/** Level checkpoints and pass state. Filled in by parent Level */
+		std::vector<Checkpoint> m_checkpoints;
 
 		int calculateInputChecksum() const;
 
+		float normalize(float p_value) const;
+
+		bool areAllCheckpointsPassed() const;
+
+		bool resetCheckpoints();
+
+		friend class Level;
+
 };
 
-inline float Car::normalize(float p_value) {
+inline float Car::normalize(float p_value) const {
 	if (p_value < -1.0f) {
 		p_value = 1.0f;
 	} else if (p_value > 1.0f) {

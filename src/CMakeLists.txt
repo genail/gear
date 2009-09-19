@@ -6,6 +6,7 @@ SET(CLIENT_SRCS
     race/Block.cpp
     race/Bound.cpp
     race/Car.cpp
+    race/Checkpoint.cpp
     race/Level.cpp
     race/RaceScene.cpp
     race/Viewport.cpp

@@ -19,7 +19,8 @@ Car::Car(float p_x, float p_y, float p_rotation) :
 	m_turn(0.0f),
 	m_acceleration(false),
 	m_brake(false),
-	m_speed(0.0f)
+	m_speed(0.0f),
+	m_lap(0)
 {
 
 }
@@ -206,4 +207,20 @@ int Car::calculateInputChecksum() const {
 	checksum += m_turn * 10000.0f;
 
 	return checksum;
+}
+
+bool Car::areAllCheckpointsPassed() const {
+	for (std::vector<Checkpoint>::const_iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
+		if (!itor->isPassed()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool Car::resetCheckpoints() {
+	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
+		itor->setPassed(false);
+	}
 }

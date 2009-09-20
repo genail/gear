@@ -193,8 +193,15 @@ void Level::addCar(Car *p_car) {
 				p_car->m_checkpoints.push_back(checkpoint);
 
 			}
+
+			// if this is a start/finish line, then add finish line checkpoint
+			if (block.getType() == Block::BT_START_LINE) {
+				const CL_Rectf rect(x * BOX_WIDTH, (y - 1) * BOX_WIDTH, (x + 1) * BOX_WIDTH, y * BOX_WIDTH);
+				p_car->m_lapCheckpoint = Checkpoint(rect);
+			}
 		}
 	}
+
 
 	m_cars.push_back(p_car);
 }

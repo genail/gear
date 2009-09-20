@@ -107,6 +107,9 @@ class Car: public Drawable {
 		/** Level checkpoints and pass state. Filled in by parent Level */
 		std::vector<Checkpoint> m_checkpoints;
 
+		/** Final lap checkpoint. Filled by parent Level */
+		Checkpoint m_lapCheckpoint;
+
 		int calculateInputChecksum() const;
 
 		float normalize(float p_value) const;

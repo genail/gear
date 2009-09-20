@@ -12,6 +12,7 @@
 
 class Checkpoint {
 	public:
+		Checkpoint() {}
 		Checkpoint(const CL_Rectf &p_rect);
 		virtual ~Checkpoint();
 

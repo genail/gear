@@ -120,10 +120,14 @@ void Car::update(unsigned int elapsedTime) {
 		}
 	}
 
-	// check if lap is done
+	// check lap progress
 	if (areAllCheckpointsPassed()) {
-		++m_lap;
-		resetCheckpoints();
+		// check for last lap checkpoint
+		if (m_lapCheckpoint.getRect().contains(m_position)) {
+			// got lap
+			++m_lap;
+			resetCheckpoints();
+		}
 	}
 
 	// turning speed

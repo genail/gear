@@ -13,6 +13,7 @@
 #include "graphics/DebugLayer.h"
 #include "graphics/Stage.h"
 #include "race/RaceScene.h"
+#include "Properties.h"
 
 #include "network/Client.h"
 
@@ -33,6 +34,23 @@ int Application::main(const std::vector<CL_String> &args)
 	if (args.size() < 2) {
 		CL_Console::write_line("usage: ./game server_addr");
 		return 1;
+	}
+
+	// set default properties
+	Properties::setProperty("debug.draw_checkpoints", false);
+
+	// read args properties
+	for (std::vector<CL_String>::const_iterator itor = args.begin(); itor != args.end(); ++itor) {
+		if (itor->substr(0, 2) == "-P") {
+			const std::vector<CL_TempString> parts = CL_StringHelp::split_text(itor->substr(2), "=");
+
+			if (parts.size() != 2) {
+				CL_Console::write_line(CL_String8("cannot parse ") + *itor);
+				continue;
+			}
+
+			Properties::setProperty(parts[0], parts[1]);
+		}
 	}
 
 	Stage::m_width = 800;

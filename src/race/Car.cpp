@@ -7,6 +7,7 @@
 
 #include "race/Car.h"
 #include "race/Level.h"
+#include "Properties.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
@@ -44,31 +45,36 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	p_gc.pop_modelview();
 
 #ifndef NDEBUG
-	// draw checkpoints
-	const CL_Vec4f red_color(1.0f, 0.0f, 0.0f, 0.3f);
-	const CL_Vec4f green_color(0.0f, 1.0f, 0.0f, 0.3f);
 
-	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
-		const CL_Rectf &rect = itor->getRect();
-		const CL_Vec4f color = itor->isPassed() ? green_color : red_color;
+	if (Properties::getPropertyAsBool("debug.draw_checkpoints")) {
 
-//		CL_Console::write_line(CL_String8("rect: left=") + CL_StringHelp::float_to_local8(rect.left) + CL_String8(", top=") + CL_StringHelp::float_to_local8(rect.top));
+		// draw checkpoints
+		const CL_Vec4f red_color(1.0f, 0.0f, 0.0f, 0.3f);
+		const CL_Vec4f green_color(0.0f, 1.0f, 0.0f, 0.3f);
 
-		CL_Vec2f positions[] = {
-				CL_Vec2f(rect.left, rect.top),
-				CL_Vec2f(rect.left, rect.bottom),
-				CL_Vec2f(rect.right, rect.bottom),
-				CL_Vec2f(rect.right, rect.top)
-		};
+		for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
+			const CL_Rectf &rect = itor->getRect();
+			const CL_Vec4f color = itor->isPassed() ? green_color : red_color;
 
-		CL_Vec4f colors[] = { color, color, color, color };
+	//		CL_Console::write_line(CL_String8("rect: left=") + CL_StringHelp::float_to_local8(rect.left) + CL_String8(", top=") + CL_StringHelp::float_to_local8(rect.top));
 
-		CL_PrimitivesArray vertices(p_gc);
-		vertices.set_attributes(0, positions);
-		vertices.set_attributes(1, colors);
+			CL_Vec2f positions[] = {
+					CL_Vec2f(rect.left, rect.top),
+					CL_Vec2f(rect.left, rect.bottom),
+					CL_Vec2f(rect.right, rect.bottom),
+					CL_Vec2f(rect.right, rect.top)
+			};
 
-		p_gc.set_program_object(cl_program_color_only);
-		p_gc.draw_primitives(cl_quads, 4, vertices);
+			CL_Vec4f colors[] = { color, color, color, color };
+
+			CL_PrimitivesArray vertices(p_gc);
+			vertices.set_attributes(0, positions);
+			vertices.set_attributes(1, colors);
+
+			p_gc.set_program_object(cl_program_color_only);
+			p_gc.draw_primitives(cl_quads, 4, vertices);
+		}
+
 	}
 #endif // NDEBUG
 }

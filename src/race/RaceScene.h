@@ -9,18 +9,18 @@
 #define RACESCENE_H_
 
 #include "graphics/Drawable.h"
-#include "Viewport.h"
-#include "Level.h"
+#include "race/Viewport.h"
+#include "race/Level.h"
+#include "race/Car.h"
 
 class RaceScene: public Drawable {
 	public:
-		RaceScene();
+		RaceScene(Car *p_localCar, Level *p_level);
 		virtual ~RaceScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
 		virtual void load(CL_GraphicContext &p_gc);
 
-		Level& getLevel() { return m_level; }
 		Viewport& getViewport() { return m_viewport; }
 
 	private:
@@ -29,7 +29,13 @@ class RaceScene: public Drawable {
 		Viewport m_viewport;
 
 		/** The level */
-		Level m_level;
+		Level *m_level;
+
+		/** Local player's car */
+		Car* m_localCar;
+
+		/** Lap display font */
+		CL_Font_Freetype m_lapDisplayFont;
 
 };
 

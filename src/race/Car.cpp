@@ -42,6 +42,35 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	m_sprite.draw(p_gc, 0, 0);
 
 	p_gc.pop_modelview();
+
+#ifndef NDEBUG
+	// draw checkpoints
+	const CL_Vec4f red_color(1.0f, 0.0f, 0.0f, 0.3f);
+	const CL_Vec4f green_color(0.0f, 1.0f, 0.0f, 0.3f);
+
+	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
+		const CL_Rectf &rect = itor->getRect();
+		const CL_Vec4f color = itor->isPassed() ? green_color : red_color;
+
+//		CL_Console::write_line(CL_String8("rect: left=") + CL_StringHelp::float_to_local8(rect.left) + CL_String8(", top=") + CL_StringHelp::float_to_local8(rect.top));
+
+		CL_Vec2f positions[] = {
+				CL_Vec2f(rect.left, rect.top),
+				CL_Vec2f(rect.left, rect.bottom),
+				CL_Vec2f(rect.right, rect.bottom),
+				CL_Vec2f(rect.right, rect.top)
+		};
+
+		CL_Vec4f colors[] = { color, color, color, color };
+
+		CL_PrimitivesArray vertices(p_gc);
+		vertices.set_attributes(0, positions);
+		vertices.set_attributes(1, colors);
+
+		p_gc.set_program_object(cl_program_color_only);
+		p_gc.draw_primitives(cl_quads, 4, vertices);
+	}
+#endif // NDEBUG
 }
 
 void Car::update(unsigned int elapsedTime) {
@@ -71,6 +100,24 @@ void Car::update(unsigned int elapsedTime) {
 	if (inputChecksum != m_inputChecksum) {
 		m_statusChangeSignal.invoke(*this);
 		m_inputChecksum = inputChecksum;
+	}
+
+	// mark checkpoints
+	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
+
+		if (itor->isPassed()) {
+			continue;
+		}
+
+		if (itor->getRect().contains(m_position)) {
+			itor->setPassed(true);
+		}
+	}
+
+	// check if lap is done
+	if (areAllCheckpointsPassed()) {
+		++m_lap;
+		resetCheckpoints();
 	}
 
 	// turning speed

@@ -24,9 +24,11 @@ class Car: public Drawable {
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
-		const CL_Pointf& getPosition() { return m_position; }
+		int getLap() const { return m_lap; }
 
-		const float getRotation() { return m_rotation.to_degrees(); }
+		const CL_Pointf& getPosition() const { return m_position; }
+
+		float getRotation() const { return m_rotation.to_degrees(); }
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);
 		int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0);

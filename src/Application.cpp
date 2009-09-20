@@ -57,15 +57,19 @@ int Application::main(const std::vector<CL_String> &args)
 	DebugLayer debugLayer;
 	Stage::m_debugLayer = &debugLayer;
 
-	RaceScene raceScene;
-	raceScene.load(gc);
+	Level *level = new Level();
+	level->load(gc);
 
 	Car *car = new Car(50, 50);
-	raceScene.getLevel().addCar(car);
+	level->addCar(car);
+
+	RaceScene raceScene(car, level);
+	raceScene.load(gc);
+
 	raceScene.getViewport().attachTo(&car->getPosition());
 	raceScene.getViewport().setScale(2.0f);
 
-	Client client(args[1], 1234, car, &raceScene.getLevel());
+	Client client(args[1], 1234, car, level);
 
 	unsigned int lastTime = CL_System::get_time();
 

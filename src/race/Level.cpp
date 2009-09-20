@@ -13,6 +13,7 @@
 #include <ClanLib/display.h>
 
 #include "graphics/Stage.h"
+#include "race/Checkpoint.h"
 
 Level::Level() :
 	m_blocks(NULL),
@@ -173,4 +174,34 @@ float Level::getResistance(float p_x, float p_y) {
 	int localY = (int) (p_y - blockY * BOX_WIDTH);
 
 	return m_blocks[blockY * m_width + blockX].getResistance(localX, localY);
+}
+
+void Level::addCar(Car *p_car) {
+	p_car->m_level = this;
+
+	// fill car checkpoints
+	for (int x = 0; x < m_width; ++x) {
+		for (int y = 0; y < m_height; ++y) {
+
+			const Block &block = getBlock(x, y);
+
+			if (block.getType() != Block::BT_NONE) {
+
+				const CL_Rectf rect(x * BOX_WIDTH, y * BOX_WIDTH, (x + 1) * BOX_WIDTH, (y + 1) * BOX_WIDTH);
+				const Checkpoint checkpoint(rect);
+
+				p_car->m_checkpoints.push_back(checkpoint);
+
+			}
+
+			// if this is a start/finish line, then add finish line checkpoint
+			if (block.getType() == Block::BT_START_LINE) {
+				const CL_Rectf rect(x * BOX_WIDTH, (y - 1) * BOX_WIDTH, (x + 1) * BOX_WIDTH, y * BOX_WIDTH);
+				p_car->m_lapCheckpoint = Checkpoint(rect);
+			}
+		}
+	}
+
+
+	m_cars.push_back(p_car);
 }

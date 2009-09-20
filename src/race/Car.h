@@ -8,8 +8,9 @@
 #ifndef CAR_H_
 #define CAR_H_
 
-#include "graphics/Drawable.h"
 #include "graphics/Stage.h"
+#include "race/Checkpoint.h"
+#include "graphics/Drawable.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
@@ -23,9 +24,11 @@ class Car: public Drawable {
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
-		const CL_Pointf& getPosition() { return m_position; }
+		int getLap() const { return m_lap; }
 
-		const float getRotation() { return m_rotation.to_degrees(); }
+		const CL_Pointf& getPosition() const { return m_position; }
+
+		float getRotation() const { return m_rotation.to_degrees(); }
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);
 		int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0);
@@ -98,15 +101,28 @@ class Car: public Drawable {
 		/** Input checksum */
 		int m_inputChecksum;
 
-		float normalize(float p_value);
+		/** Lap number */
+		int m_lap;
 
-		friend class Level;
+		/** Level checkpoints and pass state. Filled in by parent Level */
+		std::vector<Checkpoint> m_checkpoints;
+
+		/** Final lap checkpoint. Filled by parent Level */
+		Checkpoint m_lapCheckpoint;
 
 		int calculateInputChecksum() const;
 
+		float normalize(float p_value) const;
+
+		bool areAllCheckpointsPassed() const;
+
+		bool resetCheckpoints();
+
+		friend class Level;
+
 };
 
-inline float Car::normalize(float p_value) {
+inline float Car::normalize(float p_value) const {
 	if (p_value < -1.0f) {
 		p_value = 1.0f;
 	} else if (p_value > 1.0f) {

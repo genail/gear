@@ -1,11 +1,13 @@
 # Game client sources
 SET(CLIENT_SRCS
     Application.cpp
+    Properties.cpp
     graphics/DebugLayer.cpp
     graphics/Stage.cpp
     race/Block.cpp
     race/Bound.cpp
     race/Car.cpp
+    race/Checkpoint.cpp
     race/Level.cpp
     race/RaceScene.cpp
     race/Viewport.cpp
@@ -14,6 +16,7 @@ SET(CLIENT_SRCS
 
 # Server sources
 SET(SERVER_SRCS
+    Properties.cpp
     ServerApplication.cpp
     network/Server.cpp
 )

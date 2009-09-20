@@ -26,7 +26,7 @@ class Level : public Drawable {
 		virtual void load(CL_GraphicContext &p_gc);
 
 
-		void addCar(Car *p_car) { p_car->m_level = this; m_cars.push_back(p_car); }
+		void addCar(Car *p_car);
 
 		const Bound& getBound(int p_index) const { return m_bounds[p_index]; }
 

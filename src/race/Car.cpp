@@ -7,15 +7,17 @@
 
 #include "race/Car.h"
 #include "race/Level.h"
+#include "race/Player.h"
 #include "Properties.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
-Car::Car(float p_x, float p_y, float p_rotation) :
+Car::Car(Player *p_player) :
+	m_player(p_player),
 	m_level(NULL),
 	m_sprite(),
-	m_position(p_x, p_y),
+	m_position(0, 0),
 	m_rotation(0, cl_degrees),
 	m_turn(0.0f),
 	m_acceleration(false),

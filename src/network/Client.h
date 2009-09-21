@@ -13,10 +13,11 @@
 
 #include "race/Car.h"
 #include "race/Level.h"
+#include "race/Player.h"
 
 class Client {
 	public:
-		Client(const CL_String8 &p_host, const int p_port, Car *p_car, Level *p_level);
+		Client(const CL_String8 &p_host, const int p_port, Player *p_localPlayer, Level *p_level);
 		virtual ~Client();
 
 		void update(int timeElapsed);
@@ -28,11 +29,11 @@ class Client {
 		/** Game level */
 		Level *m_level;
 
-		/** Car pointer */
-		Car *m_car;
+		/** Local player pointer */
+		Player *m_localPlayer;
 
-		/** Remote car */
-		Car m_remoteCar;
+		/** Remotly connected player */
+		std::vector<Player> m_remotePlayers;
 
 		/** Time that passed from last send-events */
 		unsigned m_timeElapsed;
@@ -40,10 +41,27 @@ class Client {
 		/** The slot container */
 		CL_SlotContainer m_slots;
 
-		void slotEventReceived(const CL_NetGameEvent &p_netGameEvent);
-
 		/** Invoked when something changed in car input */
 		void slotCarInputChanged(Car &p_car);
+
+		//
+		// connection events
+		//
+
+		void slotConnected();
+
+		void slotEventReceived(const CL_NetGameEvent &p_netGameEvent);
+
+		//
+		// game events receivers
+		//
+
+		/** Player introduces to rest of players */
+		void eventHi(const CL_NetGameEvent &p_netGameEvent);
+
+		/** Car status update */
+		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);
+
 };
 
 #endif /* CLIENT_H_ */

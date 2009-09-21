@@ -16,21 +16,25 @@
 #include <ClanLib/network.h>
 
 class Level;
+class Player;
 
 class Car: public Drawable {
 	public:
-		Car(float p_x, float p_y, float p_rotation = 0);
+		Car(Player* p_player);
 		virtual ~Car();
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		int getLap() const { return m_lap; }
 
+		Player* getPlayer() const { return m_player; }
+
 		const CL_Pointf& getPosition() const { return m_position; }
 
 		float getRotation() const { return m_rotation.to_degrees(); }
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);
+
 		int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0);
 
 		void setAcceleration(bool p_value) {
@@ -63,6 +67,9 @@ class Car: public Drawable {
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
 	private:
+
+		/** Parent player */
+		Player* m_player;
 
 		/** Parent level */
 		Level* m_level;

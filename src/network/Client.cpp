@@ -38,8 +38,8 @@ void Client::slotConnected() {
 
 void Client::update(int p_timeElapsed) {
 
-	for (std::vector<Player>::iterator itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
-		(*itor).getCar().update(p_timeElapsed);
+	for (std::vector<Player*>::iterator itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
+		(*itor)->getCar().update(p_timeElapsed);
 	}
 
 	m_localPlayer->getCar().update(p_timeElapsed);
@@ -67,10 +67,10 @@ void Client::eventHi(const CL_NetGameEvent &p_netGameEvent) {
 
 	CL_Console::write_line("Client {1} connected", nickname);
 
-	m_remotePlayers.push_back(Player(nickname));
-	Player &player = m_remotePlayers.back();
+	Player *player = new Player(nickname);
+	m_remotePlayers.push_back(player);
 
-	m_level->addCar(&player.getCar());
+	m_level->addCar(&player->getCar());
 
 	// send hi again (TODO: this should be done by server)
 	CL_NetGameEvent hiEvent("hi");
@@ -93,9 +93,9 @@ void Client::eventCarStatus(const CL_NetGameEvent &p_netGameEvent) {
 }
 
 Player* Client::getPlayerByName(const CL_String& p_name) {
-	for (std::vector<Player>::iterator itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
-		if (itor->getName() == p_name) {
-			return &(*itor);
+	for (std::vector<Player*>::iterator itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
+		if ((*itor)->getName() == p_name) {
+			return (*itor);
 		}
 	}
 

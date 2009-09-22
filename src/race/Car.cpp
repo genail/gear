@@ -36,16 +36,31 @@ Car::~Car() {
 
 void Car::draw(CL_GraphicContext &p_gc) {
 
+	// TODO: move to load();
 	if (m_sprite.is_null()) {
 		m_sprite = CL_Sprite(p_gc, "race/car", Stage::getResourceManager());
+	}
+
+	if (m_nickDisplayFont.is_null()) {
+		CL_FontDescription fontDesc;
+
+		fontDesc.set_typeface_name("resources/DejaVuSansCondensed-BoldOblique.ttf");
+		fontDesc.set_height(12);
+
+		m_nickDisplayFont = CL_Font_Freetype(p_gc, fontDesc);
 	}
 
 	p_gc.push_modelview();
 
 	p_gc.mult_translate(m_position.x, m_position.y);
+
+	// display nickname
+	m_nickDisplayFont.draw_text(p_gc, 0, -20, m_player->getName());
+
 	p_gc.mult_rotate(m_rotation, 0, 0, 1);
 
 	m_sprite.draw(p_gc, 0, 0);
+
 
 	p_gc.pop_modelview();
 
@@ -82,6 +97,11 @@ void Car::draw(CL_GraphicContext &p_gc) {
 
 	}
 #endif // NDEBUG
+}
+
+void Car::load(CL_GraphicContext &p_gc) {
+
+
 }
 
 void Car::update(unsigned int elapsedTime) {

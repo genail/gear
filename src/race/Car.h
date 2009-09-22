@@ -25,6 +25,8 @@ class Car: public Drawable {
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
+		virtual void load(CL_GraphicContext &p_gc);
+
 		int getLap() const { return m_lap; }
 
 		Player* getPlayer() const { return m_player; }
@@ -117,6 +119,9 @@ class Car: public Drawable {
 
 		/** Final lap checkpoint. Filled by parent Level */
 		Checkpoint m_lapCheckpoint;
+
+		/** Nickname display font */
+		CL_Font_Freetype m_nickDisplayFont;
 
 		int calculateInputChecksum() const;
 

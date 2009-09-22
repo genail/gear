@@ -33,7 +33,7 @@ class Client {
 		Player *m_localPlayer;
 
 		/** Remotly connected player */
-		std::vector<Player> m_remotePlayers;
+		std::vector<Player*> m_remotePlayers;
 
 		/** Time that passed from last send-events */
 		unsigned m_timeElapsed;

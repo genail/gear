@@ -55,10 +55,10 @@ void Level::draw(CL_GraphicContext &p_gc) {
 
 void Level::load(CL_GraphicContext &p_gc) {
 	for (int x = 0; x < m_width; ++x) {
-			for (int y = 0; y < m_height; ++y) {
-				m_blocks[m_width * y + x].load(p_gc);
-			}
+		for (int y = 0; y < m_height; ++y) {
+			m_blocks[m_width * y + x].load(p_gc);
 		}
+	}
 }
 
 CL_String8 Level::readLine(CL_File& p_file) {

@@ -122,6 +122,10 @@ class Car: public Drawable {
 
 		friend class Level;
 
+#ifndef NDEBUG
+		void debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, float y2, const CL_Color& p_color);
+#endif // NDEBUG
+
 };
 
 inline float Car::normalize(float p_value) const {

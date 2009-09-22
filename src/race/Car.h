@@ -78,7 +78,6 @@ class Car: public Drawable {
 
 		/** Current turn. -1 is maximum left, 0 is center and 1 is maximum right */
 		float m_turn;
-		float last_turn;
 
 		/** Acceleration switch */
 		bool m_acceleration;

@@ -12,6 +12,8 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
+#include <iostream>
+
 Car::Car(float p_x, float p_y, float p_rotation) :
 	m_level(NULL),
 	m_sprite(),
@@ -81,9 +83,6 @@ void Car::draw(CL_GraphicContext &p_gc) {
 
 void Car::update(unsigned int elapsedTime) {
 
-	static const float MAX_TURN_SPEED = 5.0f;
-	static const float MIN_TURN_SPEED = 0.5f;
-		
 	static const float BRAKE_POWER = 400.0f;
 
 	static const float ACCEL_SPEED = 300.0f;
@@ -91,14 +90,10 @@ void Car::update(unsigned int elapsedTime) {
 
 	static const float AIR_RESIST = 0.2f;
 	
-	static const float TURN_RATIO = ( MAX_TURN_SPEED - MIN_TURN_SPEED ) / ( ( 1.0f - MAX_SPEED ) * ( 1.0f - MAX_SPEED ) );
-
-	static const float MAX_ANGLE = 60.0f;
+	static const float MAX_ANGLE = 44.0f;
 
 	const float delta = elapsedTime / 1000.0f;
 
-	float turn_speed = 1.0f;
-	
 	// calculate input checksum and if its different than last one, then
 	// invoke the signal
 	const int inputChecksum = calculateInputChecksum();
@@ -130,33 +125,14 @@ void Car::update(unsigned int elapsedTime) {
 		}
 	}
 
-	// turning speed
-	if( m_speed > 0.0f )
-		turn_speed = TURN_RATIO * ( m_speed - MAX_SPEED ) * ( m_speed - MAX_SPEED ) + MIN_TURN_SPEED;
+	//turning	
+	if( m_turn == -1.0f )
+		m_angle = -MAX_ANGLE;
+	else if( m_turn == 1.0f )
+		m_angle = MAX_ANGLE;
 	else 
-		turn_speed = TURN_RATIO * ( -m_speed - MAX_SPEED ) * ( -m_speed - MAX_SPEED ) + MIN_TURN_SPEED;
-	
-	if (m_turn != 0.0f) {
-		m_angle += m_turn * delta * turn_speed * 360.0f * 1.8f;
-		last_turn = m_turn;
-		if( m_angle > MAX_ANGLE ) {
-			m_angle = MAX_ANGLE;
-		} else if ( m_angle < -MAX_ANGLE ) {
-			m_angle = -MAX_ANGLE;
-		}
-	} else {
-		m_angle += -last_turn * delta * turn_speed * 360.0f * 5.0f;
-		if( last_turn == 1.0f && m_angle < 0.0f ) 
-			m_angle = 0.0f;
-		else if( last_turn == -1.0f && m_angle > 0.0f )
-			m_angle = 0.0f;
-	}	
-	
-	// turning
-
-	const CL_Angle deltaAngle(m_angle * delta * turn_speed * ( m_speed / 100.0f ), cl_degrees);
-	m_rotation += deltaAngle;
-
+		m_angle = 0.0f;
+		
 
 	// acceleration
 
@@ -192,20 +168,81 @@ void Car::update(unsigned int elapsedTime) {
 	}
 
 	// rotation
-
+		
+	CL_Vec2f accelerationVector;
+	CL_Vec2f forceVector;
+	CL_Vec2f driftVector;
+	
 	const float rad = m_rotation.to_radians();
+
+	accelerationVector.x = cos(rad);
+	accelerationVector.y = sin(rad);
+
+	accelerationVector.normalize();
+	accelerationVector *= ACCEL_SPEED;
+	
+	if( m_angle < 0.0f ) {
+ 		forceVector.x = sin(rad);
+		forceVector.y = -cos(rad);
+	
+		forceVector.normalize();
+		
+		forceVector *= m_speed / tan( 2.0f * -m_angle * 3.14f / 180.0f );
+		//forceVector *= 10.0;				
+	}
+	else if( m_angle > 0.0f ){
+		forceVector.x = -sin(rad);
+		forceVector.y = cos(rad);
+	
+		forceVector.normalize();
+		
+		forceVector *= m_speed / tan( 2.0f * m_angle * 3.14f / 180.0f );
+		//forceVector *= 10.0;
+	}
+	
+	//poslizg
+	
+	if( forceVector.length() > 16.0f ) {
+		driftVector.x = -forceVector.x;
+		driftVector.y = -forceVector.y;
+		
+		driftVector.normalize();
+		driftVector *= forceVector.length() - 15.0f;
+	}
+	
+	if( m_angle != 0.0f )
+		m_moveVector = accelerationVector + forceVector;
+	else 
+		m_moveVector = accelerationVector;
+	
+	m_moveVector.normalize();
+	
+	m_moveVector *= m_speed;
+	
+	m_moveVector += driftVector;
+	
+	/*const float rad = m_rotation.to_radians();
 
 	m_moveVector.x = cos(rad);
 	m_moveVector.y = sin(rad);
 
 	m_moveVector.normalize();
 	m_moveVector *= m_speed;
-
+	*/
 	// movement
+	if( m_angle != 0.0f )
+		m_rotation.set_degrees( atan2( m_moveVector.y, m_moveVector.x ) * 180.0f / 3.14f );
+		
+	m_rotation.normalize();
 
 	CL_Vec2f currentMoveVector = m_moveVector * delta;
 	m_position.x += currentMoveVector.x;
 	m_position.y += currentMoveVector.y;
+	
+	m_position.x += driftVector.x;
+	m_position.y += driftVector.y;
+	
+	Stage::getDebugLayer()->putMessage(CL_String8("rot"),  CL_StringHelp::float_to_local8( forceVector.length() ));
 
 #ifndef NDEBUG
 			Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));

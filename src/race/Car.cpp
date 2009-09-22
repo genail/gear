@@ -44,21 +44,13 @@ void Car::draw(CL_GraphicContext &p_gc) {
 
 	m_sprite.draw(p_gc, 0, 0);
 	
-	//vectors
-	CL_Vec2f positions[] = {
-		CL_Vec2f(forceVector.x, forceVector.y),
-	};
-	const CL_Vec4f red_color(1.0f, 0.0f, 0.0f, 0.3f);
+#ifndef NDEBUG
+	debugDrawLine(p_gc, 0, 0, forceVector.x, forceVector.y, CL_Colorf::red);
+	debugDrawLine(p_gc, 0, 0, driftVector.x*10, driftVector.y*10, CL_Colorf::green);
+	debugDrawLine(p_gc, 0, 0, accelerationVector.x/10, accelerationVector.y/10, CL_Colorf::blue);
+	debugDrawLine(p_gc, 0, 0, m_moveVector.x/10, m_moveVector.y/10, CL_Colorf::black);
+#endif // NDEBUG
 
-	CL_Vec4f colors[] = { red_color };
-	CL_PrimitivesArray vertices(p_gc);
-	vertices.set_attributes(0, positions);
-	vertices.set_attributes(1, colors);
-
-	p_gc.set_program_object(cl_program_color_only);
-	p_gc.draw_primitives(cl_lines, 1, vertices);
-	//end
-	
 	p_gc.pop_modelview();
 
 #ifndef NDEBUG
@@ -95,6 +87,27 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	}
 #endif // NDEBUG
 }
+
+#ifndef NDEBUG
+void Car::debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, float y2, const CL_Color& p_color) {
+
+	CL_Vec4f color(p_color.get_red_f(), p_color.get_green_f(), p_color.get_blue_f(), p_color.get_alpha_f());
+
+	CL_Vec2f positions[] = {
+			CL_Vec2f(x1, y1),
+			CL_Vec2f(x2, y2),
+	};
+
+	CL_Vec4f colors[] = { color, color };
+
+	CL_PrimitivesArray vertices(p_gc);
+	vertices.set_attributes(0, positions);
+	vertices.set_attributes(1, colors);
+
+	p_gc.set_program_object(cl_program_color_only);
+	p_gc.draw_primitives(cl_lines, 2, vertices);
+}
+#endif // NDEBUG
 
 void Car::update(unsigned int elapsedTime) {
 
@@ -241,7 +254,7 @@ void Car::update(unsigned int elapsedTime) {
 	if( m_angle != 0.0f )
 		m_rotation.set_degrees( atan2( m_moveVector.y, m_moveVector.x ) * 180.0f / 3.14f );
 		
-	m_rotation.normalize();
+	//m_rotation.normalize();
 
 	CL_Vec2f currentMoveVector = m_moveVector * delta;
 	m_position.x += currentMoveVector.x;

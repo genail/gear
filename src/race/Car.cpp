@@ -17,12 +17,15 @@ Car::Car(Player *p_player) :
 	m_player(p_player),
 	m_level(NULL),
 	m_sprite(),
-	m_position(0, 0),
+	m_position(0.0f, 0.0f),
 	m_rotation(0, cl_degrees),
 	m_turn(0.0f),
+	m_last_turn(0.0f),
 	m_acceleration(false),
 	m_brake(false),
 	m_speed(0.0f),
+	m_angle(0.0f),
+	m_inputChecksum(0),
 	m_lap(0)
 {
 
@@ -140,23 +143,24 @@ void Car::update(unsigned int elapsedTime) {
 	
 	if (m_turn != 0.0f) {
 		m_angle += m_turn * delta * turn_speed * 360.0f * 1.4f;
-		last_turn = m_turn;
+		m_last_turn = m_turn;
 		if( m_angle > MAX_ANGLE ) {
 			m_angle = MAX_ANGLE;
 		} else if ( m_angle < -MAX_ANGLE ) {
 			m_angle = -MAX_ANGLE;
 		}
 	} else {
-		m_angle += -last_turn * delta * turn_speed * 360.0f * 4.0f;
-		if( last_turn == 1.0f && m_angle < 0.0f ) 
+		m_angle += -m_last_turn * delta * turn_speed * 360.0f * 4.0f;
+		if( m_last_turn == 1.0f && m_angle < 0.0f ) 
 			m_angle = 0.0f;
-		else if( last_turn == -1.0f && m_angle > 0.0f )
+		else if( m_last_turn == -1.0f && m_angle > 0.0f )
 			m_angle = 0.0f;
 	}	
 	
 	// turning
 
 	const CL_Angle deltaAngle(m_angle * delta * turn_speed * ( m_speed / 100.0f ), cl_degrees);
+
 	m_rotation += deltaAngle;
 
 

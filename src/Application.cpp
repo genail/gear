@@ -34,8 +34,8 @@ CL_ClanApplication app(&Application::main);
 
 int Application::main(const std::vector<CL_String> &args)
 {
-	if (args.size() < 2) {
-		CL_Console::write_line("usage: ./game server_addr");
+	if (args.size() < 3) {
+		CL_Console::write_line("usage: ./game server_addr nickname");
 		return 1;
 	}
 
@@ -81,7 +81,7 @@ int Application::main(const std::vector<CL_String> &args)
 	Level *level = new Level();
 	level->load(gc);
 
-	Player player(getenv("USER"));
+	Player player(args[2]);
 
 	Car &car = player.getCar();
 	level->addCar(&car);

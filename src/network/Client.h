@@ -44,6 +44,8 @@ class Client {
 		/** Invoked when something changed in car input */
 		void slotCarInputChanged(Car &p_car);
 
+		Player* getPlayerByName(const CL_String& p_name);
+
 		//
 		// connection events
 		//

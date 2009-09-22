@@ -23,8 +23,6 @@ void RaceScene::draw(CL_GraphicContext &p_gc) {
 
 	m_viewport.finalizeGC(p_gc);
 
-//	m_lapDisplayFont.draw_text(p_gc, Stage::getWidth() - 100, 50, "Lap 1/2", CL_Colorf::white);
-
 	m_lapDisplayFont.draw_text(p_gc, Stage::getWidth() - 130, 40, CL_String8("Lap ") + CL_StringHelp::int_to_local8(m_localCar->getLap() + 1));
 
 }
@@ -38,4 +36,6 @@ void RaceScene::load(CL_GraphicContext &p_gc) {
 
 		m_lapDisplayFont = CL_Font_Freetype(p_gc, fontDesc);
 	}
+
+	m_level->load(p_gc);
 }

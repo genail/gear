@@ -9,6 +9,7 @@ SET(CLIENT_SRCS
     race/Car.cpp
     race/Checkpoint.cpp
     race/Level.cpp
+    race/Player.cpp
     race/RaceScene.cpp
     race/Viewport.cpp
     network/Client.cpp

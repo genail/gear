@@ -5,6 +5,8 @@
  *      Author: chudy
  */
 
+#include <stdlib.h>
+
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 #include <ClanLib/gl.h>
@@ -13,6 +15,7 @@
 #include "graphics/DebugLayer.h"
 #include "graphics/Stage.h"
 #include "race/RaceScene.h"
+#include "race/Player.h"
 #include "Properties.h"
 
 #include "network/Client.h"
@@ -31,8 +34,8 @@ CL_ClanApplication app(&Application::main);
 
 int Application::main(const std::vector<CL_String> &args)
 {
-	if (args.size() < 2) {
-		CL_Console::write_line("usage: ./game server_addr");
+	if (args.size() < 3) {
+		CL_Console::write_line("usage: ./game server_addr nickname");
 		return 1;
 	}
 
@@ -78,16 +81,18 @@ int Application::main(const std::vector<CL_String> &args)
 	Level *level = new Level();
 	level->load(gc);
 
-	Car *car = new Car(50, 50);
-	level->addCar(car);
+	Player player(args[2]);
 
-	RaceScene raceScene(car, level);
+	Car &car = player.getCar();
+	level->addCar(&car);
+
+	RaceScene raceScene(&car, level);
 	raceScene.load(gc);
 
-	raceScene.getViewport().attachTo(&car->getPosition());
+	raceScene.getViewport().attachTo(&car.getPosition());
 	raceScene.getViewport().setScale(2.0f);
 
-	Client client(args[1], 1234, car, level);
+	Client client(args[1], 1234, &player, level);
 
 	unsigned int lastTime = CL_System::get_time();
 
@@ -98,27 +103,27 @@ int Application::main(const std::vector<CL_String> &args)
 		lastTime += delta;
 
 		if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
-			car->setTurn(-1.0f);
+			car.setTurn(-1.0f);
 		} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
-			car->setTurn(1.0f);
+			car.setTurn(1.0f);
 		} else {
-			car->setTurn(0.0f);
+			car.setTurn(0.0f);
 		}
 
 		if (keyboard.get_keycode(CL_KEY_UP)) {
-			car->setAcceleration(true);
+			car.setAcceleration(true);
 		} else {
-			car->setAcceleration(false);
+			car.setAcceleration(false);
 		}
 
 		if (keyboard.get_keycode(CL_KEY_DOWN)) {
-			car->setBrake(true);
+			car.setBrake(true);
 		} else {
-			car->setBrake(false);
+			car.setBrake(false);
 		}
 
 		client.update(delta);
-		car->update(delta);
+		car.update(delta);
 
 		// Draw some text and lines:
 		gc.clear(CL_Colorf::cadetblue);

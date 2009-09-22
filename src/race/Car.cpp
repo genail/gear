@@ -7,22 +7,24 @@
 
 #include "race/Car.h"
 #include "race/Level.h"
+#include "race/Player.h"
 #include "Properties.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
-#include <iostream>
-
-Car::Car(float p_x, float p_y, float p_rotation) :
+Car::Car(Player *p_player) :
+	m_player(p_player),
 	m_level(NULL),
 	m_sprite(),
-	m_position(p_x, p_y),
+	m_position(0.0f, 0.0f),
 	m_rotation(0, cl_degrees),
 	m_turn(0.0f),
 	m_acceleration(false),
 	m_brake(false),
 	m_speed(0.0f),
+	m_angle(0.0f),
+	m_inputChecksum(0),
 	m_lap(0)
 {
 
@@ -33,13 +35,27 @@ Car::~Car() {
 
 void Car::draw(CL_GraphicContext &p_gc) {
 
+	// TODO: move to load();
 	if (m_sprite.is_null()) {
 		m_sprite = CL_Sprite(p_gc, "race/car", Stage::getResourceManager());
+	}
+
+	if (m_nickDisplayFont.is_null()) {
+		CL_FontDescription fontDesc;
+
+		fontDesc.set_typeface_name("resources/DejaVuSansCondensed-BoldOblique.ttf");
+		fontDesc.set_height(12);
+
+		m_nickDisplayFont = CL_Font_Freetype(p_gc, fontDesc);
 	}
 
 	p_gc.push_modelview();
 
 	p_gc.mult_translate(m_position.x, m_position.y);
+
+	// display nickname
+	m_nickDisplayFont.draw_text(p_gc, 0, -20, m_player->getName());
+
 	p_gc.mult_rotate(m_rotation, 0, 0, 1);
 
 	m_sprite.draw(p_gc, 0, 0);
@@ -50,6 +66,7 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	debugDrawLine(p_gc, 0, 0, accelerationVector.x/10, accelerationVector.y/10, CL_Colorf::blue);
 	debugDrawLine(p_gc, 0, 0, m_moveVector.x/10, m_moveVector.y/10, CL_Colorf::black);
 #endif // NDEBUG
+
 
 	p_gc.pop_modelview();
 
@@ -109,6 +126,11 @@ void Car::debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, f
 }
 #endif // NDEBUG
 
+void Car::load(CL_GraphicContext &p_gc) {
+
+
+}
+
 void Car::update(unsigned int elapsedTime) {
 
 	static const float BRAKE_POWER = 400.0f;
@@ -160,7 +182,6 @@ void Car::update(unsigned int elapsedTime) {
 		m_angle = MAX_ANGLE;
 	else 
 		m_angle = 0.0f;
-		
 
 	// acceleration
 

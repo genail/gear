@@ -87,6 +87,9 @@ class Car: public Drawable {
 
 		/** Move vector */
 		CL_Vec2f m_moveVector;
+		CL_Vec2f accelerationVector;
+		CL_Vec2f forceVector;
+		CL_Vec2f driftVector;
 
 		/** Current speed */
 		float m_speed;

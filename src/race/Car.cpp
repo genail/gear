@@ -43,7 +43,22 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	p_gc.mult_rotate(m_rotation, 0, 0, 1);
 
 	m_sprite.draw(p_gc, 0, 0);
+	
+	//vectors
+	CL_Vec2f positions[] = {
+		CL_Vec2f(forceVector.x, forceVector.y),
+	};
+	const CL_Vec4f red_color(1.0f, 0.0f, 0.0f, 0.3f);
 
+	CL_Vec4f colors[] = { red_color };
+	CL_PrimitivesArray vertices(p_gc);
+	vertices.set_attributes(0, positions);
+	vertices.set_attributes(1, colors);
+
+	p_gc.set_program_object(cl_program_color_only);
+	p_gc.draw_primitives(cl_lines, 1, vertices);
+	//end
+	
 	p_gc.pop_modelview();
 
 #ifndef NDEBUG
@@ -90,7 +105,7 @@ void Car::update(unsigned int elapsedTime) {
 
 	static const float AIR_RESIST = 0.2f;
 	
-	static const float MAX_ANGLE = 44.0f;
+	static const float MAX_ANGLE = 60.0f;
 
 	const float delta = elapsedTime / 1000.0f;
 
@@ -168,18 +183,16 @@ void Car::update(unsigned int elapsedTime) {
 	}
 
 	// rotation
+	driftVector.x = 0; driftVector.y = 0; driftVector.normalize();
+	forceVector.x = 0; forceVector.y = 0; forceVector.normalize();
 		
-	CL_Vec2f accelerationVector;
-	CL_Vec2f forceVector;
-	CL_Vec2f driftVector;
-	
 	const float rad = m_rotation.to_radians();
 
 	accelerationVector.x = cos(rad);
 	accelerationVector.y = sin(rad);
 
 	accelerationVector.normalize();
-	accelerationVector *= ACCEL_SPEED;
+	accelerationVector *= m_speed;
 	
 	if( m_angle < 0.0f ) {
  		forceVector.x = sin(rad);
@@ -187,7 +200,7 @@ void Car::update(unsigned int elapsedTime) {
 	
 		forceVector.normalize();
 		
-		forceVector *= m_speed / tan( 2.0f * -m_angle * 3.14f / 180.0f );
+		forceVector *= tan( -m_angle ) * m_speed / 7.0f;
 		//forceVector *= 10.0;				
 	}
 	else if( m_angle > 0.0f ){
@@ -196,18 +209,18 @@ void Car::update(unsigned int elapsedTime) {
 	
 		forceVector.normalize();
 		
-		forceVector *= m_speed / tan( 2.0f * m_angle * 3.14f / 180.0f );
+		forceVector *= tan( m_angle ) * m_speed / 7.0f;
 		//forceVector *= 10.0;
 	}
 	
 	//poslizg
 	
-	if( forceVector.length() > 16.0f ) {
+	if( forceVector.length() > 20.0f ) {
 		driftVector.x = -forceVector.x;
 		driftVector.y = -forceVector.y;
 		
 		driftVector.normalize();
-		driftVector *= forceVector.length() - 15.0f;
+		driftVector *= forceVector.length() - 20.0f;
 	}
 	
 	if( m_angle != 0.0f )
@@ -215,11 +228,6 @@ void Car::update(unsigned int elapsedTime) {
 	else 
 		m_moveVector = accelerationVector;
 	
-	m_moveVector.normalize();
-	
-	m_moveVector *= m_speed;
-	
-	m_moveVector += driftVector;
 	
 	/*const float rad = m_rotation.to_radians();
 
@@ -242,9 +250,8 @@ void Car::update(unsigned int elapsedTime) {
 	m_position.x += driftVector.x;
 	m_position.y += driftVector.y;
 	
-	Stage::getDebugLayer()->putMessage(CL_String8("rot"),  CL_StringHelp::float_to_local8( forceVector.length() ));
-
 #ifndef NDEBUG
+			Stage::getDebugLayer()->putMessage(CL_String8("force"),  CL_StringHelp::float_to_local8(forceVector.length()));
 			Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));
 			if (m_level != NULL) {
 				Stage::getDebugLayer()->putMessage(CL_String8("resist"), CL_StringHelp::float_to_local8(m_level->getResistance(m_position.x, m_position.y)));

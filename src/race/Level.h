@@ -32,9 +32,15 @@ class Level : public Drawable {
 
 		int getBoundCount() const { return m_bounds.size(); }
 
+		float getResistance(float p_x, float p_y);
+
+		/**
+		 * @return A start position of <code>p_num</code>
+		 */
+		CL_Pointf getStartPosition(int p_num) const;
+
 		void loadFromFile(const CL_String& p_filename);
 
-		float getResistance(float p_x, float p_y);
 
 	private:
 

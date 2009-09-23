@@ -17,6 +17,7 @@ Car::Car(Player *p_player) :
 	m_player(p_player),
 	m_level(NULL),
 	m_sprite(),
+	m_locked(false),
 	m_position(0.0f, 0.0f),
 	m_rotation(0, cl_degrees),
 	m_turn(0.0f),
@@ -135,6 +136,11 @@ void Car::load(CL_GraphicContext &p_gc) {
 }
 
 void Car::update(unsigned int elapsedTime) {
+
+	// don't do anything if car is locked
+	if (m_locked) {
+		return;
+	}
 
 	static const float BRAKE_POWER = 400.0f;
 
@@ -361,4 +367,24 @@ bool Car::resetCheckpoints() {
 	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
 		itor->setPassed(false);
 	}
+}
+
+void Car::setStartPosition(int p_startPosition) {
+	m_position = m_level->getStartPosition(p_startPosition);
+
+	// stop the car!
+	m_rotation = CL_Angle::from_degrees(-90);
+	m_turn = 0;
+	m_acceleration = false;
+	m_brake = false;
+	m_moveVector = CL_Vec2f();
+	accelerationVector = CL_Vec2f();
+	forceVector = CL_Vec2f();
+	driftVector = CL_Vec2f();
+	m_speed = 0.0f;
+	m_angle = 0.0f;
+	m_lap = 1;
+
+	// send the status change to other players
+	m_statusChangeSignal.invoke(*this);
 }

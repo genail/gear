@@ -53,10 +53,27 @@ void Server::slotEventArrived(CL_NetGameConnection *p_netGameConnection, const C
 //	const CL_NetGameEventValue carId(m_connections[p_netGameConnection].m_carId);
 //	p_netGameEvent.add_argument(carId);
 
+	send(p_netGameEvent, p_netGameConnection);
+}
+
+void Server::send(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore) {
 	for (std::map<CL_NetGameConnection*, Player>::iterator itor = m_connections.begin(); itor != m_connections.end(); ++itor) {
-		if ((*itor).first != p_netGameConnection) {
-			(*itor).first->send_event(p_netGameEvent);
+		if (itor->first != p_ignore) {
+			itor->first->send_event(p_event);
 		}
 	}
+}
 
+void Server::prepareRace() {
+
+	int position = 1;
+
+	for (std::map<CL_NetGameConnection*, Player>::iterator itor = m_connections.begin(); itor != m_connections.end(); ++itor) {
+
+		CL_NetGameEvent prepareEvent("prepare_race");
+		const CL_NetGameEventValue positionValue(position++);
+		prepareEvent.add_argument(positionValue);
+
+		itor->first->send_event(prepareEvent);
+	}
 }

@@ -83,7 +83,6 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 		m_blocks = new Block[m_width * m_height];
 
-//		int row = 0;
 
 		for (int i = 0; i < m_height; ++i) {
 			line = readLine(file);
@@ -94,7 +93,6 @@ void Level::loadFromFile(const CL_String& p_filename)
 				m_blocks[m_width * i + j] = Block(decodeBlock(parts[j]), BOX_WIDTH);
 			}
 
-//			++row;
 		}
 
 		// read bounds num
@@ -204,4 +202,42 @@ void Level::addCar(Car *p_car) {
 
 
 	m_cars.push_back(p_car);
+}
+
+CL_Pointf Level::getStartPosition(int p_num) const {
+	// find the start line
+	int startX, startY;
+	bool foundStartLine = false;
+
+	for (int x = 0; x < m_width; ++x) {
+		for (int y = 0; y < m_height; ++y) {
+			// if this is a start/finish line, then add finish line checkpoint
+			if (m_blocks[y * m_width + x].getType() == Block::BT_START_LINE) {
+				startX = x;
+				startY = y;
+				foundStartLine = true;
+				break;
+			}
+		}
+
+		if (foundStartLine) {
+			break;
+		}
+	}
+
+	if (!foundStartLine) {
+		assert(0 && "start line not found");
+	}
+
+	int xOffset;
+
+	if (p_num % 2 == 1) {
+		xOffset = 145;
+	} else {
+		xOffset = 65;
+	}
+
+	int yOffset = p_num * 38;
+
+	return CL_Pointf(startX * BOX_WIDTH + xOffset, startY * BOX_WIDTH + yOffset);
 }

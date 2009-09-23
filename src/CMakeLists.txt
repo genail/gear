@@ -11,6 +11,7 @@ SET(CLIENT_SRCS
     race/Level.cpp
     race/Player.cpp
     race/RaceScene.cpp
+    race/RaceUI.cpp
     race/Viewport.cpp
     network/Client.cpp
 )

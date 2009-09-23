@@ -111,3 +111,9 @@ void Client::slotCarInputChanged(Car &p_car) {
 	m_localPlayer->getCar().prepareStatusEvent(carStatus);
 	m_gameClient.send_event(carStatus);
 }
+
+void Client::eventPrepareRace(const CL_NetGameEvent &p_netGameEvent) {
+	const int position = (int) p_netGameEvent.get_argument(0);
+
+
+}

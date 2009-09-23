@@ -53,6 +53,11 @@ class Car: public Drawable {
 #endif
 		}
 
+		/**
+		 * Sets if car movement should be locked (car won't move).
+		 */
+		void setLocked(bool p_locked);
+
 		void setTurn(float p_value) {
 			m_turn = normalize(p_value);
 #ifndef NDEBUG
@@ -63,6 +68,14 @@ class Car: public Drawable {
 		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
 
 		void setRotation(float p_rotation) { m_rotation.set_degrees(p_rotation); }
+
+		/**
+		 * Sets the car position at selected <code>p_startPosition</code>
+		 * which is a number >= 1.
+		 *
+		 * @param p_startPosition Car start position.
+		 */
+		void setStartPosition(int p_startPosition);
 
 		void update(unsigned int elapsedTime);
 
@@ -78,6 +91,9 @@ class Car: public Drawable {
 
 		/** Car sprite */
 		CL_Sprite m_sprite;
+
+		/** Locked state. If true then car shoudn't move. */
+		bool m_locked;
 
 		/** Central position on map */
 		CL_Pointf m_position;

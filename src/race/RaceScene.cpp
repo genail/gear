@@ -7,7 +7,8 @@
 
 #include "RaceScene.h"
 
-RaceScene::RaceScene(Car *p_localCar, Level *p_level) :
+RaceScene::RaceScene(Car *p_localCar, Level *p_level, RaceUI *p_raceUI) :
+	m_raceUI(p_raceUI),
 	m_localCar(p_localCar),
 	m_level(p_level)
 {
@@ -25,6 +26,8 @@ void RaceScene::draw(CL_GraphicContext &p_gc) {
 
 	m_lapDisplayFont.draw_text(p_gc, Stage::getWidth() - 130, 40, CL_String8("Lap ") + CL_StringHelp::int_to_local8(m_localCar->getLap() + 1));
 
+	m_raceUI->draw(p_gc);
+
 }
 
 void RaceScene::load(CL_GraphicContext &p_gc) {
@@ -38,4 +41,6 @@ void RaceScene::load(CL_GraphicContext &p_gc) {
 	}
 
 	m_level->load(p_gc);
+
+	m_raceUI->load(p_gc);
 }

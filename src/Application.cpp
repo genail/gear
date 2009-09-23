@@ -17,6 +17,7 @@
 #include "race/RaceScene.h"
 #include "race/Player.h"
 #include "Properties.h"
+#include "race/RaceUI.h"
 
 #include "network/Client.h"
 
@@ -89,7 +90,9 @@ int Application::main(const std::vector<CL_String> &args)
 	Car &car = player.getCar();
 	level->addCar(&car);
 
-	RaceScene raceScene(&car, level);
+	RaceUI raceUI;
+
+	RaceScene raceScene(&car, level, &raceUI);
 	raceScene.load(gc);
 
 	raceScene.getViewport().attachTo(&car.getPosition());
@@ -104,6 +107,23 @@ int Application::main(const std::vector<CL_String> &args)
 	{
 		unsigned int delta = CL_System::get_time() - lastTime;
 		lastTime += delta;
+
+		if (keyboard.get_keycode(CL_KEY_1)) {
+			car.setStartPosition(1);
+			raceUI.displayCountdown();
+		}
+
+		if (keyboard.get_keycode(CL_KEY_2)) {
+			car.setStartPosition(2);
+		}
+
+		if (keyboard.get_keycode(CL_KEY_3)) {
+			car.setStartPosition(3);
+		}
+
+		if (keyboard.get_keycode(CL_KEY_4)) {
+			car.setStartPosition(4);
+		}
 
 		if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
 			car.setTurn(-1.0f);

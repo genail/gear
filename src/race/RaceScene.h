@@ -8,14 +8,15 @@
 #ifndef RACESCENE_H_
 #define RACESCENE_H_
 
-#include "graphics/Drawable.h"
-#include "race/Viewport.h"
-#include "race/Level.h"
 #include "race/Car.h"
+#include "race/Level.h"
+#include "race/RaceUI.h"
+#include "race/Viewport.h"
+#include "graphics/Drawable.h"
 
 class RaceScene: public Drawable {
 	public:
-		RaceScene(Car *p_localCar, Level *p_level);
+		RaceScene(Car *p_localCar, Level *p_level, RaceUI *p_raceUI);
 		virtual ~RaceScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
@@ -27,6 +28,9 @@ class RaceScene: public Drawable {
 
 		/** How player sees the scene */
 		Viewport m_viewport;
+
+		/** Race user interface */
+		RaceUI *m_raceUI;
 
 		/** The level */
 		Level *m_level;

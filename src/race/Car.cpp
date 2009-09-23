@@ -54,17 +54,20 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	p_gc.mult_translate(m_position.x, m_position.y);
 
 	// display nickname
-	m_nickDisplayFont.draw_text(p_gc, 0, -20, m_player->getName());
+	const CL_Size nameLabelSize = m_nickDisplayFont.get_text_size(p_gc, m_player->getName());
+	m_nickDisplayFont.draw_text(p_gc, -nameLabelSize.width / 2, -20, m_player->getName());
 
 	p_gc.mult_rotate(m_rotation, 0, 0, 1);
 
 	m_sprite.draw(p_gc, 0, 0);
 	
 #ifndef NDEBUG
-	debugDrawLine(p_gc, 0, 0, forceVector.x, forceVector.y, CL_Colorf::red);
-	debugDrawLine(p_gc, 0, 0, driftVector.x*10, driftVector.y*10, CL_Colorf::green);
-	debugDrawLine(p_gc, 0, 0, accelerationVector.x/10, accelerationVector.y/10, CL_Colorf::blue);
-	debugDrawLine(p_gc, 0, 0, m_moveVector.x/10, m_moveVector.y/10, CL_Colorf::black);
+	if (Properties::getPropertyAsBool("debug.draw_vectors")) {
+		debugDrawLine(p_gc, 0, 0, forceVector.x, forceVector.y, CL_Colorf::red);
+		debugDrawLine(p_gc, 0, 0, driftVector.x*10, driftVector.y*10, CL_Colorf::green);
+		debugDrawLine(p_gc, 0, 0, accelerationVector.x/10, accelerationVector.y/10, CL_Colorf::blue);
+		debugDrawLine(p_gc, 0, 0, m_moveVector.x/10, m_moveVector.y/10, CL_Colorf::black);
+	}
 #endif // NDEBUG
 
 

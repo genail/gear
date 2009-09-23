@@ -40,7 +40,10 @@ int Application::main(const std::vector<CL_String> &args)
 	}
 
 	// set default properties
+#ifndef NDEBUG
 	Properties::setProperty("debug.draw_checkpoints", false);
+	Properties::setProperty("debug.draw_vectors", false);
+#endif //NDEBUG
 
 	// read args properties
 	for (std::vector<CL_String>::const_iterator itor = args.begin(); itor != args.end(); ++itor) {

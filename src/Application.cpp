@@ -146,7 +146,7 @@ int Application::main(const std::vector<CL_String> &args)
 		}
 
 		client.update(delta);
-		car.update(delta);
+//		car.update(delta);
 
 		// Draw some text and lines:
 		gc.clear(CL_Colorf::cadetblue);

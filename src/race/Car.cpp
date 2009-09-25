@@ -6,14 +6,14 @@
  */
 
 #include "race/Car.h"
-#include "race/Level.h"
-#include "race/Player.h"
 #include "Properties.h"
+#include "race/Level.h"
+#include "race/RacePlayer.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
-Car::Car(Player *p_player) :
+Car::Car(RacePlayer *p_player) :
 	m_player(p_player),
 	m_level(NULL),
 	m_sprite(),
@@ -55,8 +55,8 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	p_gc.mult_translate(m_position.x, m_position.y);
 
 	// display nickname
-	const CL_Size nameLabelSize = m_nickDisplayFont.get_text_size(p_gc, m_player->getName());
-	m_nickDisplayFont.draw_text(p_gc, -nameLabelSize.width / 2, -20, m_player->getName());
+	const CL_Size nameLabelSize = m_nickDisplayFont.get_text_size(p_gc, m_player->getPlayer().getName());
+	m_nickDisplayFont.draw_text(p_gc, -nameLabelSize.width / 2, -20, m_player->getPlayer().getName());
 
 	p_gc.mult_rotate(m_rotation, 0, 0, 1);
 

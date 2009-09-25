@@ -7,11 +7,11 @@
 
 #include "RaceScene.h"
 
-RaceScene::RaceScene(Car *p_localCar, Level *p_level, RaceUI *p_raceUI) :
-	m_raceUI(p_raceUI),
-	m_localCar(p_localCar),
+RaceScene::RaceScene(RacePlayer *p_racePlayer, Level *p_level) :
+	m_localPlayer(p_racePlayer),
 	m_level(p_level)
 {
+	m_viewport.attachTo(&p_racePlayer->getCar().getPosition());
 }
 
 RaceScene::~RaceScene() {
@@ -24,9 +24,14 @@ void RaceScene::draw(CL_GraphicContext &p_gc) {
 
 	m_viewport.finalizeGC(p_gc);
 
-	m_lapDisplayFont.draw_text(p_gc, Stage::getWidth() - 130, 40, CL_String8("Lap ") + CL_StringHelp::int_to_local8(m_localCar->getLap() + 1));
+	m_lapDisplayFont.draw_text(
+			p_gc,
+			Stage::getWidth() - 130,
+			40,
+			CL_String8("Lap ") + CL_StringHelp::int_to_local8(m_localPlayer->getCar().getLap() + 1)
+	);
 
-	m_raceUI->draw(p_gc);
+	m_raceUI.draw(p_gc);
 
 }
 
@@ -42,5 +47,5 @@ void RaceScene::load(CL_GraphicContext &p_gc) {
 
 	m_level->load(p_gc);
 
-	m_raceUI->load(p_gc);
+	m_raceUI.load(p_gc);
 }

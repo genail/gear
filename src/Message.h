@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+#include "Debug.h"
+
 class Message {
 	public:
 		virtual ~Message() {}

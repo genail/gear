@@ -35,7 +35,7 @@ void Client::slotConnected() {
 	// And I should introduce myself
 
 	CL_NetGameEventValue nickname(m_player->getName());
-	CL_NetGameEvent hiEvent("general:hi", nickname);
+	CL_NetGameEvent hiEvent(EVENT_HI, nickname);
 
 	m_gameClient.send_event(hiEvent);
 }

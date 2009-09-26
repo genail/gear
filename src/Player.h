@@ -13,6 +13,7 @@
 
 class Player {
 	public:
+		Player() {}
 		Player(const CL_String8 &p_name);
 		virtual ~Player();
 

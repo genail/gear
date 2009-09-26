@@ -11,11 +11,9 @@
 #include "ClanLib/core.h"
 #include "ClanLib/network.h"
 
-class Server {
+#include "Player.h"
 
-		typedef struct {
-				int m_carId;
-		} Player;
+class Server {
 
 	public:
 		Server(int p_port);
@@ -26,14 +24,19 @@ class Server {
 		void update(int p_timeElapsed);
 
 	private:
+		/** ClanLib game server */
 		CL_NetGameServer m_gameServer;
-		CL_SlotContainer m_slots;
 
 		/** List of active connections */
-		std::map<CL_NetGameConnection*, Player> m_connections;
+		std::map<CL_NetGameConnection*, Player*> m_connections;
 
 		/** Next car id */
 		int m_nextCarId;
+
+		/** Slots container */
+		CL_SlotContainer m_slots;
+
+		void reply(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 		/**
 		 * Sends the event to all connected players. You can
@@ -49,7 +52,11 @@ class Server {
 		void slotClientDisconnected(CL_NetGameConnection *p_netGameConnection);
 		void slotEventArrived(CL_NetGameConnection *p_netGameConnection, const CL_NetGameEvent &p_netGameEvent);
 
-		int nextCarId() { return m_nextCarId++; }
+		//
+		// event handlers
+		//
+
+		void handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 };
 
 #endif /* SERVER_H_ */

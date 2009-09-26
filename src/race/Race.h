@@ -45,6 +45,7 @@ class Race {
 		/** Display window */
 		CL_DisplayWindow *m_displayWindow;
 
+		void loadAll();
 		void grabInput(unsigned delta);
 		void updateWorld(unsigned delta);
 		void drawScene(unsigned delta);

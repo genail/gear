@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 
+#include "Debug.h"
 #include "graphics/Stage.h"
 
 Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
@@ -26,7 +27,11 @@ Race::~Race() {
 
 void Race::exec() {
 
-	unsigned int lastTime = CL_System::get_time();
+	m_level.addCar(&m_localPlayer.getCar());
+
+	loadAll();
+
+	unsigned lastTime = CL_System::get_time();
 
 	while (true) { // FIXME: Check when race is finished
 
@@ -38,6 +43,17 @@ void Race::exec() {
 		drawScene(delta);
 
 	}
+}
+
+void Race::loadAll() {
+	Debug::out << "Loading race..." << std::endl;
+	const unsigned start = CL_System::get_time();
+
+	CL_GraphicContext gc = m_displayWindow->get_gc();
+	m_raceScene.load(gc);
+
+	const unsigned duration = CL_System::get_time() - start;
+	Debug::out << "Loaded in " << duration << " ms" << std::endl;
 }
 
 void Race::grabInput(unsigned delta) {
@@ -83,7 +99,7 @@ void Race::updateWorld(unsigned delta) {
 void Race::drawScene(unsigned delta) {
 	CL_GraphicContext gc = m_displayWindow->get_gc();
 
-	gc.clear(CL_Colorf::antiquewhite);
+	gc.clear(CL_Colorf::cadetblue);
 
 	m_raceScene.draw(gc);
 

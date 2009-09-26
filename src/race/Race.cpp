@@ -46,14 +46,14 @@ void Race::exec() {
 }
 
 void Race::loadAll() {
-	Debug::out << "Loading race..." << std::endl;
+	Debug::out() << "Loading race..." << std::endl;
 	const unsigned start = CL_System::get_time();
 
 	CL_GraphicContext gc = m_displayWindow->get_gc();
 	m_raceScene.load(gc);
 
 	const unsigned duration = CL_System::get_time() - start;
-	Debug::out << "Loaded in " << duration << " ms" << std::endl;
+	Debug::out() << "Loaded in " << duration << " ms" << std::endl;
 }
 
 void Race::grabInput(unsigned delta) {

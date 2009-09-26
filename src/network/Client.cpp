@@ -6,6 +6,7 @@
  */
 
 #include "network/Client.h"
+#include "network/Events.h"
 
 #include "Debug.h"
 
@@ -42,7 +43,7 @@ void Client::slotConnected() {
 void Client::slotDisconnected() {
 	// I am disconnected
 	// Is that what I've expected?
-	Debug::out << "Disconnected from server" << std::endl;
+	Debug::out() << "Disconnected from server" << std::endl;
 }
 
 void Client::slotEventReceived(const CL_NetGameEvent &p_netGameEvent) {
@@ -62,7 +63,7 @@ void Client::eventHi(const CL_NetGameEvent &p_netGameEvent) {
 	Player* player = new Player(nickname);
 	m_remotePlayers.push_back(player);
 
-	Debug::out << "Player connected: " << nickname.c_str() << std::endl;
+	Debug::out() << "Player connected: " << nickname.c_str() << std::endl;
 
 	m_signalPlayerConnected.invoke(player);
 

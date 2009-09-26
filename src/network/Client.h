@@ -11,9 +11,9 @@
 #include "ClanLib/core.h"
 #include "ClanLib/network.h"
 
+#include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
-#include "Player.h"
 
 class Client {
 	public:

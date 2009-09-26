@@ -14,13 +14,21 @@ class Debug {
 	public:
 		virtual ~Debug() {}
 
-#ifndef NDEBUG
-		static std::ostream &out;
-		static std::ostream &err;
-#endif // NDEBUG
+		static std::ostream &out() {
+			m_out << "DEBUG: ";
+			return m_out;
+		}
+
+		static std::ostream &err() {
+			m_err << "DEBUG: ";
+			return m_err;
+		}
 
 	private:
 		Debug();
+
+		static std::ostream &m_out;
+		static std::ostream &m_err;
 };
 
 #endif /* DEBUG_H_ */

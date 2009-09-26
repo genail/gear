@@ -7,5 +7,5 @@
 
 #include "Debug.h"
 
-std::ostream &Debug::out(std::cout);
-std::ostream &Debug::err(std::cerr);
+std::ostream &Debug::m_out(std::cout);
+std::ostream &Debug::m_err(std::cerr);

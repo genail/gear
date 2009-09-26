@@ -7,9 +7,12 @@
 
 #include "RaceUI.h"
 
+#include "race/Car.h"
+#include "race/Race.h"
 #include "graphics/Stage.h"
 
-RaceUI::RaceUI() :
+RaceUI::RaceUI(Race *p_race) :
+	m_race(p_race),
 	m_countDownStart(0)
 {
 }
@@ -22,6 +25,16 @@ void RaceUI::displayCountdown() {
 }
 
 void RaceUI::draw(CL_GraphicContext &p_gc) {
+
+	const Car &car = m_race->getLocalPlayer().getCar();
+
+	// draw lap
+	m_lapDisplayFont.draw_text(
+			p_gc,
+			Stage::getWidth() - 130,
+			40,
+			CL_String8("Lap ") + CL_StringHelp::int_to_local8(car.getLap() + 1)
+	);
 
 	if (m_countDownStart != 0) {
 
@@ -67,5 +80,10 @@ void RaceUI::load(CL_GraphicContext &p_gc) {
 	fontDesc.set_height(92);
 
 	m_countdownFont = CL_Font_Freetype(p_gc, fontDesc);
+
+	// load lap display font
+	fontDesc.set_height(28);
+
+	m_lapDisplayFont = CL_Font_Freetype(p_gc, fontDesc);
 
 }

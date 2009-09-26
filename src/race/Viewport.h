@@ -18,11 +18,13 @@ class Viewport {
 		void prepareGC(CL_GraphicContext &p_gc);
 		void finalizeGC(CL_GraphicContext &p_gc);
 
-		void update(unsigned int p_elapsedTime);
-
 		void attachTo(const CL_Pointf* p_point) { m_attachPoint = p_point; }
 
+		float getScale() const { return m_scale; }
+
 		void setScale(float p_scale) { m_scale = p_scale; }
+
+		void update(unsigned int p_elapsedTime);
 
 	private:
 		/** Coordinates of view */

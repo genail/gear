@@ -1,9 +1,14 @@
-# Game client sources
-SET(CLIENT_SRCS
-    Application.cpp
+# Common source files
+SET(COMMON_SRCS
     Debug.cpp
     Player.cpp
     Properties.cpp
+)
+
+# Game client sources
+SET(CLIENT_SRCS
+    ${COMMON_SRCS}
+    Application.cpp
     graphics/DebugLayer.cpp
     graphics/Stage.cpp
     race/Block.cpp
@@ -22,7 +27,7 @@ SET(CLIENT_SRCS
 
 # Server sources
 SET(SERVER_SRCS
-    Properties.cpp
+    ${COMMON_SRCS}
     ServerApplication.cpp
     network/Server.cpp
 )

@@ -15,9 +15,11 @@
 #include "race/RacePlayer.h"
 #include "graphics/Drawable.h"
 
+class Race;
+
 class RaceScene: public Drawable {
 	public:
-		RaceScene(RacePlayer *p_racePlayer, Level *p_level);
+		RaceScene(Race* p_race);
 		virtual ~RaceScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
@@ -27,11 +29,8 @@ class RaceScene: public Drawable {
 
 	private:
 
-		/** Local player */
-		RacePlayer *m_localPlayer;
-
-		/** The level */
-		Level *m_level;
+		/** The Race pointer */
+		Race *m_race;
 
 		/** How player sees the scene */
 		Viewport m_viewport;
@@ -39,8 +38,6 @@ class RaceScene: public Drawable {
 		/** Race user interface */
 		RaceUI m_raceUI;
 
-		/** Lap display font */
-		CL_Font_Freetype m_lapDisplayFont;
 
 };
 

@@ -16,7 +16,7 @@ Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	m_localPlayer(p_player),
 	m_level(),
 	m_raceClient(p_client),
-	m_raceScene(&m_localPlayer, &m_level),
+	m_raceScene(this),
 	m_displayWindow(p_window)
 {
 
@@ -82,6 +82,17 @@ void Race::grabInput(unsigned delta) {
 		car.setBrake(true);
 	} else {
 		car.setBrake(false);
+	}
+
+	// viewport change
+	if (keyboard.get_keycode(CL_KEY_ADD)) {
+		const float scale = m_raceScene.getViewport().getScale();
+		m_raceScene.getViewport().setScale(scale + scale * 0.01f);
+	}
+
+	if (keyboard.get_keycode(CL_KEY_SUBTRACT)) {
+		const float scale = m_raceScene.getViewport().getScale();
+		m_raceScene.getViewport().setScale(scale - scale * 0.01f);
 	}
 }
 

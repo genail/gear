@@ -21,10 +21,12 @@ class Race {
 		Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client);
 		virtual ~Race();
 
+		Level& getLevel() { return m_level; }
+
+		RacePlayer& getLocalPlayer() { return m_localPlayer; }
+
 		/** Executes the race and returns when it ends. */
 		void exec();
-
-		Level& getLevel() { return m_level; }
 
 	private:
 		/** This machine player */

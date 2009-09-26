@@ -70,7 +70,7 @@ int Application::main(const std::vector<CL_String> &args)
 	CL_SetupGL setup_gl;
 
 	// Create a window:
-	CL_DisplayWindow window("Hello World", Stage::getWidth(), Stage::getHeight());
+	CL_DisplayWindow window("The Great Race Game", Stage::getWidth(), Stage::getHeight());
 
 	// Retrieve some commonly used objects:
 //	CL_GraphicContext gc = window.get_gc();

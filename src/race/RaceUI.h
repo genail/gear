@@ -10,9 +10,11 @@
 
 #include "graphics/Drawable.h"
 
+class Race;
+
 class RaceUI: public Drawable {
 	public:
-		RaceUI();
+		RaceUI(Race *p_race);
 		virtual ~RaceUI();
 
 		/**
@@ -26,11 +28,18 @@ class RaceUI: public Drawable {
 		virtual void load(CL_GraphicContext &p_gc);
 
 	private:
+
+		/** The Race pointer */
+		Race *m_race;
+
 		/** Countdown start time. If 0 then countdown didn't start or its already finished */
 		unsigned m_countDownStart;
 
 		/** Countdown font */
 		CL_Font_Freetype m_countdownFont;
+
+		/** Lap display font */
+		CL_Font_Freetype m_lapDisplayFont;
 
 		void drawCountdownLabel(CL_GraphicContext &p_gc, const CL_String &p_label);
 };

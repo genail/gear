@@ -10,7 +10,7 @@
 #include "network/Events.h"
 
 Server::Server(int p_port) :
-	m_nextCarId(1)
+	m_raceServer(this)
 {
 	m_slots.connect(m_gameServer.sig_client_connected(), this, &Server::slotClientConnected);
 	m_slots.connect(m_gameServer.sig_client_disconnected(), this, &Server::slotClientDisconnected);
@@ -32,6 +32,9 @@ void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection) {
 
 	Player *player = new Player();
 	m_connections[p_netGameConnection] = player;
+
+	// emit the signal
+	m_signalPlayerConnected.invoke(p_netGameConnection, player);
 }
 
 void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection) {
@@ -41,7 +44,16 @@ void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection) {
 				 << std::endl;
 
 	std::map<CL_NetGameConnection*, Player*>::iterator itor = m_connections.find(p_netGameConnection);
+
 	if (itor != m_connections.end()) {
+
+		Player* player = itor->second;
+
+		// emit the signal
+		m_signalPlayerDisconnected.invoke(p_netGameConnection, player);
+
+		// cleanup
+		delete player;
 		m_connections.erase(itor);
 	}
 }
@@ -55,7 +67,6 @@ void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGa
 		handleHiEvent(p_connection, p_event);
 	}
 
-//	send(p_event, p_connection);
 }
 
 void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event) {
@@ -68,7 +79,11 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 
 	// check availability
 	bool nameAvailable = true;
-	for (std::map<CL_NetGameConnection*, Player*>::const_iterator itor = m_connections.begin(); itor != m_connections.end(); ++itor) {
+	for (
+		std::map<CL_NetGameConnection*, Player*>::const_iterator itor = m_connections.begin();
+		itor != m_connections.end();
+		++itor
+	) {
 		if (itor->second->getName() == playerName) {
 			nameAvailable = false;
 		}

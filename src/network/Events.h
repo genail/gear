@@ -24,6 +24,6 @@
 //
 // Race events
 //
-#define EVENT_CAR_STATE_CHANGE		"general:car_state_change"
+#define EVENT_CAR_STATE_CHANGE		"race:car_state_change"
 
 #endif /* EVENTS_H_ */

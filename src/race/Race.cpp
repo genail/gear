@@ -131,3 +131,7 @@ void Race::drawScene(unsigned delta) {
 		CL_System::sleep(sleepTime);
 	}
 }
+
+void Race::slotCarStatutChanged(Car &p_car) {
+
+}

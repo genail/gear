@@ -48,9 +48,15 @@ class Race {
 		CL_DisplayWindow *m_displayWindow;
 
 		void loadAll();
+
 		void grabInput(unsigned delta);
+
 		void updateWorld(unsigned delta);
+
 		void drawScene(unsigned delta);
+
+		/** Listen for local car status change */
+		void slotCarStatutChanged(Car &p_car);
 
 };
 

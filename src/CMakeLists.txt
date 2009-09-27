@@ -4,12 +4,6 @@ SET(COMMON_SRCS
     Message.cpp
     Player.cpp
     Properties.cpp
-)
-
-# Game client sources
-SET(CLIENT_SRCS
-    ${COMMON_SRCS}
-    Application.cpp
     graphics/DebugLayer.cpp
     graphics/Stage.cpp
     race/Block.cpp
@@ -17,8 +11,14 @@ SET(CLIENT_SRCS
     race/Car.cpp
     race/Checkpoint.cpp
     race/Level.cpp
-    race/Race.cpp
     race/RacePlayer.cpp
+)
+
+# Game client sources
+SET(CLIENT_SRCS
+    ${COMMON_SRCS}
+    Application.cpp
+    race/Race.cpp
     race/RaceScene.cpp
     race/RaceUI.cpp
     race/Viewport.cpp
@@ -30,6 +30,7 @@ SET(CLIENT_SRCS
 SET(SERVER_SRCS
     ${COMMON_SRCS}
     ServerApplication.cpp
+    network/RaceServer.cpp
     network/Server.cpp
 )
 
@@ -52,6 +53,8 @@ SET(SERVER_LIBS ${LIBS}
     ${ClanLib_App_LIBRARY}
     ${ClanLib_Core_LIBRARY}
     ${ClanLib_Network_LIBRARY}
+    ${ClanLib_Display_LIBRARY} #TODO: try to remove this dependency
+    ${ClanLib_GL_LIBRARY} #TODO: try to remove this dependency
 )
 
 
@@ -64,4 +67,4 @@ SET_TARGET_PROPERTIES(game PROPERTIES LINK_FLAGS "-lz -lfontconfig -lX11 -lXxf86
 # Server configuration
 add_executable(server ${SERVER_SRCS})
 TARGET_LINK_LIBRARIES(server ${SERVER_LIBS})
-SET_TARGET_PROPERTIES(server PROPERTIES LINK_FLAGS "-pthread")
+SET_TARGET_PROPERTIES(server PROPERTIES LINK_FLAGS "-pthread -lfontconfig")

@@ -29,6 +29,10 @@ class Race {
 		void exec();
 
 	private:
+
+		/** Iteration mutex */
+		CL_Mutex m_iterationMutex;
+
 		/** This machine player */
 		RacePlayer m_localPlayer;
 
@@ -36,7 +40,7 @@ class Race {
 		Level m_level;
 
 		/** The race network client */
-		RaceClient m_raceClient;
+		RaceClient *m_raceClient;
 
 		/** The race scene */
 		RaceScene m_raceScene;
@@ -47,16 +51,32 @@ class Race {
 		/** Display window */
 		CL_DisplayWindow *m_displayWindow;
 
-		void loadAll();
+		/** The slots container */
+		CL_SlotContainer m_slots;
 
-		void grabInput(unsigned delta);
-
-		void updateWorld(unsigned delta);
 
 		void drawScene(unsigned delta);
 
-		/** Listen for local car status change */
-		void slotCarStatutChanged(Car &p_car);
+		RacePlayer *findPlayer(const CL_String& p_name);
+
+		void grabInput(unsigned delta);
+
+		void loadAll();
+
+		void updateWorld(unsigned delta);
+
+
+		//
+		// Slots
+		//
+
+		void slotCarStateChangedRemote(const CL_NetGameEvent& p_event);
+
+		void slotCarStateChangedLocal(Car &p_car);
+
+		void slotPlayerReady(Player* p_player);
+
+		void slotPlayerLeaving(Player* p_player);
 
 };
 

@@ -10,10 +10,12 @@
 
 #include <ClanLib/core.h>
 
+
 //
 // General events
 //
 
+#define EVENT_PREFIX_GENERAL		"general"
 
 #define EVENT_HI					"general:hi"
 #define EVENT_PLAYER_CONNECTED 		"general:player_connected"
@@ -24,6 +26,9 @@
 //
 // Race events
 //
+
+#define EVENT_PREFIX_RACE			"race"
+
 #define EVENT_CAR_STATE_CHANGE		"race:car_state_change"
 
 #endif /* EVENTS_H_ */

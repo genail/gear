@@ -17,6 +17,9 @@ Server::Server(int p_port) :
 	m_slots.connect(m_gameServer.sig_event_received(), this, &Server::slotEventArrived);
 
 	m_gameServer.start(CL_StringHelp::int_to_local8(p_port));
+
+	// TESTING
+	m_raceServer.initialize();
 }
 
 Server::~Server() {
@@ -63,9 +66,19 @@ void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGa
 
 	Debug::out() << "Event " << eventName.c_str() << " received" << std::endl;
 
-	if (eventName == EVENT_HI) {
-		handleHiEvent(p_connection, p_event);
+	const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
+
+	if (parts[0] == EVENT_PREFIX_GENERAL) {
+		if (eventName == EVENT_HI) {
+			handleHiEvent(p_connection, p_event);
+			return;
+		}
+	} else if (parts[0] == EVENT_PREFIX_RACE) {
+		m_raceServer.handleEvent(p_connection, p_event);
+		return;
 	}
+
+	Debug::out() << "Event remains unhandled" << std::endl;
 
 }
 
@@ -101,7 +114,7 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 
 		Message::out() << "Player " << (unsigned) p_connection << " is now known as '" << playerName.c_str() << "'" << std::endl;
 
-		// and send others player information to the new one
+		// and send him the list of other players
 		for (std::map<CL_NetGameConnection*, Player*>::const_iterator itor = m_connections.begin(); itor != m_connections.end(); ++itor) {
 			if (itor->first == p_connection) {
 				continue;

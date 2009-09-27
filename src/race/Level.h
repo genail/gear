@@ -28,6 +28,8 @@ class Level : public Drawable {
 
 		void addCar(Car *p_car);
 
+		void removeCar(Car *p_car);
+
 		const Bound& getBound(int p_index) const { return m_bounds[p_index]; }
 
 		int getBoundCount() const { return m_bounds.size(); }

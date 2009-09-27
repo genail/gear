@@ -14,6 +14,7 @@
 #include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
+#include "network/RaceClient.h"
 
 class Client {
 	public:
@@ -23,6 +24,8 @@ class Client {
 		void connect(const CL_String &p_host, int p_port, Player *p_player);
 
 		bool isConnected() const { return m_connected; }
+
+		RaceClient& getRaceClient() { return m_raceClient; }
 
 		//
 		// client signals
@@ -34,14 +37,17 @@ class Client {
 
 
 	private:
-		/** Game client object */
-		CL_NetGameClient m_gameClient;
-
 		/** Connected state */
 		volatile bool m_connected;
 
+		/** Game client object */
+		CL_NetGameClient m_gameClient;
+
 		/** Local player pointer */
 		Player *m_player;
+
+		/** The race client */
+		RaceClient m_raceClient;
 
 		/** Remotely connected players (to server) */
 		std::vector<Player*> m_remotePlayers;
@@ -59,6 +65,9 @@ class Client {
 		/** Player leaved the game */
 		CL_Signal_v1<Player*> m_signalPlayerDisconnected;
 
+
+		void send(const CL_NetGameEvent &p_event);
+
 		//
 		// connection events
 		//
@@ -75,14 +84,20 @@ class Client {
 		// game events receivers
 		//
 
-		/** Player introduces to rest of players */
-		void eventHi(const CL_NetGameEvent &p_netGameEvent);
+		/** New player is connected */
+		void handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent);
+
+		/** Player disconnects */
+		void handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent);
 
 		/** Car status update */
 		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);
 
 		/** Should prepare a race */
 		void eventPrepareRace(const CL_NetGameEvent &p_netGameEvent);
+
+
+		friend class RaceClient;
 
 };
 

@@ -99,5 +99,6 @@ void RaceServer::handleEvent(CL_NetGameConnection *p_connection, const CL_NetGam
 }
 
 void RaceServer::handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event) {
+	Debug::out() << "handling " << p_event.get_name().c_str() << std::endl;
 	m_server->send(p_event, p_connection);
 }

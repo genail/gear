@@ -9,6 +9,7 @@
 #include "race/Level.h"
 #include "race/Player.h"
 #include "Properties.h"
+#include "Message.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
@@ -18,11 +19,11 @@ Car::Car(Player *p_player) :
 	m_level(NULL),
 	m_sprite(),
 	m_locked(false),
-	m_position(0.0f, 0.0f),
-	m_rotation(0, cl_degrees),
-	m_turn(0.0f),
-	m_acceleration(false),
-	m_brake(false),
+	m_position(0.0f, 0.0f), //najnowsza pozycja autka
+	m_rotation(0, cl_degrees), // kąt pod jakim stoi autko
+	m_turn(0.0f), //na boki
+	m_acceleration(false), //do przodu
+	m_brake(false), //do tyłu
 	m_speed(0.0f),
 	m_angle(0.0f),
 	m_inputChecksum(0),
@@ -226,8 +227,6 @@ void Car::update(unsigned int elapsedTime) {
 	}
 
 	// rotation
-	driftVector.x = 0; driftVector.y = 0; driftVector.normalize();
-	forceVector.x = 0; forceVector.y = 0; forceVector.normalize();
 		
 	const float rad = m_rotation.to_radians();
 
@@ -243,8 +242,7 @@ void Car::update(unsigned int elapsedTime) {
 	
 		forceVector.normalize();
 		
-		forceVector *= tan( -m_angle ) * m_speed / 7.0f;
-		//forceVector *= 10.0;				
+		forceVector *= 0.1f * m_speed/7.0f;	
 	}
 	else if( m_angle > 0.0f ){
 		forceVector.x = -sin(rad);
@@ -252,19 +250,11 @@ void Car::update(unsigned int elapsedTime) {
 	
 		forceVector.normalize();
 		
-		forceVector *= tan( m_angle ) * m_speed / 7.0f;
-		//forceVector *= 10.0;
+		forceVector *= 0.1f * m_speed/7.0f;
 	}
 	
-	//poslizg
+	Message::out() << "wartość: " << (tan(60.0f)) << std::endl;
 	
-	if( forceVector.length() > 20.0f ) {
-		driftVector.x = -forceVector.x;
-		driftVector.y = -forceVector.y;
-		
-		driftVector.normalize();
-		driftVector *= forceVector.length() - 20.0f;
-	}
 	
 	if( m_angle != 0.0f )
 		m_moveVector = accelerationVector + forceVector;
@@ -289,9 +279,6 @@ void Car::update(unsigned int elapsedTime) {
 	CL_Vec2f currentMoveVector = m_moveVector * delta;
 	m_position.x += currentMoveVector.x;
 	m_position.y += currentMoveVector.y;
-	
-	m_position.x += driftVector.x;
-	m_position.y += driftVector.y;
 	
 #ifndef NDEBUG
 			Stage::getDebugLayer()->putMessage(CL_String8("force"),  CL_StringHelp::float_to_local8(forceVector.length()));

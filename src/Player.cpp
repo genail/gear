@@ -9,8 +9,7 @@
 #include "race/Car.h"
 
 Player::Player(const CL_String8& p_name) :
-	m_name(p_name),
-	m_car(this)
+	m_name(p_name)
 {
 
 }

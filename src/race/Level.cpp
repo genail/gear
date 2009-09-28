@@ -204,6 +204,21 @@ void Level::addCar(Car *p_car) {
 	m_cars.push_back(p_car);
 }
 
+void Level::removeCar(Car *p_car) {
+	for (
+		std::vector<Car*>::iterator itor = m_cars.begin();
+		itor != m_cars.end();
+		++itor
+	) {
+		if (*itor == p_car) {
+			m_cars.erase(itor);
+			break;
+		}
+	}
+
+	p_car->m_level = NULL;
+}
+
 CL_Pointf Level::getStartPosition(int p_num) const {
 	// find the start line
 	int startX, startY;

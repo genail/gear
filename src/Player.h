@@ -13,20 +13,18 @@
 
 class Player {
 	public:
+		Player() {}
 		Player(const CL_String8 &p_name);
 		virtual ~Player();
 
-		Car& getCar() { return m_car; }
-		const CL_String8 &getName() const { return m_name; }
+		const CL_String &getName() const { return m_name; }
 
-		void setName(const CL_String8 &p_name) { m_name = p_name; }
+		void setName(const CL_String &p_name) { m_name = p_name; }
 
 	private:
 		/** Nickname of this player */
 		CL_String8 m_name;
 
-		/** Player's car */
-		Car m_car;
 };
 
 #endif /* PLAYER_H_ */

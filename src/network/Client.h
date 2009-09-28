@@ -11,46 +11,72 @@
 #include "ClanLib/core.h"
 #include "ClanLib/network.h"
 
+#include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
-#include "race/Player.h"
+#include "network/RaceClient.h"
 
 class Client {
 	public:
-		Client(const CL_String8 &p_host, const int p_port, Player *p_localPlayer, Level *p_level);
+		Client();
 		virtual ~Client();
 
-		void update(int timeElapsed);
+		void connect(const CL_String &p_host, int p_port, Player *p_player);
+
+		bool isConnected() const { return m_connected; }
+
+		RaceClient& getRaceClient() { return m_raceClient; }
+
+		//
+		// client signals
+		//
+
+		CL_Signal_v1<Player*> &signalPlayerConnected() { return m_signalPlayerConnected; }
+
+		CL_Signal_v1<Player*> &signalPlayerDisconnected() { return m_signalPlayerDisconnected; }
+
 
 	private:
+		/** Connected state */
+		volatile bool m_connected;
+
 		/** Game client object */
 		CL_NetGameClient m_gameClient;
 
-		/** Game level */
-		Level *m_level;
-
 		/** Local player pointer */
-		Player *m_localPlayer;
+		Player *m_player;
 
-		/** Remotly connected player */
+		/** The race client */
+		RaceClient m_raceClient;
+
+		/** Remotely connected players (to server) */
 		std::vector<Player*> m_remotePlayers;
-
-		/** Time that passed from last send-events */
-		unsigned m_timeElapsed;
 
 		/** The slot container */
 		CL_SlotContainer m_slots;
 
-		/** Invoked when something changed in car input */
-		void slotCarInputChanged(Car &p_car);
+		//
+		// This class signals
+		//
 
-		Player* getPlayerByName(const CL_String& p_name);
+		/** Player joined the game */
+		CL_Signal_v1<Player*> m_signalPlayerConnected;
+
+		/** Player leaved the game */
+		CL_Signal_v1<Player*> m_signalPlayerDisconnected;
+
+
+		void send(const CL_NetGameEvent &p_event);
 
 		//
 		// connection events
 		//
 
+		/** This client is connected */
 		void slotConnected();
+
+		/** This client has been disconnected */
+		void slotDisconnected();
 
 		void slotEventReceived(const CL_NetGameEvent &p_netGameEvent);
 
@@ -58,14 +84,20 @@ class Client {
 		// game events receivers
 		//
 
-		/** Player introduces to rest of players */
-		void eventHi(const CL_NetGameEvent &p_netGameEvent);
+		/** New player is connected */
+		void handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent);
+
+		/** Player disconnects */
+		void handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent);
 
 		/** Car status update */
 		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);
 
 		/** Should prepare a race */
 		void eventPrepareRace(const CL_NetGameEvent &p_netGameEvent);
+
+
+		friend class RaceClient;
 
 };
 

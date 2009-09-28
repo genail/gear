@@ -16,11 +16,11 @@
 #include <ClanLib/network.h>
 
 class Level;
-class Player;
+class RacePlayer;
 
 class Car: public Drawable {
 	public:
-		Car(Player* p_player);
+		Car(RacePlayer* p_player);
 		virtual ~Car();
 
 		virtual void draw(CL_GraphicContext &p_gc);
@@ -29,7 +29,7 @@ class Car: public Drawable {
 
 		int getLap() const { return m_lap; }
 
-		Player* getPlayer() const { return m_player; }
+		RacePlayer* getPlayer() const { return m_player; }
 
 		const CL_Pointf& getPosition() const { return m_position; }
 
@@ -84,7 +84,7 @@ class Car: public Drawable {
 	private:
 
 		/** Parent player */
-		Player* m_player;
+		RacePlayer* m_player;
 
 		/** Parent level */
 		Level* m_level;

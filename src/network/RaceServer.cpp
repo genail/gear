@@ -110,4 +110,34 @@ void RaceServer::handleCarStateChangeEvent(CL_NetGameConnection *p_connection, c
 void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
 	cl_log_event("handling %1", p_event.to_string());
+
+	// lock cars movement
+	const CL_NetGameEvent lockEvent(EVENT_LOCK_CAR);
+	m_server->sendToAll(lockEvent);
+
+	// set their position
+	std::pair<CL_NetGameConnection*, RacePlayer*> pair;
+
+	int startPositionNum = 1;
+	foreach (pair, m_racePlayers) {
+		Car &car = pair.second->getCar();
+		car.setStartPosition(startPositionNum);
+
+		Player &player = pair.second->getPlayer();
+
+		CL_NetGameEvent startPositionEvent(EVENT_CAR_STATE_CHANGE);
+		startPositionEvent.add_argument(player.getName());
+
+		car.prepareStatusEvent(startPositionEvent);
+
+		CL_NetGameConnection* connection = m_server->getConnectionForPlayer(&player);
+
+		if (connection != NULL) {
+			m_server->send(connection, startPositionEvent);
+		} else {
+			cl_log_event("error", "available RacePlayer not found in Server object");
+		}
+
+		++startPositionNum;
+	}
 }

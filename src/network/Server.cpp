@@ -35,6 +35,8 @@ void Server::update(int p_timeElapsed)
 
 void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection)
 {
+	CL_MutexSection lockSection(&m_lockMutex);
+
 	cl_log_event("network", "Player %1 is connected", (unsigned) p_netGameConnection);
 
 	Player *player = new Player();
@@ -46,6 +48,8 @@ void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection)
 
 void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 {
+	CL_MutexSection lockSection(&m_lockMutex);
+
 	cl_log_event("network", "Player %1 disconnects", m_connections[p_netGameConnection]->getName().empty() ? CL_StringHelp::uint_to_local8((unsigned) p_netGameConnection) : m_connections[p_netGameConnection]->getName());
 
 	std::map<CL_NetGameConnection*, Player*>::iterator itor = m_connections.find(p_netGameConnection);
@@ -79,7 +83,9 @@ void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGa
 			unhandled = true;
 		}
 
-	} else if (parts[0] == EVENT_PREFIX_RACE) {
+	} else if (parts[0] == EVENT_PREFIX_RACE)
+	{
+		CL_MutexSection lockSection(&m_lockMutex);
 		m_raceServer.handleEvent(p_connection, p_event);
 	} else {
 		unhandled = true;
@@ -100,6 +106,8 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 		return;
 	}
 
+	CL_MutexSection lockSection(&m_lockMutex);
+
 	// check availability
 	bool nameAvailable = true;
 	std::pair<CL_NetGameConnection*, Player*> pair;
@@ -111,7 +119,7 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 
 	if (!nameAvailable) {
 		// refuse of nick set
-		reply(p_connection, CL_NetGameEvent(EVENT_PLAYER_NICK_IN_USE));
+		send(p_connection, CL_NetGameEvent(EVENT_PLAYER_NICK_IN_USE));
 
 		cl_log_event("event", "Name '%1' already in use for player '%2'", playerName, (unsigned) p_connection);
 	} else {
@@ -132,19 +140,21 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 
 			CL_NetGameEvent replyEvent(EVENT_PLAYER_CONNECTED, pair.second->getName());
 
-			reply(p_connection, replyEvent);
+			send(p_connection, replyEvent);
 		}
 	}
 }
 
 
-void Server::reply(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+void Server::send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
 	p_connection->send_event(p_event);
 }
 
 void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore)
 {
+	CL_MutexSection lockSection(&m_lockMutex);
+
 	std::pair<CL_NetGameConnection*, Player*> pair;
 	foreach(pair, m_connections) {
 		if (pair.first != p_ignore) {
@@ -153,7 +163,17 @@ void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnectio
 	}
 }
 
-void Server::prepareRace()
+CL_NetGameConnection* Server::getConnectionForPlayer(const Player* player)
 {
+	CL_MutexSection lockSection(&m_lockMutex);
 
+	std::pair<CL_NetGameConnection*, Player*> pair;
+
+	foreach (pair, m_connections) {
+		if (pair.second == player) {
+			return pair.first;
+		}
+	}
+
+	return NULL;
 }

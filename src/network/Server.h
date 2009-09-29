@@ -20,24 +20,25 @@ class Server {
 		Server(int p_port);
 		virtual ~Server();
 
-		void prepareRace();
+		CL_NetGameConnection* getConnectionForPlayer(const Player* player);
 
 		void update(int p_timeElapsed);
 
-		//
 		// Signal accessors
-		//
 
 		CL_Signal_v2<CL_NetGameConnection*, Player*> &signalPlayerConnected() { return m_signalPlayerConnected; }
 
 		CL_Signal_v2<CL_NetGameConnection*, Player*> &signalPlayerDisconnected() { return m_signalPlayerDisconnected; }
 
 	private:
+		/** List of active connections */
+		std::map<CL_NetGameConnection*, Player*> m_connections;
+
 		/** ClanLib game server */
 		CL_NetGameServer m_gameServer;
 
-		/** List of active connections */
-		std::map<CL_NetGameConnection*, Player*> m_connections;
+		/** Modifications mutex */
+		CL_Mutex m_lockMutex;
 
 		/** Race server */
 		RaceServer m_raceServer;
@@ -45,17 +46,15 @@ class Server {
 		/** Slots container */
 		CL_SlotContainer m_slots;
 
-
-
-		void reply(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		//
 		// Signals
-		//
 
 		CL_Signal_v2<CL_NetGameConnection*, Player*> m_signalPlayerConnected;
 
 		CL_Signal_v2<CL_NetGameConnection*, Player*> m_signalPlayerDisconnected;
+
+
+
+		void send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL);
 

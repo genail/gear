@@ -57,15 +57,7 @@ class Server {
 
 		CL_Signal_v2<CL_NetGameConnection*, Player*> m_signalPlayerDisconnected;
 
-		/**
-		 * Sends the event to all connected players. You can
-		 * choose one player that wouldn't receive this event
-		 * by passing <code>p_ignore</code> argument.
-		 *
-		 * @param p_event Event to send forward.
-		 * @param p_ignore Client that wouldn't receive this event. Default: NULL
-		 */
-		void send(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL);
+		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL);
 
 		void slotClientConnected(CL_NetGameConnection *p_netGameConnection);
 

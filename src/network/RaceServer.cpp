@@ -9,7 +9,7 @@
 
 #include <assert.h>
 
-#include "Message.h"
+#include "common.h"
 #include "network/events.h"
 #include "network/Server.h"
 
@@ -20,10 +20,12 @@ RaceServer::RaceServer(Server* p_server) :
 {
 }
 
-RaceServer::~RaceServer() {
+RaceServer::~RaceServer()
+{
 }
 
-void RaceServer::initialize() {
+void RaceServer::initialize()
+{
 	if (m_initialized) {
 		assert(0 && "already initialized");
 	}
@@ -37,36 +39,33 @@ void RaceServer::initialize() {
 
 	RacePlayer* player;
 
-	for (
-		std::map<CL_NetGameConnection*, Player*>::iterator itor = m_server->m_connections.begin();
-		itor != m_server->m_connections.end();
-		++itor
-	) {
-		player = new RacePlayer(itor->second);
-		m_racePlayers[itor->first] = player;
+	std::pair<CL_NetGameConnection*, Player*> pair;
+
+	foreach (pair, m_server->m_connections) {
+		player = new RacePlayer(pair.second);
+		m_racePlayers[pair.first] = player;
 	}
 
 	m_initialized = true;
 }
 
-void RaceServer::destroy() {
+void RaceServer::destroy()
+{
 	if (!m_initialized) {
 		assert(0 && "not initialized");
 	}
 
-	for (
-		std::map<CL_NetGameConnection*, RacePlayer*>::iterator itor = m_racePlayers.begin();
-			itor != m_racePlayers.end();
-			++itor
-	) {
-		delete itor->second;
+	std::pair<CL_NetGameConnection*, RacePlayer*> pair;
+
+	foreach (pair, m_racePlayers) {
+		delete pair.second;
 	}
 
 	m_racePlayers.clear();
 }
 
-void RaceServer::slotPlayerConnected(CL_NetGameConnection *p_connection, Player *p_player) {
-
+void RaceServer::slotPlayerConnected(CL_NetGameConnection *p_connection, Player *p_player)
+{
 	if (!m_initialized) {
 		return;
 	}
@@ -74,8 +73,8 @@ void RaceServer::slotPlayerConnected(CL_NetGameConnection *p_connection, Player 
 	m_racePlayers[p_connection] = new RacePlayer(p_player);
 }
 
-void RaceServer::slotPlayerDisconnected(CL_NetGameConnection *p_connection, Player *p_player) {
-
+void RaceServer::slotPlayerDisconnected(CL_NetGameConnection *p_connection, Player *p_player)
+{
 	if (!m_initialized) {
 		return;
 	}
@@ -88,17 +87,27 @@ void RaceServer::slotPlayerDisconnected(CL_NetGameConnection *p_connection, Play
 	m_racePlayers.erase(itor);
 }
 
-void RaceServer::handleEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event) {
+void RaceServer::handleEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
 	const CL_String eventName = p_event.get_name();
 
 	if (eventName == EVENT_CAR_STATE_CHANGE) {
 		handleCarStateChangeEvent(p_connection, p_event);
+	}  else if (eventName == EVENT_TRIGGER_RACE_START) {
+		handleTriggerRaceStartEvent(p_connection, p_event);
 	} else {
-		Debug::err() << "unhandled event: " << eventName.c_str() << std::endl;
+		cl_log_event("error", "unhandled event: %1", eventName);
 	}
 }
 
-void RaceServer::handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event) {
-	Debug::out() << "handling " << p_event.get_name().c_str() << std::endl;
-	m_server->send(p_event, p_connection);
+void RaceServer::handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
+	cl_log_event("handling %1", p_event.to_string());
+
+	m_server->sendToAll(p_event, p_connection);
+}
+
+void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
+	cl_log_event("handling %1", p_event.to_string());
 }

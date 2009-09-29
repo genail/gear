@@ -30,5 +30,8 @@
 #define EVENT_PREFIX_RACE			"race"
 
 #define EVENT_CAR_STATE_CHANGE		"race:car_state_change"
+#define EVENT_TRIGGER_RACE_START	"race:trigger_race_start"
+#define EVENT_LOCK_CAR				"race:lock_car"
+#define EVENT_UNLOCK_CAR			"race:unlock_car"
 
 #endif /* EVENTS_H_ */

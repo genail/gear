@@ -69,18 +69,25 @@ void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGa
 
 	const CL_String eventName = p_event.get_name();
 	const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
+	bool unhandled = false;
 
 	if (parts[0] == EVENT_PREFIX_GENERAL) {
+
 		if (eventName == EVENT_HI) {
 			handleHiEvent(p_connection, p_event);
-			return;
+		} else {
+			unhandled = true;
 		}
+
 	} else if (parts[0] == EVENT_PREFIX_RACE) {
 		m_raceServer.handleEvent(p_connection, p_event);
-		return;
+	} else {
+		unhandled = true;
 	}
 
-	cl_log_event("event", "Event %1 remains unhandled", p_event.to_string());
+	if (unhandled) {
+		cl_log_event("event", "Event %1 remains unhandled", p_event.to_string());
+	}
 
 }
 
@@ -112,7 +119,7 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 
 		m_connections[p_connection]->setName(playerName);
 
-		send(CL_NetGameEvent(EVENT_PLAYER_CONNECTED, playerName), p_connection);
+		sendToAll(CL_NetGameEvent(EVENT_PLAYER_CONNECTED, playerName), p_connection);
 
 		cl_log_event("event", "Player %1 is now known as '%2'", (unsigned) p_connection, playerName);
 
@@ -130,12 +137,13 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 	}
 }
 
+
 void Server::reply(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
 	p_connection->send_event(p_event);
 }
 
-void Server::send(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore)
+void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore)
 {
 	std::pair<CL_NetGameConnection*, Player*> pair;
 	foreach(pair, m_connections) {

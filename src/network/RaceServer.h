@@ -54,6 +54,8 @@ class RaceServer {
 
 		void handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
+		void handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+
 };
 
 #endif /* RACESERVER_H_ */

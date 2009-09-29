@@ -25,7 +25,7 @@ Car::Car(RacePlayer *p_player) :
 	m_acceleration(false), //do przodu
 	m_brake(false), //do tyłu
 	m_speed(0.0f),
-	m_angle(0.0f),
+	m_angle(0.0f), // kąt zmiany kierunku jazdy
 	m_inputChecksum(0),
 	m_lap(0)
 {
@@ -137,6 +137,8 @@ void Car::load(CL_GraphicContext &p_gc) {
 }
 
 void Car::update(unsigned int elapsedTime) {
+	
+//	Message::out() << m_moveVector << std::endl;
 
 	// don't do anything if car is locked
 	if (m_locked) {
@@ -151,6 +153,8 @@ void Car::update(unsigned int elapsedTime) {
 	static const float AIR_RESIST = 0.2f;
 	
 	static const float MAX_ANGLE = 60.0f;
+	
+	static const float TENACITY = 0.08f;
 
 	const float delta = elapsedTime / 1000.0f;
 
@@ -185,15 +189,10 @@ void Car::update(unsigned int elapsedTime) {
 		}
 	}
 
-	//turning	
-	if( m_turn == -1.0f )
-		m_angle = -MAX_ANGLE;
-	else if( m_turn == 1.0f )
-		m_angle = MAX_ANGLE;
-	else 
-		m_angle = 0.0f;
+	//turning
+	float angle = MAX_ANGLE * m_turn;
 
-	// acceleration
+	// acceleration speed
 
 	if (m_acceleration) {
 		const float speedChange = ACCEL_SPEED * delta;
@@ -227,58 +226,84 @@ void Car::update(unsigned int elapsedTime) {
 	}
 
 	// rotation
-		
-	const float rad = m_rotation.to_radians();
+	
+	const float rad = m_rotation.to_radians(); // kąt autka w radianach
 
+	// wektor prędkości bez uwzględnionej zmiany kierunku
 	accelerationVector.x = cos(rad);
 	accelerationVector.y = sin(rad);
 
 	accelerationVector.normalize();
 	accelerationVector *= m_speed;
 	
-	if( m_angle < 0.0f ) {
- 		forceVector.x = sin(rad);
-		forceVector.y = -cos(rad);
+	CL_Vec2f changeVector; // wektor zmiany kierunku
 	
-		forceVector.normalize();
-		
-		forceVector *= 0.1f * m_speed/7.0f;	
+	if( angle < 0.0f ) { // skręt w jedną stronę
+		// przygotowanie wektora skrętu (zmiany kierunku jazdy)
+ 		changeVector.x = sin(rad);
+		changeVector.y = -cos(rad);
+		changeVector.normalize();
+		changeVector *= tan( -angle ) * m_speed / 7.0f; // modyfikacja siły skrętu
 	}
-	else if( m_angle > 0.0f ){
-		forceVector.x = -sin(rad);
-		forceVector.y = cos(rad);
-	
-		forceVector.normalize();
-		
-		forceVector *= 0.1f * m_speed/7.0f;
+	else if( angle > 0.0f ){ // skręt w drugą stronę, wszystko analogicznie
+		changeVector.x = -sin(rad);
+		changeVector.y = cos(rad);
+		changeVector.normalize();
+		changeVector *= tan( angle ) * m_speed / 7.0f;
 	}
 	
-	Message::out() << "wartość: " << (tan(60.0f)) << std::endl;
+	CL_Vec2f newAccelVector; // nowy, świeżo wyliczony w następnym IFie,
+	// wektor prędkości, zgodnie z którym pojechałoby autko bez poślizgu
+	
+	if( angle != 0.0f ) // sumowanie wektorow: skrętu i prostej jazdy
+		newAccelVector = changeVector + accelerationVector;
+	else // jak nie skręca to ma jechać przed siebie :)
+		newAccelVector = accelerationVector;
+	
+	// wektor o który zostanie przesunięte autko (już z poślizgiem)
+	// tip: m_moveVector ma jeszcze wartość z poprzedniej klatki, więc
+	// niejako mieszamy starą prędkość z nowo wyliczoną prędkością co
+	// daje nam efekt poślizgu (na ciało działa siła która działała na
+	// nie przed chwilą tylko podwpływem nowych sił - nowego kierunku
+	// jazdy, maleje)
+	CL_Vec2f realVector = m_moveVector + ( newAccelVector * TENACITY );
+	realVector.normalize();
+	realVector *= m_speed;
+	
+	m_moveVector = realVector;
 	
 	
-	if( m_angle != 0.0f )
-		m_moveVector = accelerationVector + forceVector;
-	else 
-		m_moveVector = accelerationVector;
+	// update position
+	m_position.x += m_moveVector.x * delta;
+	m_position.y += m_moveVector.y * delta;
 	
 	
-	/*const float rad = m_rotation.to_radians();
-
-	m_moveVector.x = cos(rad);
-	m_moveVector.y = sin(rad);
-
-	m_moveVector.normalize();
-	m_moveVector *= m_speed;
-	*/
-	// movement
-	if( m_angle != 0.0f )
-		m_rotation.set_degrees( atan2( m_moveVector.y, m_moveVector.x ) * 180.0f / 3.14f );
+	// update rotation of car when changing direction
+	if( m_turn != 0.0f ) { // wykonywany jest skręt
 		
-	//m_rotation.normalize();
-
-	CL_Vec2f currentMoveVector = m_moveVector * delta;
-	m_position.x += currentMoveVector.x;
-	m_position.y += currentMoveVector.y;
+		// tworzymy sobie osobne wektory dla rotacji
+		CL_Vec2f rotVector; // wektor rotacji
+		CL_Vec2f changeRotVector; // wektor zmiany rotacji (w danej chwili)
+		
+		rotVector.x = cos(rad);
+		rotVector.y = sin(rad);
+		rotVector.normalize();
+		
+		if( m_turn < 0.0f ) { // skręt w jedną stronę
+			changeRotVector.x = sin(rad);
+			changeRotVector.y = -cos(rad);
+			changeRotVector.normalize();
+			changeRotVector *= 0.04f;
+		}
+		else if ( m_turn > 0.0f ) { // skręt w drugą stronę
+			changeRotVector.x = -sin(rad);
+			changeRotVector.y = cos(rad);
+			changeRotVector.normalize();
+			changeRotVector *= 0.04f;
+		}
+		rotVector += changeRotVector;
+		m_rotation.set_degrees( atan2( rotVector.y, rotVector.x ) * 180.0f / 3.14f );
+	}
 	
 #ifndef NDEBUG
 			Stage::getDebugLayer()->putMessage(CL_String8("force"),  CL_StringHelp::float_to_local8(forceVector.length()));

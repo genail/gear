@@ -140,4 +140,8 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 
 		++startPositionNum;
 	}
+
+	// start countdown to unlock on all clients
+	CL_NetGameEvent countdownEvent(EVENT_START_COUNTDOWN);
+	m_server->sendToAll(countdownEvent);
 }

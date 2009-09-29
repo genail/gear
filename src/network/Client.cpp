@@ -6,7 +6,7 @@
  */
 
 #include "network/Client.h"
-#include "network/Events.h"
+#include "network/events.h"
 
 #include "Debug.h"
 

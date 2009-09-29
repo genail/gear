@@ -10,7 +10,7 @@
 #include <assert.h>
 
 #include "Message.h"
-#include "network/Events.h"
+#include "network/events.h"
 #include "network/Server.h"
 
 RaceServer::RaceServer(Server* p_server) :

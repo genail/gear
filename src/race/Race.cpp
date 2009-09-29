@@ -11,7 +11,7 @@
 
 #include "Message.h"
 #include "graphics/Stage.h"
-#include "network/Events.h"
+#include "network/events.h"
 #include "network/Client.h"
 
 Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :

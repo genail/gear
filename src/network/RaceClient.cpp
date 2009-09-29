@@ -8,7 +8,7 @@
 #include "RaceClient.h"
 
 #include "network/Client.h"
-#include "network/Events.h"
+#include "network/events.h"
 
 RaceClient::RaceClient(Client *p_client) :
 	m_client(p_client)

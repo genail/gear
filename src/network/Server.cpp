@@ -6,8 +6,9 @@
  */
 
 #include "network/Server.h"
-#include "Message.h"
-#include "network/Events.h"
+
+#include "common.h"
+#include "network/events.h"
 
 Server::Server(int p_port) :
 	m_raceServer(this)
@@ -22,16 +23,19 @@ Server::Server(int p_port) :
 	m_raceServer.initialize();
 }
 
-Server::~Server() {
+Server::~Server()
+{
 	m_gameServer.stop();
 }
 
-void Server::update(int p_timeElapsed) {
-	m_gameServer.process_events();
+void Server::update(int p_timeElapsed)
+{
+//	m_gameServer.process_events();
 }
 
-void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection) {
-	Message::out() << "Player " << (unsigned) p_netGameConnection << " is connected" << std::endl;
+void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection)
+{
+	cl_log_event("network", "Player %1 is connected", (unsigned) p_netGameConnection);
 
 	Player *player = new Player();
 	m_connections[p_netGameConnection] = player;
@@ -40,11 +44,9 @@ void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection) {
 	m_signalPlayerConnected.invoke(p_netGameConnection, player);
 }
 
-void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection) {
-	Message::out() << "Player "
-				 << (m_connections[p_netGameConnection]->getName().empty() ? CL_StringHelp::uint_to_local8((unsigned) p_netGameConnection) : m_connections[p_netGameConnection]->getName()).c_str()
-				 << " has disconnected"
-				 << std::endl;
+void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection)
+{
+	cl_log_event("network", "Player %1 disconnects", m_connections[p_netGameConnection]->getName().empty() ? CL_StringHelp::uint_to_local8((unsigned) p_netGameConnection) : m_connections[p_netGameConnection]->getName());
 
 	std::map<CL_NetGameConnection*, Player*>::iterator itor = m_connections.find(p_netGameConnection);
 
@@ -61,10 +63,12 @@ void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection) {
 	}
 }
 
-void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event) {
-	const CL_String eventName = p_event.get_name();
+void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
 
-	Debug::out() << "Event " << eventName.c_str() << " received" << std::endl;
+	cl_log_event("event", "Event %1 arrived", p_event.to_string());
+
+	const CL_String eventName = p_event.get_name();
 
 	const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
 
@@ -78,15 +82,16 @@ void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGa
 		return;
 	}
 
-	Debug::out() << "Event remains unhandled" << std::endl;
+	cl_log_event("event", "Event %1 remains unhandled", p_event.to_string());
 
 }
 
-void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event) {
+void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
 	const CL_String playerName = p_event.get_argument(0);
 
 	if (playerName.empty()) {
-		Message::err() << "Protocol error when handling 'hi' event" << std::endl;
+		cl_log_event("error", "Protocol error while handling %1 event", p_event.to_string());
 		return;
 	}
 
@@ -106,47 +111,42 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 		// refuse of nick set
 		reply(p_connection, CL_NetGameEvent(EVENT_PLAYER_NICK_IN_USE));
 
-		Message::out() << "Name '" << playerName.c_str() << "' already in use for " << (unsigned) p_connection << std::endl;
+		cl_log_event("event", "Name '%1' already in use for player '%2'", playerName, (unsigned) p_connection);
 	} else {
 		// resend player's connection event
 		m_connections[p_connection]->setName(playerName);
 		send(CL_NetGameEvent(EVENT_PLAYER_CONNECTED, playerName), p_connection);
 
-		Message::out() << "Player " << (unsigned) p_connection << " is now known as '" << playerName.c_str() << "'" << std::endl;
+		cl_log_event("event", "Player %1 is now known as '%2'", (unsigned) p_connection, playerName);
 
 		// and send him the list of other players
-		for (std::map<CL_NetGameConnection*, Player*>::const_iterator itor = m_connections.begin(); itor != m_connections.end(); ++itor) {
-			if (itor->first == p_connection) {
+		std::pair<CL_NetGameConnection*, Player*> pair;
+		foreach(pair, m_connections) {
+			if (pair.first == p_connection) {
 				continue;
 			}
 
-			reply(p_connection, CL_NetGameEvent(EVENT_PLAYER_CONNECTED, itor->second->getName()));
+			reply(p_connection, CL_NetGameEvent(EVENT_PLAYER_CONNECTED, pair.second->getName()));
 		}
 	}
 }
 
-void Server::reply(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event) {
+void Server::reply(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
 	p_connection->send_event(p_event);
 }
 
-void Server::send(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore) {
-	for (std::map<CL_NetGameConnection*, Player*>::iterator itor = m_connections.begin(); itor != m_connections.end(); ++itor) {
-		if (itor->first != p_ignore) {
-			itor->first->send_event(p_event);
+void Server::send(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore)
+{
+	std::pair<CL_NetGameConnection*, Player*> pair;
+	foreach(pair, m_connections) {
+		if (pair.first != p_ignore) {
+			pair.first->send_event(p_event);
 		}
 	}
 }
 
-void Server::prepareRace() {
+void Server::prepareRace()
+{
 
-//	int position = 1;
-//
-//	for (std::map<CL_NetGameConnection*, Player>::iterator itor = m_connections.begin(); itor != m_connections.end(); ++itor) {
-//
-//		CL_NetGameEvent prepareEvent("prepare_race");
-//		const CL_NetGameEventValue positionValue(position++);
-//		prepareEvent.add_argument(positionValue);
-//
-//		itor->first->send_event(prepareEvent);
-//	}
 }

@@ -65,11 +65,9 @@ void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 
 void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
-
 	cl_log_event("event", "Event %1 arrived", p_event.to_string());
 
 	const CL_String eventName = p_event.get_name();
-
 	const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
 
 	if (parts[0] == EVENT_PREFIX_GENERAL) {
@@ -97,12 +95,9 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 
 	// check availability
 	bool nameAvailable = true;
-	for (
-		std::map<CL_NetGameConnection*, Player*>::const_iterator itor = m_connections.begin();
-		itor != m_connections.end();
-		++itor
-	) {
-		if (itor->second->getName() == playerName) {
+	std::pair<CL_NetGameConnection*, Player*> pair;
+	foreach (pair, m_connections) {
+		if (pair.second->getName() == playerName) {
 			nameAvailable = false;
 		}
 	}
@@ -114,7 +109,9 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 		cl_log_event("event", "Name '%1' already in use for player '%2'", playerName, (unsigned) p_connection);
 	} else {
 		// resend player's connection event
+
 		m_connections[p_connection]->setName(playerName);
+
 		send(CL_NetGameEvent(EVENT_PLAYER_CONNECTED, playerName), p_connection);
 
 		cl_log_event("event", "Player %1 is now known as '%2'", (unsigned) p_connection, playerName);
@@ -126,7 +123,9 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 				continue;
 			}
 
-			reply(p_connection, CL_NetGameEvent(EVENT_PLAYER_CONNECTED, pair.second->getName()));
+			CL_NetGameEvent replyEvent(EVENT_PLAYER_CONNECTED, pair.second->getName());
+
+			reply(p_connection, replyEvent);
 		}
 	}
 }

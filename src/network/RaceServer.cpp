@@ -102,14 +102,14 @@ void RaceServer::handleEvent(CL_NetGameConnection *p_connection, const CL_NetGam
 
 void RaceServer::handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
-	cl_log_event("handling %1", p_event.to_string());
+	cl_log_event("event", "handling %1", p_event.to_string());
 
 	m_server->sendToAll(p_event, p_connection);
 }
 
 void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
-	cl_log_event("handling %1", p_event.to_string());
+	cl_log_event("event", "handling %1", p_event.to_string());
 
 	// lock cars movement
 	const CL_NetGameEvent lockEvent(EVENT_LOCK_CAR);

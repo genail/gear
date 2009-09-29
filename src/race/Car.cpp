@@ -382,7 +382,12 @@ bool Car::resetCheckpoints() {
 }
 
 void Car::setStartPosition(int p_startPosition) {
-	m_position = m_level->getStartPosition(p_startPosition);
+	if (m_level != NULL) {
+		m_position = m_level->getStartPosition(p_startPosition);
+	} else {
+		cl_log_event("warning", "Car not on Level.");
+		m_position = CL_Pointf(200, 200);
+	}
 
 	// stop the car!
 	m_rotation = CL_Angle::from_degrees(-90);

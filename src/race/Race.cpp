@@ -105,6 +105,7 @@ void Race::grabInput(unsigned delta) {
 		car.setBrake(false);
 	}
 
+#ifndef NDEBUG
 	// viewport change
 	if (keyboard.get_keycode(CL_KEY_ADD)) {
 		const float scale = m_raceScene.getViewport().getScale();
@@ -115,6 +116,13 @@ void Race::grabInput(unsigned delta) {
 		const float scale = m_raceScene.getViewport().getScale();
 		m_raceScene.getViewport().setScale(scale - scale * 0.01f);
 	}
+
+	// trigger race start
+	if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
+		m_raceClient->triggerRaceStart();
+	}
+
+#endif
 }
 
 void Race::updateWorld(unsigned delta) {

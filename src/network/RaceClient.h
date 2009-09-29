@@ -23,6 +23,8 @@ class RaceClient {
 
 		void sendCarStateEvent(const CL_NetGameEvent &p_event);
 
+		void triggerRaceStart();
+
 		//
 		// Signals
 		//

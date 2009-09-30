@@ -70,6 +70,8 @@ int Application::main(const std::vector<CL_String> &args)
 	CL_SetupGL setup_gl;
 	CL_SetupNetwork setup_network;
 
+	CL_ConsoleLogger logger;
+
 	// Create a window:
 	CL_DisplayWindow window("The Great Race Game", Stage::getWidth(), Stage::getHeight());
 

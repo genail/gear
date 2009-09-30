@@ -25,6 +25,8 @@ class RaceScene: public Drawable {
 		virtual void draw(CL_GraphicContext &p_gc);
 		virtual void load(CL_GraphicContext &p_gc);
 
+		RaceUI& getUI() { return m_raceUI; }
+
 		Viewport& getViewport() { return m_viewport; }
 
 	private:

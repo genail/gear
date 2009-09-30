@@ -17,6 +17,7 @@
 Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	m_localPlayer(p_player),
 	m_level(),
+	m_inputLock(false),
 	m_raceClient(&p_client->getRaceClient()),
 	m_raceScene(this),
 	m_displayWindow(p_window)
@@ -25,16 +26,25 @@ Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	m_slots.connect(m_localPlayer.getCar().sigStatusChange(), this, &Race::slotCarStateChangedLocal);
 	// and for remote car status change
 	m_slots.connect(m_raceClient->signalCarStateReceived(), this, &Race::slotCarStateChangedRemote);
+	// race start countdown
+	m_slots.connect(m_raceClient->signalStartCountdown(), this, &Race::slotStartCountdown);
+	// countdown ends
+	m_raceStartTimer.func_expired().set(this, &Race::slotCountdownEnds);
+	// car lock
+	m_slots.connect(m_raceClient->signalLockCar(), this, &Race::slotInputLock);
 
 	// player join
 	m_slots.connect(p_client->signalPlayerConnected(), this, &Race::slotPlayerReady);
+	// player leave
 	m_slots.connect(p_client->signalPlayerDisconnected(), this, &Race::slotPlayerLeaving);
 }
 
-Race::~Race() {
+Race::~Race()
+{
 }
 
-void Race::exec() {
+void Race::exec()
+{
 
 	m_level.addCar(&m_localPlayer.getCar());
 
@@ -66,7 +76,8 @@ void Race::exec() {
 	}
 }
 
-void Race::loadAll() {
+void Race::loadAll()
+{
 	Debug::out() << "Loading race..." << std::endl;
 	const unsigned start = CL_System::get_time();
 
@@ -77,7 +88,8 @@ void Race::loadAll() {
 	Debug::out() << "Loaded in " << duration << " ms" << std::endl;
 }
 
-void Race::grabInput(unsigned delta) {
+void Race::grabInput(unsigned delta)
+{
 	CL_InputDevice keyboard = m_displayWindow->get_ic().get_keyboard();
 	Car &car = m_localPlayer.getCar();
 
@@ -85,24 +97,26 @@ void Race::grabInput(unsigned delta) {
 		exit(0); // TODO: Find better way to exit the race
 	}
 
-	if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
-		car.setTurn(-1.0f);
-	} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
-		car.setTurn(1.0f);
-	} else {
-		car.setTurn(0.0f);
-	}
+	if (!m_inputLock) {
+		if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
+			car.setTurn(-1.0f);
+		} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
+			car.setTurn(1.0f);
+		} else {
+			car.setTurn(0.0f);
+		}
 
-	if (keyboard.get_keycode(CL_KEY_UP)) {
-		car.setAcceleration(true);
-	} else {
-		car.setAcceleration(false);
-	}
+		if (keyboard.get_keycode(CL_KEY_UP)) {
+			car.setAcceleration(true);
+		} else {
+			car.setAcceleration(false);
+		}
 
-	if (keyboard.get_keycode(CL_KEY_DOWN)) {
-		car.setBrake(true);
-	} else {
-		car.setBrake(false);
+		if (keyboard.get_keycode(CL_KEY_DOWN)) {
+			car.setBrake(true);
+		} else {
+			car.setBrake(false);
+		}
 	}
 
 #ifndef NDEBUG
@@ -125,7 +139,8 @@ void Race::grabInput(unsigned delta) {
 #endif
 }
 
-void Race::updateWorld(unsigned delta) {
+void Race::updateWorld(unsigned delta)
+{
 	// update all cars
 	m_localPlayer.getCar().update(delta);
 
@@ -136,7 +151,8 @@ void Race::updateWorld(unsigned delta) {
 	}
 }
 
-void Race::drawScene(unsigned delta) {
+void Race::drawScene(unsigned delta)
+{
 	CL_GraphicContext gc = m_displayWindow->get_gc();
 
 	gc.clear(CL_Colorf::cadetblue);
@@ -153,25 +169,34 @@ void Race::drawScene(unsigned delta) {
 	CL_KeepAlive::process();
 }
 
-void Race::slotCarStateChangedRemote(const CL_NetGameEvent& p_event) {
+void Race::slotCarStateChangedRemote(const CL_NetGameEvent& p_event)
+{
 
 	Debug::out() << "handling " << p_event.get_name().c_str() << std::endl;
 
 	// first argument will be name of player
 	const CL_String name = (CL_String) p_event.get_argument(0);
 
-	RacePlayer *racePlayer = findPlayer(name);
+	if (name.size() == 0) {
+		// this is about me!
+		cl_log_event("event", "setting myself to start position");
+		m_localPlayer.getCar().applyStatusEvent(p_event, 1);
+	} else {
+		// remote player state
+		RacePlayer *racePlayer = findPlayer(name);
 
-	if (racePlayer == NULL) {
-		Debug::err() << "remote player '" << name.c_str() << "' not found" << std::endl;
-		return;
+		if (racePlayer == NULL) {
+			Debug::err() << "remote player '" << name.c_str() << "' not found" << std::endl;
+			return;
+		}
+
+		Car &car = racePlayer->getCar();
+		car.applyStatusEvent(p_event, 1);
 	}
-
-	Car &car = racePlayer->getCar();
-	car.applyStatusEvent(p_event, 1);
 }
 
-RacePlayer *Race::findPlayer(const CL_String& p_name) {
+RacePlayer *Race::findPlayer(const CL_String& p_name)
+{
 	const size_t remotePlayersSize = m_remotePlayers.size();
 
 	for (size_t i = 0; i < remotePlayersSize; ++i) {
@@ -183,14 +208,16 @@ RacePlayer *Race::findPlayer(const CL_String& p_name) {
 	return NULL;
 }
 
-void Race::slotCarStateChangedLocal(Car &p_car) {
+void Race::slotCarStateChangedLocal(Car &p_car)
+{
 	CL_NetGameEvent event(EVENT_CAR_STATE_CHANGE, m_localPlayer.getPlayer().getName());
 	p_car.prepareStatusEvent(event);
 
 	m_raceClient->sendCarStateEvent(event);
 }
 
-void Race::slotPlayerReady(Player* p_player) {
+void Race::slotPlayerReady(Player* p_player)
+{
 
 	Debug::out() << "Player '" << p_player->getName().c_str() << "' has arrived" << std::endl;
 
@@ -204,7 +231,8 @@ void Race::slotPlayerReady(Player* p_player) {
 	m_iterationMutex.unlock();
 }
 
-void Race::slotPlayerLeaving(Player* p_player) {
+void Race::slotPlayerLeaving(Player* p_player)
+{
 
 	Debug::out() << "Player '" << p_player->getName().c_str() << "' is leaving" << std::endl;
 
@@ -226,4 +254,24 @@ void Race::slotPlayerLeaving(Player* p_player) {
 	}
 
 	m_iterationMutex.unlock();
+}
+
+void Race::slotStartCountdown()
+{
+	cl_log_event("race", "starting countdown...");
+
+	static const unsigned RACE_START_COUNTDOWN_TIME = 3000;
+
+	m_raceStartTimer.start(RACE_START_COUNTDOWN_TIME, false);
+	m_raceScene.getUI().displayCountdown();
+}
+
+void Race::slotCountdownEnds()
+{
+	m_inputLock = false;
+}
+
+void Race::slotInputLock()
+{
+	m_inputLock = true;
 }

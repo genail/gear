@@ -126,7 +126,7 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 		Player &player = pair.second->getPlayer();
 
 		CL_NetGameEvent startPositionEvent(EVENT_CAR_STATE_CHANGE);
-		startPositionEvent.add_argument(player.getName());
+		startPositionEvent.add_argument(""); // self player
 
 		car.prepareStatusEvent(startPositionEvent);
 

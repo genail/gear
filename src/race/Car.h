@@ -34,6 +34,8 @@ class Car: public Drawable {
 		const CL_Pointf& getPosition() const { return m_position; }
 
 		float getRotation() const { return m_rotation.to_degrees(); }
+		
+		float getSpeed() const { return m_speed; }
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);
 

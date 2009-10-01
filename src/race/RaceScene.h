@@ -30,6 +30,8 @@ class RaceScene: public Drawable {
 		Viewport& getViewport() { return m_viewport; }
 
 	private:
+		void updateScale();
+		float oldSpeed;
 
 		/** The Race pointer */
 		Race *m_race;

@@ -28,6 +28,9 @@ class RaceServer {
 		/** Is this server initialized */
 		bool m_initialized;
 
+		/** Number of laps in this race */
+		int m_lapsNum;
+
 		/** All race players */
 		std::map<CL_NetGameConnection*, RacePlayer*> m_racePlayers;
 

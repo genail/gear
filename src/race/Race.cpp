@@ -15,6 +15,7 @@
 #include "network/Client.h"
 
 Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
+	m_lapsNum(0),
 	m_localPlayer(p_player),
 	m_level(),
 	m_inputLock(false),
@@ -32,11 +33,14 @@ Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	m_raceStartTimer.func_expired().set(this, &Race::slotCountdownEnds);
 	// car lock
 	m_slots.connect(m_raceClient->signalLockCar(), this, &Race::slotInputLock);
+	// race state
+	m_slots.connect(m_raceClient->signalRaceStateChanged(), this, &Race::slotRaceStateChanged);
 
 	// player join
 	m_slots.connect(p_client->signalPlayerConnected(), this, &Race::slotPlayerReady);
 	// player leave
 	m_slots.connect(p_client->signalPlayerDisconnected(), this, &Race::slotPlayerLeaving);
+
 }
 
 Race::~Race()
@@ -133,7 +137,7 @@ void Race::grabInput(unsigned delta)
 
 	// trigger race start
 	if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
-		m_raceClient->triggerRaceStart();
+		m_raceClient->triggerRaceStart(3);
 	}
 
 #endif
@@ -274,4 +278,10 @@ void Race::slotCountdownEnds()
 void Race::slotInputLock()
 {
 	m_inputLock = true;
+}
+
+void Race::slotRaceStateChanged(int p_lapsNum)
+{
+	m_lapsNum = p_lapsNum;
+	m_localPlayer.getCar().setLap(1);
 }

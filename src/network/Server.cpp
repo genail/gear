@@ -71,28 +71,32 @@ void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGa
 {
 	cl_log_event("event", "Event %1 arrived", p_event.to_string());
 
-	const CL_String eventName = p_event.get_name();
-	const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
-	bool unhandled = false;
+	try {
+		const CL_String eventName = p_event.get_name();
+		const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
+		bool unhandled = false;
 
-	if (parts[0] == EVENT_PREFIX_GENERAL) {
+		if (parts[0] == EVENT_PREFIX_GENERAL) {
 
-		if (eventName == EVENT_HI) {
-			handleHiEvent(p_connection, p_event);
+			if (eventName == EVENT_HI) {
+				handleHiEvent(p_connection, p_event);
+			} else {
+				unhandled = true;
+			}
+
+		} else if (parts[0] == EVENT_PREFIX_RACE)
+		{
+			CL_MutexSection lockSection(&m_lockMutex);
+			m_raceServer.handleEvent(p_connection, p_event);
 		} else {
 			unhandled = true;
 		}
 
-	} else if (parts[0] == EVENT_PREFIX_RACE)
-	{
-		CL_MutexSection lockSection(&m_lockMutex);
-		m_raceServer.handleEvent(p_connection, p_event);
-	} else {
-		unhandled = true;
-	}
-
-	if (unhandled) {
-		cl_log_event("event", "Event %1 remains unhandled", p_event.to_string());
+		if (unhandled) {
+			cl_log_event("event", "Event %1 remains unhandled", p_event.to_string());
+		}
+	} catch (CL_Exception e) {
+		cl_log_event("exception", e.message);
 	}
 
 }

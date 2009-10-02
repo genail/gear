@@ -21,6 +21,8 @@ class Race {
 		Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client);
 		virtual ~Race();
 
+		int getLapsNum() const { return m_lapsNum; }
+
 		Level& getLevel() { return m_level; }
 
 		RacePlayer& getLocalPlayer() { return m_localPlayer; }
@@ -35,6 +37,9 @@ class Race {
 
 		/** Iteration mutex */
 		CL_Mutex m_iterationMutex;
+
+		/** Number of laps */
+		int m_lapsNum;
 
 		/** This machine player */
 		RacePlayer m_localPlayer;
@@ -87,6 +92,8 @@ class Race {
 		void slotPlayerReady(Player* p_player);
 
 		void slotPlayerLeaving(Player* p_player);
+
+		void slotRaceStateChanged(int p_lapsNum);
 
 		void slotStartCountdown();
 

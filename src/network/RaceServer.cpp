@@ -8,6 +8,7 @@
 #include "network/RaceServer.h"
 
 #include <assert.h>
+#include <limits.h>
 
 #include "common.h"
 #include "network/events.h"
@@ -15,6 +16,7 @@
 
 RaceServer::RaceServer(Server* p_server) :
 	m_initialized(false),
+	m_lapsNum(INT_MAX),
 	m_server(p_server),
 	m_slotsConnected(false)
 {
@@ -89,6 +91,7 @@ void RaceServer::slotPlayerDisconnected(CL_NetGameConnection *p_connection, Play
 
 void RaceServer::handleEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
+
 	const CL_String eventName = p_event.get_name();
 
 	if (eventName == EVENT_CAR_STATE_CHANGE) {
@@ -98,18 +101,37 @@ void RaceServer::handleEvent(CL_NetGameConnection *p_connection, const CL_NetGam
 	} else {
 		cl_log_event("error", "unhandled event: %1", eventName);
 	}
+
 }
 
 void RaceServer::handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
 	cl_log_event("event", "handling %1", p_event.to_string());
 
+	// apply state to local race player
+	RacePlayer* player = m_racePlayers[p_connection];
+	Car& car = player->getCar();
+
+	car.applyStatusEvent(p_event, 1);
+
+	// send the info to others
 	m_server->sendToAll(p_event, p_connection);
+
+	// check finished state
+	if (!player->isFinished()) {
+		car.getLap() > m_lapsNum;
+
+		// send finished event
+		const CL_NetGameEvent finishedEvent(EVENT_PLAYER_FINISHED, player->getPlayer().getName());
+		m_server->sendToAll(finishedEvent);
+	}
 }
 
 void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
 	cl_log_event("event", "handling %1", p_event.to_string());
+
+	const int lapsNum = (int) p_event.get_argument(0);
 
 	// lock cars movement
 	const CL_NetGameEvent lockEvent(EVENT_LOCK_CAR);
@@ -140,6 +162,13 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 
 		++startPositionNum;
 	}
+
+	// set the laps number
+	m_lapsNum = lapsNum;
+
+	// send the information about this race
+	const CL_NetGameEvent raceState(EVENT_RACE_STATE, lapsNum);
+	m_server->sendToAll(raceState);
 
 	// start countdown to unlock on all clients
 	CL_NetGameEvent countdownEvent(EVENT_START_COUNTDOWN);

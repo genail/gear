@@ -55,6 +55,8 @@ class Car: public Drawable {
 #endif
 		}
 
+		void setLap(int p_lap) { m_lap = p_lap; }
+
 		/**
 		 * Sets if car movement should be locked (car won't move).
 		 */

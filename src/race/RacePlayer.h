@@ -20,12 +20,20 @@ class RacePlayer {
 
 		Player& getPlayer() { return *m_player; }
 
+		bool isFinished() const { return m_finished; }
+
+		bool setFinished(bool p_finished) { m_finished = p_finished; }
+
 	private:
-		/** Base player */
-		Player* m_player;
+
+		/** Finished state */
+		bool m_finished;
 
 		/** The car */
 		Car m_car;
+
+		/** Base player */
+		Player* m_player;
 };
 
 #endif /* RACEPLAYER_H_ */

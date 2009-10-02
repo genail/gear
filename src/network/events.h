@@ -33,5 +33,7 @@
 #define EVENT_TRIGGER_RACE_START	"race:trigger_race_start"
 #define EVENT_LOCK_CAR				"race:lock_car"
 #define EVENT_START_COUNTDOWN		"race:start_countdown"
+#define EVENT_RACE_STATE			"race:race_state"
+#define EVENT_PLAYER_FINISHED		"race:player_finished"
 
 #endif /* EVENTS_H_ */

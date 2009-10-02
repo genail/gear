@@ -119,11 +119,13 @@ void RaceServer::handleCarStateChangeEvent(CL_NetGameConnection *p_connection, c
 
 	// check finished state
 	if (!player->isFinished()) {
-		car.getLap() > m_lapsNum;
+		if (car.getLap() > m_lapsNum) {
+			player->setFinished(true);
 
-		// send finished event
-		const CL_NetGameEvent finishedEvent(EVENT_PLAYER_FINISHED, player->getPlayer().getName());
-		m_server->sendToAll(finishedEvent);
+			// send finished event
+			const CL_NetGameEvent finishedEvent(EVENT_PLAYER_FINISHED, player->getPlayer().getName());
+			m_server->sendToAll(finishedEvent);
+		}
 	}
 }
 

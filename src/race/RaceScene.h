@@ -13,6 +13,7 @@
 #include "race/RaceUI.h"
 #include "race/Viewport.h"
 #include "race/RacePlayer.h"
+#include "race/TyreStripes.h"
 #include "graphics/Drawable.h"
 
 class Race;
@@ -29,9 +30,14 @@ class RaceScene: public Drawable {
 
 		Viewport& getViewport() { return m_viewport; }
 
+		void update(unsigned timeElapsed);
+
 	private:
 		void updateScale();
 		float oldSpeed;
+
+		/** Last drift car position. If null, then no drift was doing last time. */
+		CL_Pointf m_lastDriftPoint;
 
 		/** The Race pointer */
 		Race *m_race;
@@ -41,6 +47,9 @@ class RaceScene: public Drawable {
 
 		/** Race user interface */
 		RaceUI m_raceUI;
+
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
 
 
 };

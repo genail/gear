@@ -21,6 +21,7 @@ SET(CLIENT_SRCS
     race/Race.cpp
     race/RaceScene.cpp
     race/RaceUI.cpp
+    race/TyreStripes.cpp
     race/Viewport.cpp
     network/Client.cpp
     network/RaceClient.cpp

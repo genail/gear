@@ -27,6 +27,8 @@ void RaceScene::draw(CL_GraphicContext &p_gc) {
 
 	m_race->getLevel().draw(p_gc);
 
+	m_tyreStripes.draw(p_gc);
+
 	m_viewport.finalizeGC(p_gc);
 
 	m_raceUI.draw(p_gc);
@@ -62,4 +64,23 @@ void RaceScene::updateScale() {
 #ifndef NDEBUG
 	Stage::getDebugLayer()->putMessage(CL_String8("scale"),  CL_StringHelp::float_to_local8(scale));
 #endif
+}
+
+void RaceScene::update(unsigned timeElapsed) {
+	// FIXME: ceplus: move updateScene() to this method
+
+	const Car &car = m_race->getLocalPlayer().getCar();
+	const CL_Pointf &carPosition = car.getPosition();
+
+	if (car.isDrifting()) {
+		if (m_lastDriftPoint.x != 0 && m_lastDriftPoint.y != 0) {
+			m_tyreStripes.add(m_lastDriftPoint, carPosition);
+		}
+
+		m_lastDriftPoint.x = carPosition.x;
+		m_lastDriftPoint.y = carPosition.y;
+	} else {
+		m_lastDriftPoint.x = 0;
+		m_lastDriftPoint.y = 0;
+	}
 }

@@ -153,6 +153,9 @@ void Race::updateWorld(unsigned delta)
 	for (size_t i = 0; i < remotePlayersSize; ++i) {
 		m_remotePlayers[i]->getCar().update(delta);
 	}
+
+	// update race scene
+	m_raceScene.update(delta);
 }
 
 void Race::drawScene(unsigned delta)

@@ -35,6 +35,8 @@ class Car: public Drawable {
 
 		float getRotation() const { return m_rotation.to_degrees(); }
 		
+		float getRotationRad() const { return m_rotation.to_radians(); }
+
 		float getSpeed() const { return m_speed; }
 
 		bool isDrifting() const { return m_turn != 0.0f; } // FIXME: ryba: must be true only when drifting

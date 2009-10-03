@@ -21,6 +21,8 @@ class Race {
 		Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client);
 		virtual ~Race();
 
+		int getLapsNum() const { return m_lapsNum; }
+
 		Level& getLevel() { return m_level; }
 
 		RacePlayer& getLocalPlayer() { return m_localPlayer; }
@@ -30,8 +32,14 @@ class Race {
 
 	private:
 
+		/** Display window */
+		CL_DisplayWindow *m_displayWindow;
+
 		/** Iteration mutex */
 		CL_Mutex m_iterationMutex;
+
+		/** Number of laps */
+		int m_lapsNum;
 
 		/** This machine player */
 		RacePlayer m_localPlayer;
@@ -39,17 +47,20 @@ class Race {
 		/** The level */
 		Level m_level;
 
+		/** Input lock */
+		bool m_inputLock;
+
 		/** The race network client */
 		RaceClient *m_raceClient;
 
 		/** The race scene */
 		RaceScene m_raceScene;
 
+		/** Race start timer */
+		CL_Timer m_raceStartTimer;
+
 		/** Players connected remotely */
 		std::vector<RacePlayer*> m_remotePlayers;
-
-		/** Display window */
-		CL_DisplayWindow *m_displayWindow;
 
 		/** The slots container */
 		CL_SlotContainer m_slots;
@@ -74,9 +85,17 @@ class Race {
 
 		void slotCarStateChangedLocal(Car &p_car);
 
+		void slotCountdownEnds();
+
+		void slotInputLock();
+
 		void slotPlayerReady(Player* p_player);
 
 		void slotPlayerLeaving(Player* p_player);
+
+		void slotRaceStateChanged(int p_lapsNum);
+
+		void slotStartCountdown();
 
 };
 

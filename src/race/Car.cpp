@@ -331,18 +331,20 @@ int Car::prepareStatusEvent(CL_NetGameEvent &p_event) {
 	CL_NetGameEventValue moveX(m_moveVector.x);
 	CL_NetGameEventValue moveY(m_moveVector.y);
 	CL_NetGameEventValue speed(m_speed);
+	CL_NetGameEventValue lap(m_lap);
 
 	int c = 0;
 
-	p_event.add_argument(posX);     ++c;
-	p_event.add_argument(posY);     ++c;
-	p_event.add_argument(rotation); ++c;
-	p_event.add_argument(turn);     ++c;
-	p_event.add_argument(accel);    ++c;
-	p_event.add_argument(brake);    ++c;
-	p_event.add_argument(moveX);    ++c;
-	p_event.add_argument(moveY);    ++c;
-	p_event.add_argument(speed);    ++c;
+	p_event.add_argument(posX);		++c;
+	p_event.add_argument(posY);		++c;
+	p_event.add_argument(rotation);	++c;
+	p_event.add_argument(turn);		++c;
+	p_event.add_argument(accel);	++c;
+	p_event.add_argument(brake);	++c;
+	p_event.add_argument(moveX);	++c;
+	p_event.add_argument(moveY);	++c;
+	p_event.add_argument(speed);	++c;
+	p_event.add_argument(lap);		++c;
 
 	return c;
 }
@@ -359,6 +361,7 @@ int Car::applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex) {
 	m_moveVector.x = (float) p_event.get_argument(i++);
 	m_moveVector.y = (float) p_event.get_argument(i++);
 	m_speed =        (float) p_event.get_argument(i++);
+	m_lap =            (int) p_event.get_argument(i++);
 
 	return i;
 }
@@ -389,7 +392,12 @@ bool Car::resetCheckpoints() {
 }
 
 void Car::setStartPosition(int p_startPosition) {
-	m_position = m_level->getStartPosition(p_startPosition);
+	if (m_level != NULL) {
+		m_position = m_level->getStartPosition(p_startPosition);
+	} else {
+		cl_log_event("warning", "Car not on Level.");
+		m_position = CL_Pointf(200, 200);
+	}
 
 	// stop the car!
 	m_rotation = CL_Angle::from_degrees(-90);

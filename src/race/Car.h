@@ -34,6 +34,8 @@ class Car: public Drawable {
 		const CL_Pointf& getPosition() const { return m_position; }
 
 		float getRotation() const { return m_rotation.to_degrees(); }
+		
+		float getSpeed() const { return m_speed; }
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);
 
@@ -52,6 +54,8 @@ class Car: public Drawable {
 			Stage::getDebugLayer()->putMessage(CL_String8("brake"),  CL_StringHelp::bool_to_local8(p_value));
 #endif
 		}
+
+		void setLap(int p_lap) { m_lap = p_lap; }
 
 		/**
 		 * Sets if car movement should be locked (car won't move).

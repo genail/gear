@@ -14,7 +14,7 @@ Viewport::Viewport() :
 	m_width(Stage::getWidth()),
 	m_height(Stage::getHeight()),
 	m_attachPoint(NULL),
-	m_scale(1.0f)
+	m_scale(2.0f)
 {
 }
 

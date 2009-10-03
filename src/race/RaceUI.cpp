@@ -27,14 +27,19 @@ void RaceUI::displayCountdown() {
 void RaceUI::draw(CL_GraphicContext &p_gc) {
 
 	const Car &car = m_race->getLocalPlayer().getCar();
+	const CL_String currentLapStr = CL_StringHelp::int_to_local8(car.getLap());
+	const CL_String lapsNumStr = CL_StringHelp::int_to_local8(m_race->getLapsNum());
 
 	// draw lap
+
 	m_lapDisplayFont.draw_text(
 			p_gc,
 			Stage::getWidth() - 130,
 			40,
-			CL_String8("Lap ") + CL_StringHelp::int_to_local8(car.getLap() + 1)
+			CL_String8("Lap ") + currentLapStr + " / " + lapsNumStr
 	);
+
+	CL_String8:;
 
 	if (m_countDownStart != 0) {
 

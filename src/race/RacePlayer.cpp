@@ -8,8 +8,10 @@
 #include "RacePlayer.h"
 
 RacePlayer::RacePlayer(Player *p_player) :
-	m_player(p_player),
-	m_car(this)
+	m_finished(false),
+	m_car(this),
+	m_player(p_player)
+
 {
 }
 

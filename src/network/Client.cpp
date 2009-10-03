@@ -6,7 +6,7 @@
  */
 
 #include "network/Client.h"
-#include "network/Events.h"
+#include "network/events.h"
 
 #include "Debug.h"
 
@@ -47,27 +47,31 @@ void Client::slotDisconnected() {
 	Debug::out() << "Disconnected from server" << std::endl;
 }
 
-void Client::slotEventReceived(const CL_NetGameEvent &p_netGameEvent) {
-	const CL_String eventName = p_netGameEvent.get_name();
+void Client::slotEventReceived(const CL_NetGameEvent &p_netGameEvent)
+{
+	cl_log_event("event", "Event %1 arrived", p_netGameEvent.to_string());
 
-	Debug::out() << "event received: " << eventName.c_str() << std::endl;
+	try {
+		const CL_String eventName = p_netGameEvent.get_name();
+		const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
 
-	const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
-
-	if (parts[0] == EVENT_PREFIX_GENERAL) {
-		if (eventName == EVENT_PLAYER_CONNECTED) {
-			handlePlayerConnectedEvent(p_netGameEvent);
+		if (parts[0] == EVENT_PREFIX_GENERAL) {
+			if (eventName == EVENT_PLAYER_CONNECTED) {
+				handlePlayerConnectedEvent(p_netGameEvent);
+				return;
+			} else if (eventName == EVENT_PLAYER_DISCONNECTED) {
+				handlePlayerDisconnectedEvent(p_netGameEvent);
+				return;
+			}
+		} else if (parts[0] == EVENT_PREFIX_RACE) {
+			m_raceClient.handleEvent(p_netGameEvent);
 			return;
-		} else if (eventName == EVENT_PLAYER_DISCONNECTED) {
-			handlePlayerDisconnectedEvent(p_netGameEvent);
-			return;
+		} else {
+			cl_log_event("error", "Event %1 remains unhandled", p_netGameEvent.to_string());
 		}
-	} else if (parts[0] == EVENT_PREFIX_RACE) {
-		m_raceClient.handleEvent(p_netGameEvent);
-		return;
+	} catch (CL_Exception e) {
+		cl_log_event("exception", e.message);
 	}
-
-	Debug::out() << "Event remains unhandled" << std::endl;
 
 }
 

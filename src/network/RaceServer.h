@@ -28,6 +28,9 @@ class RaceServer {
 		/** Is this server initialized */
 		bool m_initialized;
 
+		/** Number of laps in this race */
+		int m_lapsNum;
+
 		/** All race players */
 		std::map<CL_NetGameConnection*, RacePlayer*> m_racePlayers;
 
@@ -53,6 +56,8 @@ class RaceServer {
 		//
 
 		void handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+
+		void handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 };
 

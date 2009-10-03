@@ -82,7 +82,7 @@ class Car: public Drawable {
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
 	private:
-
+		
 		/** Parent player */
 		RacePlayer* m_player;
 

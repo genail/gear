@@ -137,24 +137,22 @@ void Car::load(CL_GraphicContext &p_gc) {
 }
 
 void Car::update(unsigned int elapsedTime) {
-	
-//	Message::out() << m_moveVector << std::endl;
 
 	// don't do anything if car is locked
 	if (m_locked) {
 		return;
 	}
 
-	static const float BRAKE_POWER = 400.0f;
+	static const float BRAKE_POWER = 100.0f;
 
-	static const float ACCEL_SPEED = 300.0f;
+	static const float ACCEL_SPEED = 200.0f;
 	static const float MAX_SPEED = 500.0f;
 
 	static const float AIR_RESIST = 0.2f;
 	
-	static const float MAX_ANGLE = 60.0f;
+	static const float MAX_ANGLE = 50.0f;
 	
-	static const float TENACITY = 0.08f;
+	static const float TENACITY = 0.07f;
 
 	const float delta = elapsedTime / 1000.0f;
 
@@ -217,7 +215,7 @@ void Car::update(unsigned int elapsedTime) {
 	}
 
 	// air resistance
-	m_speed -= delta * AIR_RESIST * m_speed;
+		m_speed -= delta * AIR_RESIST * m_speed;
 	
 	// ground resistance
 	if (m_level != NULL) {
@@ -243,13 +241,13 @@ void Car::update(unsigned int elapsedTime) {
  		changeVector.x = sin(rad);
 		changeVector.y = -cos(rad);
 		changeVector.normalize();
-		changeVector *= tan( -angle ) * m_speed / 7.0f; // modyfikacja siły skrętu
+		changeVector *= tan( -angle ) * fabs(m_speed) / 7.0f; // modyfikacja siły skrętu
 	}
 	else if( angle > 0.0f ){ // skręt w drugą stronę, wszystko analogicznie
 		changeVector.x = -sin(rad);
 		changeVector.y = cos(rad);
 		changeVector.normalize();
-		changeVector *= tan( angle ) * m_speed / 7.0f;
+		changeVector *= tan( angle ) * fabs(m_speed) / 7.0f;
 	}
 	
 	CL_Vec2f newAccelVector; // nowy, świeżo wyliczony w następnym IFie,
@@ -264,18 +262,27 @@ void Car::update(unsigned int elapsedTime) {
 	// tip: m_moveVector ma jeszcze wartość z poprzedniej klatki, więc
 	// niejako mieszamy starą prędkość z nowo wyliczoną prędkością co
 	// daje nam efekt poślizgu (na ciało działa siła która działała na
-	// nie przed chwilą tylko podwpływem nowych sił - nowego kierunku
+	// nie przed chwilą tylko pod wpływem nowych sił - nowego kierunku
 	// jazdy, maleje)
-	CL_Vec2f realVector = m_moveVector + ( newAccelVector * TENACITY );
-	realVector.normalize();
-	realVector *= m_speed;
-	
-	m_moveVector = realVector;
+		CL_Vec2f realVector = m_moveVector + ( newAccelVector * TENACITY );
+		realVector.normalize();
+		realVector *= fabs(m_speed);
+		m_moveVector = realVector;
+		if( newAccelVector.angle(m_moveVector).to_degrees() >= 179.0f ) {
+			m_moveVector = newAccelVector;
+		}
+		
+		
 	
 	
 	// update position
 	m_position.x += m_moveVector.x * delta;
 	m_position.y += m_moveVector.y * delta;
+	
+	
+	
+	
+	
 	
 	
 	// update rotation of car when changing direction

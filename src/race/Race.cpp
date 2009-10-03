@@ -143,22 +143,25 @@ void Race::grabInput(unsigned delta)
 #endif
 }
 
-void Race::updateWorld(unsigned delta)
+void Race::updateWorld(unsigned p_delta)
 {
 	// update all cars
-	m_localPlayer.getCar().update(delta);
+	m_localPlayer.getCar().update(p_delta);
 
 	const size_t remotePlayersSize = m_remotePlayers.size();
 
 	for (size_t i = 0; i < remotePlayersSize; ++i) {
-		m_remotePlayers[i]->getCar().update(delta);
+		m_remotePlayers[i]->getCar().update(p_delta);
 	}
 
+	// update the level
+	m_level.update(p_delta);
+
 	// update race scene
-	m_raceScene.update(delta);
+	m_raceScene.update(p_delta);
 }
 
-void Race::drawScene(unsigned delta)
+void Race::drawScene(unsigned p_delta)
 {
 	CL_GraphicContext gc = m_displayWindow->get_gc();
 

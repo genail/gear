@@ -15,6 +15,7 @@
 #include "race/Car.h"
 #include "race/Block.h"
 #include "race/Bound.h"
+#include "race/TyreStripes.h"
 
 class Level : public Drawable {
 	public:
@@ -27,8 +28,6 @@ class Level : public Drawable {
 
 
 		void addCar(Car *p_car);
-
-		void removeCar(Car *p_car);
 
 		const Bound& getBound(int p_index) const { return m_bounds[p_index]; }
 
@@ -43,20 +42,31 @@ class Level : public Drawable {
 
 		void loadFromFile(const CL_String& p_filename);
 
+		void removeCar(Car *p_car);
+
+		void update(unsigned p_timeElapsed);
+
 
 	private:
-
-		/** level size */
-		int m_width, m_height;
 
 		/** level blocks */
 		Block *m_blocks;
 
+		/** Level bounds */
+		std::vector<Bound> m_bounds;
+
 		/** All cars */
 		std::vector<Car*> m_cars;
 
-		/** Level bounds */
-		std::vector<Bound> m_bounds;
+		/** Car's last drift points */
+		std::map<Car*, CL_Pointf> m_carsDriftPoints;
+
+		/** level size */
+		int m_width, m_height;
+
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
+
 
 		Level(const Level& p_level);
 

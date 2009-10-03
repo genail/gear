@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <ClanLib/display.h>
 
+#include "common.h"
 #include "graphics/Stage.h"
 #include "race/Checkpoint.h"
 
@@ -31,6 +32,7 @@ Level::~Level() {
 
 void Level::draw(CL_GraphicContext &p_gc) {
 
+	// draw tiles
 	for (int x = 0; x < 10; ++x) {
 		for (int y = 0; y < 10; ++y) {
 			p_gc.push_translate(x * BOX_WIDTH, y * BOX_WIDTH);
@@ -41,7 +43,10 @@ void Level::draw(CL_GraphicContext &p_gc) {
 		}
 	}
 
+	// draw tyre stripes
+	m_tyreStripes.draw(p_gc);
 
+	// draw cars
 	for (std::vector<Car*>::iterator itor = m_cars.begin(); itor != m_cars.end(); ++itor) {
 		(*itor)->draw(p_gc);
 	}
@@ -202,6 +207,7 @@ void Level::addCar(Car *p_car) {
 
 
 	m_cars.push_back(p_car);
+	m_carsDriftPoints[p_car] = CL_Pointf();
 }
 
 void Level::removeCar(Car *p_car) {
@@ -217,6 +223,7 @@ void Level::removeCar(Car *p_car) {
 	}
 
 	p_car->m_level = NULL;
+	m_carsDriftPoints.erase(m_carsDriftPoints.find(p_car));
 }
 
 CL_Pointf Level::getStartPosition(int p_num) const {
@@ -256,3 +263,55 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 
 	return CL_Pointf(startX * BOX_WIDTH + xOffset, startY * BOX_WIDTH + yOffset);
 }
+
+void Level::update(unsigned p_timeElapsed)
+{
+#ifndef NO_TYRE_STRIPES
+	foreach (Car* car, m_cars) {
+
+		CL_Pointf& lastDriftPoint = m_carsDriftPoints[car];
+
+		const CL_Pointf &carPosition = car->getPosition();
+
+		if (car->isDrifting()) {
+			if (lastDriftPoint.x != 0 && lastDriftPoint.y != 0) {
+
+				static const float tyreRadius = 10.0f;
+				CL_Angle carAngle(car->getRotationRad(), cl_radians);
+
+				CL_Vec2f v;
+				float rad;
+
+				for (int i = 0; i < 4; ++i) {
+					carAngle += CL_Angle(i == 0 ? 45 : 90, cl_degrees);
+
+					rad = carAngle.to_radians();
+
+					v.x = cos(rad);
+					v.y = sin(rad);
+
+					v.normalize();
+
+					v *= tyreRadius;
+
+					CL_Pointf stripePoint1(lastDriftPoint), stripePoint2(carPosition);
+
+					stripePoint1 += v;
+					stripePoint2 += v;
+
+					m_tyreStripes.add(stripePoint1, stripePoint2);
+				}
+
+
+			}
+
+			lastDriftPoint.x = carPosition.x;
+			lastDriftPoint.y = carPosition.y;
+		} else {
+			lastDriftPoint.x = 0;
+			lastDriftPoint.y = 0;
+		}
+	}
+#endif //NO_TYRE_STRIPES
+}
+

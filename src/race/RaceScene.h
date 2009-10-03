@@ -13,7 +13,6 @@
 #include "race/RaceUI.h"
 #include "race/Viewport.h"
 #include "race/RacePlayer.h"
-#include "race/TyreStripes.h"
 #include "graphics/Drawable.h"
 
 class Race;
@@ -48,8 +47,7 @@ class RaceScene: public Drawable {
 		/** Race user interface */
 		RaceUI m_raceUI;
 
-		/** Tyre stripes */
-		TyreStripes m_tyreStripes;
+
 
 
 };

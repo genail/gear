@@ -8,16 +8,14 @@
 #include "TyreStripes.h"
 
 #include "common.h"
+#include "graphics/Stage.h"
 
 TyreStripes::TyreStripes()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 TyreStripes::~TyreStripes()
 {
-	// TODO Auto-generated destructor stub
 }
 
 void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to)
@@ -37,4 +35,6 @@ void TyreStripes::draw(CL_GraphicContext &p_gc)
 	foreach (const Stripe& stripe,  m_stripes) {
 		CL_Draw::line(p_gc, stripe.m_from, stripe.m_to, color);
 	}
+
+	Stage::getDebugLayer()->putMessage("stripes_num", CL_StringHelp::int_to_local8(m_stripes.size()));
 }

@@ -40,6 +40,11 @@ void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection)
 	Player *player = new Player();
 	m_connections[p_netGameConnection] = player;
 
+	// if this is first player, then it grants the permission
+	if (m_connections.size() == 1) {
+		m_permitedConnection = p_netGameConnection;
+	}
+
 	// emit the signal
 	m_signalPlayerConnected.invoke(p_netGameConnection, player);
 }

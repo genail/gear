@@ -27,7 +27,8 @@ Car::Car(RacePlayer *p_player) :
 	m_speed(0.0f),
 	m_angle(0.0f), // kąt zmiany kierunku jazdy
 	m_inputChecksum(0),
-	m_lap(0)
+	m_lap(0),
+	m_handbrake(false)
 {
 
 }
@@ -139,34 +140,34 @@ void Car::load(CL_GraphicContext &p_gc) {
 void Car::update(unsigned int elapsedTime) {
 	
 	Message::out()<<elapsedTime<<std::endl;
-
+	
 	// don't do anything if car is locked
 	if (m_locked) {
 		return;
 	}
-
+	
 	static const float BRAKE_POWER = 100.0f;
-
+	
 	static const float ACCEL_SPEED = 200.0f;
 	static const float MAX_SPEED = 500.0f;
-
+	
 	static const float AIR_RESIST = 0.2f;
 	
 	static const float MAX_ANGLE = 50.0f;
 	
 	static const float TENACITY = 0.09f;
-
+	
 	const float delta = elapsedTime / 1000.0f;
-
+	
 	// calculate input checksum and if its different than last one, then
 	// invoke the signal
 	const int inputChecksum = calculateInputChecksum();
-
+	
 	if (inputChecksum != m_inputChecksum) {
 		m_statusChangeSignal.invoke(*this);
 		m_inputChecksum = inputChecksum;
 	}
-
+	
 	// mark checkpoints
 	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
 
@@ -178,7 +179,7 @@ void Car::update(unsigned int elapsedTime) {
 			itor->setPassed(true);
 		}
 	}
-
+	
 	// check lap progress
 	if (areAllCheckpointsPassed()) {
 		// check for last lap checkpoint
@@ -188,10 +189,10 @@ void Car::update(unsigned int elapsedTime) {
 			resetCheckpoints();
 		}
 	}
-
+	
 	//turning
 	float angle = MAX_ANGLE * m_turn;
-
+	
 	// acceleration speed
 	if (m_acceleration) {
 		const float speedChange = ACCEL_SPEED * delta;
@@ -203,7 +204,7 @@ void Car::update(unsigned int elapsedTime) {
 		}
 
 	}
-
+	
 	// brake
 	if (m_brake) {
 		const float speedChange = BRAKE_POWER * delta;
@@ -214,7 +215,12 @@ void Car::update(unsigned int elapsedTime) {
 			m_speed = -MAX_SPEED / 2;
 		}
 	}
-
+	
+	// handbrake
+	if (m_handbrake) {
+		m_speed /= 3;
+	}
+	
 	// air resistance
 		m_speed -= delta * AIR_RESIST * m_speed;
 	
@@ -272,19 +278,11 @@ void Car::update(unsigned int elapsedTime) {
 		if( newAccelVector.angle(m_moveVector).to_degrees() >= 179.0f ) {
 			m_moveVector = newAccelVector;
 		}
-		
-		
 	
 	
 	// update position
 	m_position.x += m_moveVector.x * delta;
 	m_position.y += m_moveVector.y * delta;
-	
-	
-	
-	
-	
-	
 	
 	// update rotation of car when changing direction
 	if( m_turn != 0.0f ) { // wykonywany jest skręt
@@ -309,6 +307,7 @@ void Car::update(unsigned int elapsedTime) {
 			changeRotVector.normalize();
 			changeRotVector *= 2.4f * delta;
 		}
+		
 		rotVector += changeRotVector;
 		m_rotation.set_degrees( atan2( rotVector.y, rotVector.x ) * 180.0f / 3.14f );
 	}

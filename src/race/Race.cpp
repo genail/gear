@@ -215,7 +215,7 @@ void Race::slotCarStateChangedRemote(const CL_NetGameEvent& p_event)
 	// first argument will be name of player
 	const CL_String name = (CL_String) p_event.get_argument(0);
 
-	if (name.size() == 0) {
+	if (name == m_localPlayer.getPlayer().getName()) {
 		// this is about me!
 		cl_log_event("event", "setting myself to start position");
 		m_localPlayer.getCar().applyStatusEvent(p_event, 1);

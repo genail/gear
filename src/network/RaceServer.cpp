@@ -171,17 +171,18 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 		Player &player = pair.second->getPlayer();
 
 		CL_NetGameEvent startPositionEvent(EVENT_CAR_STATE_CHANGE);
-		startPositionEvent.add_argument(""); // self player
+		startPositionEvent.add_argument(player.getName()); // self player
 
 		car.prepareStatusEvent(startPositionEvent);
 
 		CL_NetGameConnection* connection = m_server->getConnectionForPlayer(&player);
 
 		if (connection != NULL) {
-			m_server->send(connection, startPositionEvent);
+			m_server->sendToAll(startPositionEvent);
 		} else {
 			cl_log_event("error", "available RacePlayer not found in Server object");
 		}
+
 
 		++startPositionNum;
 	}

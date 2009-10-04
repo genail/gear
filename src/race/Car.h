@@ -76,6 +76,8 @@ class Car: public Drawable {
 		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
 
 		void setRotation(float p_rotation) { m_rotation.set_degrees(p_rotation); }
+		
+		void setHandbrake(bool p_handbrake) { m_handbrake = p_handbrake; }
 
 		/**
 		 * Sets the car position at selected <code>p_startPosition</code>
@@ -117,6 +119,9 @@ class Car: public Drawable {
 
 		/** Brake switch */
 		bool m_brake;
+		
+		/** Handbrake switch */
+		bool m_handbrake;
 
 		/** Move vector */
 		CL_Vec2f m_moveVector;

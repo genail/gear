@@ -139,8 +139,6 @@ void Car::load(CL_GraphicContext &p_gc) {
 
 void Car::update(unsigned int elapsedTime) {
 	
-	Message::out()<<elapsedTime<<std::endl;
-	
 	// don't do anything if car is locked
 	if (m_locked) {
 		return;
@@ -214,11 +212,6 @@ void Car::update(unsigned int elapsedTime) {
 		if (m_speed < -MAX_SPEED / 2) {
 			m_speed = -MAX_SPEED / 2;
 		}
-	}
-	
-	// handbrake
-	if (m_handbrake) {
-		m_speed /= 3;
 	}
 	
 	// air resistance

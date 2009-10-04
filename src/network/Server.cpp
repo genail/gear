@@ -153,11 +153,7 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 			send(p_connection, replyEvent);
 		}
 
-		// if race is initialized, then send him the init event
-		if (m_raceServer.isInitialized()) {
-			CL_NetGameEvent raceInitEvent(EVENT_INIT_RACE, m_raceServer.getLevelName());
-			send(p_connection, raceInitEvent);
-		}
+
 	}
 }
 
@@ -196,25 +192,33 @@ CL_NetGameConnection* Server::getConnectionForPlayer(const Player* player)
 
 void Server::handleInitRaceEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
-	if (!isPermitted(p_connection)) {
-		const CL_String &playerName = m_connections[p_connection]->getName();
-		cl_log_event("perm", "Player %1 is not permitted to init the race", playerName);
-	}
-
-	const CL_String levelName = (CL_String) p_event.get_argument(0);
-
-	// if race is initialized, then destroy it now
+	// if race is initialized, then send him the init event
 	if (m_raceServer.isInitialized()) {
-		m_raceServer.destroy();
+		CL_NetGameEvent raceInitEvent(EVENT_INIT_RACE, m_raceServer.getLevelName());
+		send(p_connection, raceInitEvent);
+
+		return;
 	}
 
-	cl_log_event("event", "Initializing the race on level %1", levelName);
+	if (isPermitted(p_connection)) {
+		const CL_String levelName = (CL_String) p_event.get_argument(0);
 
-	// initialize the level
-	m_raceServer.initialize(levelName);
+		// if race is initialized, then destroy it now
+		if (m_raceServer.isInitialized()) {
+			m_raceServer.destroy();
+		}
 
-	// send init race event to all players
-	sendToAll(p_event);
+		cl_log_event("event", "Initializing the race on level %1", levelName);
+
+		// initialize the level
+		m_raceServer.initialize(levelName);
+
+		// send init race event to all players
+		sendToAll(p_event);
+	} else {
+		cl_log_event("error", "Race is not initialized, and player %1 is not allowed to do this", m_connections[p_connection]->getName());
+	}
+
 }
 
 void Server::handleGrantEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)

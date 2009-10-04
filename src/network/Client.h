@@ -25,6 +25,10 @@ class Client {
 
 		bool isConnected() const { return m_connected; }
 
+		Player* getPlayer(int p_index) { return m_remotePlayers[p_index]; }
+
+		int getPlayersCount() const { return m_remotePlayers.size(); }
+
 		RaceClient& getRaceClient() { return m_raceClient; }
 
 		//

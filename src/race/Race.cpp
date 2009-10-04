@@ -44,6 +44,13 @@ Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	// player leave
 	m_slots.connect(p_client->signalPlayerDisconnected(), this, &Race::slotPlayerLeaving);
 
+	// add all players
+	const int playersCount = p_client->getPlayersCount();
+
+	for (int i = 0; i < playersCount; ++i) {
+		slotPlayerReady(p_client->getPlayer(i));
+	}
+
 }
 
 Race::~Race()
@@ -98,6 +105,7 @@ void Race::exec()
 
 		if (sleepTime > 0) {
 			CL_System::sleep(sleepTime);
+			CL_KeepAlive::process();
 		}
 
 	}

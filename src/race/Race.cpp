@@ -121,6 +121,12 @@ void Race::grabInput(unsigned delta)
 		} else {
 			car.setBrake(false);
 		}
+
+		if (keyboard.get_keycode(CL_KEY_SPACE)) {
+			car.setHandbrake(true);
+		} else {
+			car.setHandbrake(false);
+		}
 	}
 
 #ifndef NDEBUG

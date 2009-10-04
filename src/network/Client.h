@@ -31,6 +31,8 @@ class Client {
 		// client signals
 		//
 
+		CL_Signal_v1<const CL_String&> &signalInitRace() { return m_signalInitRace; }
+
 		CL_Signal_v1<Player*> &signalPlayerConnected() { return m_signalPlayerConnected; }
 
 		CL_Signal_v1<Player*> &signalPlayerDisconnected() { return m_signalPlayerDisconnected; }
@@ -59,6 +61,9 @@ class Client {
 		// This class signals
 		//
 
+		/** Race initialize event received */
+		CL_Signal_v1<const CL_String&> m_signalInitRace;
+
 		/** Player joined the game */
 		CL_Signal_v1<Player*> m_signalPlayerConnected;
 
@@ -83,6 +88,9 @@ class Client {
 		//
 		// game events receivers
 		//
+
+		/** Race is initialized on server side */
+		void handleInitRaceEvent(const CL_NetGameEvent &p_event);
 
 		/** New player is connected */
 		void handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent);

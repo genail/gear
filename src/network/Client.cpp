@@ -21,7 +21,12 @@ Client::Client() :
 
 void Client::connect(const CL_String &p_host, int p_port, Player *p_player) {
 	m_player = p_player;
-	m_gameClient.connect(p_host, CL_StringHelp::int_to_local8(p_port));
+
+	const CL_String port = CL_StringHelp::int_to_local8(p_port);
+
+	cl_log_event("network", "Connecting to %1:%2", p_host, port);
+
+	m_gameClient.connect(p_host, port);
 }
 
 Client::~Client() {
@@ -32,8 +37,13 @@ Client::~Client() {
 }
 
 void Client::slotConnected() {
+
+	m_connected = true;
+
 	// I am connected
 	// And I should introduce myself
+
+	cl_log_event("network", "Connected, introducing myself");
 
 	CL_NetGameEventValue nickname(m_player->getName());
 	CL_NetGameEvent hiEvent(EVENT_HI, nickname);
@@ -45,30 +55,42 @@ void Client::slotDisconnected() {
 	// I am disconnected
 	// Is that what I've expected?
 	Debug::out() << "Disconnected from server" << std::endl;
+
+	m_connected = false;
 }
 
-void Client::slotEventReceived(const CL_NetGameEvent &p_netGameEvent)
+void Client::slotEventReceived(const CL_NetGameEvent &p_event)
 {
-	cl_log_event("event", "Event %1 arrived", p_netGameEvent.to_string());
+	cl_log_event("event", "Event %1 arrived", p_event.to_string());
 
 	try {
-		const CL_String eventName = p_netGameEvent.get_name();
+		const CL_String eventName = p_event.get_name();
 		const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
+
+		bool unhandled = false;
 
 		if (parts[0] == EVENT_PREFIX_GENERAL) {
 			if (eventName == EVENT_PLAYER_CONNECTED) {
-				handlePlayerConnectedEvent(p_netGameEvent);
+				handlePlayerConnectedEvent(p_event);
 				return;
 			} else if (eventName == EVENT_PLAYER_DISCONNECTED) {
-				handlePlayerDisconnectedEvent(p_netGameEvent);
+				handlePlayerDisconnectedEvent(p_event);
 				return;
+			} else if (eventName == EVENT_INIT_RACE) {
+				handleInitRaceEvent(p_event);
+			} else {
+				unhandled = true;
 			}
 		} else if (parts[0] == EVENT_PREFIX_RACE) {
-			m_raceClient.handleEvent(p_netGameEvent);
-			return;
+			m_raceClient.handleEvent(p_event);
 		} else {
-			cl_log_event("error", "Event %1 remains unhandled", p_netGameEvent.to_string());
+			unhandled = true;
 		}
+
+		if (unhandled) {
+			cl_log_event("error", "Event %1 remains unhandled", p_event.to_string());
+		}
+
 	} catch (CL_Exception e) {
 		cl_log_event("exception", e.message);
 	}
@@ -119,4 +141,9 @@ void Client::eventPrepareRace(const CL_NetGameEvent &p_netGameEvent) {
 
 void Client::send(const CL_NetGameEvent &p_event) {
 	m_gameClient.send_event(p_event);
+}
+
+void Client::handleInitRaceEvent(const CL_NetGameEvent &p_event)
+{
+	m_signalInitRace.invoke(p_event.get_argument(0));
 }

@@ -105,6 +105,8 @@ int Application::main(const std::vector<CL_String> &args)
 	Client client;
 	client.connect(args[1], 1234, &player);
 
+	CL_KeepAlive::process();
+
 	Race race(&window, &player, &client);
 	race.exec();
 

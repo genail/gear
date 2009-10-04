@@ -18,11 +18,14 @@ Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	m_lapsNum(0),
 	m_localPlayer(p_player),
 	m_level(),
+	m_initialized(false),
 	m_inputLock(false),
 	m_raceClient(&p_client->getRaceClient()),
 	m_raceScene(this),
 	m_displayWindow(p_window)
 {
+	// wait for race init
+	m_slots.connect(p_client->signalInitRace(), this, &Race::slotInitRace);
 	// listen for local car status change
 	m_slots.connect(m_localPlayer.getCar().sigStatusChange(), this, &Race::slotCarStateChangedLocal);
 	// and for remote car status change
@@ -49,6 +52,23 @@ Race::~Race()
 
 void Race::exec()
 {
+	if (m_raceClient->getClient().isConnected()) {
+		cl_log_event("race", "Waiting for initialize event from server");
+
+		m_raceClient->initRace("resources/level.txt"); // FIXME: allow to define own level
+
+		while (!m_initialized) {
+			// process events
+			CL_KeepAlive::process();
+			CL_System::sleep(5);
+		}
+
+		cl_log_event("race", "initialized!");
+	} else {
+		cl_log_event("network", "Not connected, going offline");
+		m_level.loadFromFile("resources/level.txt");
+	}
+
 
 	m_level.addCar(&m_localPlayer.getCar());
 
@@ -57,6 +77,9 @@ void Race::exec()
 	unsigned lastTime = CL_System::get_time();
 
 	while (true) { // FIXME: Check when race is finished
+
+		// process events
+		CL_KeepAlive::process();
 
 		const unsigned delta = CL_System::get_time() - lastTime;
 		lastTime += delta;
@@ -174,9 +197,6 @@ void Race::drawScene(unsigned p_delta)
 	// Make the stuff visible:
 	m_displayWindow->flip();
 
-	// Read messages from the windowing system message queue,
-	// if any are available:
-	CL_KeepAlive::process();
 }
 
 void Race::slotCarStateChangedRemote(const CL_NetGameEvent& p_event)
@@ -290,4 +310,12 @@ void Race::slotRaceStateChanged(int p_lapsNum)
 {
 	m_lapsNum = p_lapsNum;
 	m_localPlayer.getCar().setLap(1);
+}
+
+void Race::slotInitRace(const CL_String& p_levelName)
+{
+	m_level.loadFromFile(p_levelName);
+	m_initialized = true;
+
+	cl_log_event("race", "Initialized race with level %1", p_levelName);
 }

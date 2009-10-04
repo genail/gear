@@ -213,8 +213,8 @@ void Server::handleInitRaceEvent(CL_NetGameConnection *p_connection, const CL_Ne
 	// initialize the level
 	m_raceServer.initialize(levelName);
 
-	// send init race event to other players
-	sendToAll(p_event, p_connection);
+	// send init race event to all players
+	sendToAll(p_event);
 }
 
 void Server::handleGrantEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
@@ -231,3 +231,4 @@ void Server::handleGrantEvent(CL_NetGameConnection *p_connection, const CL_NetGa
 		cl_log_event("perm", "Wrong root password for player %1", playerName);
 	}
 }
+

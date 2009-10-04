@@ -20,8 +20,16 @@ TyreStripes::~TyreStripes()
 
 void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to)
 {
+	static const int STRIPE_LIMIT = 2000;
+
 	Stripe stripe(p_from, p_to);
 	m_stripes.push_back(stripe);
+
+	// remove all stripes above the limit
+	if (m_stripes.size() > STRIPE_LIMIT) {
+		m_stripes.pop_front(); // there will be always one stripe to much
+	}
+
 }
 
 void TyreStripes::draw(CL_GraphicContext &p_gc)

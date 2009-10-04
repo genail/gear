@@ -8,6 +8,7 @@
 #ifndef TYRESTRIPES_H_
 #define TYRESTRIPES_H_
 
+#include <list>
 #include <ClanLib/core.h>
 
 #include "graphics/Drawable.h"
@@ -30,7 +31,7 @@ class TyreStripes : public Drawable {
 		virtual void draw(CL_GraphicContext &p_gc);
 
 	private:
-		std::vector<Stripe> m_stripes;
+		std::list<Stripe> m_stripes;
 };
 
 #endif /* TYRESTRIPES_H_ */

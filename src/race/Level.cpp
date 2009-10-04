@@ -18,6 +18,7 @@
 
 Level::Level() :
 	m_blocks(NULL),
+	m_loaded(false),
 	m_width(0),
 	m_height(0)
 {
@@ -145,6 +146,8 @@ void Level::loadFromFile(const CL_String& p_filename)
 		CL_Console::write_line(e.message);
 	}
 
+	m_loaded = true;
+
 
 }
 
@@ -198,6 +201,9 @@ float Level::getResistance(float p_x, float p_y) {
 }
 
 void Level::addCar(Car *p_car) {
+
+	assert(m_loaded && "Level is not loaded");
+
 	p_car->m_level = this;
 
 	// fill car checkpoints

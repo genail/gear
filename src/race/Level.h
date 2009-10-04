@@ -61,6 +61,9 @@ class Level : public Drawable {
 		/** Car's last drift points */
 		std::map<Car*, CL_Pointf> m_carsDriftPoints;
 
+		/** Loaded state */
+		bool m_loaded;
+
 		/** level size */
 		int m_width, m_height;
 

@@ -26,18 +26,16 @@ RaceServer::~RaceServer()
 {
 }
 
-void RaceServer::initialize()
+void RaceServer::initialize(const CL_String& p_levelName)
 {
 	if (m_initialized) {
 		assert(0 && "already initialized");
 	}
 
-	if (!m_slotsConnected) {
-		m_slots.connect(m_server->signalPlayerConnected(), this, &RaceServer::slotPlayerConnected);
-		m_slots.connect(m_server->signalPlayerDisconnected(), this, &RaceServer::slotPlayerDisconnected);
+	m_levelName = p_levelName;
 
-		m_slotsConnected = true;
-	}
+	m_level = new Level();
+	m_level->loadFromFile(p_levelName);
 
 	RacePlayer* player;
 
@@ -46,9 +44,19 @@ void RaceServer::initialize()
 	foreach (pair, m_server->m_connections) {
 		player = new RacePlayer(pair.second);
 		m_racePlayers[pair.first] = player;
+
+		m_level->addCar(&player->getCar());
 	}
 
 	m_initialized = true;
+
+	// connect the slots if not connected yet
+	if (!m_slotsConnected) {
+		m_slots.connect(m_server->signalPlayerConnected(), this, &RaceServer::slotPlayerConnected);
+		m_slots.connect(m_server->signalPlayerDisconnected(), this, &RaceServer::slotPlayerDisconnected);
+
+		m_slotsConnected = true;
+	}
 }
 
 void RaceServer::destroy()
@@ -56,6 +64,8 @@ void RaceServer::destroy()
 	if (!m_initialized) {
 		assert(0 && "not initialized");
 	}
+
+	delete m_level;
 
 	std::pair<CL_NetGameConnection*, RacePlayer*> pair;
 
@@ -176,3 +186,4 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 	CL_NetGameEvent countdownEvent(EVENT_START_COUNTDOWN);
 	m_server->sendToAll(countdownEvent);
 }
+

@@ -137,6 +137,8 @@ void Car::load(CL_GraphicContext &p_gc) {
 }
 
 void Car::update(unsigned int elapsedTime) {
+	
+	Message::out()<<elapsedTime<<std::endl;
 
 	// don't do anything if car is locked
 	if (m_locked) {
@@ -152,7 +154,7 @@ void Car::update(unsigned int elapsedTime) {
 	
 	static const float MAX_ANGLE = 50.0f;
 	
-	static const float TENACITY = 0.07f;
+	static const float TENACITY = 0.09f;
 
 	const float delta = elapsedTime / 1000.0f;
 
@@ -191,7 +193,6 @@ void Car::update(unsigned int elapsedTime) {
 	float angle = MAX_ANGLE * m_turn;
 
 	// acceleration speed
-
 	if (m_acceleration) {
 		const float speedChange = ACCEL_SPEED * delta;
 
@@ -300,13 +301,13 @@ void Car::update(unsigned int elapsedTime) {
 			changeRotVector.x = sin(rad);
 			changeRotVector.y = -cos(rad);
 			changeRotVector.normalize();
-			changeRotVector *= 0.04f;
+			changeRotVector *= 2.4f * delta;
 		}
 		else if ( m_turn > 0.0f ) { // skręt w drugą stronę
 			changeRotVector.x = -sin(rad);
 			changeRotVector.y = cos(rad);
 			changeRotVector.normalize();
-			changeRotVector *= 0.04f;
+			changeRotVector *= 2.4f * delta;
 		}
 		rotVector += changeRotVector;
 		m_rotation.set_degrees( atan2( rotVector.y, rotVector.x ) * 180.0f / 3.14f );

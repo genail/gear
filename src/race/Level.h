@@ -64,6 +64,9 @@ class Level : public Drawable {
 		/** level size */
 		int m_width, m_height;
 
+		/** Map of start positions */
+		std::map<int, CL_Pointf> m_startPositions;
+
 		/** Tyre stripes */
 		TyreStripes m_tyreStripes;
 

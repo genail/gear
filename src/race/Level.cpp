@@ -102,8 +102,9 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 		// read bounds num
 		line = readLine(file);
-		int boundsCount = CL_StringHelp::text_to_int(line);
+		const int boundsCount = CL_StringHelp::text_to_int(line);
 
+		// read all bounds
 		float x1, y1, x2, y2;
 
 		for (int i = 0; i < boundsCount; ++i) {
@@ -117,6 +118,23 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 			Bound bound(CL_LineSegment2f(CL_Vec2f(x1, y1), CL_Vec2f(x2, y2)));
 			m_bounds.push_back(bound);
+		}
+
+		// read start positions num
+		line = readLine(file);
+		const int startPositionsCount = CL_StringHelp::text_to_int(line);
+
+		// read start positions
+		float x,y;
+
+		for (int i = 0; i < startPositionsCount; ++i) {
+			line = readLine(file);
+			parts = CL_StringHelp::split_text(line, " ", true);
+
+			x = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
+			y = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
+
+			m_startPositions[i + 1] = CL_Pointf(x, y);
 		}
 
 

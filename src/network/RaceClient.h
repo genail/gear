@@ -17,9 +17,11 @@ class RaceClient {
 		RaceClient(Client *p_client);
 		virtual ~RaceClient();
 
+		Client &getClient() { return *m_client; }
+
 		void handleEvent(const CL_NetGameEvent &p_event);
 
-		Client &getClient() { return *m_client; }
+		void initRace(const CL_String &p_levelName);
 
 		void sendCarStateEvent(const CL_NetGameEvent &p_event);
 

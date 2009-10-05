@@ -9,6 +9,8 @@
 #define RACESERVER_H_
 
 #include <ClanLib/core.h>
+
+#include "race/Level.h"
 #include "race/RacePlayer.h"
 
 class Server;
@@ -20,9 +22,13 @@ class RaceServer {
 
 		void destroy();
 
+		const CL_String& getLevelName() const { return m_levelName; }
+
 		void handleEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
-		void initialize();
+		void initialize(const CL_String& p_levelName);
+
+		bool isInitialized() const { return m_initialized; }
 
 	private:
 		/** Is this server initialized */
@@ -30,6 +36,12 @@ class RaceServer {
 
 		/** Number of laps in this race */
 		int m_lapsNum;
+
+		/** Name of chosen level */
+		CL_String m_levelName;
+
+		/** The level */
+		Level *m_level;
 
 		/** All race players */
 		std::map<CL_NetGameConnection*, RacePlayer*> m_racePlayers;

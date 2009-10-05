@@ -26,18 +26,16 @@ RaceServer::~RaceServer()
 {
 }
 
-void RaceServer::initialize()
+void RaceServer::initialize(const CL_String& p_levelName)
 {
 	if (m_initialized) {
 		assert(0 && "already initialized");
 	}
 
-	if (!m_slotsConnected) {
-		m_slots.connect(m_server->signalPlayerConnected(), this, &RaceServer::slotPlayerConnected);
-		m_slots.connect(m_server->signalPlayerDisconnected(), this, &RaceServer::slotPlayerDisconnected);
+	m_levelName = p_levelName;
 
-		m_slotsConnected = true;
-	}
+	m_level = new Level();
+	m_level->loadFromFile(p_levelName);
 
 	RacePlayer* player;
 
@@ -46,9 +44,19 @@ void RaceServer::initialize()
 	foreach (pair, m_server->m_connections) {
 		player = new RacePlayer(pair.second);
 		m_racePlayers[pair.first] = player;
+
+		m_level->addCar(&player->getCar());
 	}
 
 	m_initialized = true;
+
+	// connect the slots if not connected yet
+	if (!m_slotsConnected) {
+		m_slots.connect(m_server->signalPlayerConnected(), this, &RaceServer::slotPlayerConnected);
+		m_slots.connect(m_server->signalPlayerDisconnected(), this, &RaceServer::slotPlayerDisconnected);
+
+		m_slotsConnected = true;
+	}
 }
 
 void RaceServer::destroy()
@@ -56,6 +64,8 @@ void RaceServer::destroy()
 	if (!m_initialized) {
 		assert(0 && "not initialized");
 	}
+
+	delete m_level;
 
 	std::pair<CL_NetGameConnection*, RacePlayer*> pair;
 
@@ -72,7 +82,12 @@ void RaceServer::slotPlayerConnected(CL_NetGameConnection *p_connection, Player 
 		return;
 	}
 
-	m_racePlayers[p_connection] = new RacePlayer(p_player);
+	cl_log_event("event", "Adding race player");
+
+	RacePlayer *racePlayer = new RacePlayer(p_player);
+
+	m_racePlayers[p_connection] = racePlayer;
+	m_level->addCar(&racePlayer->getCar());
 }
 
 void RaceServer::slotPlayerDisconnected(CL_NetGameConnection *p_connection, Player *p_player)
@@ -81,9 +96,13 @@ void RaceServer::slotPlayerDisconnected(CL_NetGameConnection *p_connection, Play
 		return;
 	}
 
+	cl_log_event("event", "Removing race player");
+
 	std::map<CL_NetGameConnection*, RacePlayer*>::iterator itor = m_racePlayers.find(p_connection);
 
 	assert(itor != m_racePlayers.end());
+
+	m_level->removeCar(&itor->second->getCar());
 
 	delete itor->second;
 	m_racePlayers.erase(itor);
@@ -107,6 +126,8 @@ void RaceServer::handleEvent(CL_NetGameConnection *p_connection, const CL_NetGam
 void RaceServer::handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
 	cl_log_event("event", "handling %1", p_event.to_string());
+
+	assert(m_racePlayers.find(p_connection) != m_racePlayers.end() && "Player not in RaceServer player list");
 
 	// apply state to local race player
 	RacePlayer* player = m_racePlayers[p_connection];
@@ -150,17 +171,18 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 		Player &player = pair.second->getPlayer();
 
 		CL_NetGameEvent startPositionEvent(EVENT_CAR_STATE_CHANGE);
-		startPositionEvent.add_argument(""); // self player
+		startPositionEvent.add_argument(player.getName()); // self player
 
 		car.prepareStatusEvent(startPositionEvent);
 
 		CL_NetGameConnection* connection = m_server->getConnectionForPlayer(&player);
 
 		if (connection != NULL) {
-			m_server->send(connection, startPositionEvent);
+			m_server->sendToAll(startPositionEvent);
 		} else {
 			cl_log_event("error", "available RacePlayer not found in Server object");
 		}
+
 
 		++startPositionNum;
 	}
@@ -176,3 +198,4 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 	CL_NetGameEvent countdownEvent(EVENT_START_COUNTDOWN);
 	m_server->sendToAll(countdownEvent);
 }
+

@@ -40,6 +40,9 @@ class Server {
 		/** Modifications mutex */
 		CL_Mutex m_lockMutex;
 
+		/** Connection that is permited to administrate */
+		CL_NetGameConnection* m_permitedConnection;
+
 		/** Race server */
 		RaceServer m_raceServer;
 
@@ -53,6 +56,7 @@ class Server {
 		CL_Signal_v2<CL_NetGameConnection*, Player*> m_signalPlayerDisconnected;
 
 
+		bool isPermitted(const CL_NetGameConnection *p_connection) const { return p_connection == m_permitedConnection; }
 
 		void send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
@@ -68,7 +72,11 @@ class Server {
 		// event handlers
 		//
 
+		void handleGrantEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+
 		void handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+
+		void handleInitRaceEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 
 		friend class RaceServer;

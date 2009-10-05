@@ -61,8 +61,14 @@ class Level : public Drawable {
 		/** Car's last drift points */
 		std::map<Car*, CL_Pointf> m_carsDriftPoints;
 
+		/** Loaded state */
+		bool m_loaded;
+
 		/** level size */
 		int m_width, m_height;
+
+		/** Map of start positions */
+		std::map<int, CL_Pointf> m_startPositions;
 
 		/** Tyre stripes */
 		TyreStripes m_tyreStripes;

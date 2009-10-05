@@ -25,11 +25,17 @@ class Client {
 
 		bool isConnected() const { return m_connected; }
 
+		Player* getPlayer(int p_index) { return m_remotePlayers[p_index]; }
+
+		int getPlayersCount() const { return m_remotePlayers.size(); }
+
 		RaceClient& getRaceClient() { return m_raceClient; }
 
 		//
 		// client signals
 		//
+
+		CL_Signal_v1<const CL_String&> &signalInitRace() { return m_signalInitRace; }
 
 		CL_Signal_v1<Player*> &signalPlayerConnected() { return m_signalPlayerConnected; }
 
@@ -55,9 +61,15 @@ class Client {
 		/** The slot container */
 		CL_SlotContainer m_slots;
 
+		/** Tells if connection is fully initialized */
+		volatile bool m_welcomed;
+
 		//
 		// This class signals
 		//
+
+		/** Race initialize event received */
+		CL_Signal_v1<const CL_String&> m_signalInitRace;
 
 		/** Player joined the game */
 		CL_Signal_v1<Player*> m_signalPlayerConnected;
@@ -84,11 +96,16 @@ class Client {
 		// game events receivers
 		//
 
+		/** Race is initialized on server side */
+		void handleInitRaceEvent(const CL_NetGameEvent &p_event);
+
 		/** New player is connected */
 		void handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent);
 
 		/** Player disconnects */
 		void handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent);
+
+		void handleWelcomeEvent(const CL_NetGameEvent &p_netGameEvent);
 
 		/** Car status update */
 		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);

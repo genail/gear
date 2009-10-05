@@ -66,3 +66,10 @@ void RaceClient::handleRaceStateEvent(const CL_NetGameEvent &p_event)
 {
 	m_signalRaceStateChanged.invoke((int) p_event.get_argument(0));
 }
+
+void RaceClient::initRace(const CL_String &p_levelName)
+{
+	CL_NetGameEvent initRaceEvent(EVENT_INIT_RACE, p_levelName);
+	m_client->send(initRaceEvent);
+}
+

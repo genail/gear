@@ -8,8 +8,6 @@
 #include "network/Client.h"
 #include "network/events.h"
 
-#include "Debug.h"
-
 Client::Client() :
 	m_connected(false),
 	m_raceClient(this)
@@ -27,6 +25,21 @@ void Client::connect(const CL_String &p_host, int p_port, Player *p_player) {
 	cl_log_event("network", "Connecting to %1:%2", p_host, port);
 
 	m_gameClient.connect(p_host, port);
+
+	// act as connected and wait for connection initialization
+	m_connected = true;
+	m_welcomed = false;
+
+	while (m_connected) {
+		CL_KeepAlive::process();
+
+		if (m_welcomed) {
+			cl_log_event("network", "Connection fully initialized");
+			break;
+		}
+
+		CL_System::sleep(10);
+	}
 }
 
 Client::~Client() {
@@ -36,14 +49,13 @@ Client::~Client() {
 	}
 }
 
-void Client::slotConnected() {
-
-	m_connected = true;
+void Client::slotConnected()
+{
 
 	// I am connected
 	// And I should introduce myself
 
-	cl_log_event("network", "Connected, introducing myself");
+	cl_log_event("network", "Introducing myself as %1", m_player->getName());
 
 	CL_NetGameEventValue nickname(m_player->getName());
 	CL_NetGameEvent hiEvent(EVENT_HI, nickname);
@@ -51,10 +63,11 @@ void Client::slotConnected() {
 	m_gameClient.send_event(hiEvent);
 }
 
-void Client::slotDisconnected() {
+void Client::slotDisconnected()
+{
 	// I am disconnected
 	// Is that what I've expected?
-	Debug::out() << "Disconnected from server" << std::endl;
+	cl_log_event("network", "Disconnected from server");
 
 	m_connected = false;
 }
@@ -70,7 +83,9 @@ void Client::slotEventReceived(const CL_NetGameEvent &p_event)
 		bool unhandled = false;
 
 		if (parts[0] == EVENT_PREFIX_GENERAL) {
-			if (eventName == EVENT_PLAYER_CONNECTED) {
+			if (eventName == EVENT_WELCOME) {
+				handleWelcomeEvent(p_event);
+			} else if (eventName == EVENT_PLAYER_CONNECTED) {
 				handlePlayerConnectedEvent(p_event);
 				return;
 			} else if (eventName == EVENT_PLAYER_DISCONNECTED) {
@@ -97,25 +112,23 @@ void Client::slotEventReceived(const CL_NetGameEvent &p_event)
 
 }
 
-void Client::handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent) {
-	Debug::out() << "handling " << p_netGameEvent.get_name().c_str() << std::endl;
-
+void Client::handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent)
+{
 	const CL_String playerName = (CL_String) p_netGameEvent.get_argument(0);
 
 	Player* player = new Player(playerName);
 	m_remotePlayers.push_back(player);
 
-	Debug::out() << "Player connected: " << playerName.c_str() << std::endl;
+	cl_log_event("event", "Player '%1' connected", playerName);
 
 	m_signalPlayerConnected.invoke(player);
 }
 
-void Client::handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent) {
-	Debug::out() << "handling " << p_netGameEvent.get_name().c_str() << std::endl;
-
+void Client::handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent)
+{
 	const CL_String playerName = (CL_String) p_netGameEvent.get_argument(0);
 
-	Debug::out() << "Player disconnected: " << playerName.c_str() << std::endl;
+	cl_log_event("event", "Player '%1' disconnected", playerName);
 
 	for (
 		std::vector<Player*>::iterator itor = m_remotePlayers.begin();
@@ -133,17 +146,24 @@ void Client::handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent
 	}
 }
 
-void Client::eventPrepareRace(const CL_NetGameEvent &p_netGameEvent) {
+void Client::eventPrepareRace(const CL_NetGameEvent &p_netGameEvent)
+{
 	const int position = (int) p_netGameEvent.get_argument(0);
 
 
 }
 
-void Client::send(const CL_NetGameEvent &p_event) {
+void Client::send(const CL_NetGameEvent &p_event)
+{
 	m_gameClient.send_event(p_event);
 }
 
 void Client::handleInitRaceEvent(const CL_NetGameEvent &p_event)
 {
 	m_signalInitRace.invoke(p_event.get_argument(0));
+}
+
+void Client::handleWelcomeEvent(const CL_NetGameEvent &p_netGameEvent)
+{
+	m_welcomed = true;
 }

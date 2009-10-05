@@ -61,6 +61,9 @@ class Client {
 		/** The slot container */
 		CL_SlotContainer m_slots;
 
+		/** Tells if connection is fully initialized */
+		volatile bool m_welcomed;
+
 		//
 		// This class signals
 		//
@@ -101,6 +104,8 @@ class Client {
 
 		/** Player disconnects */
 		void handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent);
+
+		void handleWelcomeEvent(const CL_NetGameEvent &p_netGameEvent);
 
 		/** Car status update */
 		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);

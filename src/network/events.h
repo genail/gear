@@ -17,6 +17,9 @@
 
 #define EVENT_PREFIX_GENERAL		"general"
 
+// sends as acceptance from server. From this moment connection is fully initialized.
+#define EVENT_WELCOME				"general:welcome"
+
 #define EVENT_GRANT_PERMISSIONS		"general:grant_permissions"
 #define EVENT_HI					"general:hi"
 #define EVENT_PLAYER_CONNECTED 		"general:player_connected"

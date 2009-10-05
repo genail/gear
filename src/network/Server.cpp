@@ -116,9 +116,12 @@ void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameE
 		return;
 	}
 
-	CL_MutexSection lockSection(&m_lockMutex);
+	// send the welcome message
+	const CL_NetGameEvent welcomeEvent(EVENT_WELCOME);
+	send(p_connection, welcomeEvent);
 
-	// check availability
+
+	// check name availability
 	bool nameAvailable = true;
 	std::pair<CL_NetGameConnection*, Player*> pair;
 	foreach (pair, m_connections) {

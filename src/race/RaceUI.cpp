@@ -27,8 +27,18 @@ void RaceUI::displayCountdown() {
 void RaceUI::draw(CL_GraphicContext &p_gc) {
 
 	const Car &car = m_race->getLocalPlayer().getCar();
-	const CL_String currentLapStr = CL_StringHelp::int_to_local8(car.getLap());
-	const CL_String lapsNumStr = CL_StringHelp::int_to_local8(m_race->getLapsNum());
+
+
+	int currentLap = car.getLap();
+	const int lapNum = m_race->getLapsNum();
+
+	// stop lap display at last lap even if the value is higher
+	if (currentLap > lapNum) {
+		currentLap = lapNum;
+	}
+
+	const CL_String currentLapStr = CL_StringHelp::int_to_local8(currentLap);
+	const CL_String lapsNumStr = CL_StringHelp::int_to_local8(lapNum);
 
 	// draw lap
 

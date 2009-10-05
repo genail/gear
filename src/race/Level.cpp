@@ -18,6 +18,7 @@
 
 Level::Level() :
 	m_blocks(NULL),
+	m_loaded(false),
 	m_width(0),
 	m_height(0)
 {
@@ -102,8 +103,9 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 		// read bounds num
 		line = readLine(file);
-		int boundsCount = CL_StringHelp::text_to_int(line);
+		const int boundsCount = CL_StringHelp::text_to_int(line);
 
+		// read all bounds
 		float x1, y1, x2, y2;
 
 		for (int i = 0; i < boundsCount; ++i) {
@@ -119,6 +121,23 @@ void Level::loadFromFile(const CL_String& p_filename)
 			m_bounds.push_back(bound);
 		}
 
+		// read start positions num
+		line = readLine(file);
+		const int startPositionsCount = CL_StringHelp::text_to_int(line);
+
+		// read start positions
+		float x,y;
+
+		for (int i = 0; i < startPositionsCount; ++i) {
+			line = readLine(file);
+			parts = CL_StringHelp::split_text(line, " ", true);
+
+			x = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
+			y = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
+
+			m_startPositions[i + 1] = CL_Pointf(x, y);
+		}
+
 
 		file.close();
 
@@ -126,6 +145,8 @@ void Level::loadFromFile(const CL_String& p_filename)
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);
 	}
+
+	m_loaded = true;
 
 
 }
@@ -180,6 +201,9 @@ float Level::getResistance(float p_x, float p_y) {
 }
 
 void Level::addCar(Car *p_car) {
+
+	assert(m_loaded && "Level is not loaded");
+
 	p_car->m_level = this;
 
 	// fill car checkpoints
@@ -227,41 +251,50 @@ void Level::removeCar(Car *p_car) {
 }
 
 CL_Pointf Level::getStartPosition(int p_num) const {
-	// find the start line
-	int startX, startY;
-	bool foundStartLine = false;
 
-	for (int x = 0; x < m_width; ++x) {
-		for (int y = 0; y < m_height; ++y) {
-			// if this is a start/finish line, then add finish line checkpoint
-			if (m_blocks[y * m_width + x].getType() == Block::BT_START_LINE) {
-				startX = x;
-				startY = y;
-				foundStartLine = true;
-				break;
-			}
-		}
+	std::map<int, CL_Pointf>::const_iterator startPositionItor = m_startPositions.find(p_num);
 
-		if (foundStartLine) {
-			break;
-		}
-	}
-
-	if (!foundStartLine) {
-		assert(0 && "start line not found");
-	}
-
-	int xOffset;
-
-	if (p_num % 2 == 1) {
-		xOffset = 145;
+	if (startPositionItor != m_startPositions.end()) {
+		return startPositionItor->second;
 	} else {
-		xOffset = 65;
+		return CL_Pointf(200, 200);
 	}
 
-	int yOffset = p_num * 38;
-
-	return CL_Pointf(startX * BOX_WIDTH + xOffset, startY * BOX_WIDTH + yOffset);
+//	// find the start line
+//	int startX, startY;
+//	bool foundStartLine = false;
+//
+//	for (int x = 0; x < m_width; ++x) {
+//		for (int y = 0; y < m_height; ++y) {
+//			// if this is a start/finish line, then add finish line checkpoint
+//			if (m_blocks[y * m_width + x].getType() == Block::BT_START_LINE) {
+//				startX = x;
+//				startY = y;
+//				foundStartLine = true;
+//				break;
+//			}
+//		}
+//
+//		if (foundStartLine) {
+//			break;
+//		}
+//	}
+//
+//	if (!foundStartLine) {
+//		assert(0 && "start line not found");
+//	}
+//
+//	int xOffset;
+//
+//	if (p_num % 2 == 1) {
+//		xOffset = 145;
+//	} else {
+//		xOffset = 65;
+//	}
+//
+//	int yOffset = p_num * 38;
+//
+//	return CL_Pointf(startX * BOX_WIDTH + xOffset, startY * BOX_WIDTH + yOffset);
 }
 
 void Level::update(unsigned p_timeElapsed)

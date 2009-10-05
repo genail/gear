@@ -47,6 +47,9 @@ class Race {
 		/** The level */
 		Level m_level;
 
+		/** Initialized state */
+		volatile bool m_initialized;
+
 		/** Input lock */
 		bool m_inputLock;
 
@@ -86,6 +89,8 @@ class Race {
 		void slotCarStateChangedLocal(Car &p_car);
 
 		void slotCountdownEnds();
+
+		void slotInitRace(const CL_String& p_levelName);
 
 		void slotInputLock();
 

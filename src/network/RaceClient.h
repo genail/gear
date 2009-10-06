@@ -23,6 +23,8 @@ class RaceClient {
 
 		void initRace(const CL_String &p_levelName);
 
+		void markFinished(unsigned p_raceTime);
+
 		void sendCarStateEvent(const CL_NetGameEvent &p_event);
 
 		void triggerRaceStart(int p_lapsNum);

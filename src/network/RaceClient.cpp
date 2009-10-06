@@ -69,7 +69,12 @@ void RaceClient::handleRaceStateEvent(const CL_NetGameEvent &p_event)
 
 void RaceClient::initRace(const CL_String &p_levelName)
 {
-	CL_NetGameEvent initRaceEvent(EVENT_INIT_RACE, p_levelName);
+	const CL_NetGameEvent initRaceEvent(EVENT_INIT_RACE, p_levelName);
 	m_client->send(initRaceEvent);
 }
 
+void RaceClient::markFinished(unsigned p_raceTime)
+{
+	const CL_NetGameEvent finishedEvent(EVENT_PLAYER_FINISHED, p_raceTime);
+	m_client->send(finishedEvent);
+}

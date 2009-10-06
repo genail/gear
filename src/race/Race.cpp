@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 
+#include "common.h"
 #include "Message.h"
 #include "graphics/Stage.h"
 #include "network/events.h"
@@ -183,7 +184,17 @@ void Race::grabInput(unsigned delta)
 void Race::updateWorld(unsigned p_delta)
 {
 	// update all cars
-	m_localPlayer.getCar().update(p_delta);
+	Car &localCar = m_localPlayer.getCar();
+	localCar.update(p_delta);
+
+	// check car finished state
+	if (!m_localPlayer.isFinished() && localCar.getLap() > m_lapsNum) {
+		m_localPlayer.setFinished(true);
+		const unsigned now = CL_System::get_time();
+
+		// send to the server that race is finished
+		m_raceClient->markFinished(now - m_raceStartTime);
+	}
 
 	const size_t remotePlayersSize = m_remotePlayers.size();
 
@@ -308,10 +319,18 @@ void Race::slotStartCountdown()
 
 	m_raceStartTimer.start(RACE_START_COUNTDOWN_TIME, false);
 	m_raceScene.getUI().displayCountdown();
+
+	// mark all players state as not finished
+	m_localPlayer.setFinished(false);
+
+	foreach (RacePlayer *player, m_remotePlayers) {
+		player->setFinished(false);
+	}
 }
 
 void Race::slotCountdownEnds()
 {
+	m_raceStartTime = CL_System::get_time();
 	m_inputLock = false;
 }
 

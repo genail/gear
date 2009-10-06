@@ -59,6 +59,9 @@ class Race {
 		/** The race scene */
 		RaceScene m_raceScene;
 
+		/** Start time of this race */
+		unsigned m_raceStartTime;
+
 		/** Race start timer */
 		CL_Timer m_raceStartTimer;
 

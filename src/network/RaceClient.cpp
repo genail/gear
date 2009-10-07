@@ -31,6 +31,8 @@ void RaceClient::handleEvent(const CL_NetGameEvent &p_event)
 		handleLockCarEvent(p_event);
 	} else if (eventName == EVENT_RACE_STATE) {
 		handleRaceStateEvent(p_event);
+	} else if (eventName == EVENT_PLAYER_FINISHED) {
+		handlePlayerFinishedEvent(p_event);
 	} else {
 		cl_log_event("event", "event remains unhandled: %1", p_event.to_string());
 	}
@@ -77,4 +79,9 @@ void RaceClient::markFinished(unsigned p_raceTime)
 {
 	const CL_NetGameEvent finishedEvent(EVENT_PLAYER_FINISHED, p_raceTime);
 	m_client->send(finishedEvent);
+}
+
+void RaceClient::handlePlayerFinishedEvent(const CL_NetGameEvent &p_event)
+{
+	m_signalPlayerFinished.invoke(p_event);
 }

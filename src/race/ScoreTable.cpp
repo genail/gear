@@ -65,3 +65,8 @@ unsigned ScoreTable::getEntryTime(int index) const
 {
 	return getEntry(index).m_time;
 }
+
+void ScoreTable::clear()
+{
+	m_entries.clear();
+}

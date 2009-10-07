@@ -206,7 +206,13 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 
 void RaceServer::handlePlayerFinishedEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
-	// set the player finished
+	unsigned time = p_event.get_argument(0);
+
+	// set the player finished state
 	RacePlayer *racePlayer = m_racePlayers[p_connection];
 	racePlayer->setFinished(true);
+
+	// send similar event to other players
+	CL_NetGameEvent event(EVENT_PLAYER_FINISHED, racePlayer->getPlayer().getName(), time);
+	m_server->sendToAll(event, p_connection);
 }

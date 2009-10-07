@@ -39,6 +39,8 @@ Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	m_slots.connect(m_raceClient->signalLockCar(), this, &Race::slotInputLock);
 	// race state
 	m_slots.connect(m_raceClient->signalRaceStateChanged(), this, &Race::slotRaceStateChanged);
+	// player finished
+	m_slots.connect(m_raceClient->signalPlayerFinished(), this, &Race::slotPlayerFinished);
 
 	// player join
 	m_slots.connect(p_client->signalPlayerConnected(), this, &Race::slotPlayerReady);
@@ -175,7 +177,7 @@ void Race::grabInput(unsigned delta)
 
 	// trigger race start
 	if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
-		m_raceClient->triggerRaceStart(3);
+		startRace();
 	}
 
 #endif
@@ -189,11 +191,8 @@ void Race::updateWorld(unsigned p_delta)
 
 	// check car finished state
 	if (!m_localPlayer.isFinished() && localCar.getLap() > m_lapsNum) {
-		m_localPlayer.setFinished(true);
-		const unsigned now = CL_System::get_time();
-
-		// send to the server that race is finished
-		m_raceClient->markFinished(now - m_raceStartTime);
+		const unsigned time = CL_System::get_time() - m_raceStartTime;
+		markPlayerFinished(m_localPlayer.getPlayer().getName(), time);
 	}
 
 	const size_t remotePlayersSize = m_remotePlayers.size();
@@ -351,4 +350,84 @@ void Race::slotInitRace(const CL_String& p_levelName)
 	m_initialized = true;
 
 	cl_log_event("race", "Initialized race with level %1", p_levelName);
+}
+
+void Race::slotPlayerFinished(const CL_NetGameEvent &p_event)
+{
+	const CL_String playerName = p_event.get_argument(0);
+	const unsigned time = p_event.get_argument(1);
+
+	// set this player finished state
+	markPlayerFinished(playerName, time);
+
+	// check if this race is finished
+	if (isRaceFinished()) {
+		endRace();
+	}
+}
+
+bool Race::isRaceFinished()
+{
+	if (!m_localPlayer.isFinished()) {
+		return false;
+	}
+
+	foreach (const RacePlayer *player, m_remotePlayers) {
+		if (!player->isFinished()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void Race::startRace()
+{
+	m_scoreTable.clear();
+	m_raceClient->triggerRaceStart(3);
+}
+
+void Race::endRace()
+{
+	// display the score table and quit the game
+	const int scoreEntries = m_scoreTable.getEntriesCount();
+
+	for (int i = 0; i < scoreEntries; ++i) {
+
+		const CL_String &playerName = m_scoreTable.getEntryPlayer(i)->getPlayer().getName();
+		const unsigned time = m_scoreTable.getEntryTime(i);
+
+		CL_Console::write_line("%1) %2 (%3 ms)", i + 1, playerName, time);
+	}
+
+	CL_Console::write_line("");
+	CL_Console::write_line("Thanks for playing :-)");
+
+	exit(0);
+}
+
+void Race::markPlayerFinished(const CL_String &p_name, unsigned p_time)
+{
+	RacePlayer *scorePlayer;
+
+	if (m_localPlayer.getPlayer().getName() == p_name) {
+
+		m_localPlayer.setFinished(true);
+		scorePlayer = &m_localPlayer;
+
+		// send to the server that race is finished
+		m_raceClient->markFinished(p_time);
+	} else {
+		RacePlayer *player = findPlayer(p_name);
+
+		if (player == NULL) {
+			cl_log_event("error", "Cannot find player called %1", p_name);
+			return;
+		}
+
+		player->setFinished(true);
+		scorePlayer = player;
+	}
+
+
 }

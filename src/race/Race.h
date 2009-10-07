@@ -11,9 +11,10 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
-#include <race/RacePlayer.h>
 #include <race/Level.h>
 #include <race/RaceScene.h>
+#include <race/RacePlayer.h>
+#include <race/ScoreTable.h>
 #include <network/RaceClient.h>
 
 class Race {
@@ -68,15 +69,34 @@ class Race {
 		/** Players connected remotely */
 		std::vector<RacePlayer*> m_remotePlayers;
 
+		/** The score table */
+		ScoreTable m_scoreTable;
+
 		/** The slots container */
 		CL_SlotContainer m_slots;
+
+		//
+		// Race flow
+		//
+
+		void endRace();
+
+		void markPlayerFinished(const CL_String &p_name, unsigned p_time);
+
+		void startRace();
+
+		//
+		// Other
+		//
 
 
 		void drawScene(unsigned delta);
 
-		RacePlayer *findPlayer(const CL_String& p_name);
+		RacePlayer *findPlayer(const CL_String &p_name);
 
 		void grabInput(unsigned delta);
+
+		bool isRaceFinished();
 
 		void loadAll();
 
@@ -87,19 +107,21 @@ class Race {
 		// Slots
 		//
 
-		void slotCarStateChangedRemote(const CL_NetGameEvent& p_event);
+		void slotCarStateChangedRemote(const CL_NetGameEvent &p_event);
 
 		void slotCarStateChangedLocal(Car &p_car);
 
 		void slotCountdownEnds();
 
-		void slotInitRace(const CL_String& p_levelName);
+		void slotInitRace(const CL_String &p_levelName);
 
 		void slotInputLock();
 
-		void slotPlayerReady(Player* p_player);
+		void slotPlayerFinished(const CL_NetGameEvent &p_event);
 
-		void slotPlayerLeaving(Player* p_player);
+		void slotPlayerReady(Player *p_player);
+
+		void slotPlayerLeaving(Player *p_player);
 
 		void slotRaceStateChanged(int p_lapsNum);
 

@@ -389,7 +389,7 @@ void Car::setStartPosition(int p_startPosition) {
 		m_position = m_level->getStartPosition(p_startPosition);
 	} else {
 		cl_log_event("warning", "Car not on Level.");
-		m_position = CL_Pointf(200, 200);
+		m_position = CL_Pointf(300, 300);
 	}
 
 	// stop the car!
@@ -399,8 +399,6 @@ void Car::setStartPosition(int p_startPosition) {
 	m_brake = false;
 	m_moveVector = CL_Vec2f();
 	accelerationVector = CL_Vec2f();
-	forceVector = CL_Vec2f();
-	driftVector = CL_Vec2f();
 	m_speed = 0.0f;
 	m_angle = 0.0f;
 	m_lap = 1;

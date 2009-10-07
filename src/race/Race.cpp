@@ -360,10 +360,6 @@ void Race::slotPlayerFinished(const CL_NetGameEvent &p_event)
 	// set this player finished state
 	markPlayerFinished(playerName, time);
 
-	// check if this race is finished
-	if (isRaceFinished()) {
-		endRace();
-	}
 }
 
 bool Race::isRaceFinished()
@@ -392,6 +388,8 @@ void Race::endRace()
 	// display the score table and quit the game
 	const int scoreEntries = m_scoreTable.getEntriesCount();
 
+	CL_Console::write_line("-----------Score Table------------");
+
 	for (int i = 0; i < scoreEntries; ++i) {
 
 		const CL_String &playerName = m_scoreTable.getEntryPlayer(i)->getPlayer().getName();
@@ -400,10 +398,10 @@ void Race::endRace()
 		CL_Console::write_line("%1) %2 (%3 ms)", i + 1, playerName, time);
 	}
 
+	CL_Console::write_line("----------------------------------");
+
 	CL_Console::write_line("");
 	CL_Console::write_line("Thanks for playing :-)");
-
-	exit(0);
 }
 
 void Race::markPlayerFinished(const CL_String &p_name, unsigned p_time)
@@ -429,5 +427,11 @@ void Race::markPlayerFinished(const CL_String &p_name, unsigned p_time)
 		scorePlayer = player;
 	}
 
+	// put to score table
+	m_scoreTable.add(scorePlayer, p_time);
 
+	// check if this race is finished
+	if (isRaceFinished()) {
+		endRace();
+	}
 }

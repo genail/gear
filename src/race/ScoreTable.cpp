@@ -30,11 +30,13 @@ void ScoreTable::add(const RacePlayer *p_racePlayer, unsigned p_time)
 	do {
 		if (itor->m_time > p_time) {
 			m_entries.insert(itor, Entry(p_racePlayer, p_time));
-			break;
+			return;
 		}
 
 		++itor;
 	} while (itor != m_entries.end());
+
+	m_entries.push_back(Entry(p_racePlayer, p_time));
 }
 
 int ScoreTable::getEntriesCount() const

@@ -103,7 +103,7 @@ int Application::main(const std::vector<CL_String> &args)
 //	raceScene.getViewport().setScale(2.0f);
 
 	Client client;
-	client.connect(args[1], 1234, &player);
+	client.connect(args[1], 2500, &player);
 
 	Race race(&window, &player, &client);
 	race.exec();

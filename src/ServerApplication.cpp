@@ -20,7 +20,7 @@ int ServerApplication::main(const std::vector<CL_String> &args)
 
 	CL_ConsoleLogger logger;
 
-	Server server(1234);
+	Server server(2500);
 
 	while (true) {
 		CL_KeepAlive::process();

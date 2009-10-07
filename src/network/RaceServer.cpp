@@ -115,8 +115,10 @@ void RaceServer::handleEvent(CL_NetGameConnection *p_connection, const CL_NetGam
 
 	if (eventName == EVENT_CAR_STATE_CHANGE) {
 		handleCarStateChangeEvent(p_connection, p_event);
-	}  else if (eventName == EVENT_TRIGGER_RACE_START) {
+	} else if (eventName == EVENT_TRIGGER_RACE_START) {
 		handleTriggerRaceStartEvent(p_connection, p_event);
+	} else if (eventName == EVENT_PLAYER_FINISHED) {
+		handlePlayerFinishedEvent(p_connection, p_event);
 	} else {
 		cl_log_event("error", "unhandled event: %1", eventName);
 	}
@@ -165,6 +167,9 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 
 	int startPositionNum = 1;
 	foreach (pair, m_racePlayers) {
+
+		pair.second->setFinished(false);
+
 		Car &car = pair.second->getCar();
 		car.setStartPosition(startPositionNum);
 
@@ -199,3 +204,9 @@ void RaceServer::handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection,
 	m_server->sendToAll(countdownEvent);
 }
 
+void RaceServer::handlePlayerFinishedEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
+	// set the player finished
+	RacePlayer *racePlayer = m_racePlayers[p_connection];
+	racePlayer->setFinished(true);
+}

@@ -12,6 +12,7 @@ SET(COMMON_SRCS
     race/Checkpoint.cpp
     race/Level.cpp
     race/RacePlayer.cpp
+    race/ScoreTable.cpp
     race/TyreStripes.cpp
 )
 

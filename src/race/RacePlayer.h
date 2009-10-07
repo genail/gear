@@ -20,6 +20,8 @@ class RacePlayer {
 
 		Player& getPlayer() { return *m_player; }
 
+		const Player& getPlayer() const { return *m_player; }
+
 		bool isFinished() const { return m_finished; }
 
 		bool setFinished(bool p_finished) { m_finished = p_finished; }

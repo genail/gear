@@ -9,6 +9,7 @@
 #define RACEUI_H_
 
 #include "graphics/Drawable.h"
+#include "graphics/SpeedMeter.h"
 
 class Race;
 
@@ -40,6 +41,9 @@ class RaceUI: public Drawable {
 
 		/** Lap display font */
 		CL_Font_Freetype m_lapDisplayFont;
+
+		/** Speed control widget */
+		SpeedMeter m_speedMeter;
 
 		void drawCountdownLabel(CL_GraphicContext &p_gc, const CL_String &p_label);
 };

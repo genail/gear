@@ -5,6 +5,7 @@ SET(COMMON_SRCS
     Player.cpp
     Properties.cpp
     graphics/DebugLayer.cpp
+    graphics/SpeedMeter.cpp
     graphics/Stage.cpp
     race/Block.cpp
     race/Bound.cpp

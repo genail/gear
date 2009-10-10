@@ -102,11 +102,16 @@ int Application::main(const std::vector<CL_String> &args)
 //	raceScene.getViewport().attachTo(&car.getPosition());
 //	raceScene.getViewport().setScale(2.0f);
 
-	Client client;
-	client.connect(args[1], 2500, &player);
+	try {
 
-	Race race(&window, &player, &client);
-	race.exec();
+		Client client;
+		client.connect(args[1], 2500, &player);
+
+		Race race(&window, &player, &client);
+		race.exec();
+	} catch (CL_Exception e) {
+		CL_Console::write_line(e.message);
+	}
 
 //	unsigned int lastTime = CL_System::get_time();
 //

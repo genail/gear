@@ -25,6 +25,8 @@ class SpeedMeter : public Drawable {
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+		void setSpeed(unsigned p_speedKMS);
+
 	private:
 
 		/** Background of speed control widget */
@@ -32,6 +34,9 @@ class SpeedMeter : public Drawable {
 
 		/** Arrow od speed control widget. It's facing north. */
 		CL_Sprite m_speedControlArrow;
+
+		/** Current speed in KM/S */
+		unsigned m_speedKMS;
 };
 
 #endif /* SPEEDMETER_H_ */

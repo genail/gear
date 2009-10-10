@@ -9,7 +9,8 @@
 
 #include "graphics/Stage.h"
 
-SpeedMeter::SpeedMeter()
+SpeedMeter::SpeedMeter() :
+	m_speedKMS(0)
 {
 }
 
@@ -27,6 +28,11 @@ void SpeedMeter::load(CL_GraphicContext &p_gc)
 
 void SpeedMeter::draw(CL_GraphicContext &p_gc)
 {
+	/* Start angle */
+	const CL_Angle startAngle(-140, cl_degrees);
+
+	/** Angle step per 1 km /s */
+	const float angleStep = 4.0f;
 
 	const CL_PolygonRasterizer oldRasteriser = p_gc.get_polygon_rasterizer();
 
@@ -40,12 +46,24 @@ void SpeedMeter::draw(CL_GraphicContext &p_gc)
 	p_gc.mult_translate(100 - 20, 500 + 20);
 	p_gc.mult_scale(0.20f, 0.20f);
 
+	// draw the speed meter background
 	m_speedControlBg.draw(p_gc, 0, 0);
 
-	p_gc.mult_rotate(CL_Angle(-100, cl_degrees));
+	// put arrow in the right angle
+	CL_Angle arrowRotation(startAngle);
+	arrowRotation += CL_Angle(angleStep * m_speedKMS, cl_degrees);
+
+	p_gc.mult_rotate(arrowRotation);
+
+	// draw the arrow
 	m_speedControlArrow.draw(p_gc, 0, 0);
 
 	p_gc.pop_modelview();
 
 	p_gc.set_polygon_rasterizer(oldRasteriser);
+}
+
+void SpeedMeter::setSpeed(unsigned p_speedKMS)
+{
+	m_speedKMS = p_speedKMS;
 }

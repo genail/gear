@@ -113,3 +113,10 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 	m_lapDisplayFont = CL_Font_Freetype(p_gc, fontDesc);
 
 }
+
+void RaceUI::update(unsigned p_timeElapsed)
+{
+	// set the speed meter
+	const float carSpeed = m_race->getLocalPlayer().getCar().getSpeedKMS();
+	m_speedMeter.setSpeed(carSpeed);
+}

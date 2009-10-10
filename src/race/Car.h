@@ -39,6 +39,9 @@ class Car: public Drawable {
 
 		float getSpeed() const { return m_speed; }
 
+		/** @return Car speed in km/s */
+		float getSpeedKMS() const { return m_speed / 3.0f; }
+
 		bool isDrifting() const { return m_turn != 0.0f; } // FIXME: ryba: must be true only when drifting
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);

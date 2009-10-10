@@ -32,7 +32,7 @@ void SpeedMeter::draw(CL_GraphicContext &p_gc)
 	const CL_Angle startAngle(-140, cl_degrees);
 
 	/** Angle step per 1 km /s */
-	const float angleStep = 4.0f;
+	const float angleStep = 1.0f;
 
 	const CL_PolygonRasterizer oldRasteriser = p_gc.get_polygon_rasterizer();
 

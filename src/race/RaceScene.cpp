@@ -64,7 +64,7 @@ void RaceScene::updateScale() {
 #endif
 }
 
-void RaceScene::update(unsigned timeElapsed) {
+void RaceScene::update(unsigned p_timeElapsed) {
 	// FIXME: ceplus: move updateScene() to this method
 
 	const Car &car = m_race->getLocalPlayer().getCar();
@@ -72,4 +72,7 @@ void RaceScene::update(unsigned timeElapsed) {
 	if (car.getLap() > m_race->getLapsNum()) {
 		m_viewport.detach();
 	}
+
+	// update race UI
+	m_raceUI.update(p_timeElapsed);
 }

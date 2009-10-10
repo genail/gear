@@ -28,6 +28,8 @@ class RaceUI: public Drawable {
 		virtual void draw(CL_GraphicContext &p_gc);
 		virtual void load(CL_GraphicContext &p_gc);
 
+		void update(unsigned p_timeElapsed);
+
 	private:
 
 		/** The Race pointer */

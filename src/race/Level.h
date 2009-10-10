@@ -58,8 +58,8 @@ class Level : public Drawable {
 		/** All cars */
 		std::vector<Car*> m_cars;
 
-		/** Car's last drift points */
-		std::map<Car*, CL_Pointf> m_carsDriftPoints;
+		/** Car's last drift points for all four tires: fr, rr, rl, fl */
+		std::map<Car*, CL_Pointf*> m_carsDriftPoints;
 
 		/** Loaded state */
 		bool m_loaded;

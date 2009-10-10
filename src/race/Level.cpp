@@ -231,7 +231,7 @@ void Level::addCar(Car *p_car) {
 
 
 	m_cars.push_back(p_car);
-	m_carsDriftPoints[p_car] = CL_Pointf();
+	m_carsDriftPoints[p_car] = new CL_Pointf[4];
 }
 
 void Level::removeCar(Car *p_car) {
@@ -247,6 +247,8 @@ void Level::removeCar(Car *p_car) {
 	}
 
 	p_car->m_level = NULL;
+
+	delete[] m_carsDriftPoints[p_car];
 	m_carsDriftPoints.erase(m_carsDriftPoints.find(p_car));
 }
 
@@ -260,41 +262,6 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 		return CL_Pointf(200, 200);
 	}
 
-//	// find the start line
-//	int startX, startY;
-//	bool foundStartLine = false;
-//
-//	for (int x = 0; x < m_width; ++x) {
-//		for (int y = 0; y < m_height; ++y) {
-//			// if this is a start/finish line, then add finish line checkpoint
-//			if (m_blocks[y * m_width + x].getType() == Block::BT_START_LINE) {
-//				startX = x;
-//				startY = y;
-//				foundStartLine = true;
-//				break;
-//			}
-//		}
-//
-//		if (foundStartLine) {
-//			break;
-//		}
-//	}
-//
-//	if (!foundStartLine) {
-//		assert(0 && "start line not found");
-//	}
-//
-//	int xOffset;
-//
-//	if (p_num % 2 == 1) {
-//		xOffset = 145;
-//	} else {
-//		xOffset = 65;
-//	}
-//
-//	int yOffset = p_num * 38;
-//
-//	return CL_Pointf(startX * BOX_WIDTH + xOffset, startY * BOX_WIDTH + yOffset);
 }
 
 void Level::update(unsigned p_timeElapsed)
@@ -302,47 +269,62 @@ void Level::update(unsigned p_timeElapsed)
 #ifndef NO_TYRE_STRIPES
 	foreach (Car* car, m_cars) {
 
-		CL_Pointf& lastDriftPoint = m_carsDriftPoints[car];
+		CL_Pointf* lastDriftPoints = m_carsDriftPoints[car];
+
+//		cl_log_event("debug", "last drift point %1 x %2", lastDriftPoint.x, lastDriftPoint.y);
 
 		const CL_Pointf &carPosition = car->getPosition();
 
+//		cl_log_event("debug", "car position %1 x %2", carPosition.x, carPosition.y);
+
 		if (car->isDrifting()) {
-			if (lastDriftPoint.x != 0 && lastDriftPoint.y != 0) {
 
-				static const float tyreRadius = 10.0f;
-				CL_Angle carAngle(car->getRotationRad(), cl_radians);
+			static const float tyreRadius = 10.0f;
+			CL_Angle carAngle(car->getRotationRad(), cl_radians);
 
-				CL_Vec2f v;
-				float rad;
+			CL_Vec2f v;
+			float rad;
 
-				for (int i = 0; i < 4; ++i) {
-					carAngle += CL_Angle(i == 0 ? 45 : 90, cl_degrees);
+			for (int i = 0; i < 4; ++i) {
 
-					rad = carAngle.to_radians();
+				carAngle += CL_Angle(i == 0 ? 45 : 90, cl_degrees);
 
-					v.x = cos(rad);
-					v.y = sin(rad);
+				rad = carAngle.to_radians();
 
-					v.normalize();
+				v.x = cos(rad);
+				v.y = sin(rad);
 
-					v *= tyreRadius;
+				v.normalize();
 
-					CL_Pointf stripePoint1(lastDriftPoint), stripePoint2(carPosition);
+				v *= tyreRadius;
 
-					stripePoint1 += v;
-					stripePoint2 += v;
+				CL_Pointf stripePointEnd(carPosition);
+				stripePointEnd += v;
 
-					m_tyreStripes.add(stripePoint1, stripePoint2);
+				// when last drift point is valid, then add the tire stripe
+				// if not, only update the drift point
+				if (lastDriftPoints[i].x != 0.0f && lastDriftPoints[i].y != 0.0f) {
+
+					CL_Pointf stripePointStart(lastDriftPoints[i]);
+
+//					cl_log_event("debug", "drift from %1 x %2", stripePoint1.x, stripePoint1.y);
+//					cl_log_event("debug", "drift to %1 x %2", stripePoint2.x, stripePoint2.y);
+
+					m_tyreStripes.add(stripePointStart, stripePointEnd, car);
 				}
 
+				lastDriftPoints[i].x = stripePointEnd.x;
+				lastDriftPoints[i].y = stripePointEnd.y;
 
 			}
 
-			lastDriftPoint.x = carPosition.x;
-			lastDriftPoint.y = carPosition.y;
+//			cl_log_event("debug", "last point saved %1 x %2", lastDriftPoint.x, lastDriftPoint.y);
+
 		} else {
-			lastDriftPoint.x = 0;
-			lastDriftPoint.y = 0;
+			for (int i = 0; i < 4; ++i) {
+				lastDriftPoints[i].x = 0;
+				lastDriftPoints[i].y = 0;
+			}
 		}
 	}
 #endif //NO_TYRE_STRIPES

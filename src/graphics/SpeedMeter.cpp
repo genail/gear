@@ -28,6 +28,18 @@ void SpeedMeter::load(CL_GraphicContext &p_gc)
 
 void SpeedMeter::draw(CL_GraphicContext &p_gc)
 {
+	/* bg and arrow sizes */
+	static const unsigned width = 400, height = 400;
+
+	/* Scale ration */
+	static const float scaleRatio = 0.4f;
+
+	/* Real width and height (after scaling) */
+	static const unsigned rwidth = width * scaleRatio, rheight = height * scaleRatio;
+
+	/* margin from left and bottom */
+	static const unsigned margin = 10;
+
 	/* Start angle */
 	const CL_Angle startAngle(-140, cl_degrees);
 
@@ -43,8 +55,9 @@ void SpeedMeter::draw(CL_GraphicContext &p_gc)
 	p_gc.set_polygon_rasterizer(rasterizer);
 
 	p_gc.push_modelview();
-	p_gc.mult_translate(100 - 20, 500 + 20);
-	p_gc.mult_scale(0.20f, 0.20f);
+	p_gc.mult_translate(rwidth / 2 + margin, Stage::getHeight() - rheight / 2 - margin);
+	p_gc.mult_scale(0.40f, 0.40f);
+
 
 	// draw the speed meter background
 	m_speedControlBg.draw(p_gc, 0, 0);

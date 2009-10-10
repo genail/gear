@@ -42,12 +42,12 @@
         <!-- Speed control -->
         <sprite name="speed_meter_bg">
             <image file="speed_meter_bg.png" />
-            <translation x="-400" y="-400"/>
+            <translation x="-200" y="-200"/>
         </sprite>
         
         <sprite name="speed_meter_arrow">
             <image file="speed_meter_arrow.png" />
-            <translation x="-400" y="-400"/>
+            <translation x="-200" y="-200"/>
         </sprite>
         
     </section>

@@ -45,9 +45,7 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car 
 				Stripe copy = s;
 
 				// remove old stripe
-//				cl_log_event("debug", "before: %1", m_stripes.size());
 				m_stripes.erase(ritor);
-//				cl_log_event("debug", "after: %1", m_stripes.size());
 
 				// and construct new one
 				m_stripes.push_back(Stripe(copy.m_from, p_to, p_owner));

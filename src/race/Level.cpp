@@ -271,11 +271,7 @@ void Level::update(unsigned p_timeElapsed)
 
 		CL_Pointf* lastDriftPoints = m_carsDriftPoints[car];
 
-//		cl_log_event("debug", "last drift point %1 x %2", lastDriftPoint.x, lastDriftPoint.y);
-
 		const CL_Pointf &carPosition = car->getPosition();
-
-//		cl_log_event("debug", "car position %1 x %2", carPosition.x, carPosition.y);
 
 		if (car->isDrifting()) {
 
@@ -307,9 +303,6 @@ void Level::update(unsigned p_timeElapsed)
 
 					CL_Pointf stripePointStart(lastDriftPoints[i]);
 
-//					cl_log_event("debug", "drift from %1 x %2", stripePoint1.x, stripePoint1.y);
-//					cl_log_event("debug", "drift to %1 x %2", stripePoint2.x, stripePoint2.y);
-
 					m_tyreStripes.add(stripePointStart, stripePointEnd, car);
 				}
 
@@ -318,9 +311,8 @@ void Level::update(unsigned p_timeElapsed)
 
 			}
 
-//			cl_log_event("debug", "last point saved %1 x %2", lastDriftPoint.x, lastDriftPoint.y);
-
 		} else {
+			// nullify all tires drift positions when no drift is done
 			for (int i = 0; i < 4; ++i) {
 				lastDriftPoints[i].x = 0;
 				lastDriftPoints[i].y = 0;

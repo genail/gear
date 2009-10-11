@@ -31,6 +31,7 @@ SET(CLIENT_SRCS
 SET(SERVER_SRCS
     ${COMMON_SRCS}
     ServerApplication.cpp
+    ServerConfiguration.cpp
     network/RaceServer.cpp
     network/Server.cpp
 )

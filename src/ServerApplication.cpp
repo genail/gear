@@ -10,6 +10,7 @@
 #include "ClanLib/network.h"
 
 #include "network/Server.h"
+#include "ServerConfiguration.h"
 
 CL_ClanApplication app(&ServerApplication::main);
 
@@ -21,7 +22,10 @@ int ServerApplication::main(const std::vector<CL_String> &args)
 
 		CL_ConsoleLogger logger;
 
-		Server server(2500);
+		// load the server configuration
+		ServerConfiguration config;
+
+		Server server(config.getPort());
 
 		while (true) {
 			CL_KeepAlive::process();

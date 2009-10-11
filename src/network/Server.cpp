@@ -19,6 +19,7 @@ Server::Server(int p_port) :
 	m_slots.connect(m_gameServer.sig_event_received(), this, &Server::slotEventArrived);
 
 	m_gameServer.start(CL_StringHelp::int_to_local8(p_port));
+	cl_log_event("runtime", "Server is up and running");
 }
 
 Server::~Server()

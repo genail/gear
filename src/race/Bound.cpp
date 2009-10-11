@@ -16,6 +16,8 @@ Bound::Bound(const CL_LineSegment2f &p_segment) :
 Bound::~Bound() {
 }
 
+#ifdef CLIENT
+
 void Bound::draw(CL_GraphicContext &p_gc) {
 	CL_Vec4f white_color(1.0f, 1.0f, 1.0f, 1.0f);
 //
@@ -38,3 +40,5 @@ void Bound::draw(CL_GraphicContext &p_gc) {
 //	p_gc.set_program_object(cl_program_color_only);
 //	p_gc.draw_primitives(cl_lines, 2, vertices);
 }
+
+#endif // CLIENT

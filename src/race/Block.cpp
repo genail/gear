@@ -9,6 +9,8 @@
 
 #include "Block.h"
 
+#include <cstdlib>
+
 Block::Block(BlockType p_type, int p_width) :
 	m_type(p_type),
 	m_resistanceMap(NULL),

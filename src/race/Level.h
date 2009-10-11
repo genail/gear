@@ -14,28 +14,22 @@
 #include "race/Block.h"
 #include "race/Bound.h"
 
-#ifdef CLIENT // client-only code
+#ifdef CLIENT
+
 #include "graphics/Stage.h"
 #include "race/TyreStripes.h"
 #include "graphics/Drawable.h"
 
-class Level : public Drawable
-{
-	public:
-		virtual void draw(CL_GraphicContext &p_gc);
+#define CLASS_LEVEL class Level : public Drawable
 
-		virtual void load(CL_GraphicContext &p_gc);
+#else // CLIENT
 
-	private:
-		/** Tyre stripes */
-		TyreStripes m_tyreStripes;
-
-#else // server-only code
-
-class Level
-{
+#define CLASS_LEVEL class Level
 
 #endif // CLIENT
+
+CLASS_LEVEL
+{
 
 	public:
 
@@ -62,6 +56,12 @@ class Level
 
 		void update(unsigned p_timeElapsed);
 
+#ifdef CLIENT
+		virtual void draw(CL_GraphicContext &p_gc);
+
+		virtual void load(CL_GraphicContext &p_gc);
+#endif // CLIENT
+
 
 	private:
 
@@ -85,6 +85,11 @@ class Level
 
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
+
+#ifdef CLIENT
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
+#endif // CLIENT
 
 
 

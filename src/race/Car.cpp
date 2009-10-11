@@ -7,7 +7,6 @@
 
 #include "race/Car.h"
 #include "Properties.h"
-#include "Message.h"
 #include "race/Level.h"
 #include "race/RacePlayer.h"
 

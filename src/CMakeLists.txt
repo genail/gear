@@ -1,7 +1,5 @@
 # Common source files
 SET(COMMON_SRCS
-    Debug.cpp
-    Message.cpp
     Player.cpp
     Properties.cpp
     race/Block.cpp

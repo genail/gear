@@ -8,9 +8,7 @@
 #ifndef CAR_H_
 #define CAR_H_
 
-#include "graphics/Stage.h"
 #include "race/Checkpoint.h"
-#include "graphics/Drawable.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
@@ -18,14 +16,40 @@
 class Level;
 class RacePlayer;
 
-class Car: public Drawable {
-	public:
-		Car(RacePlayer* p_player);
-		virtual ~Car();
+#ifdef CLIENT // client-only code
+#include "graphics/Stage.h"
+#include "graphics/Drawable.h"
 
+class Car: public Drawable
+{
+
+	public:
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);
+
+	private:
+		/** Car sprite */
+		CL_Sprite m_sprite;
+
+		/** Nickname display font */
+		CL_Font_Freetype m_nickDisplayFont;
+
+#ifndef NDEBUG
+		void debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, float y2, const CL_Color& p_color);
+#endif // NDEBUG
+
+
+#else // server-only code
+
+class Car
+{
+
+#endif // CLIENT
+
+	public:
+		Car(RacePlayer* p_player);
+		virtual ~Car();
 
 		int getLap() const { return m_lap; }
 
@@ -102,9 +126,6 @@ class Car: public Drawable {
 		/** Parent level */
 		Level* m_level;
 
-		/** Car sprite */
-		CL_Sprite m_sprite;
-
 		/** Locked state. If true then car shoudn't move. */
 		bool m_locked;
 
@@ -153,9 +174,6 @@ class Car: public Drawable {
 		/** Final lap checkpoint. Filled by parent Level */
 		Checkpoint m_lapCheckpoint;
 
-		/** Nickname display font */
-		CL_Font_Freetype m_nickDisplayFont;
-
 		int calculateInputChecksum() const;
 
 		float normalize(float p_value) const;
@@ -166,9 +184,6 @@ class Car: public Drawable {
 
 		friend class Level;
 
-#ifndef NDEBUG
-		void debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, float y2, const CL_Color& p_color);
-#endif // NDEBUG
 
 };
 

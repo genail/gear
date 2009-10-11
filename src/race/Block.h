@@ -8,9 +8,21 @@
 #ifndef BLOCK_H_
 #define BLOCK_H_
 
+#ifdef CLIENT
+
+#include "graphics/Stage.h"
 #include "graphics/Drawable.h"
 
-class Block : public Drawable {
+#define CLASS_BLOCK class Block : public Drawable
+
+#else
+
+#define CLASS_BLOCK class Block
+
+#endif //CLIENT
+
+CLASS_BLOCK
+{
 	public:
 
 		enum BlockType {
@@ -25,25 +37,34 @@ class Block : public Drawable {
 		};
 
 		Block() {}
-		Block(BlockType p_type, int p_width);
-		virtual ~Block();
 
-		virtual void draw(CL_GraphicContext& p_gc);
-		virtual void load(CL_GraphicContext& p_gc);
+		Block(BlockType p_type, int p_width);
+
+		virtual ~Block();
 
 		float getResistance(int x, int y) const;
 
 		BlockType getType() const { return m_type; }
+
+#ifdef CLIENT
+
+		virtual void draw(CL_GraphicContext& p_gc);
+
+		virtual void load(CL_GraphicContext& p_gc);
+
+#endif // CLIENT
 
 	private:
 		/** Subtype of this block */
 		BlockType m_type;
 
 		/** Resistance map */
-		float* m_resistanceMap;
+		float *m_resistanceMap;
 
 		/** Width of block side */
 		int m_width;
+
+#ifdef CLIENT
 
 		/** Background sprite */
 		CL_Sprite m_bgSprite;
@@ -53,6 +74,8 @@ class Block : public Drawable {
 
 		/** Secondary Foreground sprite */
 		CL_Sprite m_fgSprite2;
+
+#endif // CLIENT
 
 };
 

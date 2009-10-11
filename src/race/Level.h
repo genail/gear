@@ -10,22 +10,38 @@
 
 #include <ClanLib/core.h>
 
-#include "graphics/Drawable.h"
-
 #include "race/Car.h"
 #include "race/Block.h"
 #include "race/Bound.h"
+
+#ifdef CLIENT // client-only code
+#include "graphics/Stage.h"
 #include "race/TyreStripes.h"
+#include "graphics/Drawable.h"
 
-class Level : public Drawable {
+class Level : public Drawable
+{
 	public:
-		Level();
-		virtual ~Level();
-
-		// inherted from Drawable
 		virtual void draw(CL_GraphicContext &p_gc);
+
 		virtual void load(CL_GraphicContext &p_gc);
 
+	private:
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
+
+#else // server-only code
+
+class Level
+{
+
+#endif // CLIENT
+
+	public:
+
+		Level();
+
+		virtual ~Level();
 
 		void addCar(Car *p_car);
 
@@ -70,8 +86,7 @@ class Level : public Drawable {
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
 
-		/** Tyre stripes */
-		TyreStripes m_tyreStripes;
+
 
 
 		Level(const Level& p_level);

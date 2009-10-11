@@ -9,8 +9,6 @@
 
 #include "Block.h"
 
-#include "graphics/Stage.h"
-
 Block::Block(BlockType p_type, int p_width) :
 	m_type(p_type),
 	m_resistanceMap(NULL),
@@ -21,6 +19,8 @@ Block::Block(BlockType p_type, int p_width) :
 Block::~Block() {
 }
 
+
+#ifdef CLIENT
 void Block::draw(CL_GraphicContext& p_gc) {
 	CL_Rectf drawRect(
 			0, 0,
@@ -127,6 +127,8 @@ void Block::load(CL_GraphicContext& p_gc) {
 
 	}
 }
+
+#endif // CLIENT
 
 float Block::getResistance(int x, int y) const {
 	if (m_resistanceMap == NULL) {

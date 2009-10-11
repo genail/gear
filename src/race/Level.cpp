@@ -10,10 +10,8 @@
 #include "Level.h"
 
 #include <assert.h>
-#include <ClanLib/display.h>
 
 #include "common.h"
-#include "graphics/Stage.h"
 #include "race/Checkpoint.h"
 
 Level::Level() :
@@ -31,6 +29,7 @@ Level::~Level() {
 	}
 }
 
+#ifdef CLIENT
 void Level::draw(CL_GraphicContext &p_gc) {
 
 	// draw tiles
@@ -66,6 +65,8 @@ void Level::load(CL_GraphicContext &p_gc) {
 		}
 	}
 }
+
+#endif // CLIENT
 
 CL_String8 Level::readLine(CL_File& p_file) {
 	CL_String8 line = p_file.read_string_text("", "\n", false);
@@ -151,11 +152,8 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 }
 
-void Level::unload() {
-//	const int blocksTotal = m_width * m_height;
-//	for (int i = 0; i < blocksTotal; ++i) {
-//	}
-
+void Level::unload()
+{
 	delete[] m_blocks;
 }
 
@@ -266,6 +264,7 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 
 void Level::update(unsigned p_timeElapsed)
 {
+#ifdef CLIENT
 #ifndef NO_TYRE_STRIPES
 	foreach (Car* car, m_cars) {
 
@@ -319,6 +318,7 @@ void Level::update(unsigned p_timeElapsed)
 			}
 		}
 	}
-#endif //NO_TYRE_STRIPES
+#endif // !NO_TYRE_STRIPES
+#endif // CLIENT
 }
 

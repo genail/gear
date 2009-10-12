@@ -266,14 +266,18 @@ void Car::update(unsigned int elapsedTime) {
 	// daje nam efekt poślizgu (na ciało działa siła która działała na
 	// nie przed chwilą tylko pod wpływem nowych sił - nowego kierunku
 	// jazdy, maleje)
-		CL_Vec2f realVector = m_moveVector + ( accelerationVector * TENACITY );
-		realVector.normalize();
-		realVector *= fabs(m_speed);
-		m_moveVector = realVector;
-		if( accelerationVector.angle(m_moveVector).to_degrees() >= 179.0f ) {
-			m_moveVector = accelerationVector;
-		}
+	CL_Vec2f realVector = m_moveVector + ( accelerationVector * TENACITY );
+	realVector.normalize();
+	realVector *= fabs(m_speed);
+	m_moveVector = realVector;
+	if( accelerationVector.angle(m_moveVector).to_degrees() >= MAX_ANGLE ) {
+		m_moveVector = accelerationVector;
+	}
 	
+	float test;
+	test = accelerationVector.angle(m_moveVector).to_degrees();
+	
+	cl_log_event("debug", "%1", test);
 	
 	// update position
 	m_position.x += m_moveVector.x * delta;

@@ -155,7 +155,7 @@ void Car::update(unsigned int elapsedTime) {
 	
 	static const float MAX_ANGLE = 50.0f;
 	
-	static const float TENACITY = 0.09f;
+	static const float TENACITY = 0.08f;
 	
 	const float delta = elapsedTime / 1000.0f;
 	
@@ -252,13 +252,13 @@ void Car::update(unsigned int elapsedTime) {
 		changeVector *= tan( angle ) * fabs(m_speed) / 7.0f;
 	}
 	
-	CL_Vec2f newAccelVector; // nowy, świeżo wyliczony w następnym IFie,
+	//CL_Vec2f newAccelVector; // nowy, świeżo wyliczony w następnym IFie,
 	// wektor prędkości, zgodnie z którym pojechałoby autko bez poślizgu
 	
 	if( angle != 0.0f ) // sumowanie wektorow: skrętu i prostej jazdy
-		newAccelVector = changeVector + accelerationVector;
-	else // jak nie skręca to ma jechać przed siebie :)
-		newAccelVector = accelerationVector;
+		accelerationVector = changeVector + accelerationVector;
+	//else // jak nie skręca to ma jechać przed siebie :)
+	//	newAccelVector = accelerationVector;
 	
 	// wektor o który zostanie przesunięte autko (już z poślizgiem)
 	// tip: m_moveVector ma jeszcze wartość z poprzedniej klatki, więc
@@ -266,12 +266,12 @@ void Car::update(unsigned int elapsedTime) {
 	// daje nam efekt poślizgu (na ciało działa siła która działała na
 	// nie przed chwilą tylko pod wpływem nowych sił - nowego kierunku
 	// jazdy, maleje)
-		CL_Vec2f realVector = m_moveVector + ( newAccelVector * TENACITY );
+		CL_Vec2f realVector = m_moveVector + ( accelerationVector * TENACITY );
 		realVector.normalize();
 		realVector *= fabs(m_speed);
 		m_moveVector = realVector;
-		if( newAccelVector.angle(m_moveVector).to_degrees() >= 179.0f ) {
-			m_moveVector = newAccelVector;
+		if( accelerationVector.angle(m_moveVector).to_degrees() >= 179.0f ) {
+			m_moveVector = accelerationVector;
 		}
 	
 	
@@ -409,4 +409,16 @@ void Car::setStartPosition(int p_startPosition) {
 
 	// send the status change to other players
 	m_statusChangeSignal.invoke(*this);
+}
+
+bool Car::isDrifting() const {
+	
+	static const CL_Angle MIN_ANGLE(17, cl_degrees); // minimal angle for drifting
+	
+	// angle between acceleration vector and real move vector
+	CL_Angle currentAngle(accelerationVector.angle(m_moveVector).to_degrees(), cl_degrees);
+	
+	if (currentAngle > MIN_ANGLE) return true;
+	else return false;
+	
 }

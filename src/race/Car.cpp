@@ -67,8 +67,6 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	
 #ifndef NDEBUG
 	if (Properties::getPropertyAsBool("debug.draw_vectors")) {
-		debugDrawLine(p_gc, 0, 0, forceVector.x, forceVector.y, CL_Colorf::red);
-		debugDrawLine(p_gc, 0, 0, driftVector.x*10, driftVector.y*10, CL_Colorf::green);
 		debugDrawLine(p_gc, 0, 0, accelerationVector.x/10, accelerationVector.y/10, CL_Colorf::blue);
 		debugDrawLine(p_gc, 0, 0, m_moveVector.x/10, m_moveVector.y/10, CL_Colorf::black);
 	}
@@ -274,11 +272,6 @@ void Car::update(unsigned int elapsedTime) {
 		m_moveVector = accelerationVector;
 	}
 	
-	float test;
-	test = accelerationVector.angle(m_moveVector).to_degrees();
-	
-	cl_log_event("debug", "%1", test);
-	
 	// update position
 	m_position.x += m_moveVector.x * delta;
 	m_position.y += m_moveVector.y * delta;
@@ -313,7 +306,6 @@ void Car::update(unsigned int elapsedTime) {
 	
 #ifdef CLIENT
 #ifndef NDEBUG
-			Stage::getDebugLayer()->putMessage(CL_String8("force"),  CL_StringHelp::float_to_local8(forceVector.length()));
 			Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));
 			if (m_level != NULL) {
 				Stage::getDebugLayer()->putMessage(CL_String8("resist"), CL_StringHelp::float_to_local8(m_level->getResistance(m_position.x, m_position.y)));
@@ -417,12 +409,11 @@ void Car::setStartPosition(int p_startPosition) {
 
 bool Car::isDrifting() const {
 	
-	static const CL_Angle MIN_ANGLE(17, cl_degrees); // minimal angle for drifting
+	static const float MIN_SPEED = 320.0f;
+	static const float MIN_TURN = 0.5f;
 	
-	// angle between acceleration vector and real move vector
-	CL_Angle currentAngle(accelerationVector.angle(m_moveVector).to_degrees(), cl_degrees);
-	
-	if (currentAngle > MIN_ANGLE) return true;
+	if (m_brake && m_speed >= MIN_SPEED) return true;
+	else if (fabs(m_turn) >= MIN_TURN && m_speed >= MIN_SPEED) return true;
 	else return false;
 	
 }

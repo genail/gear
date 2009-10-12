@@ -51,7 +51,7 @@ CLASS_CAR
 		/** @return Car speed in km/s */
 		float getSpeedKMS() const { return m_speed / 3.0f; }
 
-		bool isDrifting() const { return m_turn != 0.0f; } // FIXME: ryba: must be true only when drifting
+		bool isDrifting() const;
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);
 

@@ -155,7 +155,7 @@ void Car::update(unsigned int elapsedTime) {
 	
 	static const float MAX_ANGLE = 50.0f;
 	
-	static const float TENACITY = 0.09f;
+	static const float TENACITY = 0.08f;
 	
 	const float delta = elapsedTime / 1000.0f;
 	
@@ -252,13 +252,13 @@ void Car::update(unsigned int elapsedTime) {
 		changeVector *= tan( angle ) * fabs(m_speed) / 7.0f;
 	}
 	
-	CL_Vec2f newAccelVector; // nowy, świeżo wyliczony w następnym IFie,
+	//CL_Vec2f newAccelVector; // nowy, świeżo wyliczony w następnym IFie,
 	// wektor prędkości, zgodnie z którym pojechałoby autko bez poślizgu
 	
 	if( angle != 0.0f ) // sumowanie wektorow: skrętu i prostej jazdy
-		newAccelVector = changeVector + accelerationVector;
-	else // jak nie skręca to ma jechać przed siebie :)
-		newAccelVector = accelerationVector;
+		accelerationVector = changeVector + accelerationVector;
+	//else // jak nie skręca to ma jechać przed siebie :)
+	//	newAccelVector = accelerationVector;
 	
 	// wektor o który zostanie przesunięte autko (już z poślizgiem)
 	// tip: m_moveVector ma jeszcze wartość z poprzedniej klatki, więc
@@ -266,14 +266,18 @@ void Car::update(unsigned int elapsedTime) {
 	// daje nam efekt poślizgu (na ciało działa siła która działała na
 	// nie przed chwilą tylko pod wpływem nowych sił - nowego kierunku
 	// jazdy, maleje)
-		CL_Vec2f realVector = m_moveVector + ( newAccelVector * TENACITY );
-		realVector.normalize();
-		realVector *= fabs(m_speed);
-		m_moveVector = realVector;
-		if( newAccelVector.angle(m_moveVector).to_degrees() >= 179.0f ) {
-			m_moveVector = newAccelVector;
-		}
+	CL_Vec2f realVector = m_moveVector + ( accelerationVector * TENACITY );
+	realVector.normalize();
+	realVector *= fabs(m_speed);
+	m_moveVector = realVector;
+	if( accelerationVector.angle(m_moveVector).to_degrees() >= MAX_ANGLE ) {
+		m_moveVector = accelerationVector;
+	}
 	
+	float test;
+	test = accelerationVector.angle(m_moveVector).to_degrees();
+	
+	cl_log_event("debug", "%1", test);
 	
 	// update position
 	m_position.x += m_moveVector.x * delta;
@@ -393,7 +397,7 @@ void Car::setStartPosition(int p_startPosition) {
 		m_position = m_level->getStartPosition(p_startPosition);
 	} else {
 		cl_log_event("warning", "Car not on Level.");
-		m_position = CL_Pointf(200, 200);
+		m_position = CL_Pointf(300, 300);
 	}
 
 	// stop the car!
@@ -403,12 +407,22 @@ void Car::setStartPosition(int p_startPosition) {
 	m_brake = false;
 	m_moveVector = CL_Vec2f();
 	accelerationVector = CL_Vec2f();
-	forceVector = CL_Vec2f();
-	driftVector = CL_Vec2f();
 	m_speed = 0.0f;
 	m_angle = 0.0f;
 	m_lap = 1;
 
 	// send the status change to other players
 	m_statusChangeSignal.invoke(*this);
+}
+
+bool Car::isDrifting() const {
+	
+	static const CL_Angle MIN_ANGLE(17, cl_degrees); // minimal angle for drifting
+	
+	// angle between acceleration vector and real move vector
+	CL_Angle currentAngle(accelerationVector.angle(m_moveVector).to_degrees(), cl_degrees);
+	
+	if (currentAngle > MIN_ANGLE) return true;
+	else return false;
+	
 }

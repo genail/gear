@@ -10,22 +10,32 @@
 
 #include <ClanLib/core.h>
 
-#include "graphics/Drawable.h"
-
 #include "race/Car.h"
 #include "race/Block.h"
 #include "race/Bound.h"
+
+#ifdef CLIENT
+
+#include "graphics/Stage.h"
 #include "race/TyreStripes.h"
+#include "graphics/Drawable.h"
 
-class Level : public Drawable {
+#define CLASS_LEVEL class Level : public Drawable
+
+#else // CLIENT
+
+#define CLASS_LEVEL class Level
+
+#endif // CLIENT
+
+CLASS_LEVEL
+{
+
 	public:
+
 		Level();
+
 		virtual ~Level();
-
-		// inherted from Drawable
-		virtual void draw(CL_GraphicContext &p_gc);
-		virtual void load(CL_GraphicContext &p_gc);
-
 
 		void addCar(Car *p_car);
 
@@ -46,6 +56,12 @@ class Level : public Drawable {
 
 		void update(unsigned p_timeElapsed);
 
+#ifdef CLIENT
+		virtual void draw(CL_GraphicContext &p_gc);
+
+		virtual void load(CL_GraphicContext &p_gc);
+#endif // CLIENT
+
 
 	private:
 
@@ -58,8 +74,8 @@ class Level : public Drawable {
 		/** All cars */
 		std::vector<Car*> m_cars;
 
-		/** Car's last drift points */
-		std::map<Car*, CL_Pointf> m_carsDriftPoints;
+		/** Car's last drift points for all four tires: fr, rr, rl, fl */
+		std::map<Car*, CL_Pointf*> m_carsDriftPoints;
 
 		/** Loaded state */
 		bool m_loaded;
@@ -70,8 +86,12 @@ class Level : public Drawable {
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
 
+#ifdef CLIENT
 		/** Tyre stripes */
 		TyreStripes m_tyreStripes;
+#endif // CLIENT
+
+
 
 
 		Level(const Level& p_level);

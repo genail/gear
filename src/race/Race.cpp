@@ -10,7 +10,6 @@
 #include <stdlib.h>
 
 #include "common.h"
-#include "Message.h"
 #include "graphics/Stage.h"
 #include "network/events.h"
 #include "network/Client.h"
@@ -116,14 +115,14 @@ void Race::exec()
 
 void Race::loadAll()
 {
-	Debug::out() << "Loading race..." << std::endl;
+	cl_log_event("race", "Loading race...");
 	const unsigned start = CL_System::get_time();
 
 	CL_GraphicContext gc = m_displayWindow->get_gc();
 	m_raceScene.load(gc);
 
 	const unsigned duration = CL_System::get_time() - start;
-	Debug::out() << "Loaded in " << duration << " ms" << std::endl;
+	cl_log_event("race", "Loaded in %1 ms", duration);
 }
 
 void Race::grabInput(unsigned delta)
@@ -226,7 +225,7 @@ void Race::drawScene(unsigned p_delta)
 void Race::slotCarStateChangedRemote(const CL_NetGameEvent& p_event)
 {
 
-	Debug::out() << "handling " << p_event.get_name().c_str() << std::endl;
+	cl_log_event("event", "handling %1", p_event.to_string());
 
 	// first argument will be name of player
 	const CL_String name = (CL_String) p_event.get_argument(0);
@@ -240,7 +239,7 @@ void Race::slotCarStateChangedRemote(const CL_NetGameEvent& p_event)
 		RacePlayer *racePlayer = findPlayer(name);
 
 		if (racePlayer == NULL) {
-			Debug::err() << "remote player '" << name.c_str() << "' not found" << std::endl;
+			cl_log_event("error", "remote player '%1' not found", name);
 			return;
 		}
 
@@ -273,7 +272,7 @@ void Race::slotCarStateChangedLocal(Car &p_car)
 void Race::slotPlayerReady(Player* p_player)
 {
 
-	Debug::out() << "Player '" << p_player->getName().c_str() << "' has arrived" << std::endl;
+	cl_log_event("event", "Player '%1' has arrived", p_player->getName());
 
 	RacePlayer *racePlayer = new RacePlayer(p_player);
 
@@ -288,7 +287,7 @@ void Race::slotPlayerReady(Player* p_player)
 void Race::slotPlayerLeaving(Player* p_player)
 {
 
-	Debug::out() << "Player '" << p_player->getName().c_str() << "' is leaving" << std::endl;
+	cl_log_event("event", "Player '%1' is leaving", p_player->getName());
 
 	m_iterationMutex.lock();
 

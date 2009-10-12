@@ -10,21 +10,29 @@
 #include "ClanLib/network.h"
 
 #include "network/Server.h"
+#include "ServerConfiguration.h"
 
 CL_ClanApplication app(&ServerApplication::main);
 
 int ServerApplication::main(const std::vector<CL_String> &args)
 {
-	CL_SetupCore setup_core;
-	CL_SetupNetwork setup_network;
+	try {
+		CL_SetupCore setup_core;
+		CL_SetupNetwork setup_network;
 
-	CL_ConsoleLogger logger;
+		CL_ConsoleLogger logger;
 
-	Server server(2500);
+		// load the server configuration
+		ServerConfiguration config;
 
-	while (true) {
-		CL_KeepAlive::process();
-		server.update(10);
-		CL_System::sleep(10);
+		Server server(config.getPort());
+
+		while (true) {
+			CL_KeepAlive::process();
+			server.update(10);
+			CL_System::sleep(10);
+		}
+	} catch (CL_Exception e) {
+		CL_Console::write_line("Exception thrown: %1", e.message);
 	}
 }

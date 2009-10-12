@@ -7,17 +7,17 @@
 
 #include "race/Car.h"
 #include "Properties.h"
-#include "Message.h"
 #include "race/Level.h"
 #include "race/RacePlayer.h"
 
 #include <ClanLib/core.h>
-#include <ClanLib/display.h>
 
 Car::Car(RacePlayer *p_player) :
+#ifdef CLIENT
+	m_sprite(),
+#endif // CLIENT
 	m_player(p_player),
 	m_level(NULL),
-	m_sprite(),
 	m_locked(false),
 	m_position(0.0f, 0.0f), //najnowsza pozycja autka
 	m_rotation(0, cl_degrees), // kąt pod jakim stoi autko
@@ -36,6 +36,7 @@ Car::Car(RacePlayer *p_player) :
 Car::~Car() {
 }
 
+#ifdef CLIENT
 void Car::draw(CL_GraphicContext &p_gc) {
 
 	// TODO: move to load();
@@ -134,8 +135,9 @@ void Car::debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, f
 
 void Car::load(CL_GraphicContext &p_gc) {
 
-
 }
+
+#endif // CLIENT
 
 void Car::update(unsigned int elapsedTime) {
 	
@@ -305,13 +307,15 @@ void Car::update(unsigned int elapsedTime) {
 		m_rotation.set_degrees( atan2( rotVector.y, rotVector.x ) * 180.0f / 3.14f );
 	}
 	
+#ifdef CLIENT
 #ifndef NDEBUG
 			Stage::getDebugLayer()->putMessage(CL_String8("force"),  CL_StringHelp::float_to_local8(forceVector.length()));
 			Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));
 			if (m_level != NULL) {
 				Stage::getDebugLayer()->putMessage(CL_String8("resist"), CL_StringHelp::float_to_local8(m_level->getResistance(m_position.x, m_position.y)));
 			}
-#endif
+#endif // NDEBUG
+#endif // CLIENT
 }
 
 int Car::prepareStatusEvent(CL_NetGameEvent &p_event) {

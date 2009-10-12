@@ -17,14 +17,17 @@ RaceUI::RaceUI(Race *p_race) :
 {
 }
 
-RaceUI::~RaceUI() {
+RaceUI::~RaceUI()
+{
 }
 
-void RaceUI::displayCountdown() {
+void RaceUI::displayCountdown()
+{
 	m_countDownStart = CL_System::get_time();
 }
 
-void RaceUI::draw(CL_GraphicContext &p_gc) {
+void RaceUI::draw(CL_GraphicContext &p_gc)
+{
 
 	const Car &car = m_race->getLocalPlayer().getCar();
 
@@ -39,6 +42,9 @@ void RaceUI::draw(CL_GraphicContext &p_gc) {
 
 	const CL_String currentLapStr = CL_StringHelp::int_to_local8(currentLap);
 	const CL_String lapsNumStr = CL_StringHelp::int_to_local8(lapNum);
+
+	// draw speed control
+	m_speedMeter.draw(p_gc);
 
 	// draw lap
 
@@ -75,7 +81,8 @@ void RaceUI::draw(CL_GraphicContext &p_gc) {
 	}
 }
 
-void RaceUI::drawCountdownLabel(CL_GraphicContext &p_gc, const CL_String &p_label) {
+void RaceUI::drawCountdownLabel(CL_GraphicContext &p_gc, const CL_String &p_label)
+{
 	const CL_Size size = m_countdownFont.get_text_size(p_gc, p_label);
 	m_countdownFont.draw_text(
 			p_gc,
@@ -86,7 +93,11 @@ void RaceUI::drawCountdownLabel(CL_GraphicContext &p_gc, const CL_String &p_labe
 	);
 }
 
-void RaceUI::load(CL_GraphicContext &p_gc) {
+void RaceUI::load(CL_GraphicContext &p_gc)
+{
+	// load speed meter
+	m_speedMeter.load(p_gc);
+
 
 	// load countdown font
 	CL_FontDescription fontDesc;
@@ -101,4 +112,11 @@ void RaceUI::load(CL_GraphicContext &p_gc) {
 
 	m_lapDisplayFont = CL_Font_Freetype(p_gc, fontDesc);
 
+}
+
+void RaceUI::update(unsigned p_timeElapsed)
+{
+	// set the speed meter
+	const float carSpeed = m_race->getLocalPlayer().getCar().getSpeedKMS();
+	m_speedMeter.setSpeed(carSpeed);
 }

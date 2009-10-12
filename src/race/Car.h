@@ -8,9 +8,7 @@
 #ifndef CAR_H_
 #define CAR_H_
 
-#include "graphics/Stage.h"
 #include "race/Checkpoint.h"
-#include "graphics/Drawable.h"
 
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
@@ -18,14 +16,25 @@
 class Level;
 class RacePlayer;
 
-class Car: public Drawable {
+#ifdef CLIENT // client-only code
+#include "graphics/Stage.h"
+#include "graphics/Drawable.h"
+
+#define CLASS_CAR class Car : public Drawable
+
+
+#else // server-only code
+
+#define CLASS_CAR class Car
+
+#endif // CLIENT
+
+CLASS_CAR
+{
+
 	public:
 		Car(RacePlayer* p_player);
 		virtual ~Car();
-
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
 
 		int getLap() const { return m_lap; }
 
@@ -39,6 +48,9 @@ class Car: public Drawable {
 
 		float getSpeed() const { return m_speed; }
 
+		/** @return Car speed in km/s */
+		float getSpeedKMS() const { return m_speed / 3.0f; }
+
 		bool isDrifting() const { return m_turn != 0.0f; } // FIXME: ryba: must be true only when drifting
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);
@@ -48,15 +60,19 @@ class Car: public Drawable {
 		void setAcceleration(bool p_value) {
 			m_acceleration = p_value;
 #ifndef NDEBUG
+#ifdef CLIENT
 			Stage::getDebugLayer()->putMessage(CL_String8("accel"),  CL_StringHelp::bool_to_local8(p_value));
-#endif
+#endif // CLIENT
+#endif // !NDEBUG
 		}
 
 		void setBrake(bool p_value) {
 			m_brake = p_value;
 #ifndef NDEBUG
+#ifdef CLIENT
 			Stage::getDebugLayer()->putMessage(CL_String8("brake"),  CL_StringHelp::bool_to_local8(p_value));
-#endif
+#endif // CLIENT
+#endif // !NDEBUG
 		}
 
 		void setLap(int p_lap) { m_lap = p_lap; }
@@ -69,8 +85,10 @@ class Car: public Drawable {
 		void setTurn(float p_value) {
 			m_turn = normalize(p_value);
 #ifndef NDEBUG
+#ifdef CLIENT
 			Stage::getDebugLayer()->putMessage(CL_String8("turn"),  CL_StringHelp::float_to_local8(p_value));
-#endif
+#endif // CLIENT
+#endif // !NDEBUG
 		}
 
 		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
@@ -91,6 +109,12 @@ class Car: public Drawable {
 
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
+#ifdef CLIENT
+		virtual void draw(CL_GraphicContext &p_gc);
+
+		virtual void load(CL_GraphicContext &p_gc);
+#endif // CLIENT
+
 	private:
 		
 		/** Parent player */
@@ -98,9 +122,6 @@ class Car: public Drawable {
 
 		/** Parent level */
 		Level* m_level;
-
-		/** Car sprite */
-		CL_Sprite m_sprite;
 
 		/** Locked state. If true then car shoudn't move. */
 		bool m_locked;
@@ -150,9 +171,6 @@ class Car: public Drawable {
 		/** Final lap checkpoint. Filled by parent Level */
 		Checkpoint m_lapCheckpoint;
 
-		/** Nickname display font */
-		CL_Font_Freetype m_nickDisplayFont;
-
 		int calculateInputChecksum() const;
 
 		float normalize(float p_value) const;
@@ -163,9 +181,18 @@ class Car: public Drawable {
 
 		friend class Level;
 
+#ifdef CLIENT
+		/** Car sprite */
+		CL_Sprite m_sprite;
+
+		/** Nickname display font */
+		CL_Font_Freetype m_nickDisplayFont;
+
 #ifndef NDEBUG
 		void debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, float y2, const CL_Color& p_color);
-#endif // NDEBUG
+#endif // !NDEBUG
+#endif // CLIENT
+
 
 };
 

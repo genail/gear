@@ -1,0 +1,6 @@
+<config>
+    <server>
+        <!-- Listen port. Default is 2500 -->
+        <port>2500</port>
+    </server>
+</config>

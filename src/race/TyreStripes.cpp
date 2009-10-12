@@ -18,12 +18,52 @@ TyreStripes::~TyreStripes()
 {
 }
 
-void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to)
+void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car *p_owner)
 {
-	static const int STRIPE_LIMIT = 2000;
+	static const unsigned STRIPE_LIMIT = 400;
+	static const unsigned STRIPE_LENGTH_LIMIT = 15;
+	static const unsigned BACK_SEARCH_LIMIT = 4;
 
-	Stripe stripe(p_from, p_to);
-	m_stripes.push_back(stripe);
+	// search for four last stripes of this car and check if I can merge
+	// this stripe to the last one
+	bool merged = false;
+	unsigned foundCount = 0;
+
+	for (
+			std::list<Stripe>::iterator ritor = m_stripes.end();
+			ritor != m_stripes.begin();
+			--ritor
+	) {
+		Stripe s = *ritor;
+
+		if (s.m_owner == p_owner) {
+
+			++foundCount;
+
+			// must end on the same point and length must be below limit
+			if (s.m_to == p_from && s.length() < STRIPE_LENGTH_LIMIT) {
+				Stripe copy = s;
+
+				// remove old stripe
+				m_stripes.erase(ritor);
+
+				// and construct new one
+				m_stripes.push_back(Stripe(copy.m_from, p_to, p_owner));
+				merged = true;
+
+				break;
+			}
+
+			if (foundCount == BACK_SEARCH_LIMIT) {
+				break;
+			}
+		}
+	}
+
+	if (!merged) {
+		// when not merged, then create a new stripe
+		m_stripes.push_back(Stripe(p_from, p_to, p_owner));
+	}
 
 	// remove all stripes above the limit
 	if (m_stripes.size() > STRIPE_LIMIT) {

@@ -121,7 +121,7 @@ CLASS_CAR
 		CL_CollisionOutline calculateCurrentCollisionOutline() const;
 
 		/** Invoked when collision with bound has occurred */
-		void performBoundCollision(const Bound &p_bound) { cl_log_event("todo", "bound collision!"); } // FIXME: Ryba
+		void performBoundCollision(const Bound &p_bound) {} // FIXME: Ryba
 #endif // !SERVER
 
 	private:

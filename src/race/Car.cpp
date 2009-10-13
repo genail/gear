@@ -12,6 +12,12 @@
 
 #include <ClanLib/core.h>
 
+/* Car width in pixels */
+const int CAR_WIDTH = 18;
+
+/* Car height in pixels */
+const int CAR_HEIGHT = 24;
+
 Car::Car(RacePlayer *p_player) :
 #ifdef CLIENT
 	m_sprite(),
@@ -30,7 +36,23 @@ Car::Car(RacePlayer *p_player) :
 	m_lap(0),
 	m_handbrake(false)
 {
+#ifdef CLIENT
+	// build car contour for collision check
+	CL_Contour contour;
 
+	const int halfWidth = CAR_WIDTH / 2;
+	const int halfHeight = CAR_HEIGHT / 2;
+	contour.get_points().push_back(CL_Pointf(-halfWidth, halfHeight));
+	contour.get_points().push_back(CL_Pointf(halfWidth, halfHeight));
+	contour.get_points().push_back(CL_Pointf(halfWidth, -halfHeight));
+	contour.get_points().push_back(CL_Pointf(-halfWidth, -halfHeight));
+
+	m_collisionOutline.get_contours().push_back(contour);
+	m_collisionOutline.calculate_radius();
+	m_collisionOutline.calculate_smallest_enclosing_discs();
+
+	m_collisionOutline.set_inside_test(true);
+#endif // CLIENT
 }
 
 Car::~Car() {
@@ -412,3 +434,23 @@ void Car::setStartPosition(int p_startPosition) {
 	// send the status change to other players
 	m_statusChangeSignal.invoke(*this);
 }
+
+#ifdef CLIENT
+CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
+{
+	CL_CollisionOutline outline(m_collisionOutline);
+
+//	outline.calculate_smallest_enclosing_discs();
+//	outline.set_inside_test(true);
+
+
+	// transform the outline
+	CL_Angle angle(90, cl_degrees);
+	angle += m_rotation;
+
+	outline.set_angle(angle);
+	outline.set_translation(m_position.x, m_position.y);
+
+	return outline;
+}
+#endif

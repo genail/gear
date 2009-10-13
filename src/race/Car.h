@@ -113,6 +113,9 @@ CLASS_CAR
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);
+
+		/** @return Current collision outline based on car position and rotation */
+		CL_CollisionOutline calculateCurrentCollisionOutline() const;
 #endif // CLIENT
 
 	private:
@@ -187,6 +190,9 @@ CLASS_CAR
 
 		/** Nickname display font */
 		CL_Font_Freetype m_nickDisplayFont;
+
+		/** Body outline for collision check */
+		CL_CollisionOutline m_collisionOutline;
 
 #ifndef NDEBUG
 		void debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, float y2, const CL_Color& p_color);

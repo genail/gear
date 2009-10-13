@@ -338,21 +338,32 @@ void Level::checkCollistions()
 {
 	CL_CollisionOutline coll1, coll2;
 
+
 	foreach (Car *c1, m_cars) {
 		coll1 = c1->calculateCurrentCollisionOutline();
 
-		foreach (Car *c2, m_cars) {
+		// check car collisions
+		// TODO: later :-)
+//		foreach (Car *c2, m_cars) {
+//
+//			if (c1 == c2) {
+//				continue;
+//			}
+//
+//			coll2 = c2->calculateCurrentCollisionOutline();
+//
+//			if (coll1.collide(coll2)) {
+//				cl_log_event("debug", "collision");
+//			}
+//		}
 
-			if (c1 == c2) {
-				continue;
-			}
-
-			coll2 = c2->calculateCurrentCollisionOutline();
-
-			if (coll1.collide(coll2)) {
-				cl_log_event("debug", "collision");
+		// check bounds collisions
+		foreach (const Bound &bound, m_bounds) {
+			if (coll1.collide(bound.getCollisionOutline())) {
+				c1->performBoundCollision(bound);
 			}
 		}
 	}
+
 }
 #endif // CLIENT

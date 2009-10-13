@@ -13,10 +13,13 @@
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 
+#include "race/Bound.h"
+
 class Level;
 class RacePlayer;
 
 #ifdef CLIENT // client-only code
+
 #include "graphics/Stage.h"
 #include "graphics/Drawable.h"
 
@@ -109,14 +112,17 @@ CLASS_CAR
 
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
-#ifdef CLIENT
+#ifndef SERVER
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);
 
 		/** @return Current collision outline based on car position and rotation */
 		CL_CollisionOutline calculateCurrentCollisionOutline() const;
-#endif // CLIENT
+
+		/** Invoked when collision with bound has occurred */
+		void performBoundCollision(const Bound &p_bound) { cl_log_event("todo", "bound collision!"); } // FIXME: Ryba
+#endif // !SERVER
 
 	private:
 		

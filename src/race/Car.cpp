@@ -36,7 +36,7 @@ Car::Car(RacePlayer *p_player) :
 	m_lap(0),
 	m_handbrake(false)
 {
-#ifdef CLIENT
+#ifndef SERVER
 	// build car contour for collision check
 	CL_Contour contour;
 
@@ -48,11 +48,12 @@ Car::Car(RacePlayer *p_player) :
 	contour.get_points().push_back(CL_Pointf(-halfWidth, -halfHeight));
 
 	m_collisionOutline.get_contours().push_back(contour);
-	m_collisionOutline.calculate_radius();
-	m_collisionOutline.calculate_smallest_enclosing_discs();
 
 	m_collisionOutline.set_inside_test(true);
-#endif // CLIENT
+
+	m_collisionOutline.calculate_radius();
+	m_collisionOutline.calculate_smallest_enclosing_discs();
+#endif // !SERVERs
 }
 
 Car::~Car() {

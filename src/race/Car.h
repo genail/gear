@@ -50,7 +50,7 @@ CLASS_CAR
 
 		/** @return Car speed in km/s */
 		float getSpeedKMS() const { return m_speed / 3.0f; }
-
+		
 		bool isDrifting() const;
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);

@@ -25,13 +25,13 @@ Car::Car(RacePlayer *p_player) :
 	m_player(p_player),
 	m_level(NULL),
 	m_locked(false),
-	m_position(0.0f, 0.0f), //najnowsza pozycja autka
-	m_rotation(0, cl_degrees), // kąt pod jakim stoi autko
-	m_turn(0.0f), //na boki
-	m_acceleration(false), //do przodu
-	m_brake(false), //do tyłu
+	m_position(0.0f, 0.0f),
+	m_rotation(0, cl_degrees),
+	m_turn(0.0f),
+	m_acceleration(false),
+	m_brake(false),
 	m_speed(0.0f),
-	m_angle(0.0f), // kąt zmiany kierunku jazdy
+	m_angle(0.0f),
 	m_inputChecksum(0),
 	m_lap(0),
 	m_handbrake(false)
@@ -61,6 +61,9 @@ Car::~Car() {
 
 #ifdef CLIENT
 void Car::draw(CL_GraphicContext &p_gc) {
+	
+	//debugDrawLine(p_gc, m_position.x, m_position.y, m_position.x + m_moveVector.x/2, m_position.y + m_moveVector.y/2, CL_Colorf::red);
+	//debugDrawLine(p_gc, m_position.x, m_position.y, m_position.x + accelerationVector.x/2, m_position.y + accelerationVector.y/2, CL_Colorf::black);
 	
 	// TODO: move to load();
 	if (m_sprite.is_null()) {
@@ -426,7 +429,6 @@ void Car::setStartPosition(int p_startPosition) {
 	// send the status change to other players
 	m_statusChangeSignal.invoke(*this);
 }
-
 
 bool Car::isDrifting() const {
 	

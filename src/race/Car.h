@@ -121,7 +121,32 @@ CLASS_CAR
 		CL_CollisionOutline calculateCurrentCollisionOutline() const;
 
 		/** Invoked when collision with bound has occurred */
-		void performBoundCollision(const Bound &p_bound) {} // FIXME: Ryba
+		void performBoundCollision(const Bound &p_bound) {
+			CL_Vec2f reactionVector;
+			CL_Vec2f boundVector;
+			
+			boundVector.x = fabs(p_bound.getSegment().q.x - p_bound.getSegment().p.x);
+			boundVector.y = fabs(p_bound.getSegment().q.y - p_bound.getSegment().p.y);
+			
+			reactionVector.x = -boundVector.y;
+			
+			if (m_position.x < fabs(p_bound.getSegment().q.x))
+				reactionVector.x = -boundVector.y;
+			
+			else if (m_position.x >= fabs(p_bound.getSegment().q.x))
+				reactionVector.x = boundVector.y;
+			
+			if (m_position.y < fabs(p_bound.getSegment().q.y))
+				reactionVector.y = -boundVector.x;
+			
+			else if (m_position.y >= fabs(p_bound.getSegment().q.y))
+				reactionVector.y = boundVector.x;
+			
+			reactionVector.normalize();
+			reactionVector *= m_speed;
+			
+			m_moveVector += reactionVector;
+		} // FIXME: Ryba
 #endif // !SERVER
 
 	private:

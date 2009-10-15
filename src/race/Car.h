@@ -53,8 +53,8 @@ CLASS_CAR
 
 		/** @return Car speed in km/s */
 		float getSpeedKMS() const { return m_speed / 3.0f; }
-
-		bool isDrifting() const { return m_turn != 0.0f; } // FIXME: ryba: must be true only when drifting
+		
+		bool isDrifting() const;
 
 		int prepareStatusEvent(CL_NetGameEvent &p_event);
 
@@ -121,7 +121,32 @@ CLASS_CAR
 		CL_CollisionOutline calculateCurrentCollisionOutline() const;
 
 		/** Invoked when collision with bound has occurred */
-		void performBoundCollision(const Bound &p_bound) {} // FIXME: Ryba
+		void performBoundCollision(const Bound &p_bound) {
+			CL_Vec2f reactionVector;
+			CL_Vec2f boundVector;
+			
+			boundVector.x = fabs(p_bound.getSegment().q.x - p_bound.getSegment().p.x);
+			boundVector.y = fabs(p_bound.getSegment().q.y - p_bound.getSegment().p.y);
+			
+			reactionVector.x = -boundVector.y;
+			
+			if (m_position.x < fabs(p_bound.getSegment().q.x))
+				reactionVector.x = -boundVector.y;
+			
+			else if (m_position.x >= fabs(p_bound.getSegment().q.x))
+				reactionVector.x = boundVector.y;
+			
+			if (m_position.y < fabs(p_bound.getSegment().q.y))
+				reactionVector.y = -boundVector.x;
+			
+			else if (m_position.y >= fabs(p_bound.getSegment().q.y))
+				reactionVector.y = boundVector.x;
+			
+			reactionVector.normalize();
+			reactionVector *= m_speed;
+			
+			m_moveVector += reactionVector;
+		} // FIXME: Ryba
 #endif // !SERVER
 
 	private:
@@ -156,8 +181,6 @@ CLASS_CAR
 		/** Move vector */
 		CL_Vec2f m_moveVector;
 		CL_Vec2f accelerationVector;
-		CL_Vec2f forceVector;
-		CL_Vec2f driftVector;
 
 		/** Current speed */
 		float m_speed;

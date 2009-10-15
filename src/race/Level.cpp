@@ -56,6 +56,13 @@ void Level::draw(CL_GraphicContext &p_gc) {
 		(*itor).draw(p_gc);
 	}
 
+#ifndef NDEBUG
+	// draw collision outlines
+	foreach (Car *car, m_cars) {
+		car->calculateCurrentCollisionOutline().draw(0, 0, CL_Colorf::red, p_gc);
+	}
+#endif // !NDEBUG
+
 }
 
 void Level::load(CL_GraphicContext &p_gc) {
@@ -265,6 +272,10 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 void Level::update(unsigned p_timeElapsed)
 {
 #ifdef CLIENT
+
+	// check collisions
+	checkCollistions();
+
 #ifndef NO_TYRE_STRIPES
 	foreach (Car* car, m_cars) {
 
@@ -322,3 +333,37 @@ void Level::update(unsigned p_timeElapsed)
 #endif // CLIENT
 }
 
+#ifdef CLIENT
+void Level::checkCollistions()
+{
+	CL_CollisionOutline coll1, coll2;
+
+
+	foreach (Car *c1, m_cars) {
+		coll1 = c1->calculateCurrentCollisionOutline();
+
+		// check car collisions
+		// TODO: later :-)
+//		foreach (Car *c2, m_cars) {
+//
+//			if (c1 == c2) {
+//				continue;
+//			}
+//
+//			coll2 = c2->calculateCurrentCollisionOutline();
+//
+//			if (coll1.collide(coll2)) {
+//				cl_log_event("debug", "collision");
+//			}
+//		}
+
+		// check bounds collisions
+		foreach (const Bound &bound, m_bounds) {
+			if (coll1.collide(bound.getCollisionOutline())) {
+				c1->performBoundCollision(bound);
+			}
+		}
+	}
+
+}
+#endif // CLIENT

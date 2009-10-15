@@ -1,3 +1,6 @@
+*~
+*.swp
+*.dia.autosave
 **/*~
 **/*.swp
 **/*.dia.autosave

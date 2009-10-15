@@ -10,23 +10,29 @@
 Bound::Bound(const CL_LineSegment2f &p_segment) :
 	m_segment(p_segment)
 {
+#ifndef SERVER
+	// build this bound contour
+	CL_Contour contour;
 
+	contour.get_points().push_back(p_segment.p);
+	contour.get_points().push_back(p_segment.q);
+
+	m_collisionOutline.get_contours().push_back(contour);
+
+	m_collisionOutline.set_inside_test(true);
+
+	m_collisionOutline.calculate_radius();
+	m_collisionOutline.calculate_smallest_enclosing_discs();
+#endif // !SERVER
 }
 
 Bound::~Bound() {
 }
 
-#ifdef CLIENT
+#ifndef SERVER
 
 void Bound::draw(CL_GraphicContext &p_gc) {
 	CL_Vec4f white_color(1.0f, 1.0f, 1.0f, 1.0f);
-//
-//	CL_Vec2f positions[] = { CL_Vec2f(m_segment.p.x,m_segment.p.y), CL_Vec2f(m_segment.q.x,m_segment.q.y) };
-//	CL_Vec4f colors[] = { white_color, white_color };
-//
-//	CL_PrimitivesArray vertices(p_gc);
-//	vertices.set_attributes(0, positions);
-//	vertices.set_attributes(1, colors);
 
 	CL_Pen pen;
 	pen.set_line_width(3.0);
@@ -36,9 +42,9 @@ void Bound::draw(CL_GraphicContext &p_gc) {
 
 	CL_Draw::line(p_gc, m_segment.p, m_segment.q, CL_Colorf::white);
 
-//	p_gc.set_program(cl_program_color_only);
-//	p_gc.set_program_object(cl_program_color_only);
-//	p_gc.draw_primitives(cl_lines, 2, vertices);
+#ifndef SERVER
+	m_collisionOutline.draw(0, 0, CL_Colorf::red, p_gc);
+#endif //!SERVER
 }
 
-#endif // CLIENT
+#endif // !SERVER

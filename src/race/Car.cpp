@@ -12,6 +12,12 @@
 
 #include <ClanLib/core.h>
 
+/* Car width in pixels */
+const int CAR_WIDTH = 18;
+
+/* Car height in pixels */
+const int CAR_HEIGHT = 24;
+
 Car::Car(RacePlayer *p_player) :
 #ifdef CLIENT
 	m_sprite(),
@@ -19,18 +25,35 @@ Car::Car(RacePlayer *p_player) :
 	m_player(p_player),
 	m_level(NULL),
 	m_locked(false),
-	m_position(0.0f, 0.0f), //najnowsza pozycja autka
-	m_rotation(0, cl_degrees), // kąt pod jakim stoi autko
-	m_turn(0.0f), //na boki
-	m_acceleration(false), //do przodu
-	m_brake(false), //do tyłu
+	m_position(0.0f, 0.0f),
+	m_rotation(0, cl_degrees),
+	m_turn(0.0f),
+	m_acceleration(false),
+	m_brake(false),
 	m_speed(0.0f),
-	m_angle(0.0f), // kąt zmiany kierunku jazdy
+	m_angle(0.0f),
 	m_inputChecksum(0),
 	m_lap(0),
 	m_handbrake(false)
 {
+#ifndef SERVER
+	// build car contour for collision check
+	CL_Contour contour;
 
+	const int halfWidth = CAR_WIDTH / 2;
+	const int halfHeight = CAR_HEIGHT / 2;
+	contour.get_points().push_back(CL_Pointf(-halfWidth, halfHeight));
+	contour.get_points().push_back(CL_Pointf(halfWidth, halfHeight));
+	contour.get_points().push_back(CL_Pointf(halfWidth, -halfHeight));
+	contour.get_points().push_back(CL_Pointf(-halfWidth, -halfHeight));
+
+	m_collisionOutline.get_contours().push_back(contour);
+
+	m_collisionOutline.set_inside_test(true);
+
+	m_collisionOutline.calculate_radius();
+	m_collisionOutline.calculate_smallest_enclosing_discs();
+#endif // !SERVERs
 }
 
 Car::~Car() {
@@ -38,7 +61,10 @@ Car::~Car() {
 
 #ifdef CLIENT
 void Car::draw(CL_GraphicContext &p_gc) {
-
+	
+	//debugDrawLine(p_gc, m_position.x, m_position.y, m_position.x + m_moveVector.x/2, m_position.y + m_moveVector.y/2, CL_Colorf::red);
+	//debugDrawLine(p_gc, m_position.x, m_position.y, m_position.x + accelerationVector.x/2, m_position.y + accelerationVector.y/2, CL_Colorf::black);
+	
 	// TODO: move to load();
 	if (m_sprite.is_null()) {
 		m_sprite = CL_Sprite(p_gc, "race/car", Stage::getResourceManager());
@@ -153,7 +179,9 @@ void Car::update(unsigned int elapsedTime) {
 	
 	static const float MAX_ANGLE = 50.0f;
 	
-	static const float TENACITY = 0.08f;
+	static const float MAX_TENACITY = 0.2f;
+	static const float MIN_TENACITY = 0.05f;
+	
 	
 	const float delta = elapsedTime / 1000.0f;
 	
@@ -189,26 +217,25 @@ void Car::update(unsigned int elapsedTime) {
 	}
 	
 	//turning
-	float angle = MAX_ANGLE * m_turn;
+	const float angle = MAX_ANGLE * m_turn;
 	
 	// acceleration speed
 	if (m_acceleration) {
 		const float speedChange = ACCEL_SPEED * delta;
-
+		
 		m_speed += speedChange;
-
+		
 		if (m_speed > MAX_SPEED) {
 			m_speed = MAX_SPEED;
 		}
-
 	}
 	
 	// brake
 	if (m_brake) {
 		const float speedChange = BRAKE_POWER * delta;
-
+		
 		m_speed -= speedChange;
-
+		
 		if (m_speed < -MAX_SPEED / 2) {
 			m_speed = -MAX_SPEED / 2;
 		}
@@ -222,19 +249,12 @@ void Car::update(unsigned int elapsedTime) {
 		const float groundResist = m_level->getResistance(m_position.x, m_position.y);
 		m_speed -= delta * groundResist * m_speed;
 	}
-
+	
 	// rotation
-	
 	const float rad = m_rotation.to_radians(); // kąt autka w radianach
-
-	// wektor prędkości bez uwzględnionej zmiany kierunku
-	accelerationVector.x = cos(rad);
-	accelerationVector.y = sin(rad);
-
-	accelerationVector.normalize();
-	accelerationVector *= m_speed;
 	
-	CL_Vec2f changeVector; // wektor zmiany kierunku
+	// wektor zmiany kierunku
+	CL_Vec2f changeVector;
 	
 	if( angle < 0.0f ) { // skręt w jedną stronę
 		// przygotowanie wektora skrętu (zmiany kierunku jazdy)
@@ -250,27 +270,30 @@ void Car::update(unsigned int elapsedTime) {
 		changeVector *= tan( angle ) * fabs(m_speed) / 7.0f;
 	}
 	
-	//CL_Vec2f newAccelVector; // nowy, świeżo wyliczony w następnym IFie,
-	// wektor prędkości, zgodnie z którym pojechałoby autko bez poślizgu
+	// wektor przyspieszenia bez uwzględnionej zmiany kierunku
+		accelerationVector.x = cos(rad);
+		accelerationVector.y = sin(rad);
+		
+		accelerationVector.normalize();
+		accelerationVector *= m_speed;
+		// wektor prędkości, zgodnie z którym pojechałoby autko bez poślizgu
+		if( angle != 0.0f ) // sumowanie wektorow: skrętu i prostej jazdy
+			accelerationVector = changeVector + accelerationVector;
 	
-	if( angle != 0.0f ) // sumowanie wektorow: skrętu i prostej jazdy
-		accelerationVector = changeVector + accelerationVector;
-	//else // jak nie skręca to ma jechać przed siebie :)
-	//	newAccelVector = accelerationVector;
+	// calculates current tenacity
+	const float max_tratio = MAX_TENACITY / MIN_TENACITY;
+	
+	float tratio = (max_tratio / MAX_SPEED) * fabs(m_speed);
+	if (fabs(m_speed) == 0)
+		tratio = 1;
+	
+	const float tenacity = MAX_TENACITY / tratio;
 	
 	// wektor o który zostanie przesunięte autko (już z poślizgiem)
-	// tip: m_moveVector ma jeszcze wartość z poprzedniej klatki, więc
-	// niejako mieszamy starą prędkość z nowo wyliczoną prędkością co
-	// daje nam efekt poślizgu (na ciało działa siła która działała na
-	// nie przed chwilą tylko pod wpływem nowych sił - nowego kierunku
-	// jazdy, maleje)
-	CL_Vec2f realVector = m_moveVector + ( accelerationVector * TENACITY );
+	CL_Vec2f realVector = m_moveVector + ( accelerationVector * tenacity );
 	realVector.normalize();
 	realVector *= fabs(m_speed);
 	m_moveVector = realVector;
-	if( accelerationVector.angle(m_moveVector).to_degrees() >= MAX_ANGLE ) {
-		m_moveVector = accelerationVector;
-	}
 	
 	// update position
 	m_position.x += m_moveVector.x * delta;
@@ -417,3 +440,23 @@ bool Car::isDrifting() const {
 	else return false;
 	
 }
+
+#ifdef CLIENT
+CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
+{
+	CL_CollisionOutline outline(m_collisionOutline);
+
+//	outline.calculate_smallest_enclosing_discs();
+//	outline.set_inside_test(true);
+
+
+	// transform the outline
+	CL_Angle angle(90, cl_degrees);
+	angle += m_rotation;
+
+	outline.set_angle(angle);
+	outline.set_translation(m_position.x, m_position.y);
+
+	return outline;
+}
+#endif

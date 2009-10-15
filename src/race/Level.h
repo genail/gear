@@ -86,12 +86,6 @@ CLASS_LEVEL
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
 
-#ifdef CLIENT
-		/** Tyre stripes */
-		TyreStripes m_tyreStripes;
-#endif // CLIENT
-
-
 
 
 		Level(const Level& p_level);
@@ -103,6 +97,15 @@ CLASS_LEVEL
 		CL_String8 readLine(CL_File& p_file);
 
 		void unload();
+
+#ifdef CLIENT
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
+
+
+		/** Collision checking */
+		void checkCollistions();
+#endif // CLIENT
 
 };
 

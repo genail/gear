@@ -10,34 +10,49 @@
 
 #include <ClanLib/core.h>
 
-#ifdef CLIENT
+#ifndef SERVER
 
 #include "graphics/Drawable.h"
 
 #define CLASS_BOUND class Bound : public Drawable
 
-#else // CLIENT
+#else // !SERVER
 
 #define CLASS_BOUND class Bound
 
-#endif // CLIENT
+#endif // !SERVER
 
 CLASS_BOUND
 {
 	public:
+
 		Bound(const CL_LineSegment2f &p_segment);
+
 		virtual ~Bound();
 
-		const CL_LineSegment2f& getSegment() { return m_segment; }
-
-#ifdef CLIENT
-		virtual void draw(CL_GraphicContext &p_gc);
-		virtual void load(CL_GraphicContext &p_gc) {}
-#endif // CLIENT
+		const CL_LineSegment2f& getSegment() const { return m_segment; }
 
 	private:
+
 		/** Segment of this bound */
 		CL_LineSegment2f m_segment;
+
+#ifndef SERVER
+	public:
+
+		virtual void draw(CL_GraphicContext &p_gc);
+
+		const CL_CollisionOutline &getCollisionOutline() const { return m_collisionOutline; }
+
+		virtual void load(CL_GraphicContext &p_gc) {}
+
+	private:
+
+		CL_CollisionOutline m_collisionOutline;
+
+
+#endif // !SERVER
+
 };
 
 #endif /* BOUND_H_ */

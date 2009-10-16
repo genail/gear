@@ -143,10 +143,11 @@ CLASS_CAR
 				reactionVector.y = boundVector.x;
 			
 			reactionVector.normalize();
-			reactionVector *= m_speed;
+			reactionVector *= m_speed / 2;
 			
 			m_moveVector += reactionVector;
 		} // FIXME: Ryba
+		
 #endif // !SERVER
 
 	private:

@@ -39,13 +39,32 @@ CL_ClanApplication app(&Application::main);
 
 int Application::main(const std::vector<CL_String> &args)
 {
-	if (args.size() < 3) {
-		CL_Console::write_line("usage: ./game server_addr nickname");
-		return 1;
+//	if (args.size() < 3) {
+//		CL_Console::write_line("usage: ./game server_addr nickname");
+//		return 1;
+//	}
+//
+//	const CL_String serverAddrPort = args[1];
+//	const CL_String nickname = args[2];
+
+	std::string stdinNickname, stdinServer, stdinConnect;
+
+	std::cout << "Player name: ";
+	std::cin >> stdinNickname;
+
+	do {
+		std::cout << "Do you want to connect to server? (y/n): ";
+		std::cin >> stdinConnect;
+	} while (stdinConnect != "y" && stdinConnect != "n");
+
+	if (stdinConnect == "y") {
+		std::cout << "Please specify the server to connect to. The acceptable format is HOST, HOST:PORT or write anything to ." << std::endl;
+		std::cout << "Server addr: ";
+		std::cin >> stdinServer;
 	}
 
-	const CL_String serverAddrPort = args[1];
-	const CL_String nickname = args[2];
+	const CL_String serverAddrPort = stdinServer;
+	const CL_String nickname = stdinNickname;
 
 	// set default properties
 #ifndef NDEBUG
@@ -90,15 +109,19 @@ int Application::main(const std::vector<CL_String> &args)
 
 	Player player(nickname);
 
-	// separate server addr from port if possible
-	std::vector<CL_TempString> parts = CL_StringHelp::split_text(serverAddrPort, ":");
-
-	const CL_String serverAddr = parts[0];
-	const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
-
 	try {
+
 		Client client;
-		client.connect(serverAddr, serverPort, &player);
+
+		if (serverAddrPort.size() > 0) {
+			// separate server addr from port if possible
+			std::vector<CL_TempString> parts = CL_StringHelp::split_text(serverAddrPort, ":");
+
+			const CL_String serverAddr = parts[0];
+			const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
+
+			client.connect(serverAddr, serverPort, &player);
+		}
 
 		Race race(&window, &player, &client);
 		race.exec();

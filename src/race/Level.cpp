@@ -56,12 +56,12 @@ void Level::draw(CL_GraphicContext &p_gc) {
 		(*itor).draw(p_gc);
 	}
 
-#ifndef NDEBUG
+#ifdef DRAW_COLLISION_OUTLINE
 	// draw collision outlines
 	foreach (Car *car, m_cars) {
 		car->calculateCurrentCollisionOutline().draw(0, 0, CL_Colorf::red, p_gc);
 	}
-#endif // !NDEBUG
+#endif // DRAW_COLLISION_OUTLINE
 
 }
 

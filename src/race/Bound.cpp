@@ -42,9 +42,9 @@ void Bound::draw(CL_GraphicContext &p_gc) {
 
 	CL_Draw::line(p_gc, m_segment.p, m_segment.q, CL_Colorf::white);
 
-#ifndef SERVER
+#if !defined(SERVER) && defined(DRAW_COLLISION_OUTLINE)
 	m_collisionOutline.draw(0, 0, CL_Colorf::red, p_gc);
-#endif //!SERVER
+#endif //!SERVER && DRAW_COLLISION_OUTLINE
 }
 
 #endif // !SERVER

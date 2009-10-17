@@ -25,7 +25,7 @@ Car::Car(RacePlayer *p_player) :
 	m_player(p_player),
 	m_level(NULL),
 	m_locked(false),
-	m_position(0.0f, 0.0f),
+	m_position(300.0f, 300.0f),
 	m_rotation(0, cl_degrees),
 	m_turn(0.0f),
 	m_acceleration(false),

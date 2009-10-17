@@ -16,7 +16,7 @@
 
 Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	m_displayWindow(p_window),
-	m_lapsNum(0),
+	m_lapsNum(20),
 	m_localPlayer(p_player),
 	m_level(),
 	m_initialized(false),

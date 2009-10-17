@@ -146,12 +146,6 @@ void Client::handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent
 	}
 }
 
-void Client::eventPrepareRace(const CL_NetGameEvent &p_netGameEvent)
-{
-	const int position = (int) p_netGameEvent.get_argument(0);
-
-
-}
 
 void Client::send(const CL_NetGameEvent &p_event)
 {

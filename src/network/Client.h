@@ -110,10 +110,6 @@ class Client {
 		/** Car status update */
 		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);
 
-		/** Should prepare a race */
-		void eventPrepareRace(const CL_NetGameEvent &p_netGameEvent);
-
-
 		friend class RaceClient;
 
 };

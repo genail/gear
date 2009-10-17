@@ -35,4 +35,6 @@ int ServerApplication::main(const std::vector<CL_String> &args)
 	} catch (CL_Exception e) {
 		CL_Console::write_line("Exception thrown: %1", e.message);
 	}
+
+	return 0;
 }

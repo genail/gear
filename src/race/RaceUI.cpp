@@ -55,8 +55,6 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 			CL_String8("Lap ") + currentLapStr + " / " + lapsNumStr
 	);
 
-	CL_String8:;
-
 	if (m_countDownStart != 0) {
 
 		static const unsigned LABEL_3_END = 1000 - 1;

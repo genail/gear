@@ -210,7 +210,7 @@ CLASS_CAR
 
 		bool areAllCheckpointsPassed() const;
 
-		bool resetCheckpoints();
+		void resetCheckpoints();
 
 		friend class Level;
 

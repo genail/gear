@@ -36,15 +36,15 @@ class ScoreTable {
 
 		int getEntriesCount() const;
 
-		const RacePlayer* getEntryPlayer(int index) const;
+		const RacePlayer* getEntryPlayer(size_t index) const;
 
-		unsigned getEntryTime(int index) const;
+		unsigned getEntryTime(size_t index) const;
 
 	private:
 
 		std::list<Entry> m_entries;
 
-		const Entry &getEntry(int index) const;
+		const Entry &getEntry(size_t index) const;
 
 
 };

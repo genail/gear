@@ -24,7 +24,7 @@ class RacePlayer {
 
 		bool isFinished() const { return m_finished; }
 
-		bool setFinished(bool p_finished) { m_finished = p_finished; }
+		void setFinished(bool p_finished) { m_finished = p_finished; }
 
 	private:
 

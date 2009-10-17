@@ -15,14 +15,14 @@
 #include "network/Client.h"
 
 Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
+	m_displayWindow(p_window),
 	m_lapsNum(0),
 	m_localPlayer(p_player),
 	m_level(),
 	m_initialized(false),
 	m_inputLock(false),
 	m_raceClient(&p_client->getRaceClient()),
-	m_raceScene(this),
-	m_displayWindow(p_window)
+	m_raceScene(this)
 {
 	// wait for race init
 	m_slots.connect(p_client->signalInitRace(), this, &Race::slotInitRace);

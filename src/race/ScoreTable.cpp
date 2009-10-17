@@ -44,11 +44,11 @@ int ScoreTable::getEntriesCount() const
 	return m_entries.size();
 }
 
-const ScoreTable::Entry &ScoreTable::getEntry(int index) const
+const ScoreTable::Entry &ScoreTable::getEntry(size_t index) const
 {
 	assert(index >= 0 && index < m_entries.size());
 
-	int i = 0;
+	size_t i = 0;
 	foreach (const Entry &entry, m_entries) {
 		if (i == index) {
 			return entry;
@@ -56,14 +56,17 @@ const ScoreTable::Entry &ScoreTable::getEntry(int index) const
 
 		++i;
 	}
+
+	assert(0 && "not supposed to be here");
+	return *m_entries.begin();
 }
 
-const RacePlayer* ScoreTable::getEntryPlayer(int index) const
+const RacePlayer* ScoreTable::getEntryPlayer(size_t index) const
 {
 	return getEntry(index).m_racePlayer;
 }
 
-unsigned ScoreTable::getEntryTime(int index) const
+unsigned ScoreTable::getEntryTime(size_t index) const
 {
 	return getEntry(index).m_time;
 }

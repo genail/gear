@@ -401,7 +401,7 @@ bool Car::areAllCheckpointsPassed() const {
 	return true;
 }
 
-bool Car::resetCheckpoints() {
+void Car::resetCheckpoints() {
 	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
 		itor->setPassed(false);
 	}

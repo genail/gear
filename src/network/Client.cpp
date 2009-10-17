@@ -24,21 +24,26 @@ void Client::connect(const CL_String &p_host, int p_port, Player *p_player) {
 
 	cl_log_event("network", "Connecting to %1:%2", p_host, port);
 
-	m_gameClient.connect(p_host, port);
+	try {
+		m_gameClient.connect(p_host, port);
 
-	// act as connected and wait for connection initialization
-	m_connected = true;
-	m_welcomed = false;
+		// act as connected and wait for connection initialization
+		m_connected = true;
+		m_welcomed = false;
 
-	while (m_connected) {
-		CL_KeepAlive::process();
+		while (m_connected) {
+			CL_KeepAlive::process();
 
-		if (m_welcomed) {
-			cl_log_event("network", "Connection fully initialized");
-			break;
+			if (m_welcomed) {
+				cl_log_event("network", "Connection fully initialized");
+				break;
+			}
+
+			CL_System::sleep(10);
 		}
-
-		CL_System::sleep(10);
+	} catch (CL_Exception e) {
+		cl_log_event("exception", "Cannot connect to %1:%2", p_host, p_port);
+		m_connected = false;
 	}
 }
 

@@ -189,6 +189,8 @@ Block::BlockType Level::decodeBlock(const CL_String8& p_str) {
 			assert(0 && "unknown char");
 	}
 
+	return Block::BT_NONE;
+
 }
 
 float Level::getResistance(float p_x, float p_y) {

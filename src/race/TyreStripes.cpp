@@ -84,5 +84,7 @@ void TyreStripes::draw(CL_GraphicContext &p_gc)
 		CL_Draw::line(p_gc, stripe.m_from, stripe.m_to, color);
 	}
 
+#ifndef NDEBUG
 	Stage::getDebugLayer()->putMessage("stripes_num", CL_StringHelp::int_to_local8(m_stripes.size()));
+#endif // !NDEBUG
 }

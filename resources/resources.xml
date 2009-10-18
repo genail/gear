@@ -4,6 +4,7 @@
             <image file="car.png" />
             <translation origin="center"/>
             <rotation origin="center" />
+            <scale x="0.1" y="0.1" />
         </sprite>
         <sprite name="block">
             <image file="block.png" />

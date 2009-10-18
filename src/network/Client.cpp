@@ -47,6 +47,13 @@ void Client::connect(const CL_String &p_host, int p_port, Player *p_player) {
 	}
 }
 
+void Client::disconnect()
+{
+	if (m_connected) {
+		m_gameClient.disconnect();
+	}
+}
+
 Client::~Client() {
 
 	if (isConnected()) {

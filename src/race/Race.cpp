@@ -15,6 +15,7 @@
 #include "network/Client.h"
 
 Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
+	m_close(false),
 	m_displayWindow(p_window),
 	m_lapsNum(20),
 	m_localPlayer(p_player),
@@ -24,6 +25,8 @@ Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
 	m_raceClient(&p_client->getRaceClient()),
 	m_raceScene(this)
 {
+	m_slots.connect(p_window->sig_window_close(), this, &Race::slotWindowClose);
+
 	// wait for race init
 	m_slots.connect(p_client->signalInitRace(), this, &Race::slotInitRace);
 	// listen for local car status change
@@ -85,7 +88,7 @@ void Race::exec()
 
 	unsigned lastTime = CL_System::get_time();
 
-	while (true) { // FIXME: Check when race is finished
+	while (!m_close) { // FIXME: Check when race is finished
 
 		// process events
 		CL_KeepAlive::process();
@@ -111,6 +114,9 @@ void Race::exec()
 		}
 
 	}
+
+	// disconnect from server
+	m_raceClient->getClient().disconnect();
 }
 
 void Race::loadAll()
@@ -131,7 +137,7 @@ void Race::grabInput(unsigned delta)
 	Car &car = m_localPlayer.getCar();
 
 	if (keyboard.get_keycode(CL_KEY_ESCAPE)) {
-		exit(0); // TODO: Find better way to exit the race
+		m_close = true;
 	}
 
 	if (!m_inputLock) {
@@ -400,7 +406,6 @@ void Race::endRace()
 	CL_Console::write_line("----------------------------------");
 
 	CL_Console::write_line("");
-	CL_Console::write_line("Thanks for playing :-)");
 }
 
 void Race::markPlayerFinished(const CL_String &p_name, unsigned p_time)
@@ -433,4 +438,9 @@ void Race::markPlayerFinished(const CL_String &p_name, unsigned p_time)
 	if (isRaceFinished()) {
 		endRace();
 	}
+}
+
+void Race::slotWindowClose()
+{
+	m_close = true;
 }

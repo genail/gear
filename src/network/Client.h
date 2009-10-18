@@ -23,6 +23,8 @@ class Client {
 
 		void connect(const CL_String &p_host, int p_port, Player *p_player);
 
+		void disconnect();
+
 		bool isConnected() const { return m_connected; }
 
 		Player* getPlayer(int p_index) { return m_remotePlayers[p_index]; }

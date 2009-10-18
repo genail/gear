@@ -129,5 +129,7 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_Console::write_line(e.message);
 	}
 
+	CL_Console::write_line("Thanks for playing :-)");
+
 	return 0;
 }

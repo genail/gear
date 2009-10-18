@@ -33,6 +33,9 @@ class Race {
 
 	private:
 
+		/** Set to true if game window is closing */
+		bool m_close;
+
 		/** Display window */
 		CL_DisplayWindow *m_displayWindow;
 
@@ -126,6 +129,8 @@ class Race {
 		void slotRaceStateChanged(int p_lapsNum);
 
 		void slotStartCountdown();
+
+		void slotWindowClose();
 
 };
 

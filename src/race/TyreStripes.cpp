@@ -30,11 +30,11 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car 
 	unsigned foundCount = 0;
 
 	for (
-			std::list<Stripe>::iterator ritor = m_stripes.end();
-			ritor != m_stripes.begin();
-			--ritor
+			std::list<Stripe>::iterator itor = m_stripes.begin();
+			itor != m_stripes.end();
+			++itor
 	) {
-		Stripe s = *ritor;
+		Stripe s = *itor;
 
 		if (s.m_owner == p_owner) {
 
@@ -45,10 +45,10 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car 
 				Stripe copy = s;
 
 				// remove old stripe
-				m_stripes.erase(ritor);
+				m_stripes.erase(itor);
 
 				// and construct new one
-				m_stripes.push_back(Stripe(copy.m_from, p_to, p_owner));
+				m_stripes.push_front(Stripe(copy.m_from, p_to, p_owner));
 				merged = true;
 
 				break;
@@ -62,12 +62,12 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car 
 
 	if (!merged) {
 		// when not merged, then create a new stripe
-		m_stripes.push_back(Stripe(p_from, p_to, p_owner));
+		m_stripes.push_front(Stripe(p_from, p_to, p_owner));
 	}
 
 	// remove all stripes above the limit
 	if (m_stripes.size() > STRIPE_LIMIT) {
-		m_stripes.pop_front(); // there will be always one stripe to much
+		m_stripes.pop_back(); // there will be always one stripe to much
 	}
 
 }

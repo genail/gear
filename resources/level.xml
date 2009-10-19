@@ -1,0 +1,41 @@
+<level>
+    <meta>
+        <author>Piotr Korzuszek</author>
+        <email>piotr.korzuszek@gmail.com</email>
+        <home>http://graniec.pl/trac/</home>
+    
+        <name>Demo Level</name>
+        <version>1.0</version>
+        
+        <size>
+            <width>10</width>
+            <height>10</height>
+        </size>
+    </meta>
+    
+    <content>
+        <!-- Define how track leads to -->
+        <track>
+            <starts at="1, 6" />
+            <and_goes>
+                <!-- The order is important -->
+                <up    for="4" />
+                <right for="3" />
+                <down  for="3" />
+                <right for="4" />
+                <down  for="2" />
+                <left  for="3" />
+                <down  for="2" />
+                <left  for="4" />
+                <up    for="2" />
+            </and_goes>
+        </track>
+        
+        <bounds>
+            <!--generate style="thick" /-->
+            <bound from="2.0, 2.0" to="4.0, 2.0" />
+            <bound from="4.0, 2.0" to="4.0, 5.0" />
+            <bound from="4.0, 5.0" to="8.0, 5.0" />
+        </bounds>
+    </content>
+</level>

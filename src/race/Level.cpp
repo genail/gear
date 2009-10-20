@@ -106,66 +106,93 @@ CL_String8 Level::readLine(CL_File& p_file) {
 void Level::loadFromFile(const CL_String& p_filename)
 {
 	try {
+
 		CL_File file(p_filename, CL_File::open_existing);
-		CL_String8 line;
 
-		line = readLine(file);
+		CL_DomDocument document(file);
+		const CL_DomElement root = document.get_document_element();
+		const CL_DomNode meta = document.named_item("meta");
 
-		std::vector<CL_TempString> parts = CL_StringHelp::split_text(line, " ", true);
+		// read required meta values
+		const CL_DomNode metaName = meta.named_item("name");
+		const CL_DomNode metaSize = meta.named_item("size");
 
-		m_width = CL_StringHelp::text_to_int(parts[0]);
-		m_height = CL_StringHelp::text_to_int(parts[2]);
-
-		m_blocks = new Block[m_width * m_height];
-
-
-		for (int i = 0; i < m_height; ++i) {
-			line = readLine(file);
-
-			parts = CL_StringHelp::split_text(line, " ", true);
-
-			for (int j = 0; j < m_width; ++j) {
-				m_blocks[m_width * i + j] = Block(decodeBlock(parts[j]), BOX_WIDTH);
-			}
-
+		if (metaName.is_null() || metaSize.is_null()) {
+			cl_log_event("error", "Missing meta data in level file");
+			return;
 		}
 
-		// read bounds num
-		line = readLine(file);
-		const int boundsCount = CL_StringHelp::text_to_int(line);
+		// read level size
+		const CL_DomNode metaSizeWidth = metaSize.named_item("width");
+		const CL_DomNode metaSizeHeigth = metaSize.named_item("height");
 
-		// read all bounds
-		float x1, y1, x2, y2;
-
-		for (int i = 0; i < boundsCount; ++i) {
-			line = readLine(file);
-			parts = CL_StringHelp::split_text(line, " ", true);
-
-			x1 = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
-			y1 = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
-			x2 = CL_StringHelp::text_to_float(parts[2]) * BOX_WIDTH;
-			y2 = CL_StringHelp::text_to_float(parts[3]) * BOX_WIDTH;
-
-			Bound bound(CL_LineSegment2f(CL_Vec2f(x1, y1), CL_Vec2f(x2, y2)));
-			m_bounds.push_back(bound);
+		if (metaSizeWidth.is_null() || metaSizeHeigth.is_null()) {
+			cl_log_event("error", "Missing meta size in level file");
+			return;
 		}
 
-		// read start positions num
-		line = readLine(file);
-		const int startPositionsCount = CL_StringHelp::text_to_int(line);
+		// assign these meta values
+		m_width = CL_StringHelp::local8_to_int(metaSizeWidth.get_);
 
-		// read start positions
-		float x,y;
-
-		for (int i = 0; i < startPositionsCount; ++i) {
-			line = readLine(file);
-			parts = CL_StringHelp::split_text(line, " ", true);
-
-			x = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
-			y = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
-
-			m_startPositions[i + 1] = CL_Pointf(x, y);
-		}
+//		CL_String8 line;
+//
+//		line = readLine(file);
+//
+//		std::vector<CL_TempString> parts = CL_StringHelp::split_text(line, " ", true);
+//
+//		m_width = CL_StringHelp::text_to_int(parts[0]);
+//		m_height = CL_StringHelp::text_to_int(parts[2]);
+//
+//		m_blocks = new Block[m_width * m_height];
+//
+//
+//		for (int i = 0; i < m_height; ++i) {
+//			line = readLine(file);
+//
+//			parts = CL_StringHelp::split_text(line, " ", true);
+//
+//			for (int j = 0; j < m_width; ++j) {
+//				m_blocks[m_width * i + j] = Block(decodeBlock(parts[j]), BOX_WIDTH);
+//			}
+//
+//		}
+//
+//		// read bounds num
+//		line = readLine(file);
+//		const int boundsCount = CL_StringHelp::text_to_int(line);
+//
+//		// read all bounds
+//		float x1, y1, x2, y2;
+//
+//		for (int i = 0; i < boundsCount; ++i) {
+//			line = readLine(file);
+//			parts = CL_StringHelp::split_text(line, " ", true);
+//
+//			x1 = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
+//			y1 = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
+//			x2 = CL_StringHelp::text_to_float(parts[2]) * BOX_WIDTH;
+//			y2 = CL_StringHelp::text_to_float(parts[3]) * BOX_WIDTH;
+//
+//			Bound bound(CL_LineSegment2f(CL_Vec2f(x1, y1), CL_Vec2f(x2, y2)));
+//			m_bounds.push_back(bound);
+//		}
+//
+//		// read start positions num
+//		line = readLine(file);
+//		const int startPositionsCount = CL_StringHelp::text_to_int(line);
+//
+//		// read start positions
+//		float x,y;
+//
+//		for (int i = 0; i < startPositionsCount; ++i) {
+//			line = readLine(file);
+//			parts = CL_StringHelp::split_text(line, " ", true);
+//
+//			x = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
+//			y = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
+//
+//			m_startPositions[i + 1] = CL_Pointf(x, y);
+//		}
 
 
 		file.close();

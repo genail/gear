@@ -16,6 +16,7 @@ SET(CLIENT_SRCS
     ${COMMON_SRCS}
     Application.cpp
     graphics/DebugLayer.cpp
+    graphics/GameWindow.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
     race/Race.cpp
@@ -36,6 +37,10 @@ SET(SERVER_SRCS
     network/Server.cpp
 )
 
+SET(GUI_SRCS
+    GUIPrototype.cpp
+)
+
 FIND_PACKAGE(ClanLib REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
 
@@ -51,12 +56,22 @@ SET(CLIENT_LIBS ${LIBS}
     ${ClanLib_Display_LIBRARY}
     ${ClanLib_GL_LIBRARY}
     ${ClanLib_Network_LIBRARY}
+    ${ClanLib_GUI_LIBRARY}
 )
 
 SET(SERVER_LIBS ${LIBS}
     ${ClanLib_App_LIBRARY}
     ${ClanLib_Core_LIBRARY}
     ${ClanLib_Network_LIBRARY}
+)
+
+SET(GUI_LIBS ${LIBS}
+    ${ClanLib_App_LIBRARY}
+    ${ClanLib_Core_LIBRARY}
+    ${ClanLib_GUI_LIBRARY}
+    ${ClanLib_Display_LIBRARY}
+    ${ClanLib_GL_LIBRARY}
+
 )
 
 
@@ -72,4 +87,9 @@ add_executable(server ${SERVER_SRCS})
 TARGET_LINK_LIBRARIES(server ${SERVER_LIBS})
 SET_TARGET_PROPERTIES(server PROPERTIES LINK_FLAGS "-pthread -lfontconfig")
 SET_TARGET_PROPERTIES(server PROPERTIES COMPILE_FLAGS "-Wall -DSERVER $ENV{CXXFLAGS}")
+
+
+add_executable(gui ${GUI_SRCS})
+TARGET_LINK_LIBRARIES(gui ${GUI_LIBS})
+SET_TARGET_PROPERTIES(gui PROPERTIES LINK_FLAGS "-pthread -lfontconfig -lXxf86vm -lpng -ljpeg -lfreetype")
 

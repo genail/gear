@@ -26,58 +26,22 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACESCENE_H_
-#define RACESCENE_H_
+#ifndef GAMEWINDOW_H_
+#define GAMEWINDOW_H_
 
 #include <ClanLib/gui.h>
 
-#include "race/Car.h"
-#include "race/Level.h"
-#include "race/RaceUI.h"
-#include "race/Viewport.h"
-#include "race/RacePlayer.h"
-#include "graphics/Drawable.h"
-
-class Race;
-
-class RaceScene: public Drawable, public CL_GUIComponent
-{
+class GameWindow : public CL_Window {
 	public:
-		RaceScene(Race* p_race, CL_GUIComponent *p_guiParent);
-		virtual ~RaceScene();
 
-		virtual void draw(CL_GraphicContext &p_gc);
-		virtual void load(CL_GraphicContext &p_gc);
+		GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc);
 
-		RaceUI& getUI() { return m_raceUI; }
-
-		Viewport& getViewport() { return m_viewport; }
-
-		void update(unsigned timeElapsed);
+		virtual ~GameWindow();
 
 	private:
 
-		float oldSpeed;
-
-		/** Last drift car position. If null, then no drift was doing last time. */
-		CL_Pointf m_lastDriftPoint;
-
-		/** The Race pointer */
-		Race *m_race;
-
-		/** How player sees the scene */
-		Viewport m_viewport;
-
-		/** Race user interface */
-		RaceUI m_raceUI;
-
 		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
-
-		void updateScale();
-
-
-
 
 };
 
-#endif /* RACESCENE_H_ */
+#endif /* GAMEWINDOW_H_ */

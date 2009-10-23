@@ -38,22 +38,25 @@
 #include "race/RacePlayer.h"
 #include "graphics/Drawable.h"
 
+#include "graphics/Scene.h"
+
 class Race;
 
-class RaceScene: public Drawable, public CL_GUIComponent
+class RaceScene: public Scene
 {
 	public:
 		RaceScene(Race* p_race, CL_GUIComponent *p_guiParent);
 		virtual ~RaceScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
+
 		virtual void load(CL_GraphicContext &p_gc);
 
 		RaceUI& getUI() { return m_raceUI; }
 
 		Viewport& getViewport() { return m_viewport; }
 
-		void update(unsigned timeElapsed);
+		void update(unsigned p_timeElapsed);
 
 	private:
 
@@ -74,8 +77,6 @@ class RaceScene: public Drawable, public CL_GUIComponent
 		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
 
 		void updateScale();
-
-
 
 
 };

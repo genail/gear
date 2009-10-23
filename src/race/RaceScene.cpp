@@ -46,14 +46,8 @@ RaceScene::RaceScene(Race* p_race, CL_GUIComponent *p_guiParent) :
 RaceScene::~RaceScene() {
 }
 
-void RaceScene::draw(CL_GraphicContext &p_gc) {
-
-}
-
-void RaceScene::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
+void RaceScene::draw(CL_GraphicContext &p_gc)
 {
-	updateScale();
-	
 	m_viewport.prepareGC(p_gc);
 
 	m_race->getLevel().draw(p_gc);
@@ -63,7 +57,14 @@ void RaceScene::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 	m_raceUI.draw(p_gc);
 }
 
-void RaceScene::load(CL_GraphicContext &p_gc) {
+void RaceScene::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
+{
+
+}
+
+void RaceScene::load(CL_GraphicContext &p_gc)
+{
+	Scene::load(p_gc);
 
 	m_race->getLevel().load(p_gc);
 	m_raceUI.load(p_gc);
@@ -94,8 +95,9 @@ void RaceScene::updateScale() {
 #endif
 }
 
-void RaceScene::update(unsigned p_timeElapsed) {
-	// FIXME: ceplus: move updateScene() to this method
+void RaceScene::update(unsigned p_timeElapsed)
+{
+	updateScale();
 
 	const Car &car = m_race->getLocalPlayer().getCar();
 

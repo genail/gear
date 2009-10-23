@@ -40,7 +40,14 @@ class GameWindow : public CL_Window {
 
 	private:
 
+		/** Last update logic time. When 0 then no logic update has been done before. */
+		unsigned m_lastLogicUpdateTime;
+
 		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
+
+		void updateLogic();
+
+		void renderScene(CL_GraphicContext &p_gc);
 
 };
 

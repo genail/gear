@@ -28,8 +28,11 @@
 
 #include "GameWindow.h"
 
+#include "graphics/Stage.h"
+
 GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc) :
-	CL_Window(p_manager, p_desc)
+	CL_Window(p_manager, p_desc),
+	m_lastLogicUpdateTime(0)
 {
 	func_render().set(this, &GameWindow::onRender);
 	set_constant_repaint(true);
@@ -37,4 +40,42 @@ GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescripti
 
 GameWindow::~GameWindow()
 {
+}
+
+void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
+{
+	updateLogic();
+}
+
+void GameWindow::updateLogic()
+{
+	Scene *scene = Stage::peekScene();
+
+	if (scene != NULL) {
+
+		const unsigned now = CL_System::get_time();
+
+		if (m_lastLogicUpdateTime == 0) {
+			scene->update(0);
+		} else {
+			const unsigned timeChange = now - m_lastLogicUpdateTime;
+			scene->update(timeChange);
+		}
+
+		m_lastLogicUpdateTime = now;
+
+	} else {
+		// when there is no current scene, then make the counter 0
+		// to prevent huge time jump when further scene will be available
+		m_lastLogicUpdateTime = 0;
+	}
+}
+
+void GameWindow::renderScene(CL_GraphicContext &p_gc)
+{
+	Scene *scene = Stage::peekScene();
+
+	if (scene != NULL) {
+		scene->draw(p_gc);
+	}
 }

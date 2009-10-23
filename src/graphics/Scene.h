@@ -26,55 +26,22 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STAGE_H_
-#define STAGE_H_
+#ifndef SCENE_H_
+#define SCENE_H_
 
-#include <stack>
-#include <ClanLib/core.h>
+#include <ClanLib/display.h>
 
-#include "graphics/Scene.h"
-#include "graphics/DebugLayer.h"
+class Scene {
 
-class Application;
-
-class Stage {
 	public:
 
-		virtual ~Stage() {
-		}
+		virtual void draw(CL_GraphicContext &p_gc);
 
-		static DebugLayer* getDebugLayer() { return m_debugLayer; }
+		virtual void load() {}
 
-		static int getWidth() { return m_width; }
+		virtual void update(unsigned p_timeElapsed) {}
 
-		static int getHeight() { return m_height; }
-
-		static void pushScene(Scene *p_scene) { m_sceneStack.push(p_scene); }
-
-		static void popScene() { m_sceneStack.pop(); }
-
-		static Scene *peekScene() { return m_sceneStack.empty() ? NULL : m_sceneStack.top(); }
-
-		static CL_ResourceManager* getResourceManager() { return m_resourceManager; }
+}
 
 
-	private:
-
-		/** Resource Manager */
-		static CL_ResourceManager *m_resourceManager;
-
-		/** Stage size */
-		static int m_width, m_height;
-
-		/** Scene stack */
-		static std::stack<Scene*> m_sceneStack;
-
-		/** Debug layer */
-		static DebugLayer *m_debugLayer;
-
-		Stage() {}
-
-		friend class Application;
-};
-
-#endif /* STAGE_H_ */
+#endif /* SCENE_H_ */

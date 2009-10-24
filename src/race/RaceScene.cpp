@@ -31,14 +31,9 @@
 #include "race/Race.h"
 
 RaceScene::RaceScene(Race* p_race, CL_GUIComponent *p_guiParent) :
-	CL_GUIComponent(p_guiParent),
 	m_race(p_race),
 	m_raceUI(p_race)
 {
-	set_type_name("RaceScene");
-
-	func_render().set(this, &RaceScene::onRender);
-
 	m_viewport.attachTo(&(p_race->getLocalPlayer().getCar().getPosition()));
 	oldSpeed = 0.0f;
 }
@@ -55,11 +50,6 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 	m_viewport.finalizeGC(p_gc);
 
 	m_raceUI.draw(p_gc);
-}
-
-void RaceScene::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
-{
-
 }
 
 void RaceScene::load(CL_GraphicContext &p_gc)

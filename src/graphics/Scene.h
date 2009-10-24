@@ -37,7 +37,9 @@ class Scene {
 
 		Scene() : m_loaded(false) {}
 
-		virtual void draw(CL_GraphicContext &p_gc);
+		virtual ~Scene() {}
+
+		virtual void draw(CL_GraphicContext &p_gc) = 0;
 
 		bool isLoaded() const { return m_loaded; }
 

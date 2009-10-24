@@ -35,18 +35,17 @@
 #include "network/events.h"
 #include "network/Client.h"
 
-Race::Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client) :
+Race::Race(CL_GUIComponent *p_parent, Player *p_player, Client *p_client) :
 	m_close(false),
-	m_displayWindow(p_window),
 	m_lapsNum(20),
 	m_localPlayer(p_player),
 	m_level(),
 	m_initialized(false),
 	m_inputLock(false),
 	m_raceClient(&p_client->getRaceClient()),
-	m_raceScene(this)
+	m_raceScene(this, p_parent)
 {
-	m_slots.connect(p_window->sig_window_close(), this, &Race::slotWindowClose);
+//	m_slots.connect(p_window->sig_window_close(), this, &Race::slotWindowClose);
 
 	// wait for race init
 	m_slots.connect(p_client->signalInitRace(), this, &Race::slotInitRace);
@@ -109,35 +108,37 @@ void Race::exec()
 
 	unsigned lastTime = CL_System::get_time();
 
-	while (!m_close) { // FIXME: Check when race is finished
+//	while (!m_close) { // FIXME: Check when race is finished
+//
+//		// process events
+//		CL_KeepAlive::process();
+//
+//		const unsigned delta = CL_System::get_time() - lastTime;
+//		lastTime += delta;
+//
+//		m_iterationMutex.lock();
+//
+//		grabInput(delta);
+//		updateWorld(delta);
+//		drawScene(delta);
+//
+//		m_iterationMutex.unlock();
+//
+//		// Avoid using 100% CPU in the loop:
+//		static const int MS_60 = 1000 / 60;
+//		const int sleepTime = MS_60 - delta;
+//
+//		if (sleepTime > 0) {
+//			CL_System::sleep(sleepTime);
+//			CL_KeepAlive::process();
+//		}
+//
+//	}
+//
+//	// disconnect from server
+//	m_raceClient->getClient().disconnect();
 
-		// process events
-		CL_KeepAlive::process();
-
-		const unsigned delta = CL_System::get_time() - lastTime;
-		lastTime += delta;
-
-		m_iterationMutex.lock();
-
-		grabInput(delta);
-		updateWorld(delta);
-		drawScene(delta);
-
-		m_iterationMutex.unlock();
-
-		// Avoid using 100% CPU in the loop:
-		static const int MS_60 = 1000 / 60;
-		const int sleepTime = MS_60 - delta;
-
-		if (sleepTime > 0) {
-			CL_System::sleep(sleepTime);
-			CL_KeepAlive::process();
-		}
-
-	}
-
-	// disconnect from server
-	m_raceClient->getClient().disconnect();
+	Stage::pushScene(&m_raceScene);
 }
 
 void Race::loadAll()
@@ -145,8 +146,8 @@ void Race::loadAll()
 	cl_log_event("race", "Loading race...");
 	const unsigned start = CL_System::get_time();
 
-	CL_GraphicContext gc = m_displayWindow->get_gc();
-	m_raceScene.load(gc);
+//	CL_GraphicContext gc = m_displayWindow->get_gc();
+//	m_raceScene.load(gc);
 
 	const unsigned duration = CL_System::get_time() - start;
 	cl_log_event("race", "Loaded in %1 ms", duration);
@@ -154,59 +155,59 @@ void Race::loadAll()
 
 void Race::grabInput(unsigned delta)
 {
-	CL_InputDevice keyboard = m_displayWindow->get_ic().get_keyboard();
-	Car &car = m_localPlayer.getCar();
-
-	if (keyboard.get_keycode(CL_KEY_ESCAPE)) {
-		m_close = true;
-	}
-
-	if (!m_inputLock) {
-		if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
-			car.setTurn(-1.0f);
-		} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
-			car.setTurn(1.0f);
-		} else {
-			car.setTurn(0.0f);
-		}
-
-		if (keyboard.get_keycode(CL_KEY_UP)) {
-			car.setAcceleration(true);
-		} else {
-			car.setAcceleration(false);
-		}
-
-		if (keyboard.get_keycode(CL_KEY_DOWN)) {
-			car.setBrake(true);
-		} else {
-			car.setBrake(false);
-		}
-
-		if (keyboard.get_keycode(CL_KEY_SPACE)) {
-			car.setHandbrake(true);
-		} else {
-			car.setHandbrake(false);
-		}
-	}
-
-#ifndef NDEBUG
-	// viewport change
-	if (keyboard.get_keycode(CL_KEY_ADD)) {
-		const float scale = m_raceScene.getViewport().getScale();
-		m_raceScene.getViewport().setScale(scale + scale * 0.01f);
-	}
-
-	if (keyboard.get_keycode(CL_KEY_SUBTRACT)) {
-		const float scale = m_raceScene.getViewport().getScale();
-		m_raceScene.getViewport().setScale(scale - scale * 0.01f);
-	}
-
-	// trigger race start
-	if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
-		startRace();
-	}
-
-#endif
+//	CL_InputDevice keyboard = m_displayWindow->get_ic().get_keyboard();
+//	Car &car = m_localPlayer.getCar();
+//
+//	if (keyboard.get_keycode(CL_KEY_ESCAPE)) {
+//		m_close = true;
+//	}
+//
+//	if (!m_inputLock) {
+//		if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
+//			car.setTurn(-1.0f);
+//		} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
+//			car.setTurn(1.0f);
+//		} else {
+//			car.setTurn(0.0f);
+//		}
+//
+//		if (keyboard.get_keycode(CL_KEY_UP)) {
+//			car.setAcceleration(true);
+//		} else {
+//			car.setAcceleration(false);
+//		}
+//
+//		if (keyboard.get_keycode(CL_KEY_DOWN)) {
+//			car.setBrake(true);
+//		} else {
+//			car.setBrake(false);
+//		}
+//
+//		if (keyboard.get_keycode(CL_KEY_SPACE)) {
+//			car.setHandbrake(true);
+//		} else {
+//			car.setHandbrake(false);
+//		}
+//	}
+//
+//#ifndef NDEBUG
+//	// viewport change
+//	if (keyboard.get_keycode(CL_KEY_ADD)) {
+//		const float scale = m_raceScene.getViewport().getScale();
+//		m_raceScene.getViewport().setScale(scale + scale * 0.01f);
+//	}
+//
+//	if (keyboard.get_keycode(CL_KEY_SUBTRACT)) {
+//		const float scale = m_raceScene.getViewport().getScale();
+//		m_raceScene.getViewport().setScale(scale - scale * 0.01f);
+//	}
+//
+//	// trigger race start
+//	if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
+//		startRace();
+//	}
+//
+//#endif
 }
 
 void Race::updateWorld(unsigned p_delta)
@@ -236,16 +237,16 @@ void Race::updateWorld(unsigned p_delta)
 
 void Race::drawScene(unsigned p_delta)
 {
-	CL_GraphicContext gc = m_displayWindow->get_gc();
-
-	gc.clear(CL_Colorf::cadetblue);
-
-	m_raceScene.draw(gc);
-
-	Stage::getDebugLayer()->draw(gc);
-
-	// Make the stuff visible:
-	m_displayWindow->flip();
+//	CL_GraphicContext gc = m_displayWindow->get_gc();
+//
+//	gc.clear(CL_Colorf::cadetblue);
+//
+//	m_raceScene.draw(gc);
+//
+//	Stage::getDebugLayer()->draw(gc);
+//
+//	// Make the stuff visible:
+//	m_displayWindow->flip();
 
 }
 

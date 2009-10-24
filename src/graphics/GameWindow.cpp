@@ -45,10 +45,13 @@ GameWindow::~GameWindow()
 void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 {
 	updateLogic();
+	renderScene(p_gc);
 }
 
 void GameWindow::updateLogic()
 {
+	CL_KeepAlive::process();
+
 	Scene *scene = Stage::peekScene();
 
 	if (scene != NULL) {
@@ -76,6 +79,11 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc)
 	Scene *scene = Stage::peekScene();
 
 	if (scene != NULL) {
+
+		if (!scene->isLoaded()) {
+			scene->load(p_gc);
+		}
+
 		scene->draw(p_gc);
 	}
 }

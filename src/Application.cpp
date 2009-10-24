@@ -33,6 +33,7 @@
 #include <ClanLib/gl.h>
 #include <ClanLib/application.h>
 
+#include "graphics/GameWindow.h"
 #include "graphics/DebugLayer.h"
 #include "graphics/Stage.h"
 #include "race/RaceScene.h"
@@ -70,22 +71,24 @@ int Application::main(const std::vector<CL_String> &args)
 
 	std::string stdinNickname, stdinServer, stdinConnect;
 
-	std::cout << "Player name: ";
-	std::cin >> stdinNickname;
-
-	do {
-		std::cout << "Do you want to connect to server? (y/n): ";
-		std::cin >> stdinConnect;
-	} while (stdinConnect != "y" && stdinConnect != "n");
-
-	if (stdinConnect == "y") {
-		std::cout << "Please specify the server to connect to. The acceptable format is HOST, HOST:PORT or write anything to ." << std::endl;
-		std::cout << "Server addr: ";
-		std::cin >> stdinServer;
-	}
-
-	const CL_String serverAddrPort = stdinServer;
-	const CL_String nickname = stdinNickname;
+//	std::cout << "Player name: ";
+//	std::cin >> stdinNickname;
+//
+//	do {
+//		std::cout << "Do you want to connect to server? (y/n): ";
+//		std::cin >> stdinConnect;
+//	} while (stdinConnect != "y" && stdinConnect != "n");
+//
+//	if (stdinConnect == "y") {
+//		std::cout << "Please specify the server to connect to. The acceptable format is HOST, HOST:PORT or write anything to ." << std::endl;
+//		std::cout << "Server addr: ";
+//		std::cin >> stdinServer;
+//	}
+//
+//	const CL_String serverAddrPort = stdinServer;
+//	const CL_String nickname = stdinNickname;
+	const CL_String serverAddrPort = "";
+	const CL_String nickname = "n";
 
 	// set default properties
 #ifndef NDEBUG
@@ -111,23 +114,46 @@ int Application::main(const std::vector<CL_String> &args)
 	Stage::m_height = 600;
 
 	// Setup clanlib modules:
-	CL_SetupCore setup_core;
+	CL_SetupCore 	setup_core;
 	CL_SetupDisplay setup_display;
-	CL_SetupGL setup_gl;
+	CL_SetupGL 		setup_gl;
 	CL_SetupNetwork setup_network;
+	CL_SetupGUI 	setup_gui;
 
 	CL_ConsoleLogger logger;
 
-	// Create a window:
-	CL_DisplayWindow window("The Great Race Game", Stage::getWidth(), Stage::getHeight());
-
-
+	// load resources
 	CL_ResourceManager resources("resources/resources.xml");
 	Stage::m_resourceManager = &resources;
 
+	// load GUI
+	CL_GUIManager gui;
+	CL_GUIThemeDefault theme;
+	CL_GUIWindowManagerSystem window_manager;
+
+	gui.set_window_manager(window_manager);
+
+	CL_ResourceManager res("/home/chudy/projekty/clanlib/ClanLib-2.0.4/Resources/GUIThemeAero/resources.xml");
+	CL_CSSDocument css_document;
+	css_document.load("/home/chudy/projekty/clanlib/ClanLib-2.0.4/Resources/GUIThemeAero/theme.css");
+
+	gui.set_css_document(css_document);
+	theme.set_resources(res);
+	gui.set_theme(theme);
+
+	CL_DisplayWindowDescription desc("Gear");
+	desc.set_position(CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight()), true);
+
+	GameWindow gameWindow(&gui, desc);
+
+	// load debug layer
 	DebugLayer debugLayer;
 	Stage::m_debugLayer = &debugLayer;
 
+//	// Create a window:
+//	CL_DisplayWindow window("The Great Race Game", Stage::getWidth(), Stage::getHeight());
+
+	// build race game
 	Player player(nickname);
 
 	try {
@@ -144,8 +170,9 @@ int Application::main(const std::vector<CL_String> &args)
 			client.connect(serverAddr, serverPort, &player);
 		}
 
-		Race race(&window, &player, &client);
+		Race race(&gameWindow, &player, &client);
 		race.exec();
+		gui.exec(true);
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);
 	}

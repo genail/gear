@@ -40,7 +40,7 @@
 
 class Race {
 	public:
-		Race(CL_DisplayWindow *p_window, Player *p_player, Client *p_client);
+		Race(CL_GUIComponent *p_parent, Player *p_player, Client *p_client);
 		virtual ~Race();
 
 		int getLapsNum() const { return m_lapsNum; }
@@ -56,9 +56,6 @@ class Race {
 
 		/** Set to true if game window is closing */
 		bool m_close;
-
-		/** Display window */
-		CL_DisplayWindow *m_displayWindow;
 
 		/** Iteration mutex */
 		CL_Mutex m_iterationMutex;

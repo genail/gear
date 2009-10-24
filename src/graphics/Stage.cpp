@@ -36,4 +36,4 @@ CL_ResourceManager *Stage::m_resourceManager = NULL;
 
 DebugLayer *Stage::m_debugLayer = NULL;
 
-std::stack< CL_AutoPtr<Scene> > Stage::m_sceneStack;
+std::stack<Scene*> Stage::m_sceneStack;

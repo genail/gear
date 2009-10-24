@@ -56,7 +56,7 @@ class RaceScene: public Scene
 
 		Viewport& getViewport() { return m_viewport; }
 
-		void update(unsigned p_timeElapsed);
+		virtual void update(unsigned p_timeElapsed);
 
 	private:
 
@@ -73,8 +73,6 @@ class RaceScene: public Scene
 
 		/** Race user interface */
 		RaceUI m_raceUI;
-
-		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
 
 		void updateScale();
 

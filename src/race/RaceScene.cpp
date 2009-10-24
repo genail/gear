@@ -87,6 +87,8 @@ void RaceScene::updateScale() {
 
 void RaceScene::update(unsigned p_timeElapsed)
 {
+	grabInput();
+
 	updateScale();
 
 	const Car &car = m_race->getLocalPlayer().getCar();
@@ -97,4 +99,61 @@ void RaceScene::update(unsigned p_timeElapsed)
 
 	// update race UI
 	m_raceUI.update(p_timeElapsed);
+}
+
+void RaceScene::grabInput()
+{
+		const CL_InputDevice &keyboard = getInput();
+		Car &car = m_race->m_localPlayer.getCar();
+
+		if (keyboard.get_keycode(CL_KEY_ESCAPE)) {
+			m_race->m_close = true;
+		}
+
+		if (!m_race->m_inputLock) {
+			if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
+				car.setTurn(-1.0f);
+			} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
+				car.setTurn(1.0f);
+			} else {
+				car.setTurn(0.0f);
+			}
+
+			if (keyboard.get_keycode(CL_KEY_UP)) {
+				car.setAcceleration(true);
+			} else {
+				car.setAcceleration(false);
+			}
+
+			if (keyboard.get_keycode(CL_KEY_DOWN)) {
+				car.setBrake(true);
+			} else {
+				car.setBrake(false);
+			}
+
+			if (keyboard.get_keycode(CL_KEY_SPACE)) {
+				car.setHandbrake(true);
+			} else {
+				car.setHandbrake(false);
+			}
+		}
+
+	#ifndef NDEBUG
+		// viewport change
+		if (keyboard.get_keycode(CL_KEY_ADD)) {
+			const float scale = getViewport().getScale();
+			getViewport().setScale(scale + scale * 0.01f);
+		}
+
+		if (keyboard.get_keycode(CL_KEY_SUBTRACT)) {
+			const float scale = getViewport().getScale();
+			getViewport().setScale(scale - scale * 0.01f);
+		}
+
+		// trigger race start
+		if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
+			m_race->startRace();
+		}
+
+	#endif
 }

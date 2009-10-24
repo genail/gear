@@ -150,6 +150,8 @@ class Race {
 
 		void slotWindowClose();
 
+		friend class RaceScene;
+
 };
 
 #endif /* RACE_H_ */

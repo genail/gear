@@ -74,6 +74,9 @@ class RaceScene: public Scene
 		/** Race user interface */
 		RaceUI m_raceUI;
 
+
+		void grabInput();
+
 		void updateScale();
 
 

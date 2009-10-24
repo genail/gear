@@ -41,15 +41,23 @@ class Scene {
 
 		virtual void draw(CL_GraphicContext &p_gc) = 0;
 
+		const CL_InputDevice &getInput() const { return m_input; }
+
 		bool isLoaded() const { return m_loaded; }
 
 		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
+
+		void setInput(const CL_InputDevice &p_input) { m_input = p_input; }
 
 		virtual void update(unsigned p_timeElapsed) {}
 
 	private:
 
+		/** True when load() method was invoked */
 		bool m_loaded;
+
+		/** Contains input device set by parent window */
+		CL_InputDevice m_input;
 
 };
 

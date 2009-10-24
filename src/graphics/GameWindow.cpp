@@ -56,6 +56,9 @@ void GameWindow::updateLogic()
 
 	if (scene != NULL) {
 
+		// set the current input device
+		scene->setInput(get_ic().get_keyboard());
+
 		const unsigned now = CL_System::get_time();
 
 		if (m_lastLogicUpdateTime == 0) {
@@ -80,6 +83,7 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc)
 
 	if (scene != NULL) {
 
+		// load scene when not loaded yet
 		if (!scene->isLoaded()) {
 			scene->load(p_gc);
 		}

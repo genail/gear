@@ -169,8 +169,6 @@ bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
 
 void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 {
-	cl_log_event("debug", "%1", p_event.id);
-
 	Car &car = m_racePlayer.getCar();
 
 	bool state;

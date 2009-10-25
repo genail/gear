@@ -28,8 +28,10 @@
 
 #include "RaceScene.h"
 
+#include <assert.h>
 #include <stdlib.h>
 
+#include "common.h"
 #include "race/Race.h"
 
 RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_client) :
@@ -37,6 +39,8 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	m_racePlayer(p_player),
 	m_lapsTotal(3),
 	m_inputLock(false),
+	m_turnLeft(false),
+	m_turnRight(false),
 	m_raceUI(this),
 	m_networkClient(p_client)
 {
@@ -45,12 +49,12 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	// listen for input
 	func_input_pressed().set(this, &RaceScene::onInputPressed);
 	func_input_released().set(this, &RaceScene::onInputReleased);
-	func_input().set(this, &RaceScene::onInput);
 
 	m_viewport.attachTo(&(m_racePlayer.getCar().getPosition()));
 	oldSpeed = 0.0f;
 
 	m_level.addCar(&m_racePlayer.getCar());
+	m_cars.push_back(&m_racePlayer.getCar());
 }
 
 RaceScene::~RaceScene() {
@@ -103,7 +107,13 @@ void RaceScene::updateScale() {
 
 void RaceScene::update(unsigned p_timeElapsed)
 {
+	cl_log_event("debug", "update: %1", p_timeElapsed);
+
 	updateScale();
+
+	updateCars(p_timeElapsed);
+
+	m_level.update(p_timeElapsed);
 
 	const Car &car = m_racePlayer.getCar();
 
@@ -115,80 +125,131 @@ void RaceScene::update(unsigned p_timeElapsed)
 	m_raceUI.update(p_timeElapsed);
 }
 
-bool RaceScene::onInput(const CL_InputEvent &p_event)
+void RaceScene::updateCars(unsigned p_timeElapsed)
 {
-	cl_log_event("input", p_event.str);
-	return false;
+	foreach(Car *car, m_cars) {
+		car->update(p_timeElapsed);
+	}
 }
+
 
 bool RaceScene::onInputPressed(const CL_InputEvent &p_event)
 {
-	cl_log_event("input_pressed", p_event.str);
-	return false;
+	handleInput(Pressed, p_event);
+	return true;
 }
 
 bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
 {
-	cl_log_event("input_released", p_event.str);
-	return false;
+	handleInput(Released, p_event);
+	return true;
+}
+
+void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
+{
+	Car &car = m_racePlayer.getCar();
+
+	bool state;
+
+	switch (p_state) {
+		case Pressed:
+			state = true;
+			break;
+		case Released:
+			state = false;
+			break;
+		default:
+			assert(0 && "unknown input state");
+	}
+
+	switch (p_event.id) {
+		case CL_KEY_LEFT:
+			m_turnLeft = state;
+			break;
+		case CL_KEY_RIGHT:
+			m_turnRight = state;
+			break;
+		case CL_KEY_UP:
+			car.setAcceleration(state);
+			break;
+		case CL_KEY_DOWN:
+			car.setBrake(state);
+			break;
+		case CL_KEY_SPACE:
+			car.setHandbrake(state);
+			break;
+	}
+
+	// handle quit request
+	if (p_state == Pressed && p_event.id == CL_KEY_ESCAPE) {
+		Stage::popScene();
+	}
+
+	updateCarTurn();
+}
+
+void RaceScene::updateCarTurn()
+{
+	Car &car = m_racePlayer.getCar();
+	car.setTurn((int) -m_turnLeft + (int) m_turnRight);
 }
 
 void RaceScene::grabInput()
 {
-		const CL_InputDevice &keyboard = getInput();
-		Car &car = m_racePlayer.getCar();
-
-		if (keyboard.get_keycode(CL_KEY_ESCAPE)) {
-//			m_race->m_close = true; FIXME: fix the quit sequence
-			exit(0);
-		}
-
-		if (!m_inputLock) {
-			if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
-				car.setTurn(-1.0f);
-			} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
-				car.setTurn(1.0f);
-			} else {
-				car.setTurn(0.0f);
-			}
-
-			if (keyboard.get_keycode(CL_KEY_UP)) {
-				car.setAcceleration(true);
-			} else {
-				car.setAcceleration(false);
-			}
-
-			if (keyboard.get_keycode(CL_KEY_DOWN)) {
-				car.setBrake(true);
-			} else {
-				car.setBrake(false);
-			}
-
-			if (keyboard.get_keycode(CL_KEY_SPACE)) {
-				car.setHandbrake(true);
-			} else {
-				car.setHandbrake(false);
-			}
-		}
-
-	#ifndef NDEBUG
-		// viewport change
-		if (keyboard.get_keycode(CL_KEY_ADD)) {
-			const float scale = getViewport().getScale();
-			getViewport().setScale(scale + scale * 0.01f);
-		}
-
-		if (keyboard.get_keycode(CL_KEY_SUBTRACT)) {
-			const float scale = getViewport().getScale();
-			getViewport().setScale(scale - scale * 0.01f);
-		}
-
-		// trigger race start
-		if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
-			startRace();
-		}
-
-	#endif
+//		const CL_InputDevice &keyboard = getInput();
+//		Car &car = m_racePlayer.getCar();
+//
+//		if (keyboard.get_keycode(CL_KEY_ESCAPE)) {
+////			m_race->m_close = true; FIXME: fix the quit sequence
+//			exit(0);
+//		}
+//
+//		if (!m_inputLock) {
+//			if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
+//				car.setTurn(-1.0f);
+//			} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
+//				car.setTurn(1.0f);
+//			} else {
+//				car.setTurn(0.0f);
+//			}
+//
+//			if (keyboard.get_keycode(CL_KEY_UP)) {
+//				car.setAcceleration(true);
+//			} else {
+//				car.setAcceleration(false);
+//			}
+//
+//			if (keyboard.get_keycode(CL_KEY_DOWN)) {
+//				car.setBrake(true);
+//			} else {
+//				car.setBrake(false);
+//			}
+//
+//			if (keyboard.get_keycode(CL_KEY_SPACE)) {
+//				car.setHandbrake(true);
+//			} else {
+//				car.setHandbrake(false);
+//			}
+//		}
+//
+//	#ifndef NDEBUG
+//		// viewport change
+//		if (keyboard.get_keycode(CL_KEY_ADD)) {
+//			const float scale = getViewport().getScale();
+//			getViewport().setScale(scale + scale * 0.01f);
+//		}
+//
+//		if (keyboard.get_keycode(CL_KEY_SUBTRACT)) {
+//			const float scale = getViewport().getScale();
+//			getViewport().setScale(scale - scale * 0.01f);
+//		}
+//
+//		// trigger race start
+//		if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
+//			startRace();
+//		}
+//
+//	#endif
 }
 
 void RaceScene::startRace()

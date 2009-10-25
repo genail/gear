@@ -65,6 +65,11 @@ class RaceScene: public Scene
 
 	private:
 
+		enum InputState {
+			Pressed,
+			Released
+		};
+
 		/** Player of the race */
 		RacePlayer m_racePlayer;
 
@@ -84,6 +89,9 @@ class RaceScene: public Scene
 
 		/** Set to true if user interaction should be locked */
 		bool m_inputLock;
+
+		/** Keys down */
+		bool m_turnLeft, m_turnRight;
 
 		// display
 
@@ -110,13 +118,25 @@ class RaceScene: public Scene
 		CL_SlotContainer m_slots;
 
 
-		void grabInput();
+		//
+		// Methods
+		//
 
-		bool onInput(const CL_InputEvent &p_event);
+		// input
+
+		void grabInput();
 
 		bool onInputPressed(const CL_InputEvent &p_event);
 
 		bool onInputReleased(const CL_InputEvent &p_event);
+
+		void handleInput(InputState p_state, const CL_InputEvent& p_event);
+
+		void updateCarTurn();
+
+		// logic
+
+		void updateCars(unsigned p_timeElapsed);
 
 		void updateScale();
 

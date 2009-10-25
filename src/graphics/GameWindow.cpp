@@ -56,8 +56,8 @@ void GameWindow::updateLogic()
 
 	if (scene != NULL) {
 
-		// set the current input device
-		scene->setInput(get_ic().get_keyboard());
+		// set the scene focus
+		scene->set_focus(true);
 
 		const unsigned now = CL_System::get_time();
 
@@ -71,9 +71,9 @@ void GameWindow::updateLogic()
 		m_lastLogicUpdateTime = now;
 
 	} else {
-		// when there is no current scene, then make the counter 0
-		// to prevent huge time jump when further scene will be available
-		m_lastLogicUpdateTime = 0;
+		// when there are no scenes on stack, then probably application
+		// should be ended
+		exit_with_code(0);
 	}
 }
 

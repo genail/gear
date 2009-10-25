@@ -44,9 +44,6 @@
 #include "network/Client.h"
 #include "gui/MainMenuScene.h"
 
-/* Default server port */
-const int DEFAULT_PORT = 2500;
-
 
 class Application
 {

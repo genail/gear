@@ -28,6 +28,8 @@
 
 #include "MainMenuScene.h"
 
+#include "common.h"
+
 MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	Scene(p_parent),
 	m_nameLabel(this),
@@ -82,6 +84,16 @@ void MainMenuScene::onOkClicked()
 	}
 
 	m_player.setName(m_nameLineEdit.get_text());
+
+	if (!m_serverLineEdit.get_text().empty()) {
+		// separate server addr from port if possible
+		std::vector<CL_TempString> parts = CL_StringHelp::split_text(m_serverLineEdit.get_text(), ":");
+
+		const CL_String serverAddr = parts[0];
+		const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
+
+		m_client.connect(serverAddr, serverPort, &m_player);
+	}
 
 	// looks good, start the race scene
 	Stage::pushScene(&m_raceScene);

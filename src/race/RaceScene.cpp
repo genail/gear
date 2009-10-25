@@ -33,11 +33,14 @@
 
 #include "common.h"
 #include "race/Race.h"
+#include "network/events.h"
+#include "network/Client.h"
 
 RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_client) :
 	Scene(p_guiParent),
 	m_racePlayer(p_player),
 	m_lapsTotal(3),
+	m_initialized(false),
 	m_inputLock(false),
 	m_turnLeft(false),
 	m_turnRight(false),
@@ -57,7 +60,36 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	oldSpeed = 0.0f;
 
 	m_level.addCar(&m_racePlayer.getCar());
-	m_cars.push_back(&m_racePlayer.getCar());
+	m_players.push_back(&m_racePlayer);
+
+	// wait for race init
+	m_slots.connect(p_client->signalInitRace(), this, &RaceScene::onInitRace);
+	// listen for local car status change
+	m_slots.connect(m_racePlayer.getCar().sigStatusChange(), this, &RaceScene::onCarStateChangedLocal);
+	// and for remote car status change
+	m_slots.connect(m_networkClient.signalCarStateReceived(), this, &RaceScene::onCarStateChangedRemote);
+	// race start countdown
+	m_slots.connect(m_networkClient.signalStartCountdown(), this, &RaceScene::onStartCountdown);
+	// countdown ends
+	m_raceStartTimer.func_expired().set(this, &RaceScene::onCountdownEnds);
+	// car lock
+	m_slots.connect(m_networkClient.signalLockCar(), this, &RaceScene::onInputLock);
+	// race state
+	m_slots.connect(m_networkClient.signalRaceStateChanged(), this, &RaceScene::onRaceStateChanged);
+	// player finished
+	m_slots.connect(m_networkClient.signalPlayerFinished(), this, &RaceScene::onPlayerFinished);
+
+	// player join
+	m_slots.connect(p_client->signalPlayerConnected(), this, &RaceScene::onPlayerReady);
+	// player leave
+	m_slots.connect(p_client->signalPlayerDisconnected(), this, &RaceScene::onPlayerLeaving);
+
+	if (m_networkClient.getClient().isConnected()) {
+		cl_log_event("race", "Waiting for initialize event from server");
+
+		m_networkClient.initRace("resources/level.txt"); // FIXME: allow to define own level
+	}
+
 }
 
 RaceScene::~RaceScene() {
@@ -149,8 +181,8 @@ void RaceScene::update(unsigned p_timeElapsed)
 
 void RaceScene::updateCars(unsigned p_timeElapsed)
 {
-	foreach(Car *car, m_cars) {
-		car->update(p_timeElapsed);
+	foreach(RacePlayer *player, m_players) {
+		player->getCar().update(p_timeElapsed);
 	}
 }
 
@@ -200,6 +232,15 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 		case CL_KEY_SPACE:
 			car.setHandbrake(state);
 			break;
+#ifndef NDEBUG
+		case CL_KEY_BACKSPACE:
+		{
+			if (p_state == Released) {
+				startRace();
+			}
+		}
+		break;
+#endif // NDEBUG
 	}
 
 	// handle quit request
@@ -216,66 +257,198 @@ void RaceScene::updateCarTurn()
 	car.setTurn((int) -m_turnLeft + (int) m_turnRight);
 }
 
-void RaceScene::grabInput()
-{
-//		const CL_InputDevice &keyboard = getInput();
-//		Car &car = m_racePlayer.getCar();
-//
-//		if (keyboard.get_keycode(CL_KEY_ESCAPE)) {
-////			m_race->m_close = true; FIXME: fix the quit sequence
-//			exit(0);
-//		}
-//
-//		if (!m_inputLock) {
-//			if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
-//				car.setTurn(-1.0f);
-//			} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
-//				car.setTurn(1.0f);
-//			} else {
-//				car.setTurn(0.0f);
-//			}
-//
-//			if (keyboard.get_keycode(CL_KEY_UP)) {
-//				car.setAcceleration(true);
-//			} else {
-//				car.setAcceleration(false);
-//			}
-//
-//			if (keyboard.get_keycode(CL_KEY_DOWN)) {
-//				car.setBrake(true);
-//			} else {
-//				car.setBrake(false);
-//			}
-//
-//			if (keyboard.get_keycode(CL_KEY_SPACE)) {
-//				car.setHandbrake(true);
-//			} else {
-//				car.setHandbrake(false);
-//			}
-//		}
-//
-//	#ifndef NDEBUG
-//		// viewport change
-//		if (keyboard.get_keycode(CL_KEY_ADD)) {
-//			const float scale = getViewport().getScale();
-//			getViewport().setScale(scale + scale * 0.01f);
-//		}
-//
-//		if (keyboard.get_keycode(CL_KEY_SUBTRACT)) {
-//			const float scale = getViewport().getScale();
-//			getViewport().setScale(scale - scale * 0.01f);
-//		}
-//
-//		// trigger race start
-//		if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
-//			startRace();
-//		}
-//
-//	#endif
-}
-
 void RaceScene::startRace()
 {
 	m_scoreTable.clear();
 	m_networkClient.triggerRaceStart(3);
+}
+
+void RaceScene::onCarStateChangedRemote(const CL_NetGameEvent& p_event)
+{
+
+	cl_log_event("event", "handling %1", p_event.to_string());
+
+	// first argument will be name of player
+	const CL_String name = (CL_String) p_event.get_argument(0);
+
+	if (name == m_racePlayer.getPlayer().getName()) {
+		// this is about me!
+		cl_log_event("event", "setting myself to start position");
+		m_racePlayer.getCar().applyStatusEvent(p_event, 1);
+	} else {
+		// remote player state
+		RacePlayer *racePlayer = findPlayer(name);
+
+		if (racePlayer == NULL) {
+			cl_log_event("error", "remote player '%1' not found", name);
+			return;
+		}
+
+		Car &car = racePlayer->getCar();
+		car.applyStatusEvent(p_event, 1);
+	}
+}
+
+RacePlayer *RaceScene::findPlayer(const CL_String& p_name)
+{
+	foreach(RacePlayer *player, m_players) {
+		if (player->getPlayer().getName() == p_name) {
+			return player;
+		}
+	}
+
+	return NULL;
+}
+
+void RaceScene::onCarStateChangedLocal(Car &p_car)
+{
+	CL_NetGameEvent event(EVENT_CAR_STATE_CHANGE, m_racePlayer.getPlayer().getName());
+	p_car.prepareStatusEvent(event);
+
+	m_networkClient.sendCarStateEvent(event);
+}
+
+void RaceScene::onPlayerReady(Player* p_player)
+{
+
+	cl_log_event("event", "Player '%1' has arrived", p_player->getName());
+
+	RacePlayer *racePlayer = new RacePlayer(p_player);
+
+	m_players.push_back(racePlayer);
+	m_level.addCar(&racePlayer->getCar());
+}
+
+void RaceScene::onPlayerLeaving(Player* p_player)
+{
+
+	for (
+		std::list<RacePlayer*>::iterator itor = m_players.begin();
+		itor != m_players.end();
+		++itor
+	) {
+		if (&(*itor)->getPlayer() == p_player) {
+
+			// remove car
+			m_level.removeCar(&(*itor)->getCar());
+
+			delete *itor;
+			m_players.erase(itor);
+		}
+	}
+}
+
+void RaceScene::onStartCountdown()
+{
+	cl_log_event("race", "starting countdown...");
+
+	static const unsigned RACE_START_COUNTDOWN_TIME = 3000;
+
+	m_raceStartTimer.start(RACE_START_COUNTDOWN_TIME, false);
+	m_raceUI.displayCountdown();
+
+	// mark all players state as not finished
+	m_racePlayer.setFinished(false);
+
+	foreach (RacePlayer *player, m_players) {
+		player->setFinished(false);
+	}
+}
+
+void RaceScene::onCountdownEnds()
+{
+	m_raceStartTime = CL_System::get_time();
+	m_inputLock = false;
+}
+
+void RaceScene::onInputLock()
+{
+	m_inputLock = true;
+}
+
+void RaceScene::onRaceStateChanged(int p_lapsNum)
+{
+	m_lapsTotal = p_lapsNum;
+	m_racePlayer.getCar().setLap(1);
+}
+
+void RaceScene::onInitRace(const CL_String& p_levelName)
+{
+	m_level.loadFromFile(p_levelName);
+	m_initialized = true;
+
+	cl_log_event("race", "Initialized race with level %1", p_levelName);
+}
+
+void RaceScene::onPlayerFinished(const CL_NetGameEvent &p_event)
+{
+	const CL_String playerName = p_event.get_argument(0);
+	const unsigned time = p_event.get_argument(1);
+
+	// set this player finished state
+	markPlayerFinished(playerName, time);
+
+}
+
+void RaceScene::markPlayerFinished(const CL_String &p_name, unsigned p_time)
+{
+	RacePlayer *scorePlayer;
+
+	if (m_racePlayer.getPlayer().getName() == p_name) {
+
+		m_racePlayer.setFinished(true);
+		scorePlayer = &m_racePlayer;
+
+		// send to the server that race is finished
+		m_networkClient.markFinished(p_time);
+	} else {
+		RacePlayer *player = findPlayer(p_name);
+
+		if (player == NULL) {
+			cl_log_event("error", "Cannot find player called %1", p_name);
+			return;
+		}
+
+		player->setFinished(true);
+		scorePlayer = player;
+	}
+
+	// put to score table
+	m_scoreTable.add(scorePlayer, p_time);
+
+	// check if this race is finished
+	if (isRaceFinished()) {
+		endRace();
+	}
+}
+
+void RaceScene::endRace()
+{
+	// display the score table and quit the game
+	const int scoreEntries = m_scoreTable.getEntriesCount();
+
+	CL_Console::write_line("-----------Score Table------------");
+
+	for (int i = 0; i < scoreEntries; ++i) {
+
+		const CL_String &playerName = m_scoreTable.getEntryPlayer(i)->getPlayer().getName();
+		const unsigned time = m_scoreTable.getEntryTime(i);
+
+		CL_Console::write_line("%1) %2 (%3 ms)", i + 1, playerName, time);
+	}
+
+	CL_Console::write_line("----------------------------------");
+
+	CL_Console::write_line("");
+}
+
+bool RaceScene::isRaceFinished()
+{
+	foreach (const RacePlayer *player, m_players) {
+		if (!player->isFinished()) {
+			return false;
+		}
+	}
+
+	return true;
 }

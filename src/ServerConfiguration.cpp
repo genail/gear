@@ -32,8 +32,6 @@
 
 /* Configuration file location */
 const CL_String CONFIG_FILE = "config.xml";
-/* Default server port */
-const int DEFAULT_PORT = 2500;
 
 ServerConfiguration::ServerConfiguration() :
 	m_port(DEFAULT_PORT)

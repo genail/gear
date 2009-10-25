@@ -33,4 +33,6 @@
 
 #define foreach BOOST_FOREACH
 
+#define DEFAULT_PORT 2500
+
 #endif /* COMMON_H_ */

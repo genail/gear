@@ -73,8 +73,8 @@ class RaceScene: public Scene
 		/** Player of the race */
 		RacePlayer m_racePlayer;
 
-		/** All cars list */
-		std::list<Car*> m_cars;
+		/** All players list */
+		std::list<RacePlayer*> m_players;
 
 		/** Race level */
 		Level m_level;
@@ -84,6 +84,15 @@ class RaceScene: public Scene
 
 		/** The score table */
 		ScoreTable m_scoreTable;
+
+		/** Race start timer */
+		CL_Timer m_raceStartTimer;
+
+		/** Race start time */
+		unsigned m_raceStartTime;
+
+		/** If this race is initialized */
+		bool m_initialized;
 
 		// input
 
@@ -153,6 +162,38 @@ class RaceScene: public Scene
 		// flow control
 
 		void startRace();
+
+		void endRace();
+
+		bool isRaceFinished();
+
+		void markPlayerFinished(const CL_String &p_name, unsigned p_time);
+
+		// helpers
+
+		RacePlayer *findPlayer(const CL_String& p_name);
+
+		// event handlers
+
+		void onCarStateChangedRemote(const CL_NetGameEvent& p_event);
+
+		void onCarStateChangedLocal(Car &p_car);
+
+		void onPlayerReady(Player* p_player);
+
+		void onPlayerLeaving(Player* p_player);
+
+		void onStartCountdown();
+
+		void onCountdownEnds();
+
+		void onInputLock();
+
+		void onRaceStateChanged(int p_lapsNum);
+
+		void onInitRace(const CL_String& p_levelName);
+
+		void onPlayerFinished(const CL_NetGameEvent &p_event);
 
 };
 

@@ -32,6 +32,8 @@
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
 
+#include "graphics/Scene.h"
+
 class GameWindow : public CL_Window {
 	public:
 
@@ -46,6 +48,16 @@ class GameWindow : public CL_Window {
 
 		/** Update timer */
 		CL_Timer m_timer;
+
+		// scene flow
+
+		/** Last scene */
+		Scene *m_lastScene;
+
+		//
+		// methods
+		//
+
 
 		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
 

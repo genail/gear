@@ -29,11 +29,11 @@
 #include "GameWindow.h"
 
 #include "graphics/Stage.h"
-#include "graphics/Scene.h"
 
 GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc) :
 	CL_Window(p_manager, p_desc),
-	m_lastLogicUpdateTime(0)
+	m_lastLogicUpdateTime(0),
+	m_lastScene(NULL)
 {
 	func_render().set(this, &GameWindow::onRender);
 
@@ -65,9 +65,14 @@ void GameWindow::updateLogic()
 
 	if (scene != NULL) {
 
-		// set the scene focus
-		scene->set_visible(true);
-		scene->set_focus(true);
+
+		if (scene != m_lastScene) {
+			// set the scene visibility and focus
+			scene->set_visible(true);
+			scene->set_focus(true);
+
+			m_lastScene = scene;
+		}
 
 		const unsigned now = CL_System::get_time();
 

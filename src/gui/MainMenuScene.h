@@ -32,6 +32,7 @@
 #include "Player.h"
 #include "graphics/Scene.h"
 #include "network/Client.h"
+#include "race/RaceScene.h"
 
 class MainMenuScene: public Scene {
 	public:
@@ -57,6 +58,10 @@ class MainMenuScene: public Scene {
 		Player m_player;
 
 		Client m_client;
+
+		// further scenes
+
+		RaceScene m_raceScene;
 
 
 		//

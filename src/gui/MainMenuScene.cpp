@@ -35,8 +35,11 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_nameLineEdit(this),
 	m_serverLineEdit(this),
 	m_okButton(this),
-	m_errorLabel(this)
+	m_errorLabel(this),
+	m_raceScene(p_parent, &m_player, &m_client)
 {
+	set_class_name("MainMenuScene");
+
 	m_nameLabel.set_geometry(CL_Rect(100, 100, 180, 120));
 	m_nameLabel.set_text("Player's name");
 
@@ -74,6 +77,9 @@ void MainMenuScene::onOkClicked()
 	}
 
 	m_player.setName(m_nameLineEdit.get_text());
+
+	// looks good, start the race scene
+	Stage::pushScene(&m_raceScene);
 }
 
 void MainMenuScene::displayError(const CL_String& p_message)

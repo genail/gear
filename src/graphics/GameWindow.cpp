@@ -65,8 +65,13 @@ void GameWindow::updateLogic()
 
 	if (scene != NULL) {
 
-
 		if (scene != m_lastScene) {
+
+			if (m_lastScene != NULL) {
+				m_lastScene->set_visible(false);
+				m_lastScene->set_focus(false);
+			}
+
 			// set the scene visibility and focus
 			scene->set_visible(true);
 			scene->set_focus(true);

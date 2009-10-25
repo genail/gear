@@ -29,7 +29,9 @@
 #ifndef MAINMENUSCENE_H_
 #define MAINMENUSCENE_H_
 
+#include "Player.h"
 #include "graphics/Scene.h"
+#include "network/Client.h"
 
 class MainMenuScene: public Scene {
 	public:
@@ -43,8 +45,31 @@ class MainMenuScene: public Scene {
 		// gui components
 
 		CL_Label m_nameLabel, m_serverLabel;
+
 		CL_LineEdit m_nameLineEdit, m_serverLineEdit;
+
 		CL_PushButton m_okButton;
+
+		CL_Label m_errorLabel;
+
+		// game mechanics
+
+		Player m_player;
+
+		Client m_client;
+
+
+		//
+		// Methods
+		//
+
+		// action slots
+
+		void onOkClicked();
+
+		// other
+
+		void displayError(const CL_String& p_message);
 };
 
 #endif /* MAINMENUSCENE_H_ */

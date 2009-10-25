@@ -34,7 +34,8 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_serverLabel(this),
 	m_nameLineEdit(this),
 	m_serverLineEdit(this),
-	m_okButton(this)
+	m_okButton(this),
+	m_errorLabel(this)
 {
 	m_nameLabel.set_geometry(CL_Rect(100, 100, 180, 120));
 	m_nameLabel.set_text("Player's name");
@@ -48,6 +49,10 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
 	m_okButton.set_geometry(CL_Rect(300, 180, 400, 200));
 	m_okButton.set_text("Start Race");
+
+	m_errorLabel.set_geometry(CL_Rect(200, 220, 400, 260));
+
+	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 }
 
 MainMenuScene::~MainMenuScene()
@@ -57,4 +62,23 @@ MainMenuScene::~MainMenuScene()
 void MainMenuScene::draw(CL_GraphicContext &p_gc)
 {
 	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
+}
+
+void MainMenuScene::onOkClicked()
+{
+	displayError("");
+
+	if (m_nameLineEdit.get_text().empty()) {
+		displayError("No player's name choosen");
+		return;
+	}
+
+	m_player.setName(m_nameLineEdit.get_text());
+}
+
+void MainMenuScene::displayError(const CL_String& p_message)
+{
+	m_errorLabel.set_text(p_message);
+	m_errorLabel.request_repaint();
+
 }

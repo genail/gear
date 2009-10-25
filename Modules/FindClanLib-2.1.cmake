@@ -11,6 +11,10 @@
 # For the components Core, App, Display, GL, GUI, GUIStyleSilver, MikMod,
 # Network, SDL, Signals, Sound and Vorbis, the following variables are set:
 #  ClanLib_${COMPONENT}_LIBRARY - Full path to the component's library.
+
+SET(ClanLib_VERSION "2.1")
+SET(ClanLib_LVERSION "21")
+
 IF(ClanLib_INCLUDE_DIRS)
   SET(ClanLib_FIND_QUIETLY TRUE)
 ENDIF(ClanLib_INCLUDE_DIRS)
@@ -46,7 +50,7 @@ ENDMACRO(ClanLib_ERR)
 
 MACRO(ClanLib_FIND_COMPONENT COMPONENT)
   ClanLib_MSG("Checking for Clan${COMPONENT}")
-  FIND_LIBRARY(ClanLib_${COMPONENT}_LIBRARY clan${COMPONENT}
+  FIND_LIBRARY(ClanLib_${COMPONENT}_LIBRARY clan${ClanLib_LVERSION}${COMPONENT}
     ${CLANLIB_ROOT_DIR}/lib /lib /usr/lib /usr/local/lib
     DOC "Library name for clan${COMPONENT}.")
   IF(ClanLib_${COMPONENT}_LIBRARY)
@@ -65,9 +69,9 @@ ENDMACRO(ClanLib_FIND_COMPONENT)
 ClanLib_MSG("Checking for ClanLib")
 
 FIND_PATH(ClanLib_INCLUDE_DIRS ClanLib/core.h
-  ${ClanLib_ROOT_DIR}/include ${ClanLib_ROOT_DIR}/include/ClanLib-2.0
-  /usr/local/include          /usr/local/include/ClanLib-2.0
-  /usr/include                /usr/include/ClanLib-2.0
+  ${ClanLib_ROOT_DIR}/include ${ClanLib_ROOT_DIR}/include/ClanLib-${ClanLib_VERSION}
+  /usr/local/include          /usr/local/include/ClanLib-${ClanLib_VERSION}
+  /usr/include                /usr/include/ClanLib-${ClanLib_VERSION}
   DOC "Where to find the ClanLib includes.")
 IF(ClanLib_INCLUDE_DIRS)
   ClanLib_MSG("Checking for ClanLib -- headers")

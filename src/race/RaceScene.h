@@ -31,26 +31,31 @@
 
 #include <ClanLib/gui.h>
 
+#include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
 #include "race/RaceUI.h"
 #include "race/Viewport.h"
 #include "race/RacePlayer.h"
+#include "race/ScoreTable.h"
 #include "graphics/Drawable.h"
+#include "network/RaceClient.h"
 
 #include "graphics/Scene.h"
-
-class Race;
 
 class RaceScene: public Scene
 {
 	public:
-		RaceScene(Race* p_race, CL_GUIComponent *p_guiParent);
+		RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_client);
 		virtual ~RaceScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);
+
+		int getLapsTotal() const { return m_lapsTotal; }
+
+		RacePlayer &getLocalPlayer() { return m_racePlayer; }
 
 		RaceUI& getUI() { return m_raceUI; }
 
@@ -60,25 +65,64 @@ class RaceScene: public Scene
 
 	private:
 
-		float oldSpeed;
+		/** Player of the race */
+		RacePlayer m_racePlayer;
 
-		/** Last drift car position. If null, then no drift was doing last time. */
-		CL_Pointf m_lastDriftPoint;
+		/** All cars list */
+		std::list<Car*> m_cars;
 
-		/** The Race pointer */
-		Race *m_race;
+		/** Race level */
+		Level m_level;
 
-		/** How player sees the scene */
-		Viewport m_viewport;
+		/** Total number of laps */
+		int m_lapsTotal;
+
+		/** The score table */
+		ScoreTable m_scoreTable;
+
+		// input
+
+		/** Set to true if user interaction should be locked */
+		bool m_inputLock;
+
+		// display
 
 		/** Race user interface */
 		RaceUI m_raceUI;
 
+		/** How player sees the scene */
+		Viewport m_viewport;
+
+		/** Last drift car position. If null, then no drift was doing last time. */
+		CL_Pointf m_lastDriftPoint;
+
+		/** TODO: What is this? */
+		float oldSpeed;
+
+		// network capabilities
+
+		/** Network client */
+		RaceClient m_networkClient;
+
+		// other
+
+		/** The slots container */
+		CL_SlotContainer m_slots;
+
 
 		void grabInput();
 
+		bool onInput(const CL_InputEvent &p_event);
+
+		bool onInputPressed(const CL_InputEvent &p_event);
+
+		bool onInputReleased(const CL_InputEvent &p_event);
+
 		void updateScale();
 
+		// flow control
+
+		void startRace();
 
 };
 

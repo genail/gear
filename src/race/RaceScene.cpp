@@ -28,14 +28,29 @@
 
 #include "RaceScene.h"
 
+#include <stdlib.h>
+
 #include "race/Race.h"
 
-RaceScene::RaceScene(Race* p_race, CL_GUIComponent *p_guiParent) :
-	m_race(p_race),
-	m_raceUI(p_race)
+RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_client) :
+	Scene(p_guiParent),
+	m_racePlayer(p_player),
+	m_lapsTotal(3),
+	m_inputLock(false),
+	m_raceUI(this),
+	m_networkClient(p_client)
 {
-	m_viewport.attachTo(&(p_race->getLocalPlayer().getCar().getPosition()));
+	set_type_name("RaceScene");
+
+	// listen for input
+	func_input_pressed().set(this, &RaceScene::onInputPressed);
+	func_input_released().set(this, &RaceScene::onInputReleased);
+	func_input().set(this, &RaceScene::onInput);
+
+	m_viewport.attachTo(&(m_racePlayer.getCar().getPosition()));
 	oldSpeed = 0.0f;
+
+	m_level.addCar(&m_racePlayer.getCar());
 }
 
 RaceScene::~RaceScene() {
@@ -45,7 +60,7 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 {
 	m_viewport.prepareGC(p_gc);
 
-	m_race->getLevel().draw(p_gc);
+	m_level.draw(p_gc);
 
 	m_viewport.finalizeGC(p_gc);
 
@@ -56,7 +71,8 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 {
 	Scene::load(p_gc);
 
-	m_race->getLevel().load(p_gc);
+	m_level.load(p_gc);
+
 	m_raceUI.load(p_gc);
 }
 
@@ -64,7 +80,7 @@ void RaceScene::updateScale() {
 	static const float ZOOM_SPEED = 0.005f;
 	static const float MAX_SPEED = 500.0f; // FIXME
 	
-	float speed = fabs( ceil(m_race->getLocalPlayer().getCar().getSpeed() * 10.0f ) / 10.0f);
+	float speed = fabs( ceil(m_racePlayer.getCar().getSpeed() * 10.0f ) / 10.0f);
 	
 	float properScale = -( 1.0f / MAX_SPEED ) * speed + 2.0f;
 	properScale = ceil( properScale * 100.0f ) / 100.0f;
@@ -87,13 +103,11 @@ void RaceScene::updateScale() {
 
 void RaceScene::update(unsigned p_timeElapsed)
 {
-	grabInput();
-
 	updateScale();
 
-	const Car &car = m_race->getLocalPlayer().getCar();
+	const Car &car = m_racePlayer.getCar();
 
-	if (car.getLap() > m_race->getLapsNum()) {
+	if (car.getLap() > m_lapsTotal) {
 		m_viewport.detach();
 	}
 
@@ -101,16 +115,35 @@ void RaceScene::update(unsigned p_timeElapsed)
 	m_raceUI.update(p_timeElapsed);
 }
 
+bool RaceScene::onInput(const CL_InputEvent &p_event)
+{
+	cl_log_event("input", p_event.str);
+	return false;
+}
+
+bool RaceScene::onInputPressed(const CL_InputEvent &p_event)
+{
+	cl_log_event("input_pressed", p_event.str);
+	return false;
+}
+
+bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
+{
+	cl_log_event("input_released", p_event.str);
+	return false;
+}
+
 void RaceScene::grabInput()
 {
 		const CL_InputDevice &keyboard = getInput();
-		Car &car = m_race->m_localPlayer.getCar();
+		Car &car = m_racePlayer.getCar();
 
 		if (keyboard.get_keycode(CL_KEY_ESCAPE)) {
-			m_race->m_close = true;
+//			m_race->m_close = true; FIXME: fix the quit sequence
+			exit(0);
 		}
 
-		if (!m_race->m_inputLock) {
+		if (!m_inputLock) {
 			if (keyboard.get_keycode(CL_KEY_LEFT) && !keyboard.get_keycode(CL_KEY_RIGHT)) {
 				car.setTurn(-1.0f);
 			} else if (keyboard.get_keycode(CL_KEY_RIGHT) && !keyboard.get_keycode(CL_KEY_LEFT)) {
@@ -152,8 +185,14 @@ void RaceScene::grabInput()
 
 		// trigger race start
 		if (keyboard.get_keycode(CL_KEY_BACKSPACE)) {
-			m_race->startRace();
+			startRace();
 		}
 
 	#endif
+}
+
+void RaceScene::startRace()
+{
+	m_scoreTable.clear();
+	m_networkClient.triggerRaceStart(3);
 }

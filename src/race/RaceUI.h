@@ -32,11 +32,11 @@
 #include "graphics/Drawable.h"
 #include "graphics/SpeedMeter.h"
 
-class Race;
+class RaceScene;
 
 class RaceUI: public Drawable {
 	public:
-		RaceUI(Race *p_race);
+		RaceUI(RaceScene *p_raceScene);
 		virtual ~RaceUI();
 
 		/**
@@ -53,8 +53,8 @@ class RaceUI: public Drawable {
 
 	private:
 
-		/** The Race pointer */
-		Race *m_race;
+		/** Parent scene of this object */
+		RaceScene *m_raceScene;
 
 		/** Countdown start time. If 0 then countdown didn't start or its already finished */
 		unsigned m_countDownStart;

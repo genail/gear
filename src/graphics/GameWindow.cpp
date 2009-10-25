@@ -50,7 +50,7 @@ void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 
 void GameWindow::updateLogic()
 {
-	CL_KeepAlive::process();
+//	CL_KeepAlive::process();
 
 	Scene *scene = Stage::peekScene();
 
@@ -88,6 +88,7 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc)
 			scene->load(p_gc);
 		}
 
-		scene->draw(p_gc);
+		// scene will be rendered by gui mechanics
+
 	}
 }

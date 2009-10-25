@@ -29,13 +29,17 @@
 #ifndef SCENE_H_
 #define SCENE_H_
 
+#include <ClanLib/gui.h>
 #include <ClanLib/display.h>
 
-class Scene {
+class Scene : public CL_GUIComponent {
 
 	public:
 
-		Scene() : m_loaded(false) {}
+		Scene(CL_GUIComponent *p_parent) : CL_GUIComponent(p_parent), m_loaded(false) {
+			func_render().set(this, &Scene::onRender);
+			set_geometry(CL_Rectf(0.0f, 0.0f, 640.0f, 480.0f));
+		}
 
 		virtual ~Scene() {}
 
@@ -58,6 +62,8 @@ class Scene {
 
 		/** Contains input device set by parent window */
 		CL_InputDevice m_input;
+
+		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect) { draw(p_gc); }
 
 };
 

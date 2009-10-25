@@ -170,8 +170,12 @@ int Application::main(const std::vector<CL_String> &args)
 			client.connect(serverAddr, serverPort, &player);
 		}
 
-		Race race(&gameWindow, &player, &client);
-		race.exec();
+//		Race race(&gameWindow, &player, &client);
+//		race.exec();
+
+		RaceScene raceScene(&gameWindow, &player, &client);
+		Stage::pushScene(&raceScene);
+
 		gui.exec(true);
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);

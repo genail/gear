@@ -29,11 +29,11 @@
 #include "RaceUI.h"
 
 #include "race/Car.h"
-#include "race/Race.h"
+#include "race/RaceScene.h"
 #include "graphics/Stage.h"
 
-RaceUI::RaceUI(Race *p_race) :
-	m_race(p_race),
+RaceUI::RaceUI(RaceScene *p_raceScene) :
+	m_raceScene(p_raceScene),
 	m_countDownStart(0)
 {
 }
@@ -50,11 +50,11 @@ void RaceUI::displayCountdown()
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
 
-	const Car &car = m_race->getLocalPlayer().getCar();
+	const Car &car = m_raceScene->getLocalPlayer().getCar();
 
 
 	int currentLap = car.getLap();
-	const int lapNum = m_race->getLapsNum();
+	const int lapNum = m_raceScene->getLapsTotal();
 
 	// stop lap display at last lap even if the value is higher
 	if (currentLap > lapNum) {
@@ -136,6 +136,6 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 void RaceUI::update(unsigned p_timeElapsed)
 {
 	// set the speed meter
-	const float carSpeed = m_race->getLocalPlayer().getCar().getSpeedKMS();
+	const float carSpeed = m_raceScene->getLocalPlayer().getCar().getSpeedKMS();
 	m_speedMeter.setSpeed(carSpeed);
 }

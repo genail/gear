@@ -44,6 +44,7 @@ class MainMenu: public Scene {
 
 		CL_Label m_nameLabel, m_serverLabel;
 		CL_LineEdit m_nameLineEdit, m_serverLineEdit;
+		CL_PushButton m_okButton;
 };
 
 #endif /* MAINMENU_H_ */

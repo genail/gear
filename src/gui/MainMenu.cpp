@@ -33,7 +33,8 @@ MainMenu::MainMenu(CL_GUIComponent *p_parent) :
 	m_nameLabel(this),
 	m_serverLabel(this),
 	m_nameLineEdit(this),
-	m_serverLineEdit(this)
+	m_serverLineEdit(this),
+	m_okButton(this)
 {
 	m_nameLabel.set_geometry(CL_Rect(100, 100, 180, 120));
 	m_nameLabel.set_text("Player's name");
@@ -44,6 +45,9 @@ MainMenu::MainMenu(CL_GUIComponent *p_parent) :
 	m_serverLabel.set_text("Server addr");
 
 	m_serverLineEdit.set_geometry(CL_Rect(200, 140, 400, 160));
+
+	m_okButton.set_geometry(CL_Rect(300, 180, 400, 200));
+	m_okButton.set_text("Start Race");
 }
 
 MainMenu::~MainMenu()

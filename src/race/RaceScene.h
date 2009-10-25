@@ -107,6 +107,12 @@ class RaceScene: public Scene
 		/** TODO: What is this? */
 		float oldSpeed;
 
+		/** FPS counter */
+		unsigned m_fps, m_nextFps;
+
+		/** Last fps count time */
+		unsigned m_lastFpsRegisterTime;
+
 		// network capabilities
 
 		/** Network client */
@@ -121,6 +127,10 @@ class RaceScene: public Scene
 		//
 		// Methods
 		//
+
+		// display
+
+		void countFps();
 
 		// input
 

@@ -29,6 +29,7 @@
 #ifndef GAMEWINDOW_H_
 #define GAMEWINDOW_H_
 
+#include <ClanLib/core.h>
 #include <ClanLib/gui.h>
 
 class GameWindow : public CL_Window {
@@ -43,7 +44,12 @@ class GameWindow : public CL_Window {
 		/** Last update logic time. When 0 then no logic update has been done before. */
 		unsigned m_lastLogicUpdateTime;
 
+		/** Update timer */
+		CL_Timer m_timer;
+
 		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
+
+		void repaint();
 
 		void updateLogic();
 

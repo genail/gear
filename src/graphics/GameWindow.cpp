@@ -35,11 +35,19 @@ GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescripti
 	m_lastLogicUpdateTime(0)
 {
 	func_render().set(this, &GameWindow::onRender);
-	set_constant_repaint(true);
+
+	// invoke repaint 60 times per second
+	m_timer.func_expired().set(this, &GameWindow::repaint);
+	m_timer.start(1000 / 60, true);
 }
 
 GameWindow::~GameWindow()
 {
+}
+
+void GameWindow::repaint()
+{
+	paint();
 }
 
 void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)

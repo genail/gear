@@ -42,6 +42,9 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	m_turnLeft(false),
 	m_turnRight(false),
 	m_raceUI(this),
+	m_fps(0),
+	m_nextFps(0),
+	m_lastFpsRegisterTime(0),
 	m_networkClient(p_client)
 {
 	set_type_name("RaceScene");
@@ -69,6 +72,27 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 	m_viewport.finalizeGC(p_gc);
 
 	m_raceUI.draw(p_gc);
+
+	countFps();
+
+#ifndef NDEBUG
+	Stage::getDebugLayer()->putMessage("fps", CL_StringHelp::int_to_local8(m_fps));
+
+	Stage::getDebugLayer()->draw(p_gc);
+#endif // NDEBUG
+}
+
+void RaceScene::countFps()
+{
+	const unsigned now = CL_System::get_time();
+
+	if (now - m_lastFpsRegisterTime >= 1000) {
+		m_fps = m_nextFps;
+		m_nextFps = 0;
+		m_lastFpsRegisterTime = now;
+	}
+
+	++m_nextFps;
 }
 
 void RaceScene::load(CL_GraphicContext &p_gc)
@@ -107,8 +131,6 @@ void RaceScene::updateScale() {
 
 void RaceScene::update(unsigned p_timeElapsed)
 {
-	cl_log_event("debug", "update: %1", p_timeElapsed);
-
 	updateScale();
 
 	updateCars(p_timeElapsed);
@@ -147,6 +169,8 @@ bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
 
 void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 {
+	cl_log_event("debug", "%1", p_event.id);
+
 	Car &car = m_racePlayer.getCar();
 
 	bool state;

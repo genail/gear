@@ -106,7 +106,7 @@ CL_String8 Level::readLine(CL_File& p_file) {
 void Level::loadFromFile(const CL_String& p_filename)
 {
 	try {
-		CL_File file(p_filename, CL_File::open_existing);
+		CL_File file(p_filename, CL_File::open_existing, CL_File::access_read);
 		CL_String8 line;
 
 		line = readLine(file);

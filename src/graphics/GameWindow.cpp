@@ -81,6 +81,7 @@ void GameWindow::updateLogic()
 	} else {
 		// when there are no scenes on stack, then probably application
 		// should be ended
+		cl_log_event("debug", "Closing application because of empty scene stack");
 		exit_with_code(0);
 	}
 }

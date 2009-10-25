@@ -87,7 +87,7 @@ int Application::main(const std::vector<CL_String> &args)
 //
 //	const CL_String serverAddrPort = stdinServer;
 //	const CL_String nickname = stdinNickname;
-	const CL_String serverAddrPort = "";
+	const CL_String serverAddrPort = "localhost";
 	const CL_String nickname = "n";
 
 	// set default properties
@@ -160,6 +160,11 @@ int Application::main(const std::vector<CL_String> &args)
 
 		Client client;
 
+		// create and put first scene
+		RaceScene raceScene(&gameWindow, &player, &client);
+		Stage::pushScene(&raceScene);
+
+		// connect the client
 		if (serverAddrPort.size() > 0) {
 			// separate server addr from port if possible
 			std::vector<CL_TempString> parts = CL_StringHelp::split_text(serverAddrPort, ":");
@@ -170,13 +175,10 @@ int Application::main(const std::vector<CL_String> &args)
 			client.connect(serverAddr, serverPort, &player);
 		}
 
-//		Race race(&gameWindow, &player, &client);
-//		race.exec();
 
-		RaceScene raceScene(&gameWindow, &player, &client);
-		Stage::pushScene(&raceScene);
-
+		// run the gui
 		gui.exec(true);
+
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);
 	}

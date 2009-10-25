@@ -26,25 +26,35 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAINMENU_H_
-#define MAINMENU_H_
+#include "MainMenuScene.h"
 
-#include "graphics/Scene.h"
+MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
+	Scene(p_parent),
+	m_nameLabel(this),
+	m_serverLabel(this),
+	m_nameLineEdit(this),
+	m_serverLineEdit(this),
+	m_okButton(this)
+{
+	m_nameLabel.set_geometry(CL_Rect(100, 100, 180, 120));
+	m_nameLabel.set_text("Player's name");
 
-class MainMenu: public Scene {
-	public:
-		MainMenu(CL_GUIComponent *p_parent);
+	m_nameLineEdit.set_geometry(CL_Rect(200, 100, 400, 120));
 
-		virtual ~MainMenu();
+	m_serverLabel.set_geometry(CL_Rect(100, 140, 180, 160));
+	m_serverLabel.set_text("Server addr");
 
-		virtual void draw(CL_GraphicContext &p_gc);
+	m_serverLineEdit.set_geometry(CL_Rect(200, 140, 400, 160));
 
-	private:
-		// gui components
+	m_okButton.set_geometry(CL_Rect(300, 180, 400, 200));
+	m_okButton.set_text("Start Race");
+}
 
-		CL_Label m_nameLabel, m_serverLabel;
-		CL_LineEdit m_nameLineEdit, m_serverLineEdit;
-		CL_PushButton m_okButton;
-};
+MainMenuScene::~MainMenuScene()
+{
+}
 
-#endif /* MAINMENU_H_ */
+void MainMenuScene::draw(CL_GraphicContext &p_gc)
+{
+	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
+}

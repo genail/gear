@@ -19,7 +19,7 @@ SET(CLIENT_SRCS
     graphics/GameWindow.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
-    gui/MainMenu.cpp
+    gui/MainMenuScene.cpp
 #    race/Race.cpp
     race/RaceScene.cpp
     race/RaceUI.cpp

@@ -42,7 +42,7 @@
 #include "race/RaceUI.h"
 #include "race/Race.h"
 #include "network/Client.h"
-#include "gui/MainMenu.h"
+#include "gui/MainMenuScene.h"
 
 /* Default server port */
 const int DEFAULT_PORT = 2500;
@@ -163,7 +163,7 @@ int Application::main(const std::vector<CL_String> &args)
 		// create and put first scene
 //		RaceScene raceScene(&gameWindow, &player, &client);
 //		Stage::pushScene(&raceScene);
-		MainMenu mainMenuScene(&gameWindow);
+		MainMenuScene mainMenuScene(&gameWindow);
 		Stage::pushScene(&mainMenuScene);
 
 

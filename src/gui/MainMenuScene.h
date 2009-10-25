@@ -53,6 +53,8 @@ class MainMenuScene: public Scene {
 
 		CL_Label m_errorLabel;
 
+		CL_PushButton m_quitButton;
+
 		// game mechanics
 
 		Player m_player;
@@ -71,6 +73,8 @@ class MainMenuScene: public Scene {
 		// action slots
 
 		void onOkClicked();
+
+		void onQuitClicked();
 
 		// other
 

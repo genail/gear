@@ -36,6 +36,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_serverLineEdit(this),
 	m_okButton(this),
 	m_errorLabel(this),
+	m_quitButton(this),
 	m_raceScene(p_parent, &m_player, &m_client)
 {
 	set_class_name("MainMenuScene");
@@ -55,7 +56,11 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
 	m_errorLabel.set_geometry(CL_Rect(200, 220, 400, 260));
 
+	m_quitButton.set_geometry(CL_Rect(Stage::getWidth() - 100, Stage::getHeight() - 40, Stage::getWidth() - 20, Stage::getHeight() - 20));
+	m_quitButton.set_text("Quit");
+
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
+	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
 }
 
 MainMenuScene::~MainMenuScene()
@@ -80,6 +85,11 @@ void MainMenuScene::onOkClicked()
 
 	// looks good, start the race scene
 	Stage::pushScene(&m_raceScene);
+}
+
+void MainMenuScene::onQuitClicked()
+{
+	Stage::popScene();
 }
 
 void MainMenuScene::displayError(const CL_String& p_message)

@@ -32,18 +32,21 @@
 #include <ClanLib/gui.h>
 #include <ClanLib/display.h>
 
+#include "graphics/Stage.h"
+
 class Scene : public CL_GUIComponent {
 
 	public:
 
 		Scene(CL_GUIComponent *p_parent) : CL_GUIComponent(p_parent), m_loaded(false) {
+			set_visible(false),
 			func_render().set(this, &Scene::onRender);
-			set_geometry(CL_Rectf(0.0f, 0.0f, 640.0f, 480.0f));
+			set_geometry(CL_Rectf(0.0f, 0.0f, Stage::getWidth(), Stage::getHeight()));
 		}
 
 		virtual ~Scene() {}
 
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
+		virtual void draw(CL_GraphicContext &p_gc) {};
 
 		bool isLoaded() const { return m_loaded; }
 

@@ -19,6 +19,7 @@ SET(CLIENT_SRCS
     graphics/GameWindow.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
+    gui/MainMenu.cpp
 #    race/Race.cpp
     race/RaceScene.cpp
     race/RaceUI.cpp
@@ -35,10 +36,6 @@ SET(SERVER_SRCS
     ServerConfiguration.cpp
     network/RaceServer.cpp
     network/Server.cpp
-)
-
-SET(GUI_SRCS
-    GUIPrototype.cpp
 )
 
 FIND_PACKAGE(ClanLib-2.1 REQUIRED)
@@ -87,9 +84,4 @@ add_executable(server ${SERVER_SRCS})
 TARGET_LINK_LIBRARIES(server ${SERVER_LIBS})
 SET_TARGET_PROPERTIES(server PROPERTIES LINK_FLAGS "-pthread -lfontconfig")
 SET_TARGET_PROPERTIES(server PROPERTIES COMPILE_FLAGS "-Wall -DSERVER $ENV{CXXFLAGS}")
-
-
-add_executable(gui ${GUI_SRCS})
-TARGET_LINK_LIBRARIES(gui ${GUI_LIBS})
-SET_TARGET_PROPERTIES(gui PROPERTIES LINK_FLAGS "-pthread -lfontconfig -lXxf86vm -lpng -ljpeg -lfreetype")
 

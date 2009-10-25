@@ -32,9 +32,9 @@
 #include <stack>
 #include <ClanLib/core.h>
 
-#include "graphics/Scene.h"
 #include "graphics/DebugLayer.h"
 
+class Scene;
 class Application;
 
 class Stage {

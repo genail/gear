@@ -41,8 +41,8 @@
 #include "Properties.h"
 #include "race/RaceUI.h"
 #include "race/Race.h"
-
 #include "network/Client.h"
+#include "gui/MainMenu.h"
 
 /* Default server port */
 const int DEFAULT_PORT = 2500;
@@ -161,19 +161,22 @@ int Application::main(const std::vector<CL_String> &args)
 		Client client;
 
 		// create and put first scene
-		RaceScene raceScene(&gameWindow, &player, &client);
-		Stage::pushScene(&raceScene);
+//		RaceScene raceScene(&gameWindow, &player, &client);
+//		Stage::pushScene(&raceScene);
+		MainMenu mainMenuScene(&gameWindow);
+		Stage::pushScene(&mainMenuScene);
 
-		// connect the client
-		if (serverAddrPort.size() > 0) {
-			// separate server addr from port if possible
-			std::vector<CL_TempString> parts = CL_StringHelp::split_text(serverAddrPort, ":");
 
-			const CL_String serverAddr = parts[0];
-			const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
-
-			client.connect(serverAddr, serverPort, &player);
-		}
+//		// connect the client
+//		if (serverAddrPort.size() > 0) {
+//			// separate server addr from port if possible
+//			std::vector<CL_TempString> parts = CL_StringHelp::split_text(serverAddrPort, ":");
+//
+//			const CL_String serverAddr = parts[0];
+//			const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
+//
+//			client.connect(serverAddr, serverPort, &player);
+//		}
 
 
 		// run the gui

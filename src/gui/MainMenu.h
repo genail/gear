@@ -26,80 +26,24 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GameWindow.h"
+#ifndef MAINMENU_H_
+#define MAINMENU_H_
 
-#include "graphics/Stage.h"
 #include "graphics/Scene.h"
 
-GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc) :
-	CL_Window(p_manager, p_desc),
-	m_lastLogicUpdateTime(0)
-{
-	func_render().set(this, &GameWindow::onRender);
+class MainMenu: public Scene {
+	public:
+		MainMenu(CL_GUIComponent *p_parent);
 
-	// invoke repaint 60 times per second
-	m_timer.func_expired().set(this, &GameWindow::repaint);
-	m_timer.start(1000 / 60, true);
-}
+		virtual ~MainMenu();
 
-GameWindow::~GameWindow()
-{
-}
+		virtual void draw(CL_GraphicContext &p_gc);
 
-void GameWindow::repaint()
-{
-	request_repaint();
-}
+	private:
+		// gui components
 
-void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
-{
-	updateLogic();
-	renderScene(p_gc);
-}
+		CL_Label m_nameLabel, m_serverLabel;
+		CL_LineEdit m_nameLineEdit, m_serverLineEdit;
+};
 
-void GameWindow::updateLogic()
-{
-//	CL_KeepAlive::process();
-
-	Scene *scene = Stage::peekScene();
-
-	if (scene != NULL) {
-
-		// set the scene focus
-		scene->set_visible(true);
-		scene->set_focus(true);
-
-		const unsigned now = CL_System::get_time();
-
-		if (m_lastLogicUpdateTime == 0) {
-			scene->update(0);
-		} else {
-			const unsigned timeChange = now - m_lastLogicUpdateTime;
-			scene->update(timeChange);
-		}
-
-		m_lastLogicUpdateTime = now;
-
-	} else {
-		// when there are no scenes on stack, then probably application
-		// should be ended
-		cl_log_event("debug", "Closing application because of empty scene stack");
-		exit_with_code(0);
-	}
-}
-
-void GameWindow::renderScene(CL_GraphicContext &p_gc)
-{
-	Scene *scene = Stage::peekScene();
-
-	if (scene != NULL) {
-
-		// load scene when not loaded yet
-		if (!scene->isLoaded()) {
-			scene->load(p_gc);
-		}
-
-		// scene will be rendered by gui mechanics
-
-	}
-}
+#endif /* MAINMENU_H_ */

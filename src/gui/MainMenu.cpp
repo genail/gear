@@ -26,80 +26,31 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GameWindow.h"
+#include "MainMenu.h"
 
-#include "graphics/Stage.h"
-#include "graphics/Scene.h"
-
-GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc) :
-	CL_Window(p_manager, p_desc),
-	m_lastLogicUpdateTime(0)
+MainMenu::MainMenu(CL_GUIComponent *p_parent) :
+	Scene(p_parent),
+	m_nameLabel(this),
+	m_serverLabel(this),
+	m_nameLineEdit(this),
+	m_serverLineEdit(this)
 {
-	func_render().set(this, &GameWindow::onRender);
+	m_nameLabel.set_geometry(CL_Rect(100, 100, 180, 120));
+	m_nameLabel.set_text("Player's name");
 
-	// invoke repaint 60 times per second
-	m_timer.func_expired().set(this, &GameWindow::repaint);
-	m_timer.start(1000 / 60, true);
+	m_nameLineEdit.set_geometry(CL_Rect(200, 100, 400, 120));
+
+	m_serverLabel.set_geometry(CL_Rect(100, 140, 180, 160));
+	m_serverLabel.set_text("Server addr");
+
+	m_serverLineEdit.set_geometry(CL_Rect(200, 140, 400, 160));
 }
 
-GameWindow::~GameWindow()
+MainMenu::~MainMenu()
 {
 }
 
-void GameWindow::repaint()
+void MainMenu::draw(CL_GraphicContext &p_gc)
 {
-	request_repaint();
-}
-
-void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
-{
-	updateLogic();
-	renderScene(p_gc);
-}
-
-void GameWindow::updateLogic()
-{
-//	CL_KeepAlive::process();
-
-	Scene *scene = Stage::peekScene();
-
-	if (scene != NULL) {
-
-		// set the scene focus
-		scene->set_visible(true);
-		scene->set_focus(true);
-
-		const unsigned now = CL_System::get_time();
-
-		if (m_lastLogicUpdateTime == 0) {
-			scene->update(0);
-		} else {
-			const unsigned timeChange = now - m_lastLogicUpdateTime;
-			scene->update(timeChange);
-		}
-
-		m_lastLogicUpdateTime = now;
-
-	} else {
-		// when there are no scenes on stack, then probably application
-		// should be ended
-		cl_log_event("debug", "Closing application because of empty scene stack");
-		exit_with_code(0);
-	}
-}
-
-void GameWindow::renderScene(CL_GraphicContext &p_gc)
-{
-	Scene *scene = Stage::peekScene();
-
-	if (scene != NULL) {
-
-		// load scene when not loaded yet
-		if (!scene->isLoaded()) {
-			scene->load(p_gc);
-		}
-
-		// scene will be rendered by gui mechanics
-
-	}
+	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
 }

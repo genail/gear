@@ -55,6 +55,8 @@ class Stage {
 
 		static Scene *peekScene() { return m_sceneStack.empty() ? NULL : m_sceneStack.top(); }
 
+		static void replaceScene(Scene *p_scene) { m_sceneStack.pop(); m_sceneStack.push(p_scene); }
+
 		static CL_ResourceManager* getResourceManager() { return m_resourceManager; }
 
 

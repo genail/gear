@@ -39,6 +39,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_okButton(this),
 	m_errorLabel(this),
 	m_quitButton(this),
+	m_loadingScene(p_parent),
 	m_raceScene(p_parent, &m_player, &m_client)
 {
 	set_class_name("MainMenuScene");
@@ -92,11 +93,20 @@ void MainMenuScene::onOkClicked()
 		const CL_String serverAddr = parts[0];
 		const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
 
-		m_client.connect(serverAddr, serverPort, &m_player);
-	}
 
-	// looks good, start the race scene
-	Stage::pushScene(&m_raceScene);
+		// show loading scene
+		Stage::pushScene(&m_loadingScene);
+		m_loadingScene.setMessage("Connecting to server...");
+
+		m_client.connect(serverAddr, serverPort, &m_player);
+
+		m_raceScene.init("resources/level.txt"); // FIXME: allow to define own level
+
+		Stage::replaceScene(&m_raceScene);
+
+	} else {
+		Stage::pushScene(&m_raceScene);
+	}
 }
 
 void MainMenuScene::onQuitClicked()

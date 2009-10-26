@@ -61,6 +61,8 @@ class RaceScene: public Scene
 
 		Viewport& getViewport() { return m_viewport; }
 
+		void init(const CL_String &p_levelName);
+
 		virtual void update(unsigned p_timeElapsed);
 
 	private:

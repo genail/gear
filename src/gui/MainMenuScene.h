@@ -33,6 +33,7 @@
 #include "graphics/Scene.h"
 #include "network/Client.h"
 #include "race/RaceScene.h"
+#include "gui/LoadingScene.h"
 
 class MainMenuScene: public Scene {
 	public:
@@ -62,6 +63,8 @@ class MainMenuScene: public Scene {
 		Client m_client;
 
 		// further scenes
+
+		LoadingScene m_loadingScene;
 
 		RaceScene m_raceScene;
 

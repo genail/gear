@@ -84,15 +84,14 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	// player leave
 	m_slots.connect(p_client->signalPlayerDisconnected(), this, &RaceScene::onPlayerLeaving);
 
-	if (m_networkClient.getClient().isConnected()) {
-		cl_log_event("race", "Waiting for initialize event from server");
-
-		m_networkClient.initRace("resources/level.txt"); // FIXME: allow to define own level
-	}
-
 }
 
 RaceScene::~RaceScene() {
+}
+
+void RaceScene::init(const CL_String &p_levelName)
+{
+	m_networkClient.initRace(p_levelName);
 }
 
 void RaceScene::draw(CL_GraphicContext &p_gc)

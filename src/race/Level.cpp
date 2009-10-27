@@ -35,13 +35,13 @@
 #include "common.h"
 #include "race/Checkpoint.h"
 
-Level::Level() :
+Level::Level(const CL_String &p_fileName) :
 	m_blocks(NULL),
 	m_loaded(false),
 	m_width(0),
 	m_height(0)
 {
-	loadFromFile("resources/level.txt");
+	loadFromFile(p_fileName);
 }
 
 Level::~Level() {
@@ -52,6 +52,8 @@ Level::~Level() {
 
 #ifdef CLIENT
 void Level::draw(CL_GraphicContext &p_gc) {
+
+	cl_log_event("debug", "Level::draw() this=%1", (unsigned) this);
 
 	// draw tiles
 	for (int x = 0; x < 10; ++x) {
@@ -87,6 +89,9 @@ void Level::draw(CL_GraphicContext &p_gc) {
 }
 
 void Level::load(CL_GraphicContext &p_gc) {
+
+	cl_log_event("debug", "Level::load()");
+
 	for (int x = 0; x < m_width; ++x) {
 		for (int y = 0; y < m_height; ++y) {
 			m_blocks[m_width * y + x].load(p_gc);

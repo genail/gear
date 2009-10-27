@@ -54,7 +54,7 @@ CLASS_LEVEL
 
 	public:
 
-		Level();
+		Level(const CL_String &p_fileName);
 
 		virtual ~Level();
 
@@ -70,8 +70,6 @@ CLASS_LEVEL
 		 * @return A start position of <code>p_num</code>
 		 */
 		CL_Pointf getStartPosition(int p_num) const;
-
-		void loadFromFile(const CL_String& p_filename);
 
 		void removeCar(Car *p_car);
 
@@ -118,6 +116,8 @@ CLASS_LEVEL
 		CL_String8 readLine(CL_File& p_file);
 
 		void unload();
+
+		void loadFromFile(const CL_String& p_filename);
 
 #ifdef CLIENT
 		/** Tyre stripes */

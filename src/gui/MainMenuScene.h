@@ -68,6 +68,11 @@ class MainMenuScene: public Scene {
 
 		RaceScene m_raceScene;
 
+		// other
+
+		/** The slot container */
+		CL_SlotContainer m_slots;
+
 
 		//
 		// Methods
@@ -78,6 +83,11 @@ class MainMenuScene: public Scene {
 		void onOkClicked();
 
 		void onQuitClicked();
+
+
+		void onClientConnected();
+
+		void onClientInitialized();
 
 		// other
 

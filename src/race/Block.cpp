@@ -31,11 +31,13 @@
 #include "Block.h"
 
 #include <cstdlib>
+#include <assert.h>
 
 Block::Block(BlockType p_type, int p_width) :
 	m_type(p_type),
 	m_resistanceMap(NULL),
-	m_width(p_width)
+	m_width(p_width),
+	m_loaded(false)
 {
 }
 
@@ -50,6 +52,10 @@ void Block::draw(CL_GraphicContext& p_gc) {
 			CL_Sizef(m_width, m_width)
 	);
 
+	cl_log_event("debug", "Block::draw() this=%1", (unsigned) this);
+
+	assert(!m_bgSprite.is_null());
+
 	m_bgSprite.draw(p_gc, drawRect);
 
 	if (!m_fgSprite.is_null()) {
@@ -63,6 +69,9 @@ void Block::draw(CL_GraphicContext& p_gc) {
 
 void Block::load(CL_GraphicContext& p_gc) {
 	m_bgSprite = CL_Sprite(p_gc, "race/block", Stage::getResourceManager());
+	assert(!m_bgSprite.is_null());
+
+	m_loaded = true;
 
 	CL_String8 fgSpriteName;
 	CL_String8 fgSpriteName2;

@@ -28,6 +28,8 @@
 
 #include "Stage.h"
 
+#include "graphics/Scene.h"
+
 int Stage::m_width = 0;
 
 int Stage::m_height = 0;
@@ -37,3 +39,27 @@ CL_ResourceManager *Stage::m_resourceManager = NULL;
 DebugLayer *Stage::m_debugLayer = NULL;
 
 std::stack<Scene*> Stage::m_sceneStack;
+
+void Stage::pushScene(Scene *p_scene)
+{
+	cl_log_event("stage", "scene push: %1", p_scene->get_class_name());
+	m_sceneStack.push(p_scene);
+}
+
+void Stage::popScene()
+{
+	cl_log_event("stage", "scene pop: %1", peekScene()->get_class_name());
+	m_sceneStack.pop();
+}
+
+Scene *Stage::peekScene()
+{
+	return m_sceneStack.empty() ? NULL : m_sceneStack.top();
+}
+
+void Stage::replaceScene(Scene *p_scene)
+{
+	cl_log_event("stage", "scene replace: %1", p_scene->get_class_name());
+	m_sceneStack.pop();
+	m_sceneStack.push(p_scene);
+}

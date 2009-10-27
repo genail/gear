@@ -50,7 +50,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	m_lastFpsRegisterTime(0),
 	m_networkClient(p_client)
 {
-	set_type_name("RaceScene");
+	set_class_name("RaceScene");
 
 	// listen for input
 	func_input_pressed().set(this, &RaceScene::onInputPressed);
@@ -59,7 +59,6 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	m_viewport.attachTo(&(m_racePlayer.getCar().getPosition()));
 	oldSpeed = 0.0f;
 
-	m_level.addCar(&m_racePlayer.getCar());
 	m_players.push_back(&m_racePlayer);
 
 	// wait for race init
@@ -128,6 +127,8 @@ void RaceScene::countFps()
 
 void RaceScene::load(CL_GraphicContext &p_gc)
 {
+	cl_log_event("debug", "RaceScene::load()");
+
 	Scene::load(p_gc);
 
 	m_level.load(p_gc);
@@ -374,6 +375,8 @@ void RaceScene::onRaceStateChanged(int p_lapsNum)
 void RaceScene::onInitRace(const CL_String& p_levelName)
 {
 	m_level.loadFromFile(p_levelName);
+	m_level.addCar(&m_racePlayer.getCar());
+
 	m_initialized = true;
 
 	cl_log_event("race", "Initialized race with level %1", p_levelName);

@@ -79,7 +79,7 @@ class RaceScene: public Scene
 		std::list<RacePlayer*> m_players;
 
 		/** Race level */
-		Level m_level;
+		CL_AutoPtr<Level> m_level;
 
 		/** Total number of laps */
 		int m_lapsTotal;

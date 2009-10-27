@@ -63,9 +63,9 @@ class GameWindow : public CL_Window {
 
 		void repaint();
 
-		void updateLogic();
+		void updateLogic(Scene *p_scene);
 
-		void renderScene(CL_GraphicContext &p_gc);
+		void renderScene(CL_GraphicContext &p_gc, Scene *p_scene);
 
 };
 

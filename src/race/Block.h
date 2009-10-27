@@ -98,6 +98,8 @@ CLASS_BLOCK
 
 #endif // CLIENT
 
+		bool m_loaded;
+
 };
 
 class PixelTranslator {

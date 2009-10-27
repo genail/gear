@@ -53,19 +53,19 @@ void GameWindow::repaint()
 
 void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 {
-	updateLogic();
-	renderScene(p_gc);
+	Scene *scene = Stage::peekScene();
+
+	updateLogic(scene);
+	renderScene(p_gc, scene);
 }
 
-void GameWindow::updateLogic()
+void GameWindow::updateLogic(Scene *p_scene)
 {
 //	CL_KeepAlive::process();
 
-	Scene *scene = Stage::peekScene();
+	if (p_scene != NULL) {
 
-	if (scene != NULL) {
-
-		if (scene != m_lastScene) {
+		if (p_scene != m_lastScene) {
 
 			if (m_lastScene != NULL) {
 				m_lastScene->set_visible(false);
@@ -73,19 +73,19 @@ void GameWindow::updateLogic()
 			}
 
 			// set the scene visibility and focus
-			scene->set_visible(true);
-			scene->set_focus(true);
+			p_scene->set_visible(true);
+			p_scene->set_focus(true);
 
-			m_lastScene = scene;
+			m_lastScene = p_scene;
 		}
 
 		const unsigned now = CL_System::get_time();
 
 		if (m_lastLogicUpdateTime == 0) {
-			scene->update(0);
+			p_scene->update(0);
 		} else {
 			const unsigned timeChange = now - m_lastLogicUpdateTime;
-			scene->update(timeChange);
+			p_scene->update(timeChange);
 		}
 
 		m_lastLogicUpdateTime = now;
@@ -98,15 +98,13 @@ void GameWindow::updateLogic()
 	}
 }
 
-void GameWindow::renderScene(CL_GraphicContext &p_gc)
+void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 {
-	Scene *scene = Stage::peekScene();
-
-	if (scene != NULL) {
+	if (p_scene != NULL) {
 
 		// load scene when not loaded yet
-		if (!scene->isLoaded()) {
-			scene->load(p_gc);
+		if (!p_scene->isLoaded()) {
+			p_scene->load(p_gc);
 		}
 
 		// scene will be rendered by gui mechanics

@@ -58,6 +58,12 @@ class Client {
 		// client signals
 		//
 
+		CL_Signal_v0 &signalConnected() { return m_signalConnected; }
+
+		CL_Signal_v0 &signalConnectionInitialized() { return m_signalConnectionInitialized; }
+
+		CL_Signal_v0 &signalDisconnected() { return m_signalDisconnected; }
+
 		CL_Signal_v1<const CL_String&> &signalInitRace() { return m_signalInitRace; }
 
 		CL_Signal_v1<Player*> &signalPlayerConnected() { return m_signalPlayerConnected; }
@@ -90,6 +96,15 @@ class Client {
 		//
 		// This class signals
 		//
+
+		/** The client is connected */
+		CL_Signal_v0 m_signalConnected;
+
+		/** The connection is initialized (ready to use) */
+		CL_Signal_v0 m_signalConnectionInitialized;
+
+		/** The client is no longed connected */
+		CL_Signal_v0 m_signalDisconnected;
 
 		/** Race initialize event received */
 		CL_Signal_v1<const CL_String&> m_signalInitRace;

@@ -34,6 +34,7 @@ LoadingScene::LoadingScene(CL_GUIComponent *p_parent) :
 	Scene(p_parent),
 	m_label(p_parent)
 {
+	set_class_name("LoadingScene");
 	m_label.set_geometry(CL_Rect(10.0f, Stage::getHeight() - 30.0f, Stage::getWidth() - 10.0f, Stage::getHeight() - 10.0f));
 }
 

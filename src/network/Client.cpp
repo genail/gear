@@ -46,25 +46,14 @@ void Client::connect(const CL_String &p_host, int p_port, Player *p_player) {
 	cl_log_event("network", "Connecting to %1:%2", p_host, port);
 
 	try {
-		m_gameClient.connect(p_host, port);
 
-		// act as connected and wait for connection initialization
-		m_connected = true;
+		m_connected = false;
 		m_welcomed = false;
 
-		while (m_connected) {
-			CL_KeepAlive::process();
+		m_gameClient.connect(p_host, port);
 
-			if (m_welcomed) {
-				cl_log_event("network", "Connection fully initialized");
-				break;
-			}
-
-			CL_System::sleep(10);
-		}
 	} catch (CL_Exception e) {
 		cl_log_event("exception", "Cannot connect to %1:%2", p_host, p_port);
-		m_connected = false;
 	}
 }
 
@@ -94,6 +83,8 @@ void Client::slotConnected()
 	CL_NetGameEvent hiEvent(EVENT_HI, nickname);
 
 	m_gameClient.send_event(hiEvent);
+
+	m_signalConnected.invoke();
 }
 
 void Client::slotDisconnected()
@@ -103,6 +94,8 @@ void Client::slotDisconnected()
 	cl_log_event("network", "Disconnected from server");
 
 	m_connected = false;
+
+	m_signalDisconnected.invoke();
 }
 
 void Client::slotEventReceived(const CL_NetGameEvent &p_event)
@@ -193,4 +186,7 @@ void Client::handleInitRaceEvent(const CL_NetGameEvent &p_event)
 void Client::handleWelcomeEvent(const CL_NetGameEvent &p_netGameEvent)
 {
 	m_welcomed = true;
+	cl_log_event("network", "Connection fully initialized");
+
+	m_signalConnectionInitialized.invoke();
 }

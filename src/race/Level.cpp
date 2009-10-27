@@ -64,8 +64,6 @@ Level::~Level() {
 #ifdef CLIENT
 void Level::draw(CL_GraphicContext &p_gc) {
 
-	cl_log_event("debug", "Level::draw() this=%1", (unsigned) this);
-
 	// draw tiles
 	for (int x = 0; x < 10; ++x) {
 		for (int y = 0; y < 10; ++y) {

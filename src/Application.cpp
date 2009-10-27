@@ -33,6 +33,7 @@
 #include <ClanLib/gl.h>
 #include <ClanLib/application.h>
 
+#include "Game.h"
 #include "graphics/GameWindow.h"
 #include "graphics/DebugLayer.h"
 #include "graphics/Stage.h"
@@ -43,6 +44,7 @@
 #include "race/Race.h"
 #include "network/Client.h"
 #include "gui/MainMenuScene.h"
+#include "gui/SceneContainer.h"
 
 
 class Application
@@ -147,34 +149,14 @@ int Application::main(const std::vector<CL_String> &args)
 	DebugLayer debugLayer;
 	Stage::m_debugLayer = &debugLayer;
 
-//	// Create a window:
-//	CL_DisplayWindow window("The Great Race Game", Stage::getWidth(), Stage::getHeight());
-
 	// build race game
-	Player player(nickname);
 
 	try {
 
-		Client client;
+		SceneContainer sceneContainer(&gameWindow);
+		Game::getInstance().setSceneContainer(&sceneContainer);
 
-		// create and put first scene
-//		RaceScene raceScene(&gameWindow, &player, &client);
-//		Stage::pushScene(&raceScene);
-		MainMenuScene mainMenuScene(&gameWindow);
-		Stage::pushScene(&mainMenuScene);
-
-
-//		// connect the client
-//		if (serverAddrPort.size() > 0) {
-//			// separate server addr from port if possible
-//			std::vector<CL_TempString> parts = CL_StringHelp::split_text(serverAddrPort, ":");
-//
-//			const CL_String serverAddr = parts[0];
-//			const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
-//
-//			client.connect(serverAddr, serverPort, &player);
-//		}
-
+		Stage::pushScene(&sceneContainer.getMainMenuScene());
 
 		// run the gui
 		gui.exec(true);

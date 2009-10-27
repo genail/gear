@@ -52,8 +52,6 @@ void Block::draw(CL_GraphicContext& p_gc) {
 			CL_Sizef(m_width, m_width)
 	);
 
-	cl_log_event("debug", "Block::draw() this=%1", (unsigned) this);
-
 	assert(!m_bgSprite.is_null());
 
 	m_bgSprite.draw(p_gc, drawRect);

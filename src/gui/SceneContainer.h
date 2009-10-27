@@ -35,6 +35,7 @@
 
 #include "gui/MainMenuScene.h"
 #include "gui/LoadingScene.h"
+#include "race/RaceScene.h"
 
 class SceneContainer {
 
@@ -48,15 +49,17 @@ class SceneContainer {
 
 		LoadingScene &getLoadingScene() { return m_loadingScene; }
 
-	private:
+		RaceScene &getRaceScene() { return m_raceScene; }
 
-		GameWindow *m_parent;
+	private:
 
 		// scenes
 
 		MainMenuScene m_mainMenuScene;
 
 		LoadingScene m_loadingScene;
+
+		RaceScene m_raceScene;
 };
 
 #endif /* SCENECONTAINER_H_ */

@@ -32,6 +32,7 @@
 
 LoadingScene::LoadingScene(CL_GUIComponent *p_parent) :
 	Scene(p_parent),
+	m_controller(this),
 	m_label(p_parent)
 {
 	set_class_name("LoadingScene");

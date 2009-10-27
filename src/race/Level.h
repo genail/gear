@@ -54,9 +54,13 @@ CLASS_LEVEL
 
 	public:
 
-		Level(const CL_String &p_fileName);
+		Level();
 
 		virtual ~Level();
+
+		void initialize(const CL_String &p_filename);
+
+		void destroy();
 
 		void addCar(Car *p_car);
 

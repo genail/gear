@@ -28,6 +28,7 @@
 
 #include "RaceUI.h"
 
+#include "Game.h"
 #include "race/Car.h"
 #include "race/RaceScene.h"
 #include "graphics/Stage.h"
@@ -50,7 +51,7 @@ void RaceUI::displayCountdown()
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
 
-	const Car &car = m_raceScene->getLocalPlayer().getCar();
+	const Car &car = Game::getInstance().getRacePlayer().getCar();
 
 
 	int currentLap = car.getLap();
@@ -136,6 +137,6 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 void RaceUI::update(unsigned p_timeElapsed)
 {
 	// set the speed meter
-	const float carSpeed = m_raceScene->getLocalPlayer().getCar().getSpeedKMS();
+	const float carSpeed = Game::getInstance().getRacePlayer().getCar().getSpeedKMS();
 	m_speedMeter.setSpeed(carSpeed);
 }

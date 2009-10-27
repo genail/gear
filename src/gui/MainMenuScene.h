@@ -75,23 +75,6 @@ class MainMenuScene: public Scene {
 
 		CL_PushButton m_quitButton;
 
-		// game mechanics
-
-		Player m_player;
-
-		Client m_client;
-
-		// further scenes
-
-		LoadingScene m_loadingScene;
-
-		RaceScene m_raceScene;
-
-		// other
-
-		/** The slot container */
-		CL_SlotContainer m_slots;
-
 
 		//
 		// Methods
@@ -102,11 +85,6 @@ class MainMenuScene: public Scene {
 		void onOkClicked();
 
 		void onQuitClicked();
-
-
-		void onClientConnected();
-
-		void onClientInitialized();
 
 };
 

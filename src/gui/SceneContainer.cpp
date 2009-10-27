@@ -29,9 +29,9 @@
 #include "SceneContainer.h"
 
 SceneContainer::SceneContainer(GameWindow *p_gameWindow) :
-	m_parent(p_gameWindow),
 	m_mainMenuScene(p_gameWindow),
-	m_loadingScene(p_gameWindow)
+	m_loadingScene(p_gameWindow),
+	m_raceScene(p_gameWindow)
 {
 
 }

@@ -16,6 +16,7 @@ SET(CLIENT_SRCS
     ${COMMON_SRCS}
     Application.cpp
     Game.cpp
+    controllers/LoadingController.cpp
     controllers/MainMenuController.cpp
     graphics/DebugLayer.cpp
     graphics/GameWindow.cpp

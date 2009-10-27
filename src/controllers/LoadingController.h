@@ -26,20 +26,35 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Game.h"
+#ifndef LOADINGCONTROLLER_H_
+#define LOADINGCONTROLLER_H_
 
-Game::Game() :
-	m_networkRaceConnection(&m_networkConnection),
-	m_racePlayer(&m_player)
-{
-}
+#include <ClanLib/core.h>
 
-Game::~Game()
-{
-}
+class LoadingScene;
 
-Game &Game::getInstance()
-{
-	static Game game;
-	return game;
-}
+class LoadingController {
+
+	public:
+
+		LoadingController(LoadingScene *p_scene);
+
+		virtual ~LoadingController();
+
+		void loadRace();
+
+	private:
+
+		LoadingScene *m_scene;
+
+
+		void loadLevel(const CL_String &p_name);
+
+		// signal handlers
+
+		void onClientConnected();
+
+		void onClientInitialized();
+};
+
+#endif /* LOADINGCONTROLLER_H_ */

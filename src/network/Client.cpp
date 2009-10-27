@@ -50,17 +50,17 @@ void Client::connect() {
 
 	const CL_String port = CL_StringHelp::int_to_local8(m_port);
 
-	cl_log_event("network", "Connecting to %1:%2", m_host, port);
+	cl_log_event("network", "Connecting to %1:%2", m_addr, m_port);
 
 	try {
 
 		m_connected = false;
 		m_welcomed = false;
 
-		m_gameClient.connect(m_host, port);
+		m_gameClient.connect(m_addr, port);
 
 	} catch (CL_Exception e) {
-		cl_log_event("exception", "Cannot connect to %1:%2", m_host, m_port);
+		cl_log_event("exception", "Cannot connect to %1:%2", m_addr, m_port);
 	}
 }
 
@@ -84,9 +84,9 @@ void Client::slotConnected()
 	// I am connected
 	// And I should introduce myself
 
-	cl_log_event("network", "Introducing myself as %1", m_player->getName());
+	cl_log_event("network", "Introducing myself as %1", Game::getInstance().getPlayer().getName());
 
-	CL_NetGameEventValue nickname(m_player->getName());
+	CL_NetGameEventValue nickname(Game::getInstance().getPlayer().getName());
 	CL_NetGameEvent hiEvent(EVENT_HI, nickname);
 
 	m_gameClient.send_event(hiEvent);

@@ -35,13 +35,24 @@
 #include "common.h"
 #include "race/Checkpoint.h"
 
-Level::Level(const CL_String &p_fileName) :
+Level::Level() :
 	m_blocks(NULL),
 	m_loaded(false),
 	m_width(0),
 	m_height(0)
 {
-	loadFromFile(p_fileName);
+}
+
+void Level::initialize(const CL_String &p_filename)
+{
+	loadFromFile(p_filename);
+}
+
+void Level::destroy()
+{
+	if (m_blocks != NULL) {
+		unload();
+	}
 }
 
 Level::~Level() {

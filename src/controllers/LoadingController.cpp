@@ -26,20 +26,64 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "LoadingController.h"
+
 #include "Game.h"
 
-Game::Game() :
-	m_networkRaceConnection(&m_networkConnection),
-	m_racePlayer(&m_player)
+LoadingController::LoadingController(LoadingScene *p_scene) :
+	m_scene(p_scene)
+{
+	Game &game = Game::getInstance();
+	Client &client = game.getNetworkConnection();
+	RaceClient &raceClient = game.getNetworkRaceConnection();
+
+	client.signalConnected().connect(this, &LoadingController::onClientConnected);
+	client.signalConnectionInitialized().connect(this, &LoadingController::onClientInitialized);
+}
+
+LoadingController::~LoadingController()
 {
 }
 
-Game::~Game()
+void LoadingController::loadRace()
 {
+	Game &game = Game::getInstance();
+	Client &client = game.getNetworkConnection();
+
+	if (!client.getServerAddr().empty()) {
+
+		cl_log_event("debug", "Starting online game - connecting to %1", client.getServerAddr());
+		m_scene->setMessage("Connecting to server");
+
+		client.connect();
+
+	} else {
+		cl_log_event("debug", "Starting offline game");
+		loadLevel("resources/level.txt");
+
+		RaceScene &raceScene = game.getSceneContainer().getRaceScene();
+		Stage::pushScene(&raceScene);
+	}
 }
 
-Game &Game::getInstance()
+void LoadingController::onClientConnected()
 {
-	static Game game;
-	return game;
+	m_scene->setMessage("Connected");
+}
+
+void LoadingController::onClientInitialized()
+{
+	m_scene->setMessage("Waiting for gamestate...");
+}
+
+void LoadingController::loadLevel(const CL_String &p_name)
+{
+	m_scene->setMessage("Loading level");
+	CL_KeepAlive::process();
+
+	Game &game = Game::getInstance();
+	Level &level = game.getLevel();
+
+	level.destroy();
+	level.initialize(p_name);
 }

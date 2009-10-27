@@ -39,9 +39,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_serverLineEdit(this),
 	m_okButton(this),
 	m_errorLabel(this),
-	m_quitButton(this),
-	m_loadingScene(p_parent),
-	m_raceScene(p_parent, &m_player, &m_client)
+	m_quitButton(this)
 {
 	set_class_name("MainMenuScene");
 
@@ -65,10 +63,6 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
-
-
-	m_slots.connect(m_client.signalConnected(), this, &MainMenuScene::onClientConnected);
-	m_slots.connect(m_client.signalConnectionInitialized(), this, &MainMenuScene::onClientInitialized);
 }
 
 MainMenuScene::~MainMenuScene()
@@ -83,17 +77,6 @@ void MainMenuScene::draw(CL_GraphicContext &p_gc)
 void MainMenuScene::onOkClicked()
 {
 	INVOKE_0(startRaceClicked);
-}
-
-void MainMenuScene::onClientConnected()
-{
-	m_loadingScene.setMessage("Waiting for init");
-}
-
-void MainMenuScene::onClientInitialized()
-{
-	m_raceScene.init("resources/level.txt"); // FIXME: allow to define own level
-	Stage::pushScene(&m_raceScene);
 }
 
 void MainMenuScene::onQuitClicked()

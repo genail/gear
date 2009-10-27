@@ -66,15 +66,13 @@ void MainMenuController::onRaceStartClicked()
 		game.getNetworkConnection().setServerAddr(serverAddr);
 		game.getNetworkConnection().setServerPort(serverPort);
 
-		LoadingScene &loadingScene = game.getSceneContainer().getLoadingScene();
-		Stage::pushScene(&loadingScene);
 
-		loadingScene.getController().loadRace();
-
-
-	} else {
-		Stage::pushScene(&m_raceScene);
 	}
+
+	LoadingScene &loadingScene = game.getSceneContainer().getLoadingScene();
+	Stage::pushScene(&loadingScene);
+
+	loadingScene.getController().loadRace();
 }
 
 void MainMenuController::onQuitClicked()

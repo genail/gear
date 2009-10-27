@@ -46,7 +46,7 @@
 class RaceScene: public Scene
 {
 	public:
-		RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_client);
+		RaceScene(CL_GUIComponent *p_guiParent);
 		virtual ~RaceScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
@@ -54,8 +54,6 @@ class RaceScene: public Scene
 		virtual void load(CL_GraphicContext &p_gc);
 
 		int getLapsTotal() const { return m_lapsTotal; }
-
-		RacePlayer &getLocalPlayer() { return m_racePlayer; }
 
 		RaceUI& getUI() { return m_raceUI; }
 
@@ -72,14 +70,8 @@ class RaceScene: public Scene
 			Released
 		};
 
-		/** Player of the race */
-		RacePlayer m_racePlayer;
-
 		/** All players list */
 		std::list<RacePlayer*> m_players;
-
-		/** Race level */
-		CL_AutoPtr<Level> m_level;
 
 		/** Total number of laps */
 		int m_lapsTotal;
@@ -123,11 +115,6 @@ class RaceScene: public Scene
 
 		/** Last fps count time */
 		unsigned m_lastFpsRegisterTime;
-
-		// network capabilities
-
-		/** Network client */
-		RaceClient m_networkClient;
 
 		// other
 

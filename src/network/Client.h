@@ -54,6 +54,10 @@ class Client {
 
 		RaceClient& getRaceClient() { return m_raceClient; }
 
+		const CL_String& getServerAddr() const { return m_addr; }
+
+		int getServerPort() const { return m_port; }
+
 		void setServerAddr(const CL_String& p_addr) { m_addr = p_addr; }
 
 		void setServerPort(int p_port) { m_port = p_port; }

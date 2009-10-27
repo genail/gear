@@ -56,7 +56,7 @@ void RaceServer::initialize(const CL_String& p_levelName)
 	m_levelName = p_levelName;
 
 	m_level = new Level();
-	m_level->loadFromFile(p_levelName);
+	m_level->initialize(p_levelName);
 
 	RacePlayer* player;
 

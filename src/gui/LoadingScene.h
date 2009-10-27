@@ -32,6 +32,7 @@
 #include <ClanLib/core.h>
 
 #include "graphics/Scene.h"
+#include "controllers/LoadingController.h"
 
 class LoadingScene: public Scene {
 
@@ -43,9 +44,13 @@ class LoadingScene: public Scene {
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
+		LoadingController &getController() { return m_controller; }
+
 		void setMessage(const CL_String &p_message);
 
 	private:
+
+		LoadingController m_controller;
 
 		CL_Label m_label;
 };

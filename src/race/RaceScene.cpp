@@ -31,14 +31,14 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "Game.h"
 #include "common.h"
 #include "race/Race.h"
 #include "network/events.h"
 #include "network/Client.h"
 
-RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_client) :
+RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	Scene(p_guiParent),
-	m_racePlayer(p_player),
 	m_lapsTotal(3),
 	m_initialized(false),
 	m_inputLock(false),
@@ -47,8 +47,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	m_raceUI(this),
 	m_fps(0),
 	m_nextFps(0),
-	m_lastFpsRegisterTime(0),
-	m_networkClient(p_client)
+	m_lastFpsRegisterTime(0)
 {
 	set_class_name("RaceScene");
 
@@ -56,32 +55,37 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent, Player *p_player, Client *p_c
 	func_input_pressed().set(this, &RaceScene::onInputPressed);
 	func_input_released().set(this, &RaceScene::onInputReleased);
 
-	m_viewport.attachTo(&(m_racePlayer.getCar().getPosition()));
+	Game &game = Game::getInstance();
+	RacePlayer &racePlayer = game.getRacePlayer();
+	Client &client = game.getNetworkConnection();
+	RaceClient &raceClient = game.getNetworkRaceConnection();
+
+	m_viewport.attachTo(&(racePlayer.getCar().getPosition()));
 	oldSpeed = 0.0f;
 
-	m_players.push_back(&m_racePlayer);
+	m_players.push_back(&racePlayer);
 
 	// wait for race init
-	m_slots.connect(p_client->signalInitRace(), this, &RaceScene::onInitRace);
+	m_slots.connect(client.signalInitRace(), this, &RaceScene::onInitRace);
 	// listen for local car status change
-	m_slots.connect(m_racePlayer.getCar().sigStatusChange(), this, &RaceScene::onCarStateChangedLocal);
+	m_slots.connect(racePlayer.getCar().sigStatusChange(), this, &RaceScene::onCarStateChangedLocal);
 	// and for remote car status change
-	m_slots.connect(m_networkClient.signalCarStateReceived(), this, &RaceScene::onCarStateChangedRemote);
+	m_slots.connect(raceClient.signalCarStateReceived(), this, &RaceScene::onCarStateChangedRemote);
 	// race start countdown
-	m_slots.connect(m_networkClient.signalStartCountdown(), this, &RaceScene::onStartCountdown);
+	m_slots.connect(raceClient.signalStartCountdown(), this, &RaceScene::onStartCountdown);
 	// countdown ends
 	m_raceStartTimer.func_expired().set(this, &RaceScene::onCountdownEnds);
 	// car lock
-	m_slots.connect(m_networkClient.signalLockCar(), this, &RaceScene::onInputLock);
+	m_slots.connect(raceClient.signalLockCar(), this, &RaceScene::onInputLock);
 	// race state
-	m_slots.connect(m_networkClient.signalRaceStateChanged(), this, &RaceScene::onRaceStateChanged);
+	m_slots.connect(raceClient.signalRaceStateChanged(), this, &RaceScene::onRaceStateChanged);
 	// player finished
-	m_slots.connect(m_networkClient.signalPlayerFinished(), this, &RaceScene::onPlayerFinished);
+	m_slots.connect(raceClient.signalPlayerFinished(), this, &RaceScene::onPlayerFinished);
 
 	// player join
-	m_slots.connect(p_client->signalPlayerConnected(), this, &RaceScene::onPlayerReady);
+	m_slots.connect(client.signalPlayerConnected(), this, &RaceScene::onPlayerReady);
 	// player leave
-	m_slots.connect(p_client->signalPlayerDisconnected(), this, &RaceScene::onPlayerLeaving);
+	m_slots.connect(client.signalPlayerDisconnected(), this, &RaceScene::onPlayerLeaving);
 
 }
 
@@ -90,14 +94,14 @@ RaceScene::~RaceScene() {
 
 void RaceScene::init(const CL_String &p_levelName)
 {
-	m_networkClient.initRace(p_levelName);
+//	Game::getInstance().getNetworkRaceConnection().initRace(p_levelName);
 }
 
 void RaceScene::draw(CL_GraphicContext &p_gc)
 {
 	m_viewport.prepareGC(p_gc);
 
-	m_level.draw(p_gc);
+	Game::getInstance().getLevel().draw(p_gc);
 
 	m_viewport.finalizeGC(p_gc);
 
@@ -131,7 +135,7 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 
 	Scene::load(p_gc);
 
-	m_level.load(p_gc);
+	Game::getInstance().getLevel().load(p_gc);
 
 	m_raceUI.load(p_gc);
 }
@@ -140,7 +144,7 @@ void RaceScene::updateScale() {
 	static const float ZOOM_SPEED = 0.005f;
 	static const float MAX_SPEED = 500.0f; // FIXME
 	
-	float speed = fabs( ceil(m_racePlayer.getCar().getSpeed() * 10.0f ) / 10.0f);
+	float speed = fabs( ceil(Game::getInstance().getRacePlayer().getCar().getSpeed() * 10.0f ) / 10.0f);
 	
 	float properScale = -( 1.0f / MAX_SPEED ) * speed + 2.0f;
 	properScale = ceil( properScale * 100.0f ) / 100.0f;
@@ -167,9 +171,13 @@ void RaceScene::update(unsigned p_timeElapsed)
 
 	updateCars(p_timeElapsed);
 
-	m_level.update(p_timeElapsed);
+	Game &game = Game::getInstance();
+	Level &level = game.getLevel();
 
-	const Car &car = m_racePlayer.getCar();
+	level.update(p_timeElapsed);
+
+	RacePlayer &racePlayer = game.getRacePlayer();
+	const Car &car = racePlayer.getCar();
 
 	if (car.getLap() > m_lapsTotal) {
 		m_viewport.detach();
@@ -201,7 +209,7 @@ bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
 
 void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 {
-	Car &car = m_racePlayer.getCar();
+	Car &car = Game::getInstance().getRacePlayer().getCar();
 
 	bool state;
 
@@ -253,14 +261,14 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 void RaceScene::updateCarTurn()
 {
-	Car &car = m_racePlayer.getCar();
+	Car &car = Game::getInstance().getRacePlayer().getCar();
 	car.setTurn((int) -m_turnLeft + (int) m_turnRight);
 }
 
 void RaceScene::startRace()
 {
 	m_scoreTable.clear();
-	m_networkClient.triggerRaceStart(3);
+	Game::getInstance().getNetworkRaceConnection().triggerRaceStart(3);
 }
 
 void RaceScene::onCarStateChangedRemote(const CL_NetGameEvent& p_event)
@@ -271,10 +279,10 @@ void RaceScene::onCarStateChangedRemote(const CL_NetGameEvent& p_event)
 	// first argument will be name of player
 	const CL_String name = (CL_String) p_event.get_argument(0);
 
-	if (name == m_racePlayer.getPlayer().getName()) {
+	if (name == Game::getInstance().getRacePlayer().getPlayer().getName()) {
 		// this is about me!
 		cl_log_event("event", "setting myself to start position");
-		m_racePlayer.getCar().applyStatusEvent(p_event, 1);
+		Game::getInstance().getRacePlayer().getCar().applyStatusEvent(p_event, 1);
 	} else {
 		// remote player state
 		RacePlayer *racePlayer = findPlayer(name);
@@ -302,10 +310,10 @@ RacePlayer *RaceScene::findPlayer(const CL_String& p_name)
 
 void RaceScene::onCarStateChangedLocal(Car &p_car)
 {
-	CL_NetGameEvent event(EVENT_CAR_STATE_CHANGE, m_racePlayer.getPlayer().getName());
+	CL_NetGameEvent event(EVENT_CAR_STATE_CHANGE, Game::getInstance().getRacePlayer().getPlayer().getName());
 	p_car.prepareStatusEvent(event);
 
-	m_networkClient.sendCarStateEvent(event);
+	Game::getInstance().getNetworkRaceConnection().sendCarStateEvent(event);
 }
 
 void RaceScene::onPlayerReady(Player* p_player)
@@ -316,7 +324,7 @@ void RaceScene::onPlayerReady(Player* p_player)
 	RacePlayer *racePlayer = new RacePlayer(p_player);
 
 	m_players.push_back(racePlayer);
-	m_level.addCar(&racePlayer->getCar());
+	Game::getInstance().getLevel().addCar(&racePlayer->getCar());
 }
 
 void RaceScene::onPlayerLeaving(Player* p_player)
@@ -330,7 +338,7 @@ void RaceScene::onPlayerLeaving(Player* p_player)
 		if (&(*itor)->getPlayer() == p_player) {
 
 			// remove car
-			m_level.removeCar(&(*itor)->getCar());
+			Game::getInstance().getLevel().removeCar(&(*itor)->getCar());
 
 			delete *itor;
 			m_players.erase(itor);
@@ -348,7 +356,7 @@ void RaceScene::onStartCountdown()
 	m_raceUI.displayCountdown();
 
 	// mark all players state as not finished
-	m_racePlayer.setFinished(false);
+	Game::getInstance().getRacePlayer().setFinished(false);
 
 	foreach (RacePlayer *player, m_players) {
 		player->setFinished(false);
@@ -369,13 +377,12 @@ void RaceScene::onInputLock()
 void RaceScene::onRaceStateChanged(int p_lapsNum)
 {
 	m_lapsTotal = p_lapsNum;
-	m_racePlayer.getCar().setLap(1);
+	Game::getInstance().getRacePlayer().getCar().setLap(1);
 }
 
 void RaceScene::onInitRace(const CL_String& p_levelName)
 {
-	m_level.loadFromFile(p_levelName);
-	m_level.addCar(&m_racePlayer.getCar());
+	Game::getInstance().getLevel().addCar(&Game::getInstance().getRacePlayer().getCar());
 
 	m_initialized = true;
 
@@ -396,13 +403,13 @@ void RaceScene::markPlayerFinished(const CL_String &p_name, unsigned p_time)
 {
 	RacePlayer *scorePlayer;
 
-	if (m_racePlayer.getPlayer().getName() == p_name) {
+	if (Game::getInstance().getRacePlayer().getPlayer().getName() == p_name) {
 
-		m_racePlayer.setFinished(true);
-		scorePlayer = &m_racePlayer;
+		Game::getInstance().getRacePlayer().setFinished(true);
+		scorePlayer = &Game::getInstance().getRacePlayer();
 
 		// send to the server that race is finished
-		m_networkClient.markFinished(p_time);
+		Game::getInstance().getNetworkRaceConnection().markFinished(p_time);
 	} else {
 		RacePlayer *player = findPlayer(p_name);
 

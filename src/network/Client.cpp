@@ -27,9 +27,15 @@
  */
 
 #include "network/Client.h"
+
+#include "Game.h"
+#include "common.h"
 #include "network/events.h"
 
+
+
 Client::Client() :
+	m_port(DEFAULT_PORT),
 	m_connected(false),
 	m_raceClient(this)
 {
@@ -38,22 +44,23 @@ Client::Client() :
 	m_slots.connect(m_gameClient.sig_event_received(), this, &Client::slotEventReceived);
 }
 
-void Client::connect(const CL_String &p_host, int p_port, Player *p_player) {
-	m_player = p_player;
+void Client::connect() {
 
-	const CL_String port = CL_StringHelp::int_to_local8(p_port);
+	assert(!m_addr.empty() && m_port > 0 && m_port < 0xFFFF);
 
-	cl_log_event("network", "Connecting to %1:%2", p_host, port);
+	const CL_String port = CL_StringHelp::int_to_local8(m_port);
+
+	cl_log_event("network", "Connecting to %1:%2", m_host, port);
 
 	try {
 
 		m_connected = false;
 		m_welcomed = false;
 
-		m_gameClient.connect(p_host, port);
+		m_gameClient.connect(m_host, port);
 
 	} catch (CL_Exception e) {
-		cl_log_event("exception", "Cannot connect to %1:%2", p_host, p_port);
+		cl_log_event("exception", "Cannot connect to %1:%2", m_host, m_port);
 	}
 }
 

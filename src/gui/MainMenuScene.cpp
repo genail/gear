@@ -32,6 +32,7 @@
 
 MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	Scene(p_parent),
+	m_controller(this),
 	m_nameLabel(this),
 	m_serverLabel(this),
 	m_nameLineEdit(this),
@@ -81,33 +82,7 @@ void MainMenuScene::draw(CL_GraphicContext &p_gc)
 
 void MainMenuScene::onOkClicked()
 {
-	displayError("");
-
-	if (m_nameLineEdit.get_text().empty()) {
-		displayError("No player's name choosen");
-		return;
-	}
-
-	m_player.setName(m_nameLineEdit.get_text());
-
-	if (!m_serverLineEdit.get_text().empty()) {
-		// separate server addr from port if possible
-		std::vector<CL_TempString> parts = CL_StringHelp::split_text(m_serverLineEdit.get_text(), ":");
-
-		const CL_String serverAddr = parts[0];
-		const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
-
-
-		// show loading scene
-		Stage::pushScene(&m_loadingScene);
-		m_loadingScene.setMessage("Connecting to server...");
-
-		m_client.connect(serverAddr, serverPort, &m_player);
-
-
-	} else {
-		Stage::pushScene(&m_raceScene);
-	}
+	INVOKE_0(startRaceClicked);
 }
 
 void MainMenuScene::onClientConnected()
@@ -123,7 +98,7 @@ void MainMenuScene::onClientInitialized()
 
 void MainMenuScene::onQuitClicked()
 {
-	Stage::popScene();
+	INVOKE_0(quitClicked);
 }
 
 void MainMenuScene::displayError(const CL_String& p_message)

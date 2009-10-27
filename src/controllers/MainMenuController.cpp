@@ -26,22 +26,58 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#include "MainMenuController.h"
 
-#include <boost/foreach.hpp>
+#include "Game.h"
+#include "graphics/Stage.h"
+#include "gui/MainMenuScene.h"
 
-#define foreach BOOST_FOREACH
+MainMenuController::MainMenuController(MainMenuScene *p_scene) :
+	m_scene(p_scene)
+{
+	m_slots.connect(m_scene->sig_startRaceClicked(), this, &MainMenuController::onRaceStartClicked);
+}
 
-#define DEFAULT_PORT 2500
+MainMenuController::~MainMenuController()
+{
+}
 
-#define SIGNAL_0(name)\
-	private:\
-		CL_Signal_v0 m_sig_##name; \
-	public:\
-		CL_Signal_v0 &sig_##name() { return m_sig_##name; }
 
-#define INVOKE_0(name)\
-		m_sig_##name.invoke()
+void MainMenuController::onRaceStartClicked()
+{
+	m_scene->displayError("");
 
-#endif /* COMMON_H_ */
+	if (m_scene->getPlayerName().empty()) {
+		m_scene->displayError("No player's name choosen");
+		return;
+	}
+
+	Game &game = Game::getInstance();
+
+	game.getPlayer().setName(m_scene->getPlayerName());
+
+	if (!m_scene->getServerAddr().empty()) {
+		// separate server addr from port if possible
+		std::vector<CL_TempString> parts = CL_StringHelp::split_text(m_scene->getServerAddr(), ":");
+
+		const CL_String serverAddr = parts[0];
+		const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
+
+		game.getNetworkConnection().setServerAddr(serverAddr);
+		game.getNetworkConnection().setServerPort(serverPort);
+
+		LoadingScene &loadingScene = game.getSceneContainer().getLoadingScene();
+		Stage::pushScene(&loadingScene);
+
+		loadingScene.getController().loadRace();
+
+
+	} else {
+		Stage::pushScene(&m_raceScene);
+	}
+}
+
+void MainMenuController::onQuitClicked()
+{
+	Stage::popScene();
+}

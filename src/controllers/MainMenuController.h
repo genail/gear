@@ -26,22 +26,34 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef MAINMENUCONTROLLER_H_
+#define MAINMENUCONTROLLER_H_
 
-#include <boost/foreach.hpp>
+#include <ClanLib/core.h>
 
-#define foreach BOOST_FOREACH
+class MainMenuScene;
 
-#define DEFAULT_PORT 2500
+class MainMenuController {
 
-#define SIGNAL_0(name)\
-	private:\
-		CL_Signal_v0 m_sig_##name; \
-	public:\
-		CL_Signal_v0 &sig_##name() { return m_sig_##name; }
+	public:
 
-#define INVOKE_0(name)\
-		m_sig_##name.invoke()
+		MainMenuController(MainMenuScene *p_scene);
 
-#endif /* COMMON_H_ */
+		virtual ~MainMenuController();
+
+	private:
+
+		MainMenuScene *m_scene;
+
+		/** The slot container */
+		CL_SlotContainer m_slots;
+
+
+		// action handlers
+
+		void onRaceStartClicked();
+
+		void onQuitClicked();
+};
+
+#endif /* MAINMENUCONTROLLER_H_ */

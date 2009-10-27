@@ -29,13 +29,21 @@
 #ifndef MAINMENUSCENE_H_
 #define MAINMENUSCENE_H_
 
+#include <ClanLib/core.h>
+
+#include "common.h"
 #include "Player.h"
 #include "graphics/Scene.h"
 #include "network/Client.h"
 #include "race/RaceScene.h"
 #include "gui/LoadingScene.h"
+#include "controllers/MainMenuController.h"
 
 class MainMenuScene: public Scene {
+
+		SIGNAL_0(startRaceClicked);
+		SIGNAL_0(quitClicked);
+
 	public:
 		MainMenuScene(CL_GUIComponent *p_parent);
 
@@ -43,7 +51,18 @@ class MainMenuScene: public Scene {
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
+		CL_String getPlayerName() const { return m_nameLineEdit.get_text(); }
+
+		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
+
+		void displayError(const CL_String& p_message);
+
 	private:
+
+		// scene controller
+
+		MainMenuController m_controller;
+
 		// gui components
 
 		CL_Label m_nameLabel, m_serverLabel;
@@ -89,9 +108,6 @@ class MainMenuScene: public Scene {
 
 		void onClientInitialized();
 
-		// other
-
-		void displayError(const CL_String& p_message);
 };
 
 #endif /* MAINMENUSCENE_H_ */

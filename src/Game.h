@@ -26,22 +26,45 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef GAME_H_
+#define GAME_H_
 
-#include <boost/foreach.hpp>
+#include <assert.h>
 
-#define foreach BOOST_FOREACH
+#include "Player.h"
+#include "network/Client.h"
+#include "gui/SceneContainer.h"
 
-#define DEFAULT_PORT 2500
+class Game {
 
-#define SIGNAL_0(name)\
-	private:\
-		CL_Signal_v0 m_sig_##name; \
-	public:\
-		CL_Signal_v0 &sig_##name() { return m_sig_##name; }
+	public:
 
-#define INVOKE_0(name)\
-		m_sig_##name.invoke()
+		virtual ~Game();
 
-#endif /* COMMON_H_ */
+		static Game &getInstance();
+
+		Client &getNetworkConnection() { return m_networkConnection; }
+
+		Player &getPlayer() { return m_player; }
+
+		SceneContainer &getSceneContainer() {
+			assert(m_sceneContainer.get() != NULL && "scene container must be set by Application");
+			return *m_sceneContainer.get();
+		}
+
+	private:
+
+		Client m_networkConnection;
+
+		Player m_player;
+
+		CL_AutoPtr<SceneContainer> m_sceneContainer;
+
+		Game();
+
+		void setSceneContainer(SceneContainer *p_sceneContainer) { m_sceneContainer.reset(p_sceneContainer); }
+
+		friend class Application;
+};
+
+#endif /* GAME_H_ */

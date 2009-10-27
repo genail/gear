@@ -15,12 +15,15 @@ SET(COMMON_SRCS
 SET(CLIENT_SRCS
     ${COMMON_SRCS}
     Application.cpp
+    Game.cpp
+    controllers/MainMenuController.cpp
     graphics/DebugLayer.cpp
     graphics/GameWindow.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
     gui/MainMenuScene.cpp
     gui/LoadingScene.cpp
+    gui/SceneContainer.cpp
 #    race/Race.cpp
     race/RaceScene.cpp
     race/RaceUI.cpp

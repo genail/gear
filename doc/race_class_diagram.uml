@@ -52,7 +52,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Oct 27 20:25:27 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Oct 27 21:23:42 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -1168,6 +1168,19 @@
                 <UML:Class xmi.idref = '127-0-1-1--76e24558:12497559046:-8000:0000000000001033'/>
               </UML:StructuralFeature.type>
             </UML:Attribute>
+            <UML:Operation xmi.id = '127-0-1-1--76e24558:12497559046:-8000:00000000000010C5'
+              name = 'getController' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+              isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id = '127-0-1-1--76e24558:12497559046:-8000:00000000000010C6'
+                  name = 'return' isSpecification = 'false' kind = 'return'>
+                  <UML:Parameter.type>
+                    <UML:Class xmi.idref = '127-0-1-1--76e24558:12497559046:-8000:0000000000001033'/>
+                  </UML:Parameter.type>
+                </UML:Parameter>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
           </UML:Classifier.feature>
         </UML:Class>
         <UML:Generalization xmi.id = '127-0-1-1-4227bdbf:12491bf5cc2:-8000:0000000000001011'
@@ -4361,7 +4374,7 @@ getters and setters.</text>
     </path>
   </group>
   <group name="Fig18"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[440, 520, 188, 85]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[440, 520, 188, 99]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1-4227bdbf:12491bf5cc2:-8000:0000000000001010"
        fill="1"
        fillcolor="white"
@@ -4375,7 +4388,7 @@ getters and setters.</text>
       x="440"
       y="520"
       width="188"
-      height="85"
+      height="99"
       fill="1"
       fillcolor="white"
       stroke="0"
@@ -4420,7 +4433,7 @@ getters and setters.</text>
       justification="Center"
     >LoadingScene</text>
     <group name="Fig18.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[440, 564, 188, 40]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[440, 564, 188, 54]"
          href="127-0-1-1-4227bdbf:12491bf5cc2:-8000:0000000000001010"
          fill="1"
          fillcolor="white"
@@ -4434,7 +4447,7 @@ getters and setters.</text>
         x="440"
         y="564"
         width="188"
-        height="40"
+        height="54"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -4456,7 +4469,7 @@ getters and setters.</text>
         x="440"
         y="565"
         width="141"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -4472,7 +4485,7 @@ getters and setters.</text>
         x="440"
         y="579"
         width="185"
-        height="20"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -4484,6 +4497,22 @@ getters and setters.</text>
         textsize="11"
         justification="Left"
       >setMessage(p_message : CL_String)</text>
+      <text name="Fig18.3.4"
+        x="440"
+        y="593"
+        width="168"
+        height="23"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >getController() : LoadingController</text>
     </group>
     <group name="Fig18.4"
          description="org.argouml.uml.diagram.ui.FigAttributesCompartment[440, 541, 188, 23]"
@@ -4539,7 +4568,7 @@ getters and setters.</text>
       x="440"
       y="520"
       width="188"
-      height="85"
+      height="99"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -5211,7 +5240,7 @@ getters and setters.</text>
       strokecolor="black"
     >
       <moveto x="528"
-              y="605" />
+              y="619" />
       <lineto x="528"
               y="736" />
     </path>
@@ -5569,8 +5598,8 @@ getters and setters.</text>
       <text name="Fig28.3.3"
         x="920"
         y="326"
-        width="176"
-        height="14"
+        width="178"
+        height="17"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -5667,8 +5696,8 @@ getters and setters.</text>
       <text name="Fig28.4.4"
         x="920"
         y="274"
-        width="163"
-        height="14"
+        width="167"
+        height="17"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -5906,8 +5935,8 @@ getters and setters.</text>
                         classname="org.argouml.uml.diagram.ui.PathItemPlacement"
                         figclassname="org.argouml.uml.diagram.ui.FigMultiplicity"
                         ownerhref="127-0-1-1--76e24558:12497559046:-8000:0000000000001066"
-                        angle="315.0"
-                        offset="5" />
+                        angle="-61.0"
+                        offset="19" />
       <argouml:pathitem figname="Fig32.3"
                         classname="org.argouml.uml.diagram.ui.PathItemPlacement"
                         figclassname="org.argouml.uml.diagram.ui.FigAssociationEndAnnotation"

@@ -26,22 +26,37 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef SCENECONTAINER_H_
+#define SCENECONTAINER_H_
 
-#include <boost/foreach.hpp>
+#include <ClanLib/core.h>
 
-#define foreach BOOST_FOREACH
+#include "graphics/GameWindow.h"
 
-#define DEFAULT_PORT 2500
+#include "gui/MainMenuScene.h"
+#include "gui/LoadingScene.h"
 
-#define SIGNAL_0(name)\
-	private:\
-		CL_Signal_v0 m_sig_##name; \
-	public:\
-		CL_Signal_v0 &sig_##name() { return m_sig_##name; }
+class SceneContainer {
 
-#define INVOKE_0(name)\
-		m_sig_##name.invoke()
+	public:
 
-#endif /* COMMON_H_ */
+		SceneContainer(GameWindow *p_gameWindow);
+
+		virtual ~SceneContainer();
+
+		MainMenuScene &getMainMenuScene() { return m_mainMenuScene; }
+
+		LoadingScene &getLoadingScene() { return m_loadingScene; }
+
+	private:
+
+		GameWindow *m_parent;
+
+		// scenes
+
+		MainMenuScene m_mainMenuScene;
+
+		LoadingScene m_loadingScene;
+};
+
+#endif /* SCENECONTAINER_H_ */

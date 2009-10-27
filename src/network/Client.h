@@ -42,7 +42,7 @@ class Client {
 		Client();
 		virtual ~Client();
 
-		void connect(const CL_String &p_host, int p_port, Player *p_player);
+		void connect();
 
 		void disconnect();
 
@@ -53,6 +53,10 @@ class Client {
 		int getPlayersCount() const { return m_remotePlayers.size(); }
 
 		RaceClient& getRaceClient() { return m_raceClient; }
+
+		void setServerAddr(const CL_String& p_addr) { m_addr = p_addr; }
+
+		void setServerPort(int p_port) { m_port = p_port; }
 
 		//
 		// client signals
@@ -72,14 +76,18 @@ class Client {
 
 
 	private:
+
+		/** Server addr */
+		CL_String m_addr;
+
+		/** Server port */
+		int m_port;
+
 		/** Connected state */
 		volatile bool m_connected;
 
 		/** Game client object */
 		CL_NetGameClient m_gameClient;
-
-		/** Local player pointer */
-		Player *m_player;
 
 		/** The race client */
 		RaceClient m_raceClient;

@@ -26,22 +26,16 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#include "SceneContainer.h"
 
-#include <boost/foreach.hpp>
+SceneContainer::SceneContainer(GameWindow *p_gameWindow) :
+	m_parent(p_gameWindow),
+	m_mainMenuScene(p_gameWindow),
+	m_loadingScene(p_gameWindow)
+{
 
-#define foreach BOOST_FOREACH
+}
 
-#define DEFAULT_PORT 2500
-
-#define SIGNAL_0(name)\
-	private:\
-		CL_Signal_v0 m_sig_##name; \
-	public:\
-		CL_Signal_v0 &sig_##name() { return m_sig_##name; }
-
-#define INVOKE_0(name)\
-		m_sig_##name.invoke()
-
-#endif /* COMMON_H_ */
+SceneContainer::~SceneContainer()
+{
+}

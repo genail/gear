@@ -30,7 +30,7 @@
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
-#include <ClanLib/gl.h>
+#include <ClanLib/gl1.h>
 #include <ClanLib/application.h>
 
 #include "graphics/DebugLayer.h"
@@ -113,7 +113,7 @@ int Application::main(const std::vector<CL_String> &args)
 	// Setup clanlib modules:
 	CL_SetupCore setup_core;
 	CL_SetupDisplay setup_display;
-	CL_SetupGL setup_gl;
+	CL_SetupGL1 setup_gl;
 	CL_SetupNetwork setup_network;
 
 	CL_ConsoleLogger logger;

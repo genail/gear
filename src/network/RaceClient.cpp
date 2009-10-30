@@ -61,6 +61,7 @@ void RaceClient::handleEvent(const CL_NetGameEvent &p_event)
 
 void RaceClient::handleCarStateChangeEvent(const CL_NetGameEvent &p_event)
 {
+	cl_log_event("debug", "RaceClient::handleCarStateChangeEvent()");
 	m_signalCarStateReceived.invoke(p_event);
 }
 

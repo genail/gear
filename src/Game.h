@@ -50,7 +50,7 @@ class Game {
 
 		Client &getNetworkConnection() { return m_networkConnection; }
 
-		RaceClient &getNetworkRaceConnection() { return m_networkRaceConnection; }
+		RaceClient &getNetworkRaceConnection() { return *m_networkRaceConnection; }
 
 		Player &getPlayer() { return m_player; }
 
@@ -65,7 +65,7 @@ class Game {
 
 		Client m_networkConnection;
 
-		RaceClient m_networkRaceConnection;
+		RaceClient *m_networkRaceConnection;
 
 		Player m_player;
 

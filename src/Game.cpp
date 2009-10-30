@@ -29,7 +29,9 @@
 #include "Game.h"
 
 Game::Game() :
-	m_networkRaceConnection(&m_networkConnection),
+	m_networkConnection(),
+	m_networkRaceConnection(&m_networkConnection.getRaceClient()),
+	m_player(),
 	m_racePlayer(&m_player)
 {
 }

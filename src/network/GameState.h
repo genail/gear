@@ -26,43 +26,31 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EVENTS_H_
-#define EVENTS_H_
+#ifndef GAMESTATE_H_
+#define GAMESTATE_H_
 
 #include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
+class GameState {
 
-//
-// General events
-//
+	public:
 
-#define EVENT_PREFIX_GENERAL		"general"
+		GameState() {}
 
-// sends as acceptance from server. From this moment connection is fully initialized.
-#define EVENT_WELCOME				"general:welcome"
+		virtual ~GameState() {}
 
-#define EVENT_GENERAL_GAMESTATE		"general:gamestate"
+		void parseGameStateEvent(const CL_NetGameEvent &p_gameStateEvent);
 
-#define EVENT_GRANT_PERMISSIONS		"general:grant_permissions"
-#define EVENT_HI					"general:hi"
-#define EVENT_PLAYER_CONNECTED 		"general:player_connected"
-#define EVENT_PLAYER_DISCONNECTED 	"general:player_disconnected"
-#define EVENT_PLAYER_NICK_CHANGE	"general:nick_change"
-#define EVENT_PLAYER_NICK_IN_USE	"general:nick_in_use"
+		CL_NetGameEvent genGameStateEvent() const;
 
-#define EVENT_INIT_RACE				"general:init_race"
+		const CL_String &getLevelName() const { return m_levelName; }
 
-//
-// Race events
-//
+		void setLevelName(const CL_String &p_levelName) { m_levelName = p_levelName; }
 
-#define EVENT_PREFIX_RACE			"race"
+	private:
 
-#define EVENT_CAR_STATE_CHANGE		"race:car_state_change"
-#define EVENT_TRIGGER_RACE_START	"race:trigger_race_start"
-#define EVENT_LOCK_CAR				"race:lock_car"
-#define EVENT_START_COUNTDOWN		"race:start_countdown"
-#define EVENT_RACE_STATE			"race:race_state"
-#define EVENT_PLAYER_FINISHED		"race:player_finished"
+		CL_String m_levelName;
+};
 
-#endif /* EVENTS_H_ */
+#endif /* GAMESTATE_H_ */

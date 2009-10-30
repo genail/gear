@@ -28,6 +28,8 @@
 
 #include "network/Server.h"
 
+#include <assert.h>
+
 #include "common.h"
 #include "network/events.h"
 
@@ -40,6 +42,10 @@ Server::Server(int p_port) :
 	m_slots.connect(m_gameServer.sig_event_received(), this, &Server::slotEventArrived);
 
 	m_gameServer.start(CL_StringHelp::int_to_local8(p_port));
+
+	// initialize the race server
+	m_raceServer.initialize("resources/level.txt");
+
 	cl_log_event("runtime", "Server is up and running");
 }
 
@@ -217,6 +223,8 @@ CL_NetGameConnection* Server::getConnectionForPlayer(const Player* player)
 
 void Server::handleInitRaceEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
+	assert(0 && "no longer supported");
+
 	// if race is initialized, then send him the init event
 	if (m_raceServer.isInitialized()) {
 		CL_NetGameEvent raceInitEvent(EVENT_INIT_RACE, m_raceServer.getLevelName());

@@ -31,6 +31,8 @@
 
 #include <ClanLib/core.h>
 
+#include "network/GameState.h"
+
 class LoadingScene;
 
 class LoadingController {
@@ -60,6 +62,8 @@ class LoadingController {
 		void onClientInitialized();
 
 		void onSceneVisible();
+
+		void onGameState(const GameState &p_gameState);
 };
 
 #endif /* LOADINGCONTROLLER_H_ */

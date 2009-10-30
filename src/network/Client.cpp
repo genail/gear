@@ -126,6 +126,8 @@ void Client::slotEventReceived(const CL_NetGameEvent &p_event)
 				return;
 			} else if (eventName == EVENT_INIT_RACE) {
 				handleInitRaceEvent(p_event);
+			} else if (eventName == EVENT_GENERAL_GAMESTATE) {
+				handleGameState(p_event);
 			} else {
 				unhandled = true;
 			}
@@ -142,6 +144,21 @@ void Client::slotEventReceived(const CL_NetGameEvent &p_event)
 	} catch (CL_Exception e) {
 		cl_log_event("exception", e.message);
 	}
+
+}
+
+void Client::handleGameState(const CL_NetGameEvent &p_gameState)
+{
+	try {
+		GameState gamestate;
+		gamestate.parseGameStateEvent(p_gameState);
+
+		INVOKE_1(gameStateReceived, gamestate);
+		cl_log_event("debug", "after invoke");
+	} catch (CL_Exception &e) {
+		cl_log_event("protocol error on GAMESTATE: %1", e.message);
+	}
+
 
 }
 

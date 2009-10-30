@@ -2,6 +2,7 @@
 SET(COMMON_SRCS
     Player.cpp
     Properties.cpp
+    network/GameState.cpp
     race/Block.cpp
     race/Bound.cpp
     race/Car.cpp

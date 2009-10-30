@@ -34,6 +34,7 @@
 #include "common.h"
 #include "network/events.h"
 #include "network/Server.h"
+#include "network/GameState.h"
 
 RaceServer::RaceServer(Server* p_server) :
 	m_initialized(false),
@@ -109,6 +110,13 @@ void RaceServer::slotPlayerConnected(CL_NetGameConnection *p_connection, Player 
 
 	m_racePlayers[p_connection] = racePlayer;
 	m_level->addCar(&racePlayer->getCar());
+
+	// send the gamestate
+	cl_log_event("event", "Sending gamestate");
+
+	GameState gamestate;
+	gamestate.setLevelName(m_levelName);
+	m_server->send(p_connection, gamestate.genGameStateEvent());
 }
 
 void RaceServer::slotPlayerDisconnected(CL_NetGameConnection *p_connection, Player *p_player)

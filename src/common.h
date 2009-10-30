@@ -35,13 +35,23 @@
 
 #define DEFAULT_PORT 2500
 
-#define SIGNAL_0(name)\
-	private:\
-		CL_Signal_v0 m_sig_##name; \
-	public:\
-		CL_Signal_v0 &sig_##name() { return m_sig_##name; }
+#define SIGNAL_0(name) \
+	public: \
+		CL_Signal_v0 &sig_##name() { return m_sig_##name; } \
+	private: \
+		CL_Signal_v0 m_sig_##name;
 
-#define INVOKE_0(name)\
+#define SIGNAL_1(T1, name) \
+	public: \
+		CL_Signal_v1<T1> &sig_##name() { return m_sig_##name; } \
+	private: \
+		CL_Signal_v1<T1> m_sig_##name;
+
+
+#define INVOKE_0(name) \
 		m_sig_##name.invoke()
+
+#define INVOKE_1(name, arg1) \
+		m_sig_##name.invoke(arg1)
 
 #endif /* COMMON_H_ */

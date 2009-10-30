@@ -32,12 +32,18 @@
 #include "ClanLib/core.h"
 #include "ClanLib/network.h"
 
+#include "common.h"
 #include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
+#include "network/GameState.h"
 #include "network/RaceClient.h"
 
+
 class Client {
+
+		SIGNAL_1(const GameState&, gameStateReceived);
+
 	public:
 		Client();
 		virtual ~Client();
@@ -156,6 +162,8 @@ class Client {
 		void handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent);
 
 		void handleWelcomeEvent(const CL_NetGameEvent &p_netGameEvent);
+
+		void handleGameState(const CL_NetGameEvent &p_gameState);
 
 		/** Car status update */
 		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);

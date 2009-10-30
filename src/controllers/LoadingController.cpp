@@ -38,6 +38,7 @@ LoadingController::LoadingController(LoadingScene *p_scene) :
 
 	m_slots.connect(client.signalConnected(), this, &LoadingController::onClientConnected);
 	m_slots.connect(client.signalConnectionInitialized(), this, &LoadingController::onClientInitialized);
+	m_slots.connect(client.sig_gameStateReceived(), this, &LoadingController::onGameState);
 	m_slots.connect(m_scene->sig_sceneVisible(), this, &LoadingController::onSceneVisible);
 }
 
@@ -97,4 +98,18 @@ void LoadingController::loadLevel(const CL_String &p_name)
 void LoadingController::onSceneVisible()
 {
 	cl_log_event("debug", "LoadingController::onSceneVisible()");
+}
+
+void LoadingController::onGameState(const GameState &p_gameState)
+{
+	cl_log_event("debug", "LoadingController::onGameState()");
+	loadLevel(p_gameState.getLevelName());
+
+	Game &game = Game::getInstance();
+	RaceScene &raceScene = game.getSceneContainer().getRaceScene();
+
+	raceScene.destroy();
+	raceScene.initialize();
+
+	Stage::replaceScene(&raceScene);
 }

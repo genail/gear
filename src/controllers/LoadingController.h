@@ -47,6 +47,9 @@ class LoadingController {
 
 		LoadingScene *m_scene;
 
+		/** The slot container */
+		CL_SlotContainer m_slots;
+
 
 		void loadLevel(const CL_String &p_name);
 
@@ -55,6 +58,8 @@ class LoadingController {
 		void onClientConnected();
 
 		void onClientInitialized();
+
+		void onSceneVisible();
 };
 
 #endif /* LOADINGCONTROLLER_H_ */

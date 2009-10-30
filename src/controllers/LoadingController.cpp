@@ -35,10 +35,10 @@ LoadingController::LoadingController(LoadingScene *p_scene) :
 {
 	Game &game = Game::getInstance();
 	Client &client = game.getNetworkConnection();
-	RaceClient &raceClient = game.getNetworkRaceConnection();
 
-	client.signalConnected().connect(this, &LoadingController::onClientConnected);
-	client.signalConnectionInitialized().connect(this, &LoadingController::onClientInitialized);
+	m_slots.connect(client.signalConnected(), this, &LoadingController::onClientConnected);
+	m_slots.connect(client.signalConnectionInitialized(), this, &LoadingController::onClientInitialized);
+	m_slots.connect(m_scene->sig_sceneVisible(), this, &LoadingController::onSceneVisible);
 }
 
 LoadingController::~LoadingController()
@@ -47,6 +47,7 @@ LoadingController::~LoadingController()
 
 void LoadingController::loadRace()
 {
+
 	Game &game = Game::getInstance();
 	Client &client = game.getNetworkConnection();
 
@@ -59,8 +60,11 @@ void LoadingController::loadRace()
 
 	} else {
 		cl_log_event("debug", "Starting offline game");
+		m_scene->setMessage("Loading level");
+
 		loadLevel("resources/level.txt");
 
+		Game &game = Game::getInstance();
 		RaceScene &raceScene = game.getSceneContainer().getRaceScene();
 
 		raceScene.destroy();
@@ -82,12 +86,15 @@ void LoadingController::onClientInitialized()
 
 void LoadingController::loadLevel(const CL_String &p_name)
 {
-	m_scene->setMessage("Loading level");
-	CL_KeepAlive::process();
 
 	Game &game = Game::getInstance();
 	Level &level = game.getLevel();
 
 	level.destroy();
 	level.initialize(p_name);
+}
+
+void LoadingController::onSceneVisible()
+{
+	cl_log_event("debug", "LoadingController::onSceneVisible()");
 }

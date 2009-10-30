@@ -31,16 +31,24 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
 #include "graphics/Scene.h"
 #include "controllers/LoadingController.h"
 
 class LoadingScene: public Scene {
+
+		SIGNAL_0(sceneVisible);
+		SIGNAL_0(sceneRepaint);
 
 	public:
 
 		LoadingScene(CL_GUIComponent *p_parent);
 
 		virtual ~LoadingScene();
+
+		void initialize();
+
+		void destroy();
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
@@ -53,6 +61,10 @@ class LoadingScene: public Scene {
 		LoadingController m_controller;
 
 		CL_Label m_label;
+
+		bool m_visibleOnScreen;
+
+		bool m_sceneVisibleSigInvoked;
 };
 
 #endif /* LOADINGSCENE_H_ */

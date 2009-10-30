@@ -71,6 +71,10 @@ void MainMenuController::onRaceStartClicked()
 	}
 
 	LoadingScene &loadingScene = game.getSceneContainer().getLoadingScene();
+
+	loadingScene.destroy();
+	loadingScene.initialize();
+
 	Stage::pushScene(&loadingScene);
 
 	loadingScene.getController().loadRace();

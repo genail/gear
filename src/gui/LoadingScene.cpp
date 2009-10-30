@@ -43,9 +43,32 @@ LoadingScene::~LoadingScene()
 {
 }
 
+void LoadingScene::initialize()
+{
+	m_visibleOnScreen = false;
+	m_sceneVisibleSigInvoked = false;
+}
+
+void LoadingScene::destroy()
+{
+
+}
+
 void LoadingScene::draw(CL_GraphicContext &p_gc)
 {
+	INVOKE_0(sceneRepaint);
+
 	CL_Draw::fill(p_gc, 0.0f, 0.0f, Stage::getWidth(), Stage::getHeight(), CL_Colorf::white);
+
+	// invoke the scene visible, when I'm sure that is really visible
+	// and make it only once per initialize()
+	if (!m_visibleOnScreen) {
+		m_visibleOnScreen = true;
+	} else if (!m_sceneVisibleSigInvoked) {
+		INVOKE_0(sceneVisible);
+		m_sceneVisibleSigInvoked = true;
+	}
+
 }
 
 void LoadingScene::setMessage(const CL_String &p_message)

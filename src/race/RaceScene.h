@@ -49,6 +49,10 @@ class RaceScene: public Scene
 		RaceScene(CL_GUIComponent *p_guiParent);
 		virtual ~RaceScene();
 
+		void initialize();
+
+		void destroy();
+
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);

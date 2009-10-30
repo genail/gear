@@ -62,7 +62,11 @@ void LoadingController::loadRace()
 		loadLevel("resources/level.txt");
 
 		RaceScene &raceScene = game.getSceneContainer().getRaceScene();
-		Stage::pushScene(&raceScene);
+
+		raceScene.destroy();
+		raceScene.initialize();
+
+		Stage::replaceScene(&raceScene);
 	}
 }
 

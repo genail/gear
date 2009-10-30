@@ -56,14 +56,13 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	func_input_released().set(this, &RaceScene::onInputReleased);
 
 	Game &game = Game::getInstance();
-	RacePlayer &racePlayer = game.getRacePlayer();
 	Client &client = game.getNetworkConnection();
 	RaceClient &raceClient = game.getNetworkRaceConnection();
 
-	m_viewport.attachTo(&(racePlayer.getCar().getPosition()));
-	oldSpeed = 0.0f;
+	RacePlayer &racePlayer = game.getRacePlayer();
 
-	m_players.push_back(&racePlayer);
+
+	oldSpeed = 0.0f;
 
 	// wait for race init
 	m_slots.connect(client.signalInitRace(), this, &RaceScene::onInitRace);
@@ -90,6 +89,27 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 }
 
 RaceScene::~RaceScene() {
+}
+
+void RaceScene::initialize()
+{
+	Game &game = Game::getInstance();
+
+	RacePlayer &racePlayer = game.getRacePlayer();
+	m_viewport.attachTo(&(racePlayer.getCar().getPosition()));
+	m_players.push_back(&racePlayer);
+
+	Level &level = game.getLevel();
+	level.addCar(&racePlayer.getCar());
+}
+
+void RaceScene::destroy()
+{
+	Game &game = Game::getInstance();
+	RacePlayer &racePlayer = game.getRacePlayer();
+	Level &level = game.getLevel();
+
+	level.removeCar(&racePlayer.getCar());
 }
 
 void RaceScene::init(const CL_String &p_levelName)

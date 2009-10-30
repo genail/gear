@@ -36,6 +36,7 @@ MainMenuController::MainMenuController(MainMenuScene *p_scene) :
 	m_scene(p_scene)
 {
 	m_slots.connect(m_scene->sig_startRaceClicked(), this, &MainMenuController::onRaceStartClicked);
+	m_slots.connect(m_scene->sig_quitClicked(), this, &MainMenuController::onQuitClicked);
 }
 
 MainMenuController::~MainMenuController()

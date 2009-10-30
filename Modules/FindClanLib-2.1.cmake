@@ -24,6 +24,7 @@ IF(NOT ClanLib_FIND_COMPONENTS)
     App
     Display
     GL
+    GL1
     GUI
     GUIStyleSilver
     MikMod
@@ -101,6 +102,7 @@ MARK_AS_ADVANCED(
   ClanLib_Core_LIBRARY
   ClanLib_Display_LIBRARY
   ClanLib_GL_LIBRARY
+  ClanLib_GL1_LIBRARY
   ClanLib_GUI_LIBRARY
   ClanLib_GUIStyleSilver_LIBRARY
   ClanLib_MikMod_LIBRARY

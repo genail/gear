@@ -132,9 +132,9 @@ int Application::main(const std::vector<CL_String> &args)
 
 	gui.set_window_manager(window_manager);
 
-	CL_ResourceManager res("/home/chudy/projekty/clanlib/ClanLib-2.0.4/Resources/GUIThemeAero/resources.xml");
+	CL_ResourceManager res("resources/GUIThemeAeroPacked/resources.xml");
 	CL_CSSDocument css_document;
-	css_document.load("/home/chudy/projekty/clanlib/ClanLib-2.0.4/Resources/GUIThemeAero/theme.css");
+	css_document.load("resources/GUIThemeAeroPacked/theme.css");
 
 	gui.set_css_document(css_document);
 	theme.set_resources(res);

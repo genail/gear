@@ -32,6 +32,8 @@
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 
+namespace Net {
+
 class GameState {
 
 	public:
@@ -52,5 +54,7 @@ class GameState {
 
 		CL_String m_levelName;
 };
+
+}
 
 #endif /* GAMESTATE_H_ */

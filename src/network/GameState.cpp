@@ -30,6 +30,8 @@
 
 #include "network/events.h"
 
+namespace Net {
+
 void GameState::parseGameStateEvent(const CL_NetGameEvent &p_gameStateEvent)
 {
 	m_levelName = p_gameStateEvent.get_argument(0);
@@ -39,3 +41,5 @@ CL_NetGameEvent GameState::genGameStateEvent() const
 {
 	return CL_NetGameEvent(EVENT_GENERAL_GAMESTATE, m_levelName);
 }
+
+} // namespace

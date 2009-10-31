@@ -31,16 +31,17 @@
 #include "Game.h"
 #include "common.h"
 #include "network/events.h"
+#include "network/PlayerInfo.h"
 
-
+namespace Net {
 
 Client::Client() :
 	m_port(DEFAULT_PORT),
-	m_connected(false),
-	m_raceClient(this)
+	m_connected(false)
+//	m_raceClient(this)
 {
-	m_slots.connect(m_gameClient.sig_connected(), this, &Client::slotConnected);
-	m_slots.connect(m_gameClient.sig_disconnected(), this, &Client::slotDisconnected);
+	m_slots.connect(m_gameClient.sig_connected(), this, &Client::onConnected);
+	m_slots.connect(m_gameClient.sig_disconnected(), this, &Client::onDisconnected);
 	m_slots.connect(m_gameClient.sig_event_received(), this, &Client::slotEventReceived);
 }
 
@@ -53,12 +54,7 @@ void Client::connect() {
 	cl_log_event("network", "Connecting to %1:%2", m_addr, m_port);
 
 	try {
-
-		m_connected = false;
-		m_welcomed = false;
-
 		m_gameClient.connect(m_addr, port);
-
 	} catch (CL_Exception e) {
 		cl_log_event("exception", "Cannot connect to %1:%2", m_addr, m_port);
 	}
@@ -78,23 +74,22 @@ Client::~Client() {
 	}
 }
 
-void Client::slotConnected()
+void Client::onConnected()
 {
+	m_connected = true;
+	m_signalConnected.invoke();
 
 	// I am connected
-	// And I should introduce myself
+	// Sending player info
+	PlayerInfo playerInfo;
+	playerInfo.setName(Game::getInstance().getPlayer().getName());
 
-	cl_log_event("network", "Introducing myself as %1", Game::getInstance().getPlayer().getName());
+	cl_log_event("network", "Introducing myself as %1", playerInfo.getName());
 
-	CL_NetGameEventValue nickname(Game::getInstance().getPlayer().getName());
-	CL_NetGameEvent hiEvent(EVENT_HI, nickname);
-
-	m_gameClient.send_event(hiEvent);
-
-	m_signalConnected.invoke();
+	send(playerInfo.genEvent());
 }
 
-void Client::slotDisconnected()
+void Client::onDisconnected()
 {
 	// I am disconnected
 	// Is that what I've expected?
@@ -214,3 +209,5 @@ void Client::handleWelcomeEvent(const CL_NetGameEvent &p_netGameEvent)
 
 	m_signalConnectionInitialized.invoke();
 }
+
+} // namespace

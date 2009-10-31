@@ -26,44 +26,43 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EVENTS_H_
-#define EVENTS_H_
+#ifndef PLAYERINFO_H_
+#define PLAYERINFO_H_
 
 #include <ClanLib/core.h>
 
+#include "network/Packet.h"
+#include "network/ProtocolVersion.h"
 
+namespace Net {
 
-#define EVENT_PLAYERINFO "player_info"
+class PlayerInfo : public Packet {
 
+	public:
 
+		PlayerInfo();
 
-//#define EVENT_PREFIX_GENERAL		"general"
-//
-//// sends as acceptance from server. From this moment connection is fully initialized.
-//#define EVENT_WELCOME				"general:welcome"
-//
-//#define EVENT_GENERAL_GAMESTATE		"general:gamestate"
-//
-//#define EVENT_GRANT_PERMISSIONS		"general:grant_permissions"
-//#define EVENT_HI					"general:hi"
-//#define EVENT_PLAYER_CONNECTED 		"general:player_connected"
-//#define EVENT_PLAYER_DISCONNECTED 	"general:player_disconnected"
-//#define EVENT_PLAYER_NICK_CHANGE	"general:nick_change"
-//#define EVENT_PLAYER_NICK_IN_USE	"general:nick_in_use"
-//
-//#define EVENT_INIT_RACE				"general:init_race"
-//
-////
-//// Race events
-////
-//
-//#define EVENT_PREFIX_RACE			"race"
-//
-//#define EVENT_CAR_STATE_CHANGE		"race:car_state_change"
-//#define EVENT_TRIGGER_RACE_START	"race:trigger_race_start"
-//#define EVENT_LOCK_CAR				"race:lock_car"
-//#define EVENT_START_COUNTDOWN		"race:start_countdown"
-//#define EVENT_RACE_STATE			"race:race_state"
-//#define EVENT_PLAYER_FINISHED		"race:player_finished"
+		virtual ~PlayerInfo();
 
-#endif /* EVENTS_H_ */
+		virtual CL_NetGameEvent genEvent() const;
+
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
+
+		const CL_String &getName() const { return m_name; }
+
+		const ProtocolVersion &getProtocolVersion() const { return m_protocolVersion; }
+
+		void setName(const CL_String &p_name) { m_name = p_name; }
+
+		void setProtocolVersion(const ProtocolVersion &p_protocolVersion) { m_protocolVersion = p_protocolVersion; }
+
+	private:
+
+		ProtocolVersion m_protocolVersion;
+
+		CL_String m_name;
+};
+
+}
+
+#endif /* PLAYERINFO_H_ */

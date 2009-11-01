@@ -26,39 +26,32 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLAYERINFO_H_
-#define PLAYERINFO_H_
+#include "PlayerJoined.h"
 
-#include <ClanLib/core.h>
+#include <assert.h>
 
-#include "Packet.h"
+#include "network/events.h"
 
 namespace Net {
 
-class PlayerInfo: public Net::Packet {
-
-	public:
-
-		PlayerInfo();
-
-		virtual ~PlayerInfo();
-
-
-		virtual CL_NetGameEvent buildEvent() const = 0;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
-
-
-		const CL_String &getName() const { return m_name; }
-
-
-		void setName(const CL_String &p_name) const { m_name = p_name; }
-
-	private:
-
-		CL_String m_name;
-};
-
+PlayerJoined::PlayerJoined()
+{
 }
 
-#endif /* PLAYERINFO_H_ */
+PlayerJoined::~PlayerJoined()
+{
+}
+
+CL_NetGameEvent PlayerJoined::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_PLAYER_INFO);
+	event.add_argument(m_name);
+}
+
+void PlayerJoined::parseEvent(const CL_NetGameEvent &p_event)
+{
+	assert(p_event.get_name() == EVENT_PLAYER_INFO);
+	m_name = p_event.get_argument(0);
+}
+
+} // namespace

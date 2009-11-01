@@ -35,7 +35,7 @@
 #include "network/version.h"
 #include "network/Goodbye.h"
 #include "network/ClientInfo.h"
-#include "network/PlayerInfo.h"
+#include "network/PlayerJoined.h"
 
 namespace Net {
 
@@ -122,24 +122,6 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 			onClientInfo(p_connection, p_event);
 		}
 
-		if (parts[0] == EVENT_PREFIX_GENERAL) {
-
-			if (eventName == EVENT_HI) {
-				handleHiEvent(p_connection, p_event);
-			} else if (eventName == EVENT_GRANT_PERMISSIONS) {
-				handleGrantEvent(p_connection, p_event);
-			} else if (eventName == EVENT_INIT_RACE) {
-				handleInitRaceEvent(p_connection, p_event);
-			} else {
-				unhandled = true;
-			}
-
-		} else if (parts[0] == EVENT_PREFIX_RACE) {
-			CL_MutexSection lockSection(&m_lockMutex);
-			m_raceServer.handleEvent(p_connection, p_event);
-		} else {
-			unhandled = true;
-		}
 
 		if (unhandled) {
 			cl_log_event("event", "Event %1 remains unhandled", p_event.to_string());
@@ -191,7 +173,8 @@ void Server::onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEv
 	// set the name and inform all
 	m_connections[p_connection].m_name = clientInfo.getName();
 
-	PlayerInfo
+	PlayerJoined playerInfo;
+	playerInfo.setName(clientInfo.getName());
 
 	sendToAll();
 

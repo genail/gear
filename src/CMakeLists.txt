@@ -3,9 +3,10 @@ SET(COMMON_SRCS
     Player.cpp
     Properties.cpp
     network/CarState.cpp
+    network/ClientInfo.cpp
     network/GameState.cpp
     network/Goodbye.cpp
-    network/Player.cpp
+    network/PlayerInfo.cpp
     race/Block.cpp
     race/Bound.cpp
     race/Car.cpp

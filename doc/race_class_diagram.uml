@@ -64,7 +64,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Nov 01 17:37:37 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Nov 01 18:01:45 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -3171,7 +3171,7 @@
               </UML:Classifier.feature>
             </UML:Class>
             <UML:Class xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B9'
-              name = 'PlayerInfo' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+              name = 'PlayerJoined' visibility = 'public' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
               <UML:GeneralizableElement.generalization>
                 <UML:Generalization xmi.idref = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011C3'/>
@@ -11928,7 +11928,7 @@ getters and setters.</text>
       bold="false"
       textsize="11"
       justification="Center"
-    >PlayerInfo</text>
+    >PlayerJoined</text>
     <group name="Fig16.3"
          description="org.argouml.uml.diagram.ui.FigOperationsCompartment[832, 884, 155, 40]"
          href="127-0-1-1--71e35396:124b0059add:-8000:00000000000011B9"

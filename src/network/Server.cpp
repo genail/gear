@@ -35,6 +35,7 @@
 #include "network/version.h"
 #include "network/Goodbye.h"
 #include "network/ClientInfo.h"
+#include "network/PlayerInfo.h"
 
 namespace Net {
 
@@ -78,39 +79,32 @@ void Server::stop()
 	}
 }
 
-void Server::onClientConnected(CL_NetGameConnection *p_netGameConnection)
+void Server::onClientConnected(CL_NetGameConnection *p_conn)
 {
-	cl_log_event("network", "Player %1 is connected", (unsigned) p_netGameConnection);
+	cl_log_event("network", "Player %1 is connected", (unsigned) p_conn);
 
-	Player *player = new Player();
-	m_connections[p_netGameConnection] = player;
+	Player player;
+	m_connections[p_conn] = player;
 
-	// if this is first player, then it grants the permission
-	if (m_connections.size() == 1) {
-		m_permitedConnection = p_netGameConnection;
-	}
-
-	// emit the signal
-	m_signalPlayerConnected.invoke(p_netGameConnection, player);
+	// no signal invoke yet
 }
 
 void Server::onClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 {
-	CL_MutexSection lockSection(&m_lockMutex);
+	cl_log_event("network", "Player %1 disconnects", m_connections[p_netGameConnection].m_name.empty() ? CL_StringHelp::uint_to_local8((unsigned) p_netGameConnection) : m_connections[p_netGameConnection].m_name);
 
-	cl_log_event("network", "Player %1 disconnects", m_connections[p_netGameConnection]->getName().empty() ? CL_StringHelp::uint_to_local8((unsigned) p_netGameConnection) : m_connections[p_netGameConnection]->getName());
-
-	std::map<CL_NetGameConnection*, Player*>::iterator itor = m_connections.find(p_netGameConnection);
+	std::map<CL_NetGameConnection*, Player>::iterator itor = m_connections.find(p_netGameConnection);
 
 	if (itor != m_connections.end()) {
 
-		Player* player = itor->second;
+		const Player &player = itor->second;
 
-		// emit the signal
-		m_signalPlayerDisconnected.invoke(p_netGameConnection, player);
+		// emit the signal if player was in the game
+		if (player.m_gameStateSent) {
+			INVOKE_1(playerLeaved, player.m_name);
+		}
 
 		// cleanup
-		delete player;
 		m_connections.erase(itor);
 	}
 }
@@ -176,9 +170,9 @@ void Server::onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEv
 	// check name availability
 	// check name availability
 	bool nameAvailable = true;
-	std::pair<CL_NetGameConnection*, Player*> pair;
+	std::pair<CL_NetGameConnection*, Server::Player> pair;
 	foreach (pair, m_connections) {
-		if (pair.second->getName() == clientInfo.getName()) {
+		if (pair.second.m_name == clientInfo.getName()) {
 			nameAvailable = false;
 		}
 	}
@@ -194,6 +188,12 @@ void Server::onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEv
 		return;
 	}
 
+	// set the name and inform all
+	m_connections[p_connection].m_name = clientInfo.getName();
+
+	PlayerInfo
+
+	sendToAll();
 
 }
 
@@ -256,15 +256,23 @@ void Server::send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_e
 	p_connection->send_event(p_event);
 }
 
-void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore)
+void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore, bool p_ignoreNotFullyConnected)
 {
 	CL_MutexSection lockSection(&m_lockMutex);
 
-	std::pair<CL_NetGameConnection*, Player*> pair;
+	std::pair<CL_NetGameConnection*, ServerPlayer*> pair;
+
 	foreach(pair, m_connections) {
-		if (pair.first != p_ignore) {
-			pair.first->send_event(p_event);
+
+		if (pair.first == p_ignore) {
+			continue;
 		}
+
+		if (p_ignoreNotFullyConnected && !pair.second.m_gameStateSent) {
+			continue;
+		}
+
+		pair.first->send_event(p_event);
 	}
 }
 

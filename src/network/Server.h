@@ -29,15 +29,30 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include "ClanLib/core.h"
-#include "ClanLib/network.h"
+#include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
-#include "Player.h"
+#include "common.h"
 #include "network/RaceServer.h"
 
 namespace Net {
 
 class Server {
+
+	SIGNAL_1(const CL_String&, playerJoined);
+
+	SIGNAL_1(const CL_String&, playerLeaved);
+
+		class Player {
+
+				CL_String m_name;
+
+				bool m_gameStateSent;
+
+				Player() :
+					m_gameStateSent(false)
+				{}
+		};
 
 	public:
 
@@ -61,7 +76,7 @@ class Server {
 		bool m_running;
 
 		/** List of active connections */
-		std::map<CL_NetGameConnection*, Player*> m_connections;
+		std::map<CL_NetGameConnection*, Server::Player> m_connections;
 
 		/** ClanLib game server */
 		CL_NetGameServer m_gameServer;
@@ -72,7 +87,7 @@ class Server {
 
 		void send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
-		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL);
+		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL, bool p_ignoreNotFullyConnected = true);
 
 		void onClientConnected(CL_NetGameConnection *p_connection);
 

@@ -103,7 +103,7 @@ void LoadingController::onSceneVisible()
 void LoadingController::onGameState(const GameState &p_gameState)
 {
 	cl_log_event("debug", "LoadingController::onGameState()");
-	loadLevel(p_gameState.getLevelName());
+	loadLevel(p_gameState.getLevel());
 
 	Game &game = Game::getInstance();
 	RaceScene &raceScene = game.getSceneContainer().getRaceScene();

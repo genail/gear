@@ -41,7 +41,7 @@ class Packet {
 
 		virtual ~Packet() {}
 
-		virtual CL_NetGameEvent genEvent() const = 0;
+		virtual CL_NetGameEvent buildEvent() const = 0;
 
 		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
 };

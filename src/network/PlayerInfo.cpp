@@ -40,19 +40,21 @@ PlayerInfo::~PlayerInfo()
 {
 }
 
-CL_NetGameEvent PlayerInfo::genEvent() const
+CL_NetGameEvent PlayerInfo::buildEvent() const
 {
-	CL_NetGameEvent event(EVENT_PLAYERINFO);
+	CL_NetGameEvent event(EVENT_PLAYER_INFO);
 
 	event.add_argument(m_protocolVersion.getMajor());
 	event.add_argument(m_protocolVersion.getMinor());
 
 	event.add_argument(m_name);
+
+	return event;
 }
 
 void PlayerInfo::parseEvent(const CL_NetGameEvent &p_event)
 {
-	assert(p_event.get_name() == EVENT_PLAYERINFO);
+	assert(p_event.get_name() == EVENT_PLAYER_INFO);
 
 	m_protocolVersion.setMajor(p_event.get_argument(0));
 	m_protocolVersion.setMinor(p_event.get_argument(1));

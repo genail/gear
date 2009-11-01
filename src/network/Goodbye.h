@@ -26,51 +26,44 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GAMESTATE_H_
-#define GAMESTATE_H_
-
-#include <ClanLib/core.h>
-#include <ClanLib/network.h>
+#ifndef GOODBYE_H_
+#define GOODBYE_H_
 
 #include "network/Packet.h"
-#include "network/CarState.h"
 
 namespace Net {
 
-class GameState : public Packet {
+class Goodbye : public Packet {
 
 	public:
 
-		GameState() {}
+		enum GoodbyeReason {
+			UNSUPPORTED_PROTOCOL_VERSION,
+			NAME_ALREADY_IN_USE
+		};
 
-		virtual ~GameState() {}
+		Goodbye() {}
 
+		virtual ~Goodbye() {}
 
 		virtual CL_NetGameEvent buildEvent() const = 0;
 
 		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
 
+		GoodbyeReason getGoodbyeReason() const { return m_reason; }
 
-		const CL_String &getLevel() const { return m_level; }
+		/**
+		 * @return Textual representation of goodbye reason.
+		 */
+		CL_String getStringMessage() const;
 
-		size_t getPlayerCount() const { return m_names.size(); }
-
-		const CL_String &getPlayerName(size_t p_index) const { return m_names[p_index]; }
-
-		const CarState &getCarState(size_t p_index) const { return m_carStates[p_index]; }
-
-
-		void setLevel(const CL_String &p_level) { m_level = p_level; }
+		void setGoodbyeReason(GoodbyeReason p_reason) { m_reason = p_reason; }
 
 	private:
 
-		CL_String m_level;
-
-		std::vector<CL_String> m_names;
-
-		std::vector<CarState> m_carStates;
+		GoodbyeReason m_reason;
 };
 
 }
 
-#endif /* GAMESTATE_H_ */
+#endif /* GOODBYE_H_ */

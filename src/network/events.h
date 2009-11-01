@@ -32,9 +32,23 @@
 #include <ClanLib/core.h>
 
 
+// connect / disconnect procedure
 
-#define EVENT_PLAYERINFO "player_info"
+#define EVENT_PLAYER_INFO 	"player_info"
 
+#define EVENT_GAME_STATE 	"game_state"
+
+#define EVENT_GOODBYE		"goodbye"
+
+// player events
+
+#define EVENT_PLAYER_JOINED "player_joined"
+
+#define EVENT_PLAYER_LEAVED "player_leaved"
+
+// race events
+
+#define EVENT_CAR_STATE		"car_state"
 
 
 //#define EVENT_PREFIX_GENERAL		"general"

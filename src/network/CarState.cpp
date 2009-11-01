@@ -26,51 +26,44 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GAMESTATE_H_
-#define GAMESTATE_H_
+#include "CarState.h"
 
-#include <ClanLib/core.h>
-#include <ClanLib/network.h>
-
-#include "network/Packet.h"
-#include "network/CarState.h"
+#include "network/events.h"
 
 namespace Net {
 
-class GameState : public Packet {
+CL_NetGameEvent CarState::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_CAR_STATE);
 
-	public:
+	event.add_argument(m_position.x);
+	event.add_argument(m_position.y);
 
-		GameState() {}
+	event.add_argument(m_rotation.to_radians());
 
-		virtual ~GameState() {}
+	event.add_argument(m_movement.x);
+	event.add_argument(m_movement.y);
 
+	event.add_argument(m_accel);
+	event.add_argument(m_turn);
 
-		virtual CL_NetGameEvent buildEvent() const = 0;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
-
-
-		const CL_String &getLevel() const { return m_level; }
-
-		size_t getPlayerCount() const { return m_names.size(); }
-
-		const CL_String &getPlayerName(size_t p_index) const { return m_names[p_index]; }
-
-		const CarState &getCarState(size_t p_index) const { return m_carStates[p_index]; }
-
-
-		void setLevel(const CL_String &p_level) { m_level = p_level; }
-
-	private:
-
-		CL_String m_level;
-
-		std::vector<CL_String> m_names;
-
-		std::vector<CarState> m_carStates;
-};
-
+	return event;
 }
 
-#endif /* GAMESTATE_H_ */
+void CarState::parseEvent(const CL_NetGameEvent &p_event)
+{
+	assert(p_event.get_name() == EVENT_CAR_STATE);
+
+	m_position.x = p_event.get_argument(0);
+	m_position.y = p_event.get_argument(1);
+
+	m_rotation.from_radians(p_event.get_argument(2));
+
+	m_movement.x = p_event.get_argument(3);
+	m_movement.y = p_event.get_argument(4);
+
+	m_accel = p_event.get_argument(5);
+	m_turn = p_event.get_argument(6);
+}
+
+} // namespace

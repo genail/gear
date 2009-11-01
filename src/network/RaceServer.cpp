@@ -115,7 +115,7 @@ void RaceServer::slotPlayerConnected(CL_NetGameConnection *p_connection, Player 
 	cl_log_event("event", "Sending gamestate");
 
 	GameState gamestate;
-	gamestate.setLevelName(m_levelName);
+	gamestate.setLevel(m_levelName);
 	m_server->send(p_connection, gamestate.genGameStateEvent());
 }
 

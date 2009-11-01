@@ -44,7 +44,7 @@ class PlayerInfo : public Packet {
 
 		virtual ~PlayerInfo();
 
-		virtual CL_NetGameEvent genEvent() const;
+		virtual CL_NetGameEvent buildEvent() const;
 
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 

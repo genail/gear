@@ -26,24 +26,22 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GAMESTATE_H_
-#define GAMESTATE_H_
+#ifndef CARSTATE_H_
+#define CARSTATE_H_
 
 #include <ClanLib/core.h>
-#include <ClanLib/network.h>
 
 #include "network/Packet.h"
-#include "network/CarState.h"
 
 namespace Net {
 
-class GameState : public Packet {
+class CarState {
 
 	public:
 
-		GameState() {}
+		CarState() {}
 
-		virtual ~GameState() {}
+		virtual ~CarState() {}
 
 
 		virtual CL_NetGameEvent buildEvent() const = 0;
@@ -51,26 +49,40 @@ class GameState : public Packet {
 		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
 
 
-		const CL_String &getLevel() const { return m_level; }
+		const CL_Point2f &getPosition() const { return m_position; }
 
-		size_t getPlayerCount() const { return m_names.size(); }
+		const CL_Point2f &getRotation() const { return m_rotation; }
 
-		const CL_String &getPlayerName(size_t p_index) const { return m_names[p_index]; }
+		const CL_Vec2f &getMovement() const { return m_movement; }
 
-		const CarState &getCarState(size_t p_index) const { return m_carStates[p_index]; }
+		float getAcceleration() const { return m_accel; }
+
+		float getTurn() const { return m_turn; }
 
 
-		void setLevel(const CL_String &p_level) { m_level = p_level; }
+		void setPosition(const CL_Point2f &p_position) { m_position = p_position; }
+
+		void setRotation(const CL_Angle &p_rotation) { m_rotation = p_rotation; }
+
+		void setMovement(const CL_Vec2f &p_movement) { m_movement = p_movement; }
+
+		void setAcceleration(float p_accel) { m_accel = p_accel; }
+
+		void setTurn(float p_turn) { m_turn = p_turn; }
 
 	private:
 
-		CL_String m_level;
+		CL_Point2f m_position;
 
-		std::vector<CL_String> m_names;
+		CL_Angle m_rotation;
 
-		std::vector<CarState> m_carStates;
+		CL_Vec2f m_movement;
+
+		float m_accel;
+
+		float m_turn;
 };
 
 }
 
-#endif /* GAMESTATE_H_ */
+#endif /* CARSTATE_H_ */

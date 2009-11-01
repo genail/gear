@@ -52,6 +52,12 @@ class Client {
 		/** Received game state */
 		SIGNAL_1(const GameState&, gameStateReceived);
 
+		/** New player joined */
+		SIGNAL_1(const CL_String&, playerJoined);
+
+		/** Player leaved */
+		SIGNAL_1(const CL_String&, playerLeaved);
+
 	public:
 		Client();
 
@@ -61,11 +67,11 @@ class Client {
 
 		void disconnect();
 
-//		bool isConnected() const { return m_connected; }
 
 		const CL_String& getServerAddr() const { return m_addr; }
 
 		int getServerPort() const { return m_port; }
+
 
 		void setServerAddr(const CL_String& p_addr) { m_addr = p_addr; }
 
@@ -86,12 +92,6 @@ class Client {
 		/** Game client object */
 		CL_NetGameClient m_gameClient;
 
-		/** The race client */
-//		RaceClient m_raceClient;
-
-		/** Remotely connected players (to server) */
-//		std::vector<Player*> m_remotePlayers;
-
 		/** The slot container */
 		CL_SlotContainer m_slots;
 
@@ -108,24 +108,22 @@ class Client {
 		/** This client has been disconnected */
 		void onDisconnected();
 
-		void slotEventReceived(const CL_NetGameEvent &p_netGameEvent);
+		/** Event received */
+		void onEventReceived(const CL_NetGameEvent &p_event);
 
 		//
 		// game events receivers
 		//
 
-		/** New player is connected */
-		void handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent);
+		void onGoodbye(const CL_NetGameEvent &p_event);
 
-		/** Player disconnects */
-		void handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent);
+		void onGameState(const CL_NetGameEvent &p_gameState);
 
-		void handleGameState(const CL_NetGameEvent &p_gameState);
+		void onPlayerJoined(const CL_NetGameEvent &p_event);
 
-		/** Car status update */
-		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);
+		void onPlayerLeaved(const CL_NetGameEvent &p_event);
 
-		friend class RaceClient;
+		void onCarState(const CL_NetGameEvent &p_event);
 
 };
 

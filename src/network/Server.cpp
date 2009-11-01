@@ -175,13 +175,16 @@ void Server::onClientInfo(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p
 	// set the name and inform all
 	m_connections[p_conn].m_name = clientInfo.getName();
 
+	cl_log_event("event", "'%1' is now known as '%2', sending gamestate...", (unsigned) p_conn, clientInfo.getName());
+
 	PlayerJoined playerJoined;
 	playerJoined.setName(clientInfo.getName());
 
 	sendToAll(playerJoined.buildEvent(), p_conn);
 
 	// send the gamestate
-
+	const GameState gamestate = prepareGameState();
+	send(p_conn, gamestate.buildEvent());
 }
 
 GameState Server::prepareGameState()
@@ -197,6 +200,10 @@ GameState Server::prepareGameState()
 			gamestate.addPlayer(player.m_name, player.m_lastCarState);
 		}
 	}
+
+	gamestate.setLevel("resources/level.txt"); // FIXME: How to choose level?
+
+	return gamestate;
 }
 
 

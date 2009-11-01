@@ -46,6 +46,8 @@ CL_NetGameEvent PlayerJoined::buildEvent() const
 {
 	CL_NetGameEvent event(EVENT_PLAYER_INFO);
 	event.add_argument(m_name);
+
+	return event;
 }
 
 void PlayerJoined::parseEvent(const CL_NetGameEvent &p_event)

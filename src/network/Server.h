@@ -94,8 +94,6 @@ class Server {
 
 		GameState prepareGameState();
 
-		void sendGameState(CL_NetGameConnection *p_conn, const GameState &p_gameState);
-
 
 		void onClientConnected(CL_NetGameConnection *p_connection);
 

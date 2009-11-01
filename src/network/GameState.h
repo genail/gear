@@ -60,6 +60,8 @@ class GameState : public Packet {
 		const CarState &getCarState(size_t p_index) const { return m_carStates[p_index]; }
 
 
+		void addPlayer(const CL_String &p_name, const CarState &p_carState);
+
 		void setLevel(const CL_String &p_level) { m_level = p_level; }
 
 	private:

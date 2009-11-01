@@ -89,4 +89,10 @@ void GameState::parseEvent(const CL_NetGameEvent &p_event)
 	}
 }
 
+void GameState::addPlayer(const CL_String &p_name, const CarState &p_carState)
+{
+	m_names.push_back(p_name);
+	m_carStates.push_back(p_carState);
+}
+
 } // namespace

@@ -33,6 +33,7 @@
 #include <ClanLib/network.h>
 
 #include "common.h"
+#include "network/CarState.h"
 #include "network/RaceServer.h"
 
 namespace Net {
@@ -48,6 +49,8 @@ class Server {
 				CL_String m_name;
 
 				bool m_gameStateSent;
+
+				CarState m_lastCarState;
 
 				Player() :
 					m_gameStateSent(false)
@@ -88,6 +91,11 @@ class Server {
 		void send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL, bool p_ignoreNotFullyConnected = true);
+
+		GameState prepareGameState();
+
+		void sendGameState(CL_NetGameConnection *p_conn, const GameState &p_gameState);
+
 
 		void onClientConnected(CL_NetGameConnection *p_connection);
 

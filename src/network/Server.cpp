@@ -34,6 +34,7 @@
 #include "network/events.h"
 #include "network/version.h"
 #include "network/Goodbye.h"
+#include "network/GameState.h"
 #include "network/ClientInfo.h"
 #include "network/PlayerJoined.h"
 
@@ -132,20 +133,20 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 
 }
 
-void Server::onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+void Server::onClientInfo(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
 {
 	ClientInfo clientInfo;
 	clientInfo.parseEvent(p_event);
 
 	// check the version
 	if (clientInfo.getProtocolVersion().getMajor() != PROTOCOL_VERSION_MAJOR) {
-		cl_log_event("event", "Unsupported protocol version for player '%2'", (unsigned) p_connection);
+		cl_log_event("event", "Unsupported protocol version for player '%2'", (unsigned) p_conn);
 
 		// send goodbye
 		Goodbye goodbye;
 		goodbye.setGoodbyeReason(Goodbye::UNSUPPORTED_PROTOCOL_VERSION);
 
-		send(p_connection, goodbye.buildEvent());
+		send(p_conn, goodbye.buildEvent());
 		return;
 	}
 
@@ -160,76 +161,40 @@ void Server::onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEv
 	}
 
 	if (!nameAvailable) {
-		cl_log_event("event", "Name '%1' already in use for player '%2'", clientInfo.getName(), (unsigned) p_connection);
+		cl_log_event("event", "Name '%1' already in use for player '%2'", clientInfo.getName(), (unsigned) p_conn);
 
 		// send goodbye
 		Goodbye goodbye;
 		goodbye.setGoodbyeReason(Goodbye::NAME_ALREADY_IN_USE);
 
-		send(p_connection, goodbye.buildEvent());
+		send(p_conn, goodbye.buildEvent());
 		return;
 	}
 
 	// set the name and inform all
-	m_connections[p_connection].m_name = clientInfo.getName();
+	m_connections[p_conn].m_name = clientInfo.getName();
 
-	PlayerJoined playerInfo;
-	playerInfo.setName(clientInfo.getName());
+	PlayerJoined playerJoined;
+	playerJoined.setName(clientInfo.getName());
 
-	sendToAll();
+	sendToAll(playerJoined.buildEvent(), p_conn);
+
+	// send the gamestate
 
 }
 
-void Server::handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+GameState Server::prepareGameState()
 {
-	const CL_String playerName = p_event.get_argument(0);
+	GameState gamestate;
 
-	if (playerName.empty()) {
-		cl_log_event("error", "Protocol error while handling %1 event", p_event.to_string());
-		return;
-	}
+	std::pair<CL_NetGameConnection*, Server::Player> pair;
 
-	// send the welcome message
-	const CL_NetGameEvent welcomeEvent(EVENT_WELCOME);
-	send(p_connection, welcomeEvent);
-
-
-	// check name availability
-	bool nameAvailable = true;
-	std::pair<CL_NetGameConnection*, Player*> pair;
 	foreach (pair, m_connections) {
-		if (pair.second->getName() == playerName) {
-			nameAvailable = false;
+		const Server::Player &player = pair.second;
+
+		if (player.m_gameStateSent) {
+			gamestate.addPlayer(player.m_name, player.m_lastCarState);
 		}
-	}
-
-	if (!nameAvailable) {
-		// refuse of nick set
-		send(p_connection, CL_NetGameEvent(EVENT_PLAYER_NICK_IN_USE));
-
-		cl_log_event("event", "Name '%1' already in use for player '%2'", playerName, (unsigned) p_connection);
-	} else {
-		// resend player's connection event
-
-		m_connections[p_connection]->setName(playerName);
-
-		sendToAll(CL_NetGameEvent(EVENT_PLAYER_CONNECTED, playerName), p_connection);
-
-		cl_log_event("event", "Player %1 is now known as '%2'", (unsigned) p_connection, playerName);
-
-		// and send him the list of other players
-		std::pair<CL_NetGameConnection*, Player*> pair;
-		foreach(pair, m_connections) {
-			if (pair.first == p_connection) {
-				continue;
-			}
-
-			CL_NetGameEvent replyEvent(EVENT_PLAYER_CONNECTED, pair.second->getName());
-
-			send(p_connection, replyEvent);
-		}
-
-
 	}
 }
 
@@ -272,54 +237,6 @@ CL_NetGameConnection* Server::getConnectionForPlayer(const Player* player)
 	}
 
 	return NULL;
-}
-
-void Server::handleInitRaceEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
-{
-	assert(0 && "no longer supported");
-
-	// if race is initialized, then send him the init event
-	if (m_raceServer.isInitialized()) {
-		CL_NetGameEvent raceInitEvent(EVENT_INIT_RACE, m_raceServer.getLevelName());
-		send(p_connection, raceInitEvent);
-
-		return;
-	}
-
-	if (isPermitted(p_connection)) {
-		const CL_String levelName = (CL_String) p_event.get_argument(0);
-
-		// if race is initialized, then destroy it now
-		if (m_raceServer.isInitialized()) {
-			m_raceServer.destroy();
-		}
-
-		cl_log_event("event", "Initializing the race on level %1", levelName);
-
-		// initialize the level
-		m_raceServer.initialize(levelName);
-
-		// send init race event to all players
-		sendToAll(p_event);
-	} else {
-		cl_log_event("error", "Race is not initialized, and player %1 is not allowed to do this", m_connections[p_connection]->getName());
-	}
-
-}
-
-void Server::handleGrantEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
-{
-	const CL_String &playerName = m_connections[p_connection]->getName();
-
-	const CL_String password = p_event.get_argument(0);
-
-	if (password == "123") { // FIXME: store the password as server configuration
-		m_permitedConnection = p_connection;
-
-		cl_log_event("perm", "Player %1 is the root", playerName);
-	} else {
-		cl_log_event("perm", "Wrong root password for player %1", playerName);
-	}
 }
 
 } // namespace

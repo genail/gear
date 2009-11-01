@@ -46,9 +46,9 @@ class GameState : public Packet {
 		virtual ~GameState() {}
 
 
-		virtual CL_NetGameEvent buildEvent() const = 0;
+		virtual CL_NetGameEvent buildEvent() const;
 
-		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
 
 		const CL_String &getLevel() const { return m_level; }

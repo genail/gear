@@ -70,7 +70,7 @@ void Client::disconnect()
 
 Client::~Client() {
 
-	if (isConnected()) {
+	if (m_connected) {
 		m_gameClient.disconnect();
 	}
 }
@@ -78,7 +78,7 @@ Client::~Client() {
 void Client::onConnected()
 {
 	m_connected = true;
-	m_signalConnected.invoke();
+	INVOKE_0(connected);
 
 	// I am connected
 	// Sending player info
@@ -98,7 +98,7 @@ void Client::onDisconnected()
 
 	m_connected = false;
 
-	m_signalDisconnected.invoke();
+	INVOKE_0(disconnected);
 }
 
 void Client::onEventReceived(const CL_NetGameEvent &p_event)
@@ -154,7 +154,7 @@ void Client::onGameState(const CL_NetGameEvent &p_gameState)
 {
 	try {
 		GameState gamestate;
-		gamestate.parseGameStateEvent(p_gameState);
+		gamestate.parseEvent(p_gameState);
 
 		INVOKE_1(gameStateReceived, gamestate);
 	} catch (CL_Exception &e) {
@@ -179,12 +179,20 @@ void Client::onPlayerLeaved(const CL_NetGameEvent &p_event)
 
 void Client::onCarState(const CL_NetGameEvent &p_event)
 {
+	CarState state;
+	state.parseEvent(p_event);
 
+	INVOKE_1(carStateReceived, state);
 }
 
 void Client::send(const CL_NetGameEvent &p_event)
 {
 	m_gameClient.send_event(p_event);
+}
+
+void Client::sendCarState(const Net::CarState &p_state)
+{
+	send(p_state.buildEvent());
 }
 
 } // namespace

@@ -61,7 +61,7 @@ void Server::start()
 	assert(!m_running);
 
 	try {
-		m_gameServer.start(CL_StringHelp::int_to_local8(m_port));
+		m_gameServer.start(CL_StringHelp::int_to_local8(m_bindPort));
 		m_running = true;
 	} catch (const CL_Exception &e) {
 		cl_log_event("runtime", "Unable to start the server: %1", e.message);
@@ -116,6 +116,7 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 
 	try {
 		bool unhandled = false;
+		const CL_String eventName = p_event.get_name();
 
 		// connection initialize events
 
@@ -143,7 +144,7 @@ void Server::onClientInfo(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p
 		cl_log_event("event", "Unsupported protocol version for player '%2'", (unsigned) p_conn);
 
 		// send goodbye
-		Goodbye goodbye;
+		Net::Goodbye goodbye;
 		goodbye.setGoodbyeReason(Goodbye::UNSUPPORTED_PROTOCOL_VERSION);
 
 		send(p_conn, goodbye.buildEvent());
@@ -206,9 +207,7 @@ void Server::send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_e
 
 void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore, bool p_ignoreNotFullyConnected)
 {
-	CL_MutexSection lockSection(&m_lockMutex);
-
-	std::pair<CL_NetGameConnection*, ServerPlayer*> pair;
+	std::pair<CL_NetGameConnection*, Server::Player> pair;
 
 	foreach(pair, m_connections) {
 
@@ -224,20 +223,20 @@ void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnectio
 	}
 }
 
-CL_NetGameConnection* Server::getConnectionForPlayer(const Player* player)
-{
-	CL_MutexSection lockSection(&m_lockMutex);
-
-	std::pair<CL_NetGameConnection*, Player*> pair;
-
-	foreach (pair, m_connections) {
-		if (pair.second == player) {
-			return pair.first;
-		}
-	}
-
-	return NULL;
-}
+//CL_NetGameConnection* Server::getConnectionForPlayer(const Player* player)
+//{
+//	CL_MutexSection lockSection(&m_lockMutex);
+//
+//	std::pair<CL_NetGameConnection*, Player*> pair;
+//
+//	foreach (pair, m_connections) {
+//		if (pair.second == player) {
+//			return pair.first;
+//		}
+//	}
+//
+//	return NULL;
+//}
 
 } // namespace
 

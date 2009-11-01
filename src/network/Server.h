@@ -34,7 +34,7 @@
 
 #include "common.h"
 #include "network/CarState.h"
-#include "network/RaceServer.h"
+#include "network/GameState.h"
 
 namespace Net {
 
@@ -44,7 +44,7 @@ class Server {
 
 	SIGNAL_1(const CL_String&, playerLeaved);
 
-		class Player {
+		struct Player {
 
 				CL_String m_name;
 

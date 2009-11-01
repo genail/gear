@@ -12,7 +12,6 @@ SET(COMMON_SRCS
     race/Car.cpp
     race/Checkpoint.cpp
     race/Level.cpp
-    race/RacePlayer.cpp
     race/ScoreTable.cpp
 )
 
@@ -36,7 +35,6 @@ SET(CLIENT_SRCS
     race/TyreStripes.cpp
     race/Viewport.cpp
     network/Client.cpp
-    network/RaceClient.cpp
 )
 
 # Server sources
@@ -44,7 +42,6 @@ SET(SERVER_SRCS
     ${COMMON_SRCS}
     ServerApplication.cpp
     ServerConfiguration.cpp
-    network/RaceServer.cpp
     network/Server.cpp
 )
 

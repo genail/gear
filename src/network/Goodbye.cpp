@@ -28,6 +28,8 @@
 
 #include "Goodbye.h"
 
+#include <assert.h>
+
 #include "network/events.h"
 
 namespace Net {
@@ -43,10 +45,10 @@ CL_NetGameEvent Goodbye::buildEvent() const
 void Goodbye::parseEvent(const CL_NetGameEvent &p_event)
 {
 	assert(p_event.get_name() == EVENT_GOODBYE);
-	m_reason = p_event.get_argument(0);
+	m_reason = (GoodbyeReason) (int) p_event.get_argument(0);
 }
 
-const CL_String &Goodbye::getStringMessage() const
+CL_String Goodbye::getStringMessage() const
 {
 	switch (m_reason) {
 		case UNSUPPORTED_PROTOCOL_VERSION:

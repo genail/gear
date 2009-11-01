@@ -59,11 +59,9 @@ class LoadingController {
 
 		void onClientConnected();
 
-		void onClientInitialized();
-
 		void onSceneVisible();
 
-		void onGameState(const GameState &p_gameState);
+		void onGameState(const Net::GameState &p_gameState);
 };
 
 #endif /* LOADINGCONTROLLER_H_ */

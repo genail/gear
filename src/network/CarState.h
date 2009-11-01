@@ -35,7 +35,7 @@
 
 namespace Net {
 
-class CarState {
+class CarState : public Net::Packet {
 
 	public:
 
@@ -44,27 +44,34 @@ class CarState {
 		virtual ~CarState() {}
 
 
-		virtual CL_NetGameEvent buildEvent() const = 0;
+		virtual CL_NetGameEvent buildEvent() const;
 
-		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
+		const CL_String &getName() const { return m_name; }
 
-		const CL_Point2f &getPosition() const { return m_position; }
+		const CL_Pointf &getPosition() const { return m_position; }
 
-		const CL_Point2f &getRotation() const { return m_rotation; }
+		const CL_Angle &getRotation() const { return m_rotation; }
 
 		const CL_Vec2f &getMovement() const { return m_movement; }
+
+		float getSpeed() const { return m_speed; }
 
 		float getAcceleration() const { return m_accel; }
 
 		float getTurn() const { return m_turn; }
 
 
-		void setPosition(const CL_Point2f &p_position) { m_position = p_position; }
+		void setName(const CL_String &p_name) { m_name = p_name; }
+
+		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
 
 		void setRotation(const CL_Angle &p_rotation) { m_rotation = p_rotation; }
 
 		void setMovement(const CL_Vec2f &p_movement) { m_movement = p_movement; }
+
+		void setSpeed(float p_speed) { m_speed = p_speed; }
 
 		void setAcceleration(float p_accel) { m_accel = p_accel; }
 
@@ -72,11 +79,15 @@ class CarState {
 
 	private:
 
-		CL_Point2f m_position;
+		CL_String m_name;
+
+		CL_Pointf m_position;
 
 		CL_Angle m_rotation;
 
 		CL_Vec2f m_movement;
+
+		float m_speed;
 
 		float m_accel;
 

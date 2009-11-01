@@ -32,22 +32,19 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
-#include <race/Level.h>
-#include <race/RaceScene.h>
-#include <race/RacePlayer.h>
-#include <race/ScoreTable.h>
-#include <network/RaceClient.h>
+#include "race/Level.h"
+#include "race/RaceScene.h"
+#include "race/ScoreTable.h"
 
 class Race {
 	public:
-		Race(CL_GUIComponent *p_parent, Player *p_player, Client *p_client);
+		Race(CL_GUIComponent *p_parent, Player *p_player, Net::Client *p_client);
+
 		virtual ~Race();
 
 		int getLapsNum() const { return m_lapsNum; }
 
 		Level& getLevel() { return m_level; }
-
-		RacePlayer& getLocalPlayer() { return m_localPlayer; }
 
 		/** Executes the race and returns when it ends. */
 		void exec();
@@ -64,7 +61,7 @@ class Race {
 		int m_lapsNum;
 
 		/** This machine player */
-		RacePlayer m_localPlayer;
+		Player m_localPlayer;
 
 		/** The level */
 		Level m_level;
@@ -74,9 +71,6 @@ class Race {
 
 		/** Input lock */
 		bool m_inputLock;
-
-		/** The race network client */
-		RaceClient *m_raceClient;
 
 		/** The race scene */
 		RaceScene m_raceScene;
@@ -88,7 +82,7 @@ class Race {
 		CL_Timer m_raceStartTimer;
 
 		/** Players connected remotely */
-		std::vector<RacePlayer*> m_remotePlayers;
+		std::vector<Player*> m_remotePlayers;
 
 		/** The score table */
 		ScoreTable m_scoreTable;
@@ -113,7 +107,7 @@ class Race {
 
 		void drawScene(unsigned delta);
 
-		RacePlayer *findPlayer(const CL_String &p_name);
+		Player *findPlayer(const CL_String &p_name);
 
 		void grabInput(unsigned delta);
 

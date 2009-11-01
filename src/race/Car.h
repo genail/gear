@@ -37,7 +37,9 @@
 #include "race/Bound.h"
 
 class Level;
-class RacePlayer;
+
+#include "common.h"
+#include "network/CarState.h"
 
 #ifdef CLIENT // client-only code
 
@@ -57,12 +59,10 @@ CLASS_CAR
 {
 
 	public:
-		Car(RacePlayer* p_player);
+		Car();
 		virtual ~Car();
 
 		int getLap() const { return m_lap; }
-
-		RacePlayer* getPlayer() const { return m_player; }
 
 		const CL_Pointf& getPosition() const { return m_position; }
 
@@ -77,9 +77,13 @@ CLASS_CAR
 		
 		bool isDrifting() const;
 
-		int prepareStatusEvent(CL_NetGameEvent &p_event);
+		DEPRECATED(int prepareStatusEvent(CL_NetGameEvent &p_event));
 
-		int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0);
+		Net::CarState prepareCarState();
+
+		DEPRECATED(int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0));
+
+		void applyCarState(const Net::CarState &p_carState);
 
 		void setAcceleration(bool p_value) {
 			m_acceleration = p_value;
@@ -173,9 +177,6 @@ CLASS_CAR
 
 	private:
 		
-		/** Parent player */
-		RacePlayer* m_player;
-
 		/** Parent level */
 		Level* m_level;
 

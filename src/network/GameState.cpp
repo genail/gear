@@ -28,6 +28,8 @@
 
 #include "GameState.h"
 
+#include <assert.h>
+
 #include "network/events.h"
 
 namespace Net {
@@ -79,7 +81,7 @@ void GameState::parseEvent(const CL_NetGameEvent &p_event)
 		CL_NetGameEvent carStateEvent(EVENT_CAR_STATE);
 
 		for (size_t j = 0; j < argumentCount; ++j) {
-			carStateEvent.add_argument(p_event(arg++));
+			carStateEvent.add_argument(p_event.get_argument(arg++));
 		}
 
 		CarState carState;

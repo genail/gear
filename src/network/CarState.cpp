@@ -28,6 +28,8 @@
 
 #include "CarState.h"
 
+#include <assert.h>
+
 #include "network/events.h"
 
 namespace Net {
@@ -35,6 +37,8 @@ namespace Net {
 CL_NetGameEvent CarState::buildEvent() const
 {
 	CL_NetGameEvent event(EVENT_CAR_STATE);
+
+	event.add_argument(m_name);
 
 	event.add_argument(m_position.x);
 	event.add_argument(m_position.y);
@@ -44,6 +48,7 @@ CL_NetGameEvent CarState::buildEvent() const
 	event.add_argument(m_movement.x);
 	event.add_argument(m_movement.y);
 
+	event.add_argument(m_speed);
 	event.add_argument(m_accel);
 	event.add_argument(m_turn);
 
@@ -54,16 +59,21 @@ void CarState::parseEvent(const CL_NetGameEvent &p_event)
 {
 	assert(p_event.get_name() == EVENT_CAR_STATE);
 
-	m_position.x = p_event.get_argument(0);
-	m_position.y = p_event.get_argument(1);
+	int arg = 0;
 
-	m_rotation.from_radians(p_event.get_argument(2));
+	m_name = p_event.get_argument(arg++);
 
-	m_movement.x = p_event.get_argument(3);
-	m_movement.y = p_event.get_argument(4);
+	m_position.x = p_event.get_argument(arg++);
+	m_position.y = p_event.get_argument(arg++);
 
-	m_accel = p_event.get_argument(5);
-	m_turn = p_event.get_argument(6);
+	m_rotation.from_radians(p_event.get_argument(arg++));
+
+	m_movement.x = p_event.get_argument(arg++);
+	m_movement.y = p_event.get_argument(arg++);
+
+	m_speed = p_event.get_argument(arg++);
+	m_accel = p_event.get_argument(arg++);
+	m_turn = p_event.get_argument(arg++);
 }
 
 } // namespace

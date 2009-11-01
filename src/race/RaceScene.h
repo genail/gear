@@ -36,10 +36,8 @@
 #include "race/Level.h"
 #include "race/RaceUI.h"
 #include "race/Viewport.h"
-#include "race/RacePlayer.h"
 #include "race/ScoreTable.h"
 #include "graphics/Drawable.h"
-#include "network/RaceClient.h"
 
 #include "graphics/Scene.h"
 
@@ -75,7 +73,7 @@ class RaceScene: public Scene
 		};
 
 		/** All players list */
-		std::list<RacePlayer*> m_players;
+		std::list<Player*> m_players;
 
 		/** Total number of laps */
 		int m_lapsTotal;
@@ -164,17 +162,19 @@ class RaceScene: public Scene
 
 		// helpers
 
-		RacePlayer *findPlayer(const CL_String& p_name);
+		Player *findPlayer(const CL_String& p_name);
 
 		// event handlers
 
 		void onCarStateChangedRemote(const CL_NetGameEvent& p_event);
 
+		void onCarStateReceived(const Net::CarState &p_carState);
+
 		void onCarStateChangedLocal(Car &p_car);
 
-		void onPlayerReady(Player* p_player);
+		void onPlayerJoined(const CL_String &p_name);
 
-		void onPlayerLeaving(Player* p_player);
+		void onPlayerLeaved(const CL_String &p_name);
 
 		void onStartCountdown();
 

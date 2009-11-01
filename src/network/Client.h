@@ -38,7 +38,6 @@
 #include "race/Level.h"
 #include "network/CarState.h"
 #include "network/GameState.h"
-#include "network/RaceClient.h"
 
 namespace Net {
 
@@ -47,11 +46,14 @@ class Client {
 		/** Client is connected */
 		SIGNAL_0(connected);
 
+		/** Client is disconnected */
+		SIGNAL_0(disconnected);
+
 		/** Player info accepted */
 		SIGNAL_0(accepted);
 
 		/** Received game state */
-		SIGNAL_1(const GameState&, gameStateReceived);
+		SIGNAL_1(const Net::GameState&, gameStateReceived);
 
 		/** New player joined */
 		SIGNAL_1(const CL_String&, playerJoined);
@@ -60,7 +62,7 @@ class Client {
 		SIGNAL_1(const CL_String&, playerLeaved);
 
 		/** Got new car state */
-		SIGNAL_1(const CarState&, carStateReceived);
+		SIGNAL_1(const Net::CarState&, carStateReceived);
 
 	public:
 		Client();
@@ -70,6 +72,9 @@ class Client {
 		void connect();
 
 		void disconnect();
+
+
+		void sendCarState(const Net::CarState &p_state);
 
 
 		const CL_String& getServerAddr() const { return m_addr; }

@@ -44,15 +44,15 @@ class PlayerJoined: public Net::Packet {
 		virtual ~PlayerJoined();
 
 
-		virtual CL_NetGameEvent buildEvent() const = 0;
+		virtual CL_NetGameEvent buildEvent() const;
 
-		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
 
 		const CL_String &getName() const { return m_name; }
 
 
-		void setName(const CL_String &p_name) const { m_name = p_name; }
+		void setName(const CL_String &p_name) { m_name = p_name; }
 
 	private:
 

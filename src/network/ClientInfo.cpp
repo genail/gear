@@ -28,6 +28,8 @@
 
 #include "ClientInfo.h"
 
+#include <assert.h>
+
 #include "network/events.h"
 
 namespace Net {

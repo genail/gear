@@ -42,7 +42,7 @@ ScoreTable::~ScoreTable()
 
 }
 
-void ScoreTable::add(const RacePlayer *p_racePlayer, unsigned p_time)
+void ScoreTable::add(const Player *p_player, unsigned p_time)
 {
 
 	// push score in sorted order (lowest time first)
@@ -50,14 +50,14 @@ void ScoreTable::add(const RacePlayer *p_racePlayer, unsigned p_time)
 
 	do {
 		if (itor->m_time > p_time) {
-			m_entries.insert(itor, Entry(p_racePlayer, p_time));
+			m_entries.insert(itor, Entry(p_player, p_time));
 			return;
 		}
 
 		++itor;
 	} while (itor != m_entries.end());
 
-	m_entries.push_back(Entry(p_racePlayer, p_time));
+	m_entries.push_back(Entry(p_player, p_time));
 }
 
 int ScoreTable::getEntriesCount() const
@@ -82,9 +82,9 @@ const ScoreTable::Entry &ScoreTable::getEntry(size_t index) const
 	return *m_entries.begin();
 }
 
-const RacePlayer* ScoreTable::getEntryPlayer(size_t index) const
+const Player* ScoreTable::getEntryPlayer(size_t index) const
 {
-	return getEntry(index).m_racePlayer;
+	return getEntry(index).m_player;
 }
 
 unsigned ScoreTable::getEntryTime(size_t index) const

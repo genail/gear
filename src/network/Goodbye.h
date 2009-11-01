@@ -46,9 +46,9 @@ class Goodbye : public Packet {
 
 		virtual ~Goodbye() {}
 
-		virtual CL_NetGameEvent buildEvent() const = 0;
+		virtual CL_NetGameEvent buildEvent() const;
 
-		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
 		GoodbyeReason getGoodbyeReason() const { return m_reason; }
 

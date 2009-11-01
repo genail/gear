@@ -33,10 +33,8 @@
 
 #include "Player.h"
 #include "network/Client.h"
-#include "network/RaceClient.h"
 #include "gui/SceneContainer.h"
 #include "race/Level.h"
-#include "race/RacePlayer.h"
 
 class Game {
 
@@ -48,13 +46,9 @@ class Game {
 
 		Level &getLevel() { return m_level; }
 
-		Client &getNetworkConnection() { return m_networkConnection; }
-
-		RaceClient &getNetworkRaceConnection() { return *m_networkRaceConnection; }
+		Net::Client &getNetworkConnection() { return m_networkConnection; }
 
 		Player &getPlayer() { return m_player; }
-
-		RacePlayer &getRacePlayer() { return m_racePlayer; }
 
 		SceneContainer &getSceneContainer() {
 			assert(m_sceneContainer.get() != NULL && "scene container must be set by Application");
@@ -63,13 +57,9 @@ class Game {
 
 	private:
 
-		Client m_networkConnection;
-
-		RaceClient *m_networkRaceConnection;
+		Net::Client m_networkConnection;
 
 		Player m_player;
-
-		RacePlayer m_racePlayer;
 
 		Level m_level;
 

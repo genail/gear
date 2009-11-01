@@ -51,7 +51,7 @@ void RaceUI::displayCountdown()
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
 
-	const Car &car = Game::getInstance().getRacePlayer().getCar();
+	const Car &car = Game::getInstance().getPlayer().getCar();
 
 
 	int currentLap = car.getLap();
@@ -137,6 +137,6 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 void RaceUI::update(unsigned p_timeElapsed)
 {
 	// set the speed meter
-	const float carSpeed = Game::getInstance().getRacePlayer().getCar().getSpeedKMS();
+	const float carSpeed = Game::getInstance().getPlayer().getCar().getSpeedKMS();
 	m_speedMeter.setSpeed(carSpeed);
 }

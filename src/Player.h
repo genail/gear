@@ -33,10 +33,18 @@
 #include "race/Car.h"
 
 class Player {
+
 	public:
+
 		Player() {}
+
 		Player(const CL_String8 &p_name);
+
 		virtual ~Player();
+
+		Car &getCar() { return m_car; }
+
+		const Car &getCar() const { return m_car; }
 
 		const CL_String &getName() const { return m_name; }
 
@@ -45,6 +53,9 @@ class Player {
 	private:
 		/** Nickname of this player */
 		CL_String8 m_name;
+
+		/** The car */
+		Car m_car;
 
 };
 

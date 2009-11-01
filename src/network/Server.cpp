@@ -32,37 +32,54 @@
 
 #include "common.h"
 #include "network/events.h"
+#include "network/version.h"
+#include "network/Goodbye.h"
+#include "network/ClientInfo.h"
 
-Server::Server(int p_port) :
-	m_permitedConnection(NULL),
-	m_raceServer(this)
+namespace Net {
+
+Server::Server() :
+	m_bindPort(DEFAULT_PORT),
+	m_running(false)
 {
-	m_slots.connect(m_gameServer.sig_client_connected(), this, &Server::slotClientConnected);
-	m_slots.connect(m_gameServer.sig_client_disconnected(), this, &Server::slotClientDisconnected);
-	m_slots.connect(m_gameServer.sig_event_received(), this, &Server::slotEventArrived);
-
-	m_gameServer.start(CL_StringHelp::int_to_local8(p_port));
-
-	// initialize the race server
-	m_raceServer.initialize("resources/level.txt");
-
-	cl_log_event("runtime", "Server is up and running");
+	m_slots.connect(m_gameServer.sig_client_connected(), this, &Server::onClientConnected);
+	m_slots.connect(m_gameServer.sig_client_disconnected(), this, &Server::onClientDisconnected);
+	m_slots.connect(m_gameServer.sig_event_received(), this, &Server::onEventArrived);
 }
 
 Server::~Server()
 {
-	m_gameServer.stop();
+	if (m_running) {
+		stop();
+	}
 }
 
-void Server::update(int p_timeElapsed)
+void Server::start()
 {
-//	m_gameServer.process_events();
+	assert(!m_running);
+
+	try {
+		m_gameServer.start(CL_StringHelp::int_to_local8(m_port));
+		m_running = true;
+	} catch (const CL_Exception &e) {
+		cl_log_event("runtime", "Unable to start the server: %1", e.message);
+	}
 }
 
-void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection)
+void Server::stop()
 {
-	CL_MutexSection lockSection(&m_lockMutex);
+	assert(m_running);
 
+	try {
+		m_gameServer.stop();
+		m_running = false;
+	} catch (const CL_Exception &e) {
+		cl_log_event("runtime", "Unable to stop the server: %1", e.message);
+	}
+}
+
+void Server::onClientConnected(CL_NetGameConnection *p_netGameConnection)
+{
 	cl_log_event("network", "Player %1 is connected", (unsigned) p_netGameConnection);
 
 	Player *player = new Player();
@@ -77,7 +94,7 @@ void Server::slotClientConnected(CL_NetGameConnection *p_netGameConnection)
 	m_signalPlayerConnected.invoke(p_netGameConnection, player);
 }
 
-void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection)
+void Server::onClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 {
 	CL_MutexSection lockSection(&m_lockMutex);
 
@@ -98,14 +115,18 @@ void Server::slotClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 	}
 }
 
-void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
 	cl_log_event("event", "Event %1 arrived", p_event.to_string());
 
 	try {
-		const CL_String eventName = p_event.get_name();
-		const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
 		bool unhandled = false;
+
+		// connection initialize events
+
+		if (eventName == EVENT_CLIENT_INFO) {
+			onClientInfo(p_connection, p_event);
+		}
 
 		if (parts[0] == EVENT_PREFIX_GENERAL) {
 
@@ -132,6 +153,47 @@ void Server::slotEventArrived(CL_NetGameConnection *p_connection, const CL_NetGa
 	} catch (CL_Exception e) {
 		cl_log_event("exception", e.message);
 	}
+
+}
+
+void Server::onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
+	ClientInfo clientInfo;
+	clientInfo.parseEvent(p_event);
+
+	// check the version
+	if (clientInfo.getProtocolVersion().getMajor() != PROTOCOL_VERSION_MAJOR) {
+		cl_log_event("event", "Unsupported protocol version for player '%2'", (unsigned) p_connection);
+
+		// send goodbye
+		Goodbye goodbye;
+		goodbye.setGoodbyeReason(Goodbye::UNSUPPORTED_PROTOCOL_VERSION);
+
+		send(p_connection, goodbye.buildEvent());
+		return;
+	}
+
+	// check name availability
+	// check name availability
+	bool nameAvailable = true;
+	std::pair<CL_NetGameConnection*, Player*> pair;
+	foreach (pair, m_connections) {
+		if (pair.second->getName() == clientInfo.getName()) {
+			nameAvailable = false;
+		}
+	}
+
+	if (!nameAvailable) {
+		cl_log_event("event", "Name '%1' already in use for player '%2'", clientInfo.getName(), (unsigned) p_connection);
+
+		// send goodbye
+		Goodbye goodbye;
+		goodbye.setGoodbyeReason(Goodbye::NAME_ALREADY_IN_USE);
+
+		send(p_connection, goodbye.buildEvent());
+		return;
+	}
+
 
 }
 
@@ -268,4 +330,6 @@ void Server::handleGrantEvent(CL_NetGameConnection *p_connection, const CL_NetGa
 		cl_log_event("perm", "Wrong root password for player %1", playerName);
 	}
 }
+
+} // namespace
 

@@ -35,72 +35,58 @@
 #include "Player.h"
 #include "network/RaceServer.h"
 
+namespace Net {
+
 class Server {
 
 	public:
-		Server(int p_port);
+
+		Server();
+
 		virtual ~Server();
 
-		CL_NetGameConnection* getConnectionForPlayer(const Player* player);
+		void setBindPort(unsigned short p_port) { m_bindPort = p_port; }
 
-		void update(int p_timeElapsed);
 
-		// Signal accessors
+		void start();
 
-		CL_Signal_v2<CL_NetGameConnection*, Player*> &signalPlayerConnected() { return m_signalPlayerConnected; }
+		void stop();
 
-		CL_Signal_v2<CL_NetGameConnection*, Player*> &signalPlayerDisconnected() { return m_signalPlayerDisconnected; }
 
 	private:
+		/** Bind port number */
+		unsigned short m_bindPort;
+
+		/** Running state */
+		bool m_running;
+
 		/** List of active connections */
 		std::map<CL_NetGameConnection*, Player*> m_connections;
 
 		/** ClanLib game server */
 		CL_NetGameServer m_gameServer;
 
-		/** Modifications mutex */
-		CL_Mutex m_lockMutex;
-
-		/** Connection that is permited to administrate */
-		CL_NetGameConnection* m_permitedConnection;
-
-		/** Race server */
-		RaceServer m_raceServer;
-
 		/** Slots container */
 		CL_SlotContainer m_slots;
 
-		// Signals
-
-		CL_Signal_v2<CL_NetGameConnection*, Player*> m_signalPlayerConnected;
-
-		CL_Signal_v2<CL_NetGameConnection*, Player*> m_signalPlayerDisconnected;
-
-
-		bool isPermitted(const CL_NetGameConnection *p_connection) const { return p_connection == m_permitedConnection; }
 
 		void send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL);
 
-		void slotClientConnected(CL_NetGameConnection *p_netGameConnection);
+		void onClientConnected(CL_NetGameConnection *p_connection);
 
-		void slotClientDisconnected(CL_NetGameConnection *p_netGameConnection);
+		void onClientDisconnected(CL_NetGameConnection *p_connection);
 
-		void slotEventArrived(CL_NetGameConnection *p_netGameConnection, const CL_NetGameEvent &p_netGameEvent);
+		void onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 		//
 		// event handlers
 		//
 
-		void handleGrantEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		void handleHiEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		void handleInitRaceEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-
-		friend class RaceServer;
+		void onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 };
+
+} // namespace
 
 #endif /* SERVER_H_ */

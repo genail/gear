@@ -32,7 +32,7 @@
 #include "common.h"
 #include "network/events.h"
 #include "network/Goodbye.h"
-#include "network/PlayerInfo.h"
+#include "network/ClientInfo.h"
 
 namespace Net {
 

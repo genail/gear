@@ -36,6 +36,7 @@
 #include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
+#include "network/CarState.h"
 #include "network/GameState.h"
 #include "network/RaceClient.h"
 
@@ -57,6 +58,9 @@ class Client {
 
 		/** Player leaved */
 		SIGNAL_1(const CL_String&, playerLeaved);
+
+		/** Got new car state */
+		SIGNAL_1(const CarState&, carStateReceived);
 
 	public:
 		Client();

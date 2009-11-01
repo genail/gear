@@ -64,7 +64,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Nov 01 09:38:36 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Nov 01 16:53:41 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -2618,7 +2618,7 @@
               </UML:Classifier.feature>
             </UML:Class>
             <UML:Class xmi.id = '127-0-1-1--78503d1b:124ab3e9e31:-8000:000000000000110E'
-              name = 'PlayerInfo' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+              name = 'ClientInfo' visibility = 'public' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
               <UML:GeneralizableElement.generalization>
                 <UML:Generalization xmi.idref = '127-0-1-1--78503d1b:124ab3e9e31:-8000:0000000000001113'/>
@@ -3085,6 +3085,91 @@
                 </UML:AssociationEnd>
               </UML:Association.connection>
             </UML:Association>
+            <UML:Class xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011A7'
+              name = 'Server' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+              isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+              <UML:Classifier.feature>
+                <UML:Operation xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011AF'
+                  name = 'getBindPort' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B0'
+                      name = 'return' isSpecification = 'false' kind = 'return'>
+                      <UML:Parameter.type>
+                        <UML:Class xmi.idref = '127-0-1-1--c22cd78:1248731786f:-8000:0000000000000F5F'/>
+                      </UML:Parameter.type>
+                    </UML:Parameter>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
+                <UML:Attribute xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011A8'
+                  name = 'm_bindPort' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  changeability = 'changeable' targetScope = 'instance'>
+                  <UML:StructuralFeature.multiplicity>
+                    <UML:Multiplicity xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011A9'>
+                      <UML:Multiplicity.range>
+                        <UML:MultiplicityRange xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011AA'
+                          lower = '1' upper = '1'/>
+                      </UML:Multiplicity.range>
+                    </UML:Multiplicity>
+                  </UML:StructuralFeature.multiplicity>
+                  <UML:StructuralFeature.type>
+                    <UML:Class xmi.idref = '127-0-1-1--c22cd78:1248731786f:-8000:0000000000000F5F'/>
+                  </UML:StructuralFeature.type>
+                </UML:Attribute>
+                <UML:Operation xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011AB'
+                  name = 'setBindPort' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011AC'
+                      name = 'return' isSpecification = 'false' kind = 'return'/>
+                    <UML:Parameter xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011AE'
+                      name = 'p_port' isSpecification = 'false'>
+                      <UML:Parameter.type>
+                        <UML:Class xmi.idref = '127-0-1-1--c22cd78:1248731786f:-8000:0000000000000F5F'/>
+                      </UML:Parameter.type>
+                    </UML:Parameter>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
+                <UML:Operation xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B1'
+                  name = 'start' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B2'
+                      name = 'return' isSpecification = 'false' kind = 'return'/>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
+                <UML:Operation xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B3'
+                  name = 'stop' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B4'
+                      name = 'return' isSpecification = 'false' kind = 'return'/>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
+                <UML:Operation xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B5'
+                  name = 'sig_playerJoined' visibility = 'public' isSpecification = 'false'
+                  ownerScope = 'instance' isQuery = 'false' concurrency = 'sequential' isRoot = 'false'
+                  isLeaf = 'false' isAbstract = 'false'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B6'
+                      name = 'return' isSpecification = 'false' kind = 'return'/>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
+                <UML:Operation xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B7'
+                  name = 'sig_PlayerLeaved' visibility = 'public' isSpecification = 'false'
+                  ownerScope = 'instance' isQuery = 'false' concurrency = 'sequential' isRoot = 'false'
+                  isLeaf = 'false' isAbstract = 'false'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011B8'
+                      name = 'return' isSpecification = 'false' kind = 'return'/>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
+              </UML:Classifier.feature>
+            </UML:Class>
           </UML:Namespace.ownedElement>
         </UML:Package>
         <UML:Enumeration xmi.id = '127-0-1-1--78503d1b:124ab3e9e31:-8000:000000000000114A'
@@ -3102,7 +3187,7 @@
           isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
           <UML:Classifier.feature>
             <UML:Attribute xmi.id = '127-0-1-1--76e24558:12497559046:-8000:000000000000108E'
-              name = 'm_server' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+              name = 'm_serverAddr' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
               changeability = 'changeable' targetScope = 'instance'>
               <UML:StructuralFeature.multiplicity>
                 <UML:Multiplicity xmi.id = '127-0-1-1--76e24558:12497559046:-8000:000000000000108F'>
@@ -3461,6 +3546,9 @@
     <UML:Class xmi.id = '127-0-1-1-438da8b1:124aed22ff5:-8000:00000000000011A5'
       name = 'void' visibility = 'public' isSpecification = 'false' isRoot = 'false'
       isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
+    <UML:Class xmi.id = '127-0-1-1--71e35396:124b0059add:-8000:00000000000011AD'
+      name = 'void' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+      isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
   </XMI.content>
 </XMI>
 <pgml description="org.argouml.uml.diagram.static_structure.ui.UMLClassDiagram|127-0-1-1-58d8af01:124871ea964:-8000:0000000000000B36"
@@ -3562,7 +3650,7 @@
         x="824"
         y="613"
         width="147"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -4046,7 +4134,7 @@
         x="1536"
         y="624"
         width="176"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -5257,7 +5345,7 @@ getters and setters.</text>
         x="1088"
         y="851"
         width="159"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -5773,7 +5861,7 @@ getters and setters.</text>
         x="440"
         y="579"
         width="185"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -7853,7 +7941,7 @@ getters and setters.</text>
       <text name="Fig38.4.2"
         x="464"
         y="1254"
-        width="108"
+        width="132"
         height="17"
         fill="0"
         fillcolor="white"
@@ -7865,7 +7953,7 @@ getters and setters.</text>
         bold="false"
         textsize="11"
         justification="Left"
-      >m_server : CL_String</text>
+      >m_serverAddr : CL_String</text>
       <text name="Fig38.4.3"
         x="464"
         y="1268"
@@ -9727,7 +9815,7 @@ getters and setters.</text>
       <text name="Fig1.4.2"
         x="120"
         y="494"
-        width="110"
+        width="133"
         height="17"
         fill="0"
         fillcolor="255 200 255"
@@ -9739,7 +9827,7 @@ getters and setters.</text>
         bold="false"
         textsize="11"
         justification="Left"
-      >m_server : CL_String</text>
+      >m_serverAddr : CL_String</text>
       <text name="Fig1.4.3"
         x="120"
         y="508"
@@ -10028,7 +10116,7 @@ getters and setters.</text>
       bold="false"
       textsize="11"
       justification="Center"
-    >PlayerInfo</text>
+    >ClientInfo</text>
     <group name="Fig3.3"
          description="org.argouml.uml.diagram.ui.FigOperationsCompartment[672, 637, 240, 72]"
          href="127-0-1-1--78503d1b:124ab3e9e31:-8000:000000000000110E"
@@ -10065,8 +10153,8 @@ getters and setters.</text>
       <text name="Fig3.3.2"
         x="672"
         y="638"
-        width="116"
-        height="17"
+        width="112"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -10097,8 +10185,8 @@ getters and setters.</text>
       <text name="Fig3.3.4"
         x="672"
         y="666"
-        width="155"
-        height="17"
+        width="150"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -10179,8 +10267,8 @@ getters and setters.</text>
       <text name="Fig3.4.3"
         x="672"
         y="612"
-        width="107"
-        height="23"
+        width="102"
+        height="20"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -10653,8 +10741,8 @@ getters and setters.</text>
       <text name="Fig7.3.3"
         x="1312"
         y="684"
-        width="160"
-        height="17"
+        width="157"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -10943,8 +11031,8 @@ getters and setters.</text>
       <text name="Fig10.3.3"
         x="952"
         y="901"
-        width="107"
-        height="14"
+        width="110"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -10959,8 +11047,8 @@ getters and setters.</text>
       <text name="Fig10.3.4"
         x="952"
         y="915"
-        width="200"
-        height="14"
+        width="207"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -10975,10 +11063,10 @@ getters and setters.</text>
       <text name="Fig10.3.5"
         x="952"
         y="929"
-        width="210"
-        height="14"
+        width="215"
+        height="17"
         fill="0"
-        fillcolor="white"
+        fillcolor="200 255 255"
         stroke="0"
         strokecolor="black"
         textcolor="black"
@@ -10994,7 +11082,7 @@ getters and setters.</text>
         width="263"
         height="20"
         fill="0"
-        fillcolor="white"
+        fillcolor="200 255 255"
         stroke="0"
         strokecolor="black"
         textcolor="black"
@@ -11076,7 +11164,7 @@ getters and setters.</text>
         width="182"
         height="20"
         fill="0"
-        fillcolor="white"
+        fillcolor="200 255 255"
         stroke="0"
         strokecolor="black"
         textcolor="black"
@@ -11456,7 +11544,7 @@ getters and setters.</text>
                         offset="5" />
     </private>
     <path name="Fig14.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -11467,6 +11555,256 @@ getters and setters.</text>
       <lineto x="1304"
               y="899" />
     </path>
+  </group>
+  <group name="Fig15"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[792, 1120, 122, 159]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       href="127-0-1-1--71e35396:124b0059add:-8000:00000000000011A7"
+       fill="1"
+       fillcolor="255 200 255"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+    </private>
+    
+    <rectangle name="Fig15.0"
+      x="792"
+      y="1120"
+      width="122"
+      height="159"
+      fill="1"
+      fillcolor="255 200 255"
+      stroke="0"
+      strokecolor="0 255 255"
+    />
+    <group name="Fig15.1"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[792, 1120, 122, 0]"
+         href="127-0-1-1--71e35396:124b0059add:-8000:00000000000011A7"
+         fill="1"
+         fillcolor="255 200 255"
+         stroke="1"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig15.1.0"
+        x="792"
+        y="1120"
+        width="122"
+        height="0"
+        fill="1"
+        fillcolor="255 200 255"
+        stroke="1"
+        strokecolor="black"
+      />
+    </group>
+    <text name="Fig15.2"
+      x="792"
+      y="1120"
+      width="122"
+      height="21"
+      fill="1"
+      fillcolor="255 200 255"
+      stroke="0"
+      strokecolor="black"
+      textcolor="black"
+      font="Arial"
+      italic="false"
+      bold="false"
+      textsize="11"
+      justification="Center"
+    >Server</text>
+    <group name="Fig15.3"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[792, 1173, 122, 105]"
+         href="127-0-1-1--71e35396:124b0059add:-8000:00000000000011A7"
+         fill="1"
+         fillcolor="255 200 255"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig15.3.0"
+        x="792"
+        y="1173"
+        width="122"
+        height="105"
+        fill="1"
+        fillcolor="255 200 255"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig15.3.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="255 200 255"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="792"
+                y="1173" />
+        <lineto x="913"
+                y="1173" />
+      </path>
+      <text name="Fig15.3.2"
+        x="792"
+        y="1174"
+        width="89"
+        height="14"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >getBindPort() : int</text>
+      <text name="Fig15.3.3"
+        x="792"
+        y="1188"
+        width="120"
+        height="14"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >setBindPort(p_port : int)</text>
+      <text name="Fig15.3.4"
+        x="792"
+        y="1202"
+        width="36"
+        height="14"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >start()</text>
+      <text name="Fig15.3.5"
+        x="792"
+        y="1216"
+        width="35"
+        height="14"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >stop()</text>
+      <text name="Fig15.3.6"
+        x="792"
+        y="1230"
+        width="95"
+        height="14"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >sig_playerJoined()</text>
+      <text name="Fig15.3.7"
+        x="792"
+        y="1244"
+        width="100"
+        height="20"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >sig_PlayerLeaved()</text>
+    </group>
+    <group name="Fig15.4"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[792, 1141, 122, 32]"
+         href="127-0-1-1--71e35396:124b0059add:-8000:00000000000011A7"
+         fill="1"
+         fillcolor="255 200 255"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig15.4.0"
+        x="792"
+        y="1141"
+        width="122"
+        height="32"
+        fill="1"
+        fillcolor="255 200 255"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig15.4.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="255 200 255"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="792"
+                y="1141" />
+        <lineto x="913"
+                y="1141" />
+      </path>
+      <text name="Fig15.4.2"
+        x="792"
+        y="1142"
+        width="79"
+        height="20"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >m_bindPort : int</text>
+    </group>
+    <rectangle name="Fig15.5"
+      x="792"
+      y="1120"
+      width="122"
+      height="159"
+      fill="0"
+      fillcolor="255 200 255"
+      stroke="1"
+      strokecolor="black"
+    />
   </group>
 </pgml>
 <todo>

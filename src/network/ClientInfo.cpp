@@ -26,58 +26,40 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EVENTS_H_
-#define EVENTS_H_
+#include "ClientInfo.h"
 
-#include <ClanLib/core.h>
+#include "network/events.h"
 
+namespace Net {
 
-// connect / disconnect procedure
+ClientInfo::ClientInfo()
+{
+}
 
-#define EVENT_CLIENT_INFO 	"player_info"
+ClientInfo::~ClientInfo()
+{
+}
 
-#define EVENT_GAME_STATE 	"game_state"
+CL_NetGameEvent ClientInfo::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_CLIENT_INFO);
 
-#define EVENT_GOODBYE		"goodbye"
+	event.add_argument(m_protocolVersion.getMajor());
+	event.add_argument(m_protocolVersion.getMinor());
 
-// player events
+	event.add_argument(m_name);
 
-#define EVENT_PLAYER_JOINED "player_joined"
+	return event;
+}
 
-#define EVENT_PLAYER_LEAVED "player_leaved"
+void ClientInfo::parseEvent(const CL_NetGameEvent &p_event)
+{
+	assert(p_event.get_name() == EVENT_CLIENT_INFO);
 
-// race events
+	m_protocolVersion.setMajor(p_event.get_argument(0));
+	m_protocolVersion.setMinor(p_event.get_argument(1));
 
-#define EVENT_CAR_STATE		"car_state"
+	m_name = p_event.get_argument(2);
+}
 
-
-//#define EVENT_PREFIX_GENERAL		"general"
-//
-//// sends as acceptance from server. From this moment connection is fully initialized.
-//#define EVENT_WELCOME				"general:welcome"
-//
-//#define EVENT_GENERAL_GAMESTATE		"general:gamestate"
-//
-//#define EVENT_GRANT_PERMISSIONS		"general:grant_permissions"
-//#define EVENT_HI					"general:hi"
-//#define EVENT_PLAYER_CONNECTED 		"general:player_connected"
-//#define EVENT_PLAYER_DISCONNECTED 	"general:player_disconnected"
-//#define EVENT_PLAYER_NICK_CHANGE	"general:nick_change"
-//#define EVENT_PLAYER_NICK_IN_USE	"general:nick_in_use"
-//
-//#define EVENT_INIT_RACE				"general:init_race"
-//
-////
-//// Race events
-////
-//
-//#define EVENT_PREFIX_RACE			"race"
-//
-//#define EVENT_CAR_STATE_CHANGE		"race:car_state_change"
-//#define EVENT_TRIGGER_RACE_START	"race:trigger_race_start"
-//#define EVENT_LOCK_CAR				"race:lock_car"
-//#define EVENT_START_COUNTDOWN		"race:start_countdown"
-//#define EVENT_RACE_STATE			"race:race_state"
-//#define EVENT_PLAYER_FINISHED		"race:player_finished"
-
-#endif /* EVENTS_H_ */
+} // namespace

@@ -82,7 +82,7 @@ void Client::onConnected()
 
 	// I am connected
 	// Sending player info
-	PlayerInfo playerInfo;
+	ClientInfo playerInfo;
 	playerInfo.setName(Game::getInstance().getPlayer().getName());
 
 	cl_log_event("network", "Introducing myself as %1", playerInfo.getName());

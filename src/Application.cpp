@@ -109,8 +109,8 @@ int Application::main(const std::vector<CL_String> &args)
 		}
 	}
 
-	Stage::m_width = 800;
-	Stage::m_height = 600;
+	Stage::m_width = 1024;
+	Stage::m_height = 768;
 
 	// Setup clanlib modules:
 	CL_SetupCore 	setup_core;

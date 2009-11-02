@@ -32,7 +32,12 @@
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 
-class GameState {
+#include "network/Packet.h"
+#include "network/CarState.h"
+
+namespace Net {
+
+class GameState : public Packet {
 
 	public:
 
@@ -40,17 +45,34 @@ class GameState {
 
 		virtual ~GameState() {}
 
-		void parseGameStateEvent(const CL_NetGameEvent &p_gameStateEvent);
 
-		CL_NetGameEvent genGameStateEvent() const;
+		virtual CL_NetGameEvent buildEvent() const;
 
-		const CL_String &getLevelName() const { return m_levelName; }
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-		void setLevelName(const CL_String &p_levelName) { m_levelName = p_levelName; }
+
+		const CL_String &getLevel() const { return m_level; }
+
+		size_t getPlayerCount() const { return m_names.size(); }
+
+		const CL_String &getPlayerName(size_t p_index) const { return m_names[p_index]; }
+
+		const CarState &getCarState(size_t p_index) const { return m_carStates[p_index]; }
+
+
+		void addPlayer(const CL_String &p_name, const CarState &p_carState);
+
+		void setLevel(const CL_String &p_level) { m_level = p_level; }
 
 	private:
 
-		CL_String m_levelName;
+		CL_String m_level;
+
+		std::vector<CL_String> m_names;
+
+		std::vector<CarState> m_carStates;
 };
+
+}
 
 #endif /* GAMESTATE_H_ */

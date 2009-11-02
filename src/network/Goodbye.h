@@ -26,75 +26,44 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GameState.h"
+#ifndef GOODBYE_H_
+#define GOODBYE_H_
 
-#include <assert.h>
-
-#include "network/events.h"
+#include "network/Packet.h"
 
 namespace Net {
 
-CL_NetGameEvent GameState::buildEvent() const
-{
-	CL_NetGameEvent event(EVENT_GAME_STATE);
+class Goodbye : public Packet {
 
-	event.add_argument(m_level);
+	public:
 
-	const size_t playerCount = m_names.size();
-	event.add_argument(playerCount);
+		enum GoodbyeReason {
+			UNSUPPORTED_PROTOCOL_VERSION,
+			NAME_ALREADY_IN_USE
+		};
 
-	for (size_t i = 0; i < playerCount; ++i) {
-		event.add_argument(m_names[i]);
+		Goodbye() {}
 
-		// inline car state event arguments
-		const CarState &carState = m_carStates[i];
-		const CL_NetGameEvent carStateEvent = carState.buildEvent();
+		virtual ~Goodbye() {}
 
-		const size_t argumentCount = carStateEvent.get_argument_count();
-		event.add_argument(argumentCount);
+		virtual CL_NetGameEvent buildEvent() const;
 
-		for (size_t j = 0; j < argumentCount; ++j) {
-			event.add_argument(carStateEvent.get_argument(j));
-		}
-	}
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-	return event;
+		GoodbyeReason getGoodbyeReason() const { return m_reason; }
+
+		/**
+		 * @return Textual representation of goodbye reason.
+		 */
+		CL_String getStringMessage() const;
+
+		void setGoodbyeReason(GoodbyeReason p_reason) { m_reason = p_reason; }
+
+	private:
+
+		GoodbyeReason m_reason;
+};
+
 }
 
-void GameState::parseEvent(const CL_NetGameEvent &p_event)
-{
-	assert(p_event.get_name() == EVENT_GAME_STATE);
-
-	unsigned arg = 0;
-	m_level = p_event.get_argument(arg++);
-
-	const size_t playerCount = p_event.get_argument(arg++);
-
-	m_names.clear();
-	m_carStates.clear();
-
-	for (size_t i = 0; i < playerCount; ++i) {
-		m_names.push_back(p_event.get_argument(arg++));
-
-		// read inline car state event
-		const size_t argumentCount = p_event.get_argument(arg++);
-		CL_NetGameEvent carStateEvent(EVENT_CAR_STATE);
-
-		for (size_t j = 0; j < argumentCount; ++j) {
-			carStateEvent.add_argument(p_event.get_argument(arg++));
-		}
-
-		CarState carState;
-		carState.parseEvent(carStateEvent);
-
-		m_carStates.push_back(carState);
-	}
-}
-
-void GameState::addPlayer(const CL_String &p_name, const CarState &p_carState)
-{
-	m_names.push_back(p_name);
-	m_carStates.push_back(p_carState);
-}
-
-} // namespace
+#endif /* GOODBYE_H_ */

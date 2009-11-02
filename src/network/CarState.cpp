@@ -26,7 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GameState.h"
+#include "CarState.h"
 
 #include <assert.h>
 
@@ -34,67 +34,46 @@
 
 namespace Net {
 
-CL_NetGameEvent GameState::buildEvent() const
+CL_NetGameEvent CarState::buildEvent() const
 {
-	CL_NetGameEvent event(EVENT_GAME_STATE);
+	CL_NetGameEvent event(EVENT_CAR_STATE);
 
-	event.add_argument(m_level);
+	event.add_argument(m_name);
 
-	const size_t playerCount = m_names.size();
-	event.add_argument(playerCount);
+	event.add_argument(m_position.x);
+	event.add_argument(m_position.y);
 
-	for (size_t i = 0; i < playerCount; ++i) {
-		event.add_argument(m_names[i]);
+	event.add_argument(m_rotation.to_radians());
 
-		// inline car state event arguments
-		const CarState &carState = m_carStates[i];
-		const CL_NetGameEvent carStateEvent = carState.buildEvent();
+	event.add_argument(m_movement.x);
+	event.add_argument(m_movement.y);
 
-		const size_t argumentCount = carStateEvent.get_argument_count();
-		event.add_argument(argumentCount);
-
-		for (size_t j = 0; j < argumentCount; ++j) {
-			event.add_argument(carStateEvent.get_argument(j));
-		}
-	}
+	event.add_argument(m_speed);
+	event.add_argument(m_accel);
+	event.add_argument(m_turn);
 
 	return event;
 }
 
-void GameState::parseEvent(const CL_NetGameEvent &p_event)
+void CarState::parseEvent(const CL_NetGameEvent &p_event)
 {
-	assert(p_event.get_name() == EVENT_GAME_STATE);
+	assert(p_event.get_name() == EVENT_CAR_STATE);
 
-	unsigned arg = 0;
-	m_level = p_event.get_argument(arg++);
+	int arg = 0;
 
-	const size_t playerCount = p_event.get_argument(arg++);
+	m_name = p_event.get_argument(arg++);
 
-	m_names.clear();
-	m_carStates.clear();
+	m_position.x = p_event.get_argument(arg++);
+	m_position.y = p_event.get_argument(arg++);
 
-	for (size_t i = 0; i < playerCount; ++i) {
-		m_names.push_back(p_event.get_argument(arg++));
+	m_rotation.from_radians(p_event.get_argument(arg++));
 
-		// read inline car state event
-		const size_t argumentCount = p_event.get_argument(arg++);
-		CL_NetGameEvent carStateEvent(EVENT_CAR_STATE);
+	m_movement.x = p_event.get_argument(arg++);
+	m_movement.y = p_event.get_argument(arg++);
 
-		for (size_t j = 0; j < argumentCount; ++j) {
-			carStateEvent.add_argument(p_event.get_argument(arg++));
-		}
-
-		CarState carState;
-		carState.parseEvent(carStateEvent);
-
-		m_carStates.push_back(carState);
-	}
-}
-
-void GameState::addPlayer(const CL_String &p_name, const CarState &p_carState)
-{
-	m_names.push_back(p_name);
-	m_carStates.push_back(p_carState);
+	m_speed = p_event.get_argument(arg++);
+	m_accel = p_event.get_argument(arg++);
+	m_turn = p_event.get_argument(arg++);
 }
 
 } // namespace

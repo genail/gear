@@ -26,15 +26,43 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RacePlayer.h"
+#ifndef PLAYERINFO_H_
+#define CLIENTINFO_H_
 
-RacePlayer::RacePlayer(Player *p_player) :
-	m_finished(false),
-	m_car(this),
-	m_player(p_player)
+#include <ClanLib/core.h>
 
-{
+#include "network/Packet.h"
+#include "network/ProtocolVersion.h"
+
+namespace Net {
+
+class ClientInfo : public Packet {
+
+	public:
+
+		ClientInfo();
+
+		virtual ~ClientInfo();
+
+		virtual CL_NetGameEvent buildEvent() const;
+
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
+
+		const CL_String &getName() const { return m_name; }
+
+		const ProtocolVersion &getProtocolVersion() const { return m_protocolVersion; }
+
+		void setName(const CL_String &p_name) { m_name = p_name; }
+
+		void setProtocolVersion(const ProtocolVersion &p_protocolVersion) { m_protocolVersion = p_protocolVersion; }
+
+	private:
+
+		ProtocolVersion m_protocolVersion;
+
+		CL_String m_name;
+};
+
 }
 
-RacePlayer::~RacePlayer() {
-}
+#endif /* CLIENTINFO_H_ */

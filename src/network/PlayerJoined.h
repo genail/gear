@@ -26,75 +26,39 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GameState.h"
+#ifndef PLAYERJOINED_H_
+#define PLAYERJOINED_H_
 
-#include <assert.h>
+#include <ClanLib/core.h>
 
-#include "network/events.h"
+#include "Packet.h"
 
 namespace Net {
 
-CL_NetGameEvent GameState::buildEvent() const
-{
-	CL_NetGameEvent event(EVENT_GAME_STATE);
+class PlayerJoined: public Net::Packet {
 
-	event.add_argument(m_level);
+	public:
 
-	const size_t playerCount = m_names.size();
-	event.add_argument(playerCount);
+		PlayerJoined();
 
-	for (size_t i = 0; i < playerCount; ++i) {
-		event.add_argument(m_names[i]);
+		virtual ~PlayerJoined();
 
-		// inline car state event arguments
-		const CarState &carState = m_carStates[i];
-		const CL_NetGameEvent carStateEvent = carState.buildEvent();
 
-		const size_t argumentCount = carStateEvent.get_argument_count();
-		event.add_argument(argumentCount);
+		virtual CL_NetGameEvent buildEvent() const;
 
-		for (size_t j = 0; j < argumentCount; ++j) {
-			event.add_argument(carStateEvent.get_argument(j));
-		}
-	}
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-	return event;
+
+		const CL_String &getName() const { return m_name; }
+
+
+		void setName(const CL_String &p_name) { m_name = p_name; }
+
+	private:
+
+		CL_String m_name;
+};
+
 }
 
-void GameState::parseEvent(const CL_NetGameEvent &p_event)
-{
-	assert(p_event.get_name() == EVENT_GAME_STATE);
-
-	unsigned arg = 0;
-	m_level = p_event.get_argument(arg++);
-
-	const size_t playerCount = p_event.get_argument(arg++);
-
-	m_names.clear();
-	m_carStates.clear();
-
-	for (size_t i = 0; i < playerCount; ++i) {
-		m_names.push_back(p_event.get_argument(arg++));
-
-		// read inline car state event
-		const size_t argumentCount = p_event.get_argument(arg++);
-		CL_NetGameEvent carStateEvent(EVENT_CAR_STATE);
-
-		for (size_t j = 0; j < argumentCount; ++j) {
-			carStateEvent.add_argument(p_event.get_argument(arg++));
-		}
-
-		CarState carState;
-		carState.parseEvent(carStateEvent);
-
-		m_carStates.push_back(carState);
-	}
-}
-
-void GameState::addPlayer(const CL_String &p_name, const CarState &p_carState)
-{
-	m_names.push_back(p_name);
-	m_carStates.push_back(p_carState);
-}
-
-} // namespace
+#endif /* PLAYERJOINED_H_ */

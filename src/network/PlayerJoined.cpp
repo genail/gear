@@ -26,7 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GameState.h"
+#include "PlayerJoined.h"
 
 #include <assert.h>
 
@@ -34,67 +34,26 @@
 
 namespace Net {
 
-CL_NetGameEvent GameState::buildEvent() const
+PlayerJoined::PlayerJoined()
 {
-	CL_NetGameEvent event(EVENT_GAME_STATE);
+}
 
-	event.add_argument(m_level);
+PlayerJoined::~PlayerJoined()
+{
+}
 
-	const size_t playerCount = m_names.size();
-	event.add_argument(playerCount);
-
-	for (size_t i = 0; i < playerCount; ++i) {
-		event.add_argument(m_names[i]);
-
-		// inline car state event arguments
-		const CarState &carState = m_carStates[i];
-		const CL_NetGameEvent carStateEvent = carState.buildEvent();
-
-		const size_t argumentCount = carStateEvent.get_argument_count();
-		event.add_argument(argumentCount);
-
-		for (size_t j = 0; j < argumentCount; ++j) {
-			event.add_argument(carStateEvent.get_argument(j));
-		}
-	}
+CL_NetGameEvent PlayerJoined::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_PLAYER_INFO);
+	event.add_argument(m_name);
 
 	return event;
 }
 
-void GameState::parseEvent(const CL_NetGameEvent &p_event)
+void PlayerJoined::parseEvent(const CL_NetGameEvent &p_event)
 {
-	assert(p_event.get_name() == EVENT_GAME_STATE);
-
-	unsigned arg = 0;
-	m_level = p_event.get_argument(arg++);
-
-	const size_t playerCount = p_event.get_argument(arg++);
-
-	m_names.clear();
-	m_carStates.clear();
-
-	for (size_t i = 0; i < playerCount; ++i) {
-		m_names.push_back(p_event.get_argument(arg++));
-
-		// read inline car state event
-		const size_t argumentCount = p_event.get_argument(arg++);
-		CL_NetGameEvent carStateEvent(EVENT_CAR_STATE);
-
-		for (size_t j = 0; j < argumentCount; ++j) {
-			carStateEvent.add_argument(p_event.get_argument(arg++));
-		}
-
-		CarState carState;
-		carState.parseEvent(carStateEvent);
-
-		m_carStates.push_back(carState);
-	}
-}
-
-void GameState::addPlayer(const CL_String &p_name, const CarState &p_carState)
-{
-	m_names.push_back(p_name);
-	m_carStates.push_back(p_carState);
+	assert(p_event.get_name() == EVENT_PLAYER_INFO);
+	m_name = p_event.get_argument(0);
 }
 
 } // namespace

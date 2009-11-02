@@ -26,37 +26,42 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACEPLAYER_H_
-#define RACEPLAYER_H_
+#include "ClientInfo.h"
 
-#include "Player.h"
-#include "race/Car.h"
+#include <assert.h>
 
-class RacePlayer {
-	public:
-		RacePlayer(Player *p_player);
-		virtual ~RacePlayer();
+#include "network/events.h"
 
-		Car& getCar() { return m_car; }
+namespace Net {
 
-		Player& getPlayer() { return *m_player; }
+ClientInfo::ClientInfo()
+{
+}
 
-		const Player& getPlayer() const { return *m_player; }
+ClientInfo::~ClientInfo()
+{
+}
 
-		bool isFinished() const { return m_finished; }
+CL_NetGameEvent ClientInfo::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_CLIENT_INFO);
 
-		void setFinished(bool p_finished) { m_finished = p_finished; }
+	event.add_argument(m_protocolVersion.getMajor());
+	event.add_argument(m_protocolVersion.getMinor());
 
-	private:
+	event.add_argument(m_name);
 
-		/** Finished state */
-		bool m_finished;
+	return event;
+}
 
-		/** The car */
-		Car m_car;
+void ClientInfo::parseEvent(const CL_NetGameEvent &p_event)
+{
+	assert(p_event.get_name() == EVENT_CLIENT_INFO);
 
-		/** Base player */
-		Player* m_player;
-};
+	m_protocolVersion.setMajor(p_event.get_argument(0));
+	m_protocolVersion.setMinor(p_event.get_argument(1));
 
-#endif /* RACEPLAYER_H_ */
+	m_name = p_event.get_argument(2);
+}
+
+} // namespace

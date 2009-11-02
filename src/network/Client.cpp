@@ -31,17 +31,19 @@
 #include "Game.h"
 #include "common.h"
 #include "network/events.h"
+#include "network/Goodbye.h"
+#include "network/ClientInfo.h"
 
-
+namespace Net {
 
 Client::Client() :
 	m_port(DEFAULT_PORT),
-	m_connected(false),
-	m_raceClient(this)
+	m_connected(false)
+//	m_raceClient(this)
 {
-	m_slots.connect(m_gameClient.sig_connected(), this, &Client::slotConnected);
-	m_slots.connect(m_gameClient.sig_disconnected(), this, &Client::slotDisconnected);
-	m_slots.connect(m_gameClient.sig_event_received(), this, &Client::slotEventReceived);
+	m_slots.connect(m_gameClient.sig_connected(), this, &Client::onConnected);
+	m_slots.connect(m_gameClient.sig_disconnected(), this, &Client::onDisconnected);
+	m_slots.connect(m_gameClient.sig_event_received(), this, &Client::onEventReceived);
 }
 
 void Client::connect() {
@@ -53,12 +55,7 @@ void Client::connect() {
 	cl_log_event("network", "Connecting to %1:%2", m_addr, m_port);
 
 	try {
-
-		m_connected = false;
-		m_welcomed = false;
-
 		m_gameClient.connect(m_addr, port);
-
 	} catch (CL_Exception e) {
 		cl_log_event("exception", "Cannot connect to %1:%2", m_addr, m_port);
 	}
@@ -73,28 +70,27 @@ void Client::disconnect()
 
 Client::~Client() {
 
-	if (isConnected()) {
+	if (m_connected) {
 		m_gameClient.disconnect();
 	}
 }
 
-void Client::slotConnected()
+void Client::onConnected()
 {
+	m_connected = true;
+	INVOKE_0(connected);
 
 	// I am connected
-	// And I should introduce myself
+	// Sending player info
+	ClientInfo playerInfo;
+	playerInfo.setName(Game::getInstance().getPlayer().getName());
 
-	cl_log_event("network", "Introducing myself as %1", Game::getInstance().getPlayer().getName());
+	cl_log_event("network", "Introducing myself as %1", playerInfo.getName());
 
-	CL_NetGameEventValue nickname(Game::getInstance().getPlayer().getName());
-	CL_NetGameEvent hiEvent(EVENT_HI, nickname);
-
-	m_gameClient.send_event(hiEvent);
-
-	m_signalConnected.invoke();
+	send(playerInfo.buildEvent());
 }
 
-void Client::slotDisconnected()
+void Client::onDisconnected()
 {
 	// I am disconnected
 	// Is that what I've expected?
@@ -102,38 +98,36 @@ void Client::slotDisconnected()
 
 	m_connected = false;
 
-	m_signalDisconnected.invoke();
+	INVOKE_0(disconnected);
 }
 
-void Client::slotEventReceived(const CL_NetGameEvent &p_event)
+void Client::onEventReceived(const CL_NetGameEvent &p_event)
 {
 	cl_log_event("event", "Event %1 arrived", p_event.to_string());
 
 	try {
 		const CL_String eventName = p_event.get_name();
-		const std::vector<CL_TempString> parts = CL_StringHelp::split_text(eventName, ":");
-
 		bool unhandled = false;
 
-		if (parts[0] == EVENT_PREFIX_GENERAL) {
-			if (eventName == EVENT_WELCOME) {
-				handleWelcomeEvent(p_event);
-			} else if (eventName == EVENT_PLAYER_CONNECTED) {
-				handlePlayerConnectedEvent(p_event);
-				return;
-			} else if (eventName == EVENT_PLAYER_DISCONNECTED) {
-				handlePlayerDisconnectedEvent(p_event);
-				return;
-			} else if (eventName == EVENT_INIT_RACE) {
-				handleInitRaceEvent(p_event);
-			} else if (eventName == EVENT_GENERAL_GAMESTATE) {
-				handleGameState(p_event);
-			} else {
-				unhandled = true;
-			}
-		} else if (parts[0] == EVENT_PREFIX_RACE) {
-			m_raceClient.handleEvent(p_event);
-		} else {
+		// connect / disconnect procedure
+
+		if (eventName == EVENT_GOODBYE) {
+			onGoodbye(p_event);
+		} else if (eventName == EVENT_GAME_STATE) {
+			onGameState(p_event);
+		} else
+
+		// player events
+
+		if (eventName == EVENT_PLAYER_JOINED) {
+			onPlayerJoined(p_event);
+		} else if (eventName == EVENT_PLAYER_LEAVED) {
+			onPlayerLeaved(p_event);
+		} else
+
+		// unknown events remain unhandled
+
+		{
 			unhandled = true;
 		}
 
@@ -147,70 +141,58 @@ void Client::slotEventReceived(const CL_NetGameEvent &p_event)
 
 }
 
-void Client::handleGameState(const CL_NetGameEvent &p_gameState)
+void Client::onGoodbye(const CL_NetGameEvent &p_event)
+{
+	Goodbye goodbye;
+	goodbye.parseEvent(p_event);
+
+	cl_log_event("event", "Server says goodbye: %1", goodbye.getStringMessage());
+	disconnect();
+}
+
+void Client::onGameState(const CL_NetGameEvent &p_gameState)
 {
 	try {
 		GameState gamestate;
-		gamestate.parseGameStateEvent(p_gameState);
+		gamestate.parseEvent(p_gameState);
 
 		INVOKE_1(gameStateReceived, gamestate);
-		cl_log_event("debug", "after invoke");
 	} catch (CL_Exception &e) {
 		cl_log_event("protocol error on GAMESTATE: %1", e.message);
 	}
 
-
 }
 
-void Client::handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent)
+void Client::onPlayerJoined(const CL_NetGameEvent &p_event)
 {
-	const CL_String playerName = (CL_String) p_netGameEvent.get_argument(0);
-
-	Player* player = new Player(playerName);
-	m_remotePlayers.push_back(player);
-
-	cl_log_event("event", "Player '%1' connected", playerName);
-
-	m_signalPlayerConnected.invoke(player);
+	const CL_String name = p_event.get_argument(0);
+	cl_log_event("event", "Player '%1' joined the game", name);
+	INVOKE_1(playerJoined, name);
 }
 
-void Client::handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent)
+void Client::onPlayerLeaved(const CL_NetGameEvent &p_event)
 {
-	const CL_String playerName = (CL_String) p_netGameEvent.get_argument(0);
-
-	cl_log_event("event", "Player '%1' disconnected", playerName);
-
-	for (
-		std::vector<Player*>::iterator itor = m_remotePlayers.begin();
-		itor != m_remotePlayers.end();
-		++itor
-	) {
-		if ((*itor)->getName() == playerName) {
-
-			m_signalPlayerDisconnected.invoke(*itor);
-
-			delete *itor;
-			m_remotePlayers.erase(itor);
-			break;
-		}
-	}
+	const CL_String name = p_event.get_argument(0);
+	cl_log_event("event", "Player '%1' leaved the game", name);
+	INVOKE_1(playerLeaved, name);
 }
 
+void Client::onCarState(const CL_NetGameEvent &p_event)
+{
+	CarState state;
+	state.parseEvent(p_event);
+
+	INVOKE_1(carStateReceived, state);
+}
 
 void Client::send(const CL_NetGameEvent &p_event)
 {
 	m_gameClient.send_event(p_event);
 }
 
-void Client::handleInitRaceEvent(const CL_NetGameEvent &p_event)
+void Client::sendCarState(const Net::CarState &p_state)
 {
-	m_signalInitRace.invoke(p_event.get_argument(0));
+	send(p_state.buildEvent());
 }
 
-void Client::handleWelcomeEvent(const CL_NetGameEvent &p_netGameEvent)
-{
-	m_welcomed = true;
-	cl_log_event("network", "Connection fully initialized");
-
-	m_signalConnectionInitialized.invoke();
-}
+} // namespace

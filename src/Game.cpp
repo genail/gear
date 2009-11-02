@@ -30,9 +30,7 @@
 
 Game::Game() :
 	m_networkConnection(),
-	m_networkRaceConnection(&m_networkConnection.getRaceClient()),
-	m_player(),
-	m_racePlayer(&m_player)
+	m_player()
 {
 }
 

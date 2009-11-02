@@ -34,10 +34,9 @@ LoadingController::LoadingController(LoadingScene *p_scene) :
 	m_scene(p_scene)
 {
 	Game &game = Game::getInstance();
-	Client &client = game.getNetworkConnection();
+	Net::Client &client = game.getNetworkConnection();
 
-	m_slots.connect(client.signalConnected(), this, &LoadingController::onClientConnected);
-	m_slots.connect(client.signalConnectionInitialized(), this, &LoadingController::onClientInitialized);
+	m_slots.connect(client.sig_connected(), this, &LoadingController::onClientConnected);
 	m_slots.connect(client.sig_gameStateReceived(), this, &LoadingController::onGameState);
 	m_slots.connect(m_scene->sig_sceneVisible(), this, &LoadingController::onSceneVisible);
 }
@@ -50,7 +49,7 @@ void LoadingController::loadRace()
 {
 
 	Game &game = Game::getInstance();
-	Client &client = game.getNetworkConnection();
+	Net::Client &client = game.getNetworkConnection();
 
 	if (!client.getServerAddr().empty()) {
 
@@ -80,11 +79,6 @@ void LoadingController::onClientConnected()
 	m_scene->setMessage("Connected");
 }
 
-void LoadingController::onClientInitialized()
-{
-	m_scene->setMessage("Waiting for gamestate...");
-}
-
 void LoadingController::loadLevel(const CL_String &p_name)
 {
 
@@ -100,10 +94,10 @@ void LoadingController::onSceneVisible()
 	cl_log_event("debug", "LoadingController::onSceneVisible()");
 }
 
-void LoadingController::onGameState(const GameState &p_gameState)
+void LoadingController::onGameState(const Net::GameState &p_gameState)
 {
 	cl_log_event("debug", "LoadingController::onGameState()");
-	loadLevel(p_gameState.getLevelName());
+	loadLevel(p_gameState.getLevel());
 
 	Game &game = Game::getInstance();
 	RaceScene &raceScene = game.getSceneContainer().getRaceScene();

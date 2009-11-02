@@ -36,53 +36,55 @@
 #include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
+#include "network/CarState.h"
 #include "network/GameState.h"
-#include "network/RaceClient.h"
 
+namespace Net {
 
 class Client {
 
-		SIGNAL_1(const GameState&, gameStateReceived);
+		/** Client is connected */
+		SIGNAL_0(connected);
+
+		/** Client is disconnected */
+		SIGNAL_0(disconnected);
+
+		/** Player info accepted */
+		SIGNAL_0(accepted);
+
+		/** Received game state */
+		SIGNAL_1(const Net::GameState&, gameStateReceived);
+
+		/** New player joined */
+		SIGNAL_1(const CL_String&, playerJoined);
+
+		/** Player leaved */
+		SIGNAL_1(const CL_String&, playerLeaved);
+
+		/** Got new car state */
+		SIGNAL_1(const Net::CarState&, carStateReceived);
 
 	public:
 		Client();
+
 		virtual ~Client();
 
 		void connect();
 
 		void disconnect();
 
-		bool isConnected() const { return m_connected; }
 
-		Player* getPlayer(int p_index) { return m_remotePlayers[p_index]; }
+		void sendCarState(const Net::CarState &p_state);
 
-		int getPlayersCount() const { return m_remotePlayers.size(); }
-
-		RaceClient& getRaceClient() { return m_raceClient; }
 
 		const CL_String& getServerAddr() const { return m_addr; }
 
 		int getServerPort() const { return m_port; }
 
+
 		void setServerAddr(const CL_String& p_addr) { m_addr = p_addr; }
 
 		void setServerPort(int p_port) { m_port = p_port; }
-
-		//
-		// client signals
-		//
-
-		CL_Signal_v0 &signalConnected() { return m_signalConnected; }
-
-		CL_Signal_v0 &signalConnectionInitialized() { return m_signalConnectionInitialized; }
-
-		CL_Signal_v0 &signalDisconnected() { return m_signalDisconnected; }
-
-		CL_Signal_v1<const CL_String&> &signalInitRace() { return m_signalInitRace; }
-
-		CL_Signal_v1<Player*> &signalPlayerConnected() { return m_signalPlayerConnected; }
-
-		CL_Signal_v1<Player*> &signalPlayerDisconnected() { return m_signalPlayerDisconnected; }
 
 
 	private:
@@ -94,44 +96,13 @@ class Client {
 		int m_port;
 
 		/** Connected state */
-		volatile bool m_connected;
+		bool m_connected;
 
 		/** Game client object */
 		CL_NetGameClient m_gameClient;
 
-		/** The race client */
-		RaceClient m_raceClient;
-
-		/** Remotely connected players (to server) */
-		std::vector<Player*> m_remotePlayers;
-
 		/** The slot container */
 		CL_SlotContainer m_slots;
-
-		/** Tells if connection is fully initialized */
-		volatile bool m_welcomed;
-
-		//
-		// This class signals
-		//
-
-		/** The client is connected */
-		CL_Signal_v0 m_signalConnected;
-
-		/** The connection is initialized (ready to use) */
-		CL_Signal_v0 m_signalConnectionInitialized;
-
-		/** The client is no longed connected */
-		CL_Signal_v0 m_signalDisconnected;
-
-		/** Race initialize event received */
-		CL_Signal_v1<const CL_String&> m_signalInitRace;
-
-		/** Player joined the game */
-		CL_Signal_v1<Player*> m_signalPlayerConnected;
-
-		/** Player leaved the game */
-		CL_Signal_v1<Player*> m_signalPlayerDisconnected;
 
 
 		void send(const CL_NetGameEvent &p_event);
@@ -141,35 +112,30 @@ class Client {
 		//
 
 		/** This client is connected */
-		void slotConnected();
+		void onConnected();
 
 		/** This client has been disconnected */
-		void slotDisconnected();
+		void onDisconnected();
 
-		void slotEventReceived(const CL_NetGameEvent &p_netGameEvent);
+		/** Event received */
+		void onEventReceived(const CL_NetGameEvent &p_event);
 
 		//
 		// game events receivers
 		//
 
-		/** Race is initialized on server side */
-		void handleInitRaceEvent(const CL_NetGameEvent &p_event);
+		void onGoodbye(const CL_NetGameEvent &p_event);
 
-		/** New player is connected */
-		void handlePlayerConnectedEvent(const CL_NetGameEvent &p_netGameEvent);
+		void onGameState(const CL_NetGameEvent &p_gameState);
 
-		/** Player disconnects */
-		void handlePlayerDisconnectedEvent(const CL_NetGameEvent &p_netGameEvent);
+		void onPlayerJoined(const CL_NetGameEvent &p_event);
 
-		void handleWelcomeEvent(const CL_NetGameEvent &p_netGameEvent);
+		void onPlayerLeaved(const CL_NetGameEvent &p_event);
 
-		void handleGameState(const CL_NetGameEvent &p_gameState);
-
-		/** Car status update */
-		void eventCarStatus(const CL_NetGameEvent &p_netGameEvent);
-
-		friend class RaceClient;
+		void onCarState(const CL_NetGameEvent &p_event);
 
 };
+
+} // namespace
 
 #endif /* CLIENT_H_ */

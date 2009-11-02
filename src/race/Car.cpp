@@ -29,7 +29,7 @@
 #include "race/Car.h"
 #include "Properties.h"
 #include "race/Level.h"
-#include "race/RacePlayer.h"
+#include "Game.h"
 
 #include <ClanLib/core.h>
 
@@ -39,11 +39,10 @@ const int CAR_WIDTH = 18;
 /* Car height in pixels */
 const int CAR_HEIGHT = 24;
 
-Car::Car(RacePlayer *p_player) :
+Car::Car() :
 #ifdef CLIENT
 	m_sprite(),
 #endif // CLIENT
-	m_player(p_player),
 	m_level(NULL),
 	m_locked(false),
 	m_position(300.0f, 300.0f),
@@ -105,8 +104,9 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	p_gc.mult_translate(m_position.x, m_position.y);
 
 	// display nickname
-	const CL_Size nameLabelSize = m_nickDisplayFont.get_text_size(p_gc, m_player->getPlayer().getName());
-	m_nickDisplayFont.draw_text(p_gc, -nameLabelSize.width / 2, -20, m_player->getPlayer().getName());
+	const CL_String &playerName = Game::getInstance().getPlayer().getName();
+	const CL_Size nameLabelSize = m_nickDisplayFont.get_text_size(p_gc, playerName);
+	m_nickDisplayFont.draw_text(p_gc, -nameLabelSize.width / 2, -20, playerName);
 
 	p_gc.mult_rotate(m_rotation, 0, 0, 1);
 
@@ -386,6 +386,27 @@ int Car::prepareStatusEvent(CL_NetGameEvent &p_event) {
 	return c;
 }
 
+Net::CarState Car::prepareCarState()
+{
+	Net::CarState state;
+
+	state.setPosition(m_position);
+	state.setRotation(m_rotation);
+	state.setMovement(m_moveVector);
+	state.setSpeed(m_speed);
+	state.setTurn(m_turn);
+
+	if (m_acceleration && !m_brake) {
+		state.setAcceleration(1.0f);
+	} else if (!m_acceleration && m_brake) {
+		state.setAcceleration(-1.0f);
+	} else {
+		state.setAcceleration(0.0f);
+	}
+
+	return state;
+}
+
 int Car::applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex) {
 	int i = p_beginIndex;
 
@@ -401,6 +422,17 @@ int Car::applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex) {
 	m_lap =            (int) p_event.get_argument(i++);
 
 	return i;
+}
+
+void Car::applyCarState(const Net::CarState &p_carState)
+{
+	m_position = p_carState.getPosition();
+	m_rotation = p_carState.getRotation();
+	m_moveVector = p_carState.getMovement();
+	m_speed = p_carState.getSpeed();
+	m_turn = p_carState.getTurn();
+	m_acceleration = p_carState.getAcceleration() > 0.0f;
+	m_brake = p_carState.getAcceleration() < 0.0f;
 }
 
 int Car::calculateInputChecksum() const {

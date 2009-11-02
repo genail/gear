@@ -26,86 +26,41 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACECLIENT_H_
-#define RACECLIENT_H_
+#ifndef PROTOCOLVERSION_H_
+#define PROTOCOLVERSION_H_
 
-#include "race/RacePlayer.h"
+#include "network/version.h"
 
-class Client;
+namespace Net {
 
-class RaceClient {
+class ProtocolVersion {
 
 	public:
 
-		RaceClient(Client *p_client);
+		ProtocolVersion() :
+			m_major(PROTOCOL_VERSION_MAJOR),
+			m_minor(PROTOCOL_VERSION_MINOR)
+		{}
 
-		virtual ~RaceClient();
+		virtual ~ProtocolVersion() {}
 
-		Client &getClient() { return *m_client; }
+		int getMajor() const { return m_major; }
 
-		void handleEvent(const CL_NetGameEvent &p_event);
+		int getMinor() const { return m_minor; }
 
-		void initRace(const CL_String &p_levelName);
+		void setMajor(int p_major) { m_major = p_major; }
 
-		void markFinished(unsigned p_raceTime);
-
-		void sendCarStateEvent(const CL_NetGameEvent &p_event);
-
-		void triggerRaceStart(int p_lapsNum);
-
-		//
-		// Signals
-		//
-
-		CL_Signal_v1<const CL_NetGameEvent&> &signalCarStateReceived()
-		{ return m_signalCarStateReceived; }
-
-		CL_Signal_v0 &signalLockCar()
-		{ return m_signalLockCar; }
-
-		CL_Signal_v1<const CL_NetGameEvent&> &signalPlayerFinished()
-		{ return m_signalPlayerFinished; }
-
-		CL_Signal_v1<int> &signalRaceStateChanged()
-		{ return m_signalRaceStateChanged; }
-
-		CL_Signal_v0 &signalStartCountdown()
-		{ return m_signalStartCountdownEvent; }
+		void setMinor(int p_minor) { m_minor = p_minor; }
 
 	private:
 
-		/** Base game client */
-		Client *m_client;
+		/** When different, then protocol cannot be handled */
+		int m_major;
 
-		//
-		// Signals
-		//
-
-		CL_Signal_v1<const CL_NetGameEvent&> 	m_signalCarStateReceived;
-
-		CL_Signal_v0 							m_signalLockCar;
-
-		CL_Signal_v1<const CL_NetGameEvent&>	m_signalPlayerFinished;
-
-		CL_Signal_v1<int> 						m_signalRaceStateChanged;
-
-		CL_Signal_v0 							m_signalStartCountdownEvent;
-
-		//
-		// Event handlers
-		//
-
-		void handleCarStateChangeEvent(const CL_NetGameEvent &p_event);
-
-		void handleLockCarEvent(const CL_NetGameEvent &p_event);
-
-		void handlePlayerFinishedEvent(const CL_NetGameEvent &p_event);
-
-		void handleRaceStateEvent(const CL_NetGameEvent &p_event);
-
-		void handleStartCountdownEvent(const CL_NetGameEvent &p_event);
-
-
+		/** When only difference in this, then protocol can be handled but not fully */
+		int m_minor;
 };
 
-#endif /* RACECLIENT_H_ */
+}
+
+#endif /* PROTOCOLVERSION_H_ */

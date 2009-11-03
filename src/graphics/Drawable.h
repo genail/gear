@@ -31,11 +31,30 @@
 #ifndef DRAWABLE_H_
 #define DRAWABLE_H_
 
+namespace Gfx
+{
+
 class Drawable {
+
 	public:
+
+		Drawable() :
+			m_loaded(false)
+			{}
+
 		virtual void draw(CL_GraphicContext &p_gc) = 0;
-		virtual void load(CL_GraphicContext &p_gc) {}
+
+		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
+
+
+		bool isLoaded() const { return m_loaded; }
+
+	private:
+
+		bool m_loaded;
 
 };
+
+} // namespace
 
 #endif /* DRAWABLE_H_ */

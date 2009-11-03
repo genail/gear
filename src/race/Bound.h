@@ -35,7 +35,7 @@
 
 #include "graphics/Drawable.h"
 
-#define CLASS_BOUND class Bound : public Drawable
+#define CLASS_BOUND class Bound : public Gfx::Drawable
 
 #else // !SERVER
 

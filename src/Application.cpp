@@ -109,8 +109,8 @@ int Application::main(const std::vector<CL_String> &args)
 		}
 	}
 
-	Stage::m_width = 1024;
-	Stage::m_height = 768;
+	Gfx::Stage::m_width = 1024;
+	Gfx::Stage::m_height = 768;
 
 	// Setup clanlib modules:
 	CL_SetupCore 	setup_core;
@@ -123,7 +123,7 @@ int Application::main(const std::vector<CL_String> &args)
 
 	// load resources
 	CL_ResourceManager resources("resources/resources.xml");
-	Stage::m_resourceManager = &resources;
+	Gfx::Stage::m_resourceManager = &resources;
 
 	// load GUI
 	CL_GUIManager gui;
@@ -141,13 +141,13 @@ int Application::main(const std::vector<CL_String> &args)
 	gui.set_theme(theme);
 
 	CL_DisplayWindowDescription desc("Gear");
-	desc.set_position(CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight()), true);
+	desc.set_position(CL_Rect(0, 0, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()), true);
 
 	GameWindow gameWindow(&gui, desc);
 
 	// load debug layer
 	DebugLayer debugLayer;
-	Stage::m_debugLayer = &debugLayer;
+	Gfx::Stage::m_debugLayer = &debugLayer;
 
 	// build race game
 
@@ -156,7 +156,7 @@ int Application::main(const std::vector<CL_String> &args)
 		SceneContainer sceneContainer(&gameWindow);
 		Game::getInstance().setSceneContainer(&sceneContainer);
 
-		Stage::pushScene(&sceneContainer.getMainMenuScene());
+		Gfx::Stage::pushScene(&sceneContainer.getMainMenuScene());
 
 		// run the gui
 		gui.exec(true);

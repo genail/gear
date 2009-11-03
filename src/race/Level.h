@@ -41,7 +41,7 @@
 #include "race/TyreStripes.h"
 #include "graphics/Drawable.h"
 
-#define CLASS_LEVEL class Level : public Drawable
+#define CLASS_LEVEL class Level : public Gfx::Drawable
 
 #else // CLIENT
 
@@ -74,6 +74,12 @@ CLASS_LEVEL
 		 * @return A start position of <code>p_num</code>
 		 */
 		CL_Pointf getStartPosition(int p_num) const;
+
+
+		size_t getCarCount() const { return m_cars.size(); }
+
+		const Car &getCar(size_t p_index) const { return *m_cars[p_index]; }
+
 
 		void removeCar(Car *p_car);
 

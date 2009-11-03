@@ -72,7 +72,7 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 
 	m_lapDisplayFont.draw_text(
 			p_gc,
-			Stage::getWidth() - 130,
+			Gfx::Stage::getWidth() - 130,
 			40,
 			CL_String8("Lap ") + currentLapStr + " / " + lapsNumStr
 	);
@@ -106,8 +106,8 @@ void RaceUI::drawCountdownLabel(CL_GraphicContext &p_gc, const CL_String &p_labe
 	const CL_Size size = m_countdownFont.get_text_size(p_gc, p_label);
 	m_countdownFont.draw_text(
 			p_gc,
-			Stage::getWidth() / 2 - size.width / 2,
-			Stage::getHeight() / 2 - size.height / 2,
+			Gfx::Stage::getWidth() / 2 - size.width / 2,
+			Gfx::Stage::getHeight() / 2 - size.height / 2,
 			p_label,
 			CL_Colorf::red
 	);

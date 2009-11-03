@@ -75,12 +75,12 @@ void MainMenuController::onRaceStartClicked()
 	loadingScene.destroy();
 	loadingScene.initialize();
 
-	Stage::pushScene(&loadingScene);
+	Gfx::Stage::pushScene(&loadingScene);
 
 	loadingScene.getController().loadRace();
 }
 
 void MainMenuController::onQuitClicked()
 {
-	Stage::popScene();
+	Gfx::Stage::popScene();
 }

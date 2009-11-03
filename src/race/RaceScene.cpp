@@ -121,6 +121,8 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 
 	Game::getInstance().getLevel().draw(p_gc);
 
+	drawCars(p_gc);
+
 	m_viewport.finalizeGC(p_gc);
 
 	m_raceUI.draw(p_gc);
@@ -128,10 +130,51 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 	countFps();
 
 #ifndef NDEBUG
-	Stage::getDebugLayer()->putMessage("fps", CL_StringHelp::int_to_local8(m_fps));
+	Gfx::Stage::getDebugLayer()->putMessage("fps", CL_StringHelp::int_to_local8(m_fps));
 
-	Stage::getDebugLayer()->draw(p_gc);
+	Gfx::Stage::getDebugLayer()->draw(p_gc);
 #endif // NDEBUG
+}
+
+void RaceScene::drawCars(CL_GraphicContext &p_gc)
+{
+	Level &level = Game::getInstance().getLevel();
+	size_t carCount = level.getCarCount();
+
+	for (size_t i = 0; i < carCount; ++i) {
+		const Car &car = level.getCar(i);
+		drawCar(p_gc, car);
+	}
+}
+
+void RaceScene::drawCar(CL_GraphicContext &p_gc, const Car &p_car)
+{
+	carsMapping_t::iterator itor = m_carsMapping.find(&p_car);
+
+	CL_SharedPtr<Gfx::Car> gfxCar;
+
+	if (itor == m_carsMapping.end()) {
+		gfxCar = CL_SharedPtr<Gfx::Car>(cl_new Gfx::Car());
+		gfxCar->load(p_gc);
+
+		m_carsMapping[&p_car] = gfxCar;
+	} else {
+		gfxCar = itor->second;
+	}
+
+	gfxCar->setPosition(p_car.getPosition());
+	gfxCar->setRotation(CL_Angle(p_car.getRotationRad(), cl_radians));
+
+	gfxCar->draw(p_gc);
+
+//		gfxCar = (*itor->second);
+////		(&itor->second)->get()->draw(p_gc);
+//		cl_log_event("debug", "a");
+//	} else {
+//
+////		m_carsMapping[&p_car]->draw(p_gc);
+//		cl_log_event("debug", "b");
+//	}
 }
 
 void RaceScene::countFps()
@@ -179,7 +222,7 @@ void RaceScene::updateScale() {
 	
 		
 #ifndef NDEBUG
-	Stage::getDebugLayer()->putMessage(CL_String8("scale"),  CL_StringHelp::float_to_local8(scale));
+	Gfx::Stage::getDebugLayer()->putMessage(CL_String8("scale"),  CL_StringHelp::float_to_local8(scale));
 #endif
 }
 
@@ -271,7 +314,7 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 	// handle quit request
 	if (p_state == Pressed && p_event.id == CL_KEY_ESCAPE) {
-		Stage::popScene();
+		Gfx::Stage::popScene();
 	}
 
 	updateCarTurn();

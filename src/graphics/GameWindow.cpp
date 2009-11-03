@@ -53,7 +53,7 @@ void GameWindow::repaint()
 
 void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 {
-	Scene *scene = Stage::peekScene();
+	Scene *scene = Gfx::Stage::peekScene();
 
 	updateLogic(scene);
 	renderScene(p_gc, scene);

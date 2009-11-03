@@ -26,52 +26,42 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "LoadingScene.h"
+#ifndef GFX_CAR_H_
+#define GFX_CAR_H_
 
-#include "graphics/Stage.h"
+#include <ClanLib/core.h>
 
-LoadingScene::LoadingScene(CL_GUIComponent *p_parent) :
-	Scene(p_parent),
-	m_controller(this),
-	m_label(p_parent)
-{
-	set_class_name("LoadingScene");
-	m_label.set_geometry(CL_Rect(10.0f, Gfx::Stage::getHeight() - 30.0f, Gfx::Stage::getWidth() - 10.0f, Gfx::Stage::getHeight() - 10.0f));
-}
+#include "graphics/Drawable.h"
 
-LoadingScene::~LoadingScene()
-{
-}
+namespace Gfx {
 
-void LoadingScene::initialize()
-{
-	m_visibleOnScreen = false;
-	m_sceneVisibleSigInvoked = false;
-}
+class Car : public Gfx::Drawable {
 
-void LoadingScene::destroy()
-{
+	public:
 
-}
+		Car();
 
-void LoadingScene::draw(CL_GraphicContext &p_gc)
-{
-	INVOKE_0(sceneRepaint);
+		virtual ~Car();
 
-	CL_Draw::fill(p_gc, 0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight(), CL_Colorf::white);
+		virtual void draw(CL_GraphicContext &p_gc);
 
-	// invoke the scene visible, when I'm sure that is really visible
-	// and make it only once per initialize()
-	if (!m_visibleOnScreen) {
-		m_visibleOnScreen = true;
-	} else if (!m_sceneVisibleSigInvoked) {
-		INVOKE_0(sceneVisible);
-		m_sceneVisibleSigInvoked = true;
-	}
+		virtual void load(CL_GraphicContext &p_gc);
 
-}
 
-void LoadingScene::setMessage(const CL_String &p_message)
-{
-	m_label.set_text(p_message);
-}
+		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
+
+		void setRotation(const CL_Angle &p_rotation) { m_rotation = p_rotation; }
+
+	private:
+
+		CL_Sprite m_sprite;
+
+		CL_Pointf m_position;
+
+		CL_Angle m_rotation;
+
+};
+
+} // namespace
+
+#endif /* GFX_CAR_H_ */

@@ -46,7 +46,7 @@ class Level;
 #include "graphics/Stage.h"
 #include "graphics/Drawable.h"
 
-#define CLASS_CAR class Car : public Drawable
+#define CLASS_CAR class Car : public Gfx::Drawable
 
 
 #else // server-only code
@@ -89,7 +89,7 @@ CLASS_CAR
 			m_acceleration = p_value;
 #ifndef NDEBUG
 #ifdef CLIENT
-			Stage::getDebugLayer()->putMessage(CL_String8("accel"),  CL_StringHelp::bool_to_local8(p_value));
+			Gfx::Stage::getDebugLayer()->putMessage(CL_String8("accel"),  CL_StringHelp::bool_to_local8(p_value));
 #endif // CLIENT
 #endif // !NDEBUG
 		}
@@ -98,7 +98,7 @@ CLASS_CAR
 			m_brake = p_value;
 #ifndef NDEBUG
 #ifdef CLIENT
-			Stage::getDebugLayer()->putMessage(CL_String8("brake"),  CL_StringHelp::bool_to_local8(p_value));
+			Gfx::Stage::getDebugLayer()->putMessage(CL_String8("brake"),  CL_StringHelp::bool_to_local8(p_value));
 #endif // CLIENT
 #endif // !NDEBUG
 		}
@@ -114,7 +114,7 @@ CLASS_CAR
 			m_turn = normalize(p_value);
 #ifndef NDEBUG
 #ifdef CLIENT
-			Stage::getDebugLayer()->putMessage(CL_String8("turn"),  CL_StringHelp::float_to_local8(p_value));
+			Gfx::Stage::getDebugLayer()->putMessage(CL_String8("turn"),  CL_StringHelp::float_to_local8(p_value));
 #endif // CLIENT
 #endif // !NDEBUG
 		}

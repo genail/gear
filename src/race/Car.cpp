@@ -87,7 +87,7 @@ void Car::draw(CL_GraphicContext &p_gc) {
 	
 	// TODO: move to load();
 	if (m_sprite.is_null()) {
-		m_sprite = CL_Sprite(p_gc, "race/car", Stage::getResourceManager());
+		m_sprite = CL_Sprite(p_gc, "race/car", Gfx::Stage::getResourceManager());
 	}
 
 	if (m_nickDisplayFont.is_null()) {
@@ -350,9 +350,9 @@ void Car::update(unsigned int elapsedTime) {
 	
 #ifdef CLIENT
 #ifndef NDEBUG
-			Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));
+			Gfx::Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));
 			if (m_level != NULL) {
-				Stage::getDebugLayer()->putMessage(CL_String8("resist"), CL_StringHelp::float_to_local8(m_level->getResistance(m_position.x, m_position.y)));
+				Gfx::Stage::getDebugLayer()->putMessage(CL_String8("resist"), CL_StringHelp::float_to_local8(m_level->getResistance(m_position.x, m_position.y)));
 			}
 #endif // NDEBUG
 #endif // CLIENT

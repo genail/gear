@@ -37,6 +37,8 @@
 class Scene;
 class Application;
 
+namespace Gfx {
+
 class Stage {
 	public:
 
@@ -76,7 +78,9 @@ class Stage {
 
 		Stage() {}
 
-		friend class Application;
+		friend class ::Application;
 };
+
+} // namespace
 
 #endif /* STAGE_H_ */

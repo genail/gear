@@ -58,7 +58,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
 	m_errorLabel.set_geometry(CL_Rect(200, 220, 400, 260));
 
-	m_quitButton.set_geometry(CL_Rect(Stage::getWidth() - 100, Stage::getHeight() - 40, Stage::getWidth() - 20, Stage::getHeight() - 20));
+	m_quitButton.set_geometry(CL_Rect(Gfx::Stage::getWidth() - 100, Gfx::Stage::getHeight() - 40, Gfx::Stage::getWidth() - 20, Gfx::Stage::getHeight() - 20));
 	m_quitButton.set_text("Quit");
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);

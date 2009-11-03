@@ -34,7 +34,7 @@
 #include "graphics/Stage.h"
 #include "graphics/Drawable.h"
 
-#define CLASS_BLOCK class Block : public Drawable
+#define CLASS_BLOCK class Block : public Gfx::Drawable
 
 #else
 

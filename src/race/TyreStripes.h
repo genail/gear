@@ -35,7 +35,7 @@
 #include "race/Car.h"
 #include "graphics/Drawable.h"
 
-class TyreStripes : public Drawable {
+class TyreStripes : public Gfx::Drawable {
 
 		struct Stripe {
 				CL_Pointf m_from, m_to;

@@ -66,7 +66,7 @@ void Block::draw(CL_GraphicContext& p_gc) {
 }
 
 void Block::load(CL_GraphicContext& p_gc) {
-	m_bgSprite = CL_Sprite(p_gc, "race/block", Stage::getResourceManager());
+	m_bgSprite = CL_Sprite(p_gc, "race/block", Gfx::Stage::getResourceManager());
 	assert(!m_bgSprite.is_null());
 
 	m_loaded = true;
@@ -117,10 +117,10 @@ void Block::load(CL_GraphicContext& p_gc) {
 	}
 
 	if (fgSpriteName.size() > 0) {
-		m_fgSprite = CL_Sprite(p_gc, fgSpriteName, Stage::getResourceManager());
+		m_fgSprite = CL_Sprite(p_gc, fgSpriteName, Gfx::Stage::getResourceManager());
 
 		if (fgSpriteName2.size() > 0) {
-			m_fgSprite2 = CL_Sprite(p_gc, fgSpriteName2, Stage::getResourceManager());
+			m_fgSprite2 = CL_Sprite(p_gc, fgSpriteName2, Gfx::Stage::getResourceManager());
 		}
 
 		// build resistance map

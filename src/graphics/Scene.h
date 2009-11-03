@@ -41,7 +41,7 @@ class Scene : public CL_GUIComponent {
 		Scene(CL_GUIComponent *p_parent) : CL_GUIComponent(p_parent), m_loaded(false) {
 			set_visible(false),
 			func_render().set(this, &Scene::onRender);
-			set_geometry(CL_Rectf(0.0f, 0.0f, Stage::getWidth(), Stage::getHeight()));
+			set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
 		}
 
 		virtual ~Scene() {}

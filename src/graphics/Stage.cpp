@@ -30,6 +30,8 @@
 
 #include "graphics/Scene.h"
 
+namespace Gfx {
+
 int Stage::m_width = 0;
 
 int Stage::m_height = 0;
@@ -63,3 +65,5 @@ void Stage::replaceScene(Scene *p_scene)
 	m_sceneStack.pop();
 	m_sceneStack.push(p_scene);
 }
+
+} // namespace

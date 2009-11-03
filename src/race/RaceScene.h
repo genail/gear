@@ -29,6 +29,7 @@
 #ifndef RACESCENE_H_
 #define RACESCENE_H_
 
+#include <ClanLib/core.h>
 #include <ClanLib/gui.h>
 
 #include "Player.h"
@@ -38,6 +39,7 @@
 #include "race/Viewport.h"
 #include "race/ScoreTable.h"
 #include "graphics/Drawable.h"
+#include "graphics/Car.h"
 
 #include "graphics/Scene.h"
 
@@ -118,6 +120,10 @@ class RaceScene: public Scene
 		/** Last fps count time */
 		unsigned m_lastFpsRegisterTime;
 
+		/** Logic car to gfx car mapping */
+		typedef std::map<const Car*, CL_SharedPtr<Gfx::Car> > carsMapping_t;
+		carsMapping_t m_carsMapping;
+
 		// other
 
 		/** The slots container */
@@ -131,6 +137,10 @@ class RaceScene: public Scene
 		// display
 
 		void countFps();
+
+		void drawCars(CL_GraphicContext &p_gc);
+
+		void drawCar(CL_GraphicContext &p_gc, const Car &p_car);
 
 		// input
 

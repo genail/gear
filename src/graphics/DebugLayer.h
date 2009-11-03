@@ -32,7 +32,7 @@
 #include <ClanLib/core.h>
 #include "graphics/Drawable.h"
 
-class DebugLayer : public Drawable {
+class DebugLayer : public Gfx::Drawable {
 	public:
 		DebugLayer();
 		virtual ~DebugLayer();

@@ -34,7 +34,7 @@
 
 #include "graphics/Drawable.h"
 
-class SpeedMeter : public Drawable {
+class SpeedMeter : public Gfx::Drawable {
 
 	public:
 

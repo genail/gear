@@ -34,7 +34,7 @@
 
 class RaceScene;
 
-class RaceUI: public Drawable {
+class RaceUI: public Gfx::Drawable {
 	public:
 		RaceUI(RaceScene *p_raceScene);
 		virtual ~RaceUI();

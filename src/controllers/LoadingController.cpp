@@ -70,7 +70,7 @@ void LoadingController::loadRace()
 		raceScene.destroy();
 		raceScene.initialize();
 
-		Stage::replaceScene(&raceScene);
+		Gfx::Stage::replaceScene(&raceScene);
 	}
 }
 
@@ -105,5 +105,5 @@ void LoadingController::onGameState(const Net::GameState &p_gameState)
 	raceScene.destroy();
 	raceScene.initialize();
 
-	Stage::replaceScene(&raceScene);
+	Gfx::Stage::replaceScene(&raceScene);
 }

@@ -22,6 +22,7 @@ SET(CLIENT_SRCS
     Game.cpp
     controllers/LoadingController.cpp
     controllers/MainMenuController.cpp
+    graphics/Car.cpp
     graphics/DebugLayer.cpp
     graphics/GameWindow.cpp
     graphics/SpeedMeter.cpp

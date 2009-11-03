@@ -106,6 +106,6 @@ void TyreStripes::draw(CL_GraphicContext &p_gc)
 	}
 
 #ifndef NDEBUG
-	Stage::getDebugLayer()->putMessage("stripes_num", CL_StringHelp::int_to_local8(m_stripes.size()));
+	Gfx::Stage::getDebugLayer()->putMessage("stripes_num", CL_StringHelp::int_to_local8(m_stripes.size()));
 #endif // !NDEBUG
 }

@@ -26,8 +26,8 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACE_H_
-#define RACE_H_
+#ifndef RACE_RACE_H_
+#define RACE_RACE_H_
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
@@ -35,6 +35,8 @@
 #include "race/Level.h"
 #include "race/RaceScene.h"
 #include "race/ScoreTable.h"
+
+namespace Race {
 
 class Race {
 	public:
@@ -148,4 +150,6 @@ class Race {
 
 };
 
-#endif /* RACE_H_ */
+} // namespace
+
+#endif /* RACE_RACE_H_ */

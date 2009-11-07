@@ -26,28 +26,19 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef BLOCK_H_
-#define BLOCK_H_
+#ifndef RACE_BLOCK_H_
+#define RACE_BLOCK_H_
 
-#ifdef CLIENT
+#include "boost/utility.hpp"
 
-#include "graphics/Stage.h"
-#include "graphics/Drawable.h"
+namespace Race {
 
-#define CLASS_BLOCK class Block : public Gfx::Drawable
-
-#else
-
-#define CLASS_BLOCK class Block
-
-#endif //CLIENT
-
-CLASS_BLOCK
+class Block : public boost::noncopyable
 {
 	public:
 
 		enum BlockType {
-			BT_NONE,
+			BT_GRASS,
 			BT_STREET_HORIZ,
 			BT_STREET_VERT,
 			BT_TURN_BOTTOM_RIGHT,
@@ -67,14 +58,6 @@ CLASS_BLOCK
 
 		BlockType getType() const { return m_type; }
 
-#ifdef CLIENT
-
-		virtual void draw(CL_GraphicContext& p_gc);
-
-		virtual void load(CL_GraphicContext& p_gc);
-
-#endif // CLIENT
-
 	private:
 		/** Subtype of this block */
 		BlockType m_type;
@@ -82,23 +65,8 @@ CLASS_BLOCK
 		/** Resistance map */
 		float *m_resistanceMap;
 
-		/** Width of block side */
+		/** Width of block in pixels */
 		int m_width;
-
-#ifdef CLIENT
-
-		/** Background sprite */
-		CL_Sprite m_bgSprite;
-
-		/** Primary Foreground sprite */
-		CL_Sprite m_fgSprite;
-
-		/** Secondary Foreground sprite */
-		CL_Sprite m_fgSprite2;
-
-#endif // CLIENT
-
-		bool m_loaded;
 
 };
 
@@ -134,4 +102,6 @@ class PixelTranslator90 : public PixelTranslator {
 		}
 };
 
-#endif /* BLOCK_H_ */
+} // namespace
+
+#endif /* RACE_BLOCK_H_ */

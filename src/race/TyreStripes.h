@@ -39,9 +39,9 @@ class TyreStripes : public Gfx::Drawable {
 
 		struct Stripe {
 				CL_Pointf m_from, m_to;
-				const Car *m_owner;
+				const Race::Car *m_owner;
 
-				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car *p_owner) :
+				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner) :
 					m_from(p_from), m_to(p_to), m_owner(p_owner) {}
 
 				float length() const
@@ -52,7 +52,7 @@ class TyreStripes : public Gfx::Drawable {
 		TyreStripes();
 		virtual ~TyreStripes();
 
-		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car *p_owner);
+		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner);
 
 		virtual void draw(CL_GraphicContext &p_gc);
 

@@ -97,7 +97,7 @@ void RaceScene::initialize()
 	m_viewport.attachTo(&(player.getCar().getPosition()));
 	m_players.push_back(&player);
 
-	Level &level = game.getLevel();
+	Race::Level &level = game.getLevel();
 	level.addCar(&player.getCar());
 }
 
@@ -105,7 +105,7 @@ void RaceScene::destroy()
 {
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
-	Level &level = game.getLevel();
+	Race::Level &level = game.getLevel();
 
 	level.removeCar(&player.getCar());
 }
@@ -118,6 +118,9 @@ void RaceScene::init(const CL_String &p_levelName)
 void RaceScene::draw(CL_GraphicContext &p_gc)
 {
 	m_viewport.prepareGC(p_gc);
+
+	// draw pure level
+	drawLevel(p_gc);
 
 	Game::getInstance().getLevel().draw(p_gc);
 
@@ -136,28 +139,47 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 #endif // NDEBUG
 }
 
+void RaceScene::drawLevel(CL_GraphicContext &p_gc)
+{
+	Race::Level &level = Game::getInstance().getLevel();
+
+	const size_t w = level.getWidth();
+	const size_t h = level.getHeight();
+
+	for (size_t iw = 0; iw < w; ++iw) {
+		for (size_t ih = 0; ih < h; ++ih) {
+			drawGroundBlock(level.getBlock(iw, ih), iw, ih);
+		}
+	}
+}
+
+void RaceScene::drawGroundBlock(const Race::Block& p_block, size_t x, size_t y)
+{
+//	CL_SharedPtr<Gfx::GroundBlock> gfxBlock = m_blockMapping[p_block.]
+}
+
 void RaceScene::drawCars(CL_GraphicContext &p_gc)
 {
-	Level &level = Game::getInstance().getLevel();
+	Race::Level &level = Game::getInstance().getLevel();
 	size_t carCount = level.getCarCount();
 
 	for (size_t i = 0; i < carCount; ++i) {
-		const Car &car = level.getCar(i);
+		const Race::Car &car = level.getCar(i);
 		drawCar(p_gc, car);
 	}
 }
 
-void RaceScene::drawCar(CL_GraphicContext &p_gc, const Car &p_car)
+void RaceScene::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 {
-	carsMapping_t::iterator itor = m_carsMapping.find(&p_car);
+	carMapping_t::iterator itor = m_carMapping.find(&p_car);
 
 	CL_SharedPtr<Gfx::Car> gfxCar;
 
-	if (itor == m_carsMapping.end()) {
+	if (itor == m_carMapping.end()) {
 		gfxCar = CL_SharedPtr<Gfx::Car>(cl_new Gfx::Car());
 		gfxCar->load(p_gc);
 
-		m_carsMapping[&p_car] = gfxCar;
+		m_carMapping[&p_car] = gfxCar;
 	} else {
 		gfxCar = itor->second;
 	}
@@ -233,12 +255,12 @@ void RaceScene::update(unsigned p_timeElapsed)
 	updateCars(p_timeElapsed);
 
 	Game &game = Game::getInstance();
-	Level &level = game.getLevel();
+	Race::Level &level = game.getLevel();
 
 	level.update(p_timeElapsed);
 
 	Player &player = game.getPlayer();
-	const Car &car = player.getCar();
+	const Race::Car &car = player.getCar();
 
 	if (car.getLap() > m_lapsTotal) {
 		m_viewport.detach();
@@ -270,7 +292,7 @@ bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
 
 void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 {
-	Car &car = Game::getInstance().getPlayer().getCar();
+	Race::Car &car = Game::getInstance().getPlayer().getCar();
 
 	bool state;
 
@@ -322,7 +344,7 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 void RaceScene::updateCarTurn()
 {
-	Car &car = Game::getInstance().getPlayer().getCar();
+	Race::Car &car = Game::getInstance().getPlayer().getCar();
 	car.setTurn((int) -m_turnLeft + (int) m_turnRight);
 }
 
@@ -349,7 +371,7 @@ void RaceScene::onCarStateReceived(const Net::CarState &p_carState)
 			return;
 		}
 
-		Car &car = player->getCar();
+		Race::Car &car = player->getCar();
 		car.applyCarState(p_carState);
 	}
 }
@@ -365,7 +387,7 @@ Player *RaceScene::findPlayer(const CL_String& p_name)
 	return NULL;
 }
 
-void RaceScene::onCarStateChangedLocal(Car &p_car)
+void RaceScene::onCarStateChangedLocal(Race::Car &p_car)
 {
 	Net::CarState carState = p_car.prepareCarState();
 	carState.setName(Game::getInstance().getPlayer().getName());

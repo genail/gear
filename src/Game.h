@@ -44,7 +44,7 @@ class Game {
 
 		static Game &getInstance();
 
-		Level &getLevel() { return m_level; }
+		Race::Level &getLevel() { return m_level; }
 
 		Net::Client &getNetworkConnection() { return m_networkConnection; }
 
@@ -61,7 +61,7 @@ class Game {
 
 		Player m_player;
 
-		Level m_level;
+		Race::Level m_level;
 
 		CL_AutoPtr<SceneContainer> m_sceneContainer;
 

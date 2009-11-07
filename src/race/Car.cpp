@@ -26,12 +26,15 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "common.h"
 #include "race/Car.h"
 #include "Properties.h"
 #include "race/Level.h"
 #include "Game.h"
 
 #include <ClanLib/core.h>
+
+namespace Race {
 
 /* Car width in pixels */
 const int CAR_WIDTH = 18;
@@ -40,9 +43,6 @@ const int CAR_WIDTH = 18;
 const int CAR_HEIGHT = 24;
 
 Car::Car() :
-#ifdef CLIENT
-	m_sprite(),
-#endif // CLIENT
 	m_level(NULL),
 	m_locked(false),
 	m_position(300.0f, 300.0f),
@@ -79,110 +79,6 @@ Car::Car() :
 Car::~Car() {
 }
 
-#ifdef CLIENT
-void Car::draw(CL_GraphicContext &p_gc) {
-	
-	//debugDrawLine(p_gc, m_position.x, m_position.y, m_position.x + m_moveVector.x/2, m_position.y + m_moveVector.y/2, CL_Colorf::red);
-	//debugDrawLine(p_gc, m_position.x, m_position.y, m_position.x + accelerationVector.x/2, m_position.y + accelerationVector.y/2, CL_Colorf::black);
-	
-	// TODO: move to load();
-	if (m_sprite.is_null()) {
-		m_sprite = CL_Sprite(p_gc, "race/car", Gfx::Stage::getResourceManager());
-	}
-
-	if (m_nickDisplayFont.is_null()) {
-		CL_FontDescription fontDesc;
-
-		fontDesc.set_typeface_name("resources/DejaVuSansCondensed-BoldOblique.ttf");
-		fontDesc.set_height(12);
-
-		m_nickDisplayFont = CL_Font_Freetype(p_gc, fontDesc);
-	}
-
-	p_gc.push_modelview();
-
-	p_gc.mult_translate(m_position.x, m_position.y);
-
-	// display nickname
-	const CL_String &playerName = Game::getInstance().getPlayer().getName();
-	const CL_Size nameLabelSize = m_nickDisplayFont.get_text_size(p_gc, playerName);
-	m_nickDisplayFont.draw_text(p_gc, -nameLabelSize.width / 2, -20, playerName);
-
-	p_gc.mult_rotate(m_rotation, 0, 0, 1);
-
-	m_sprite.draw(p_gc, 0, 0);
-	
-#ifndef NDEBUG
-	if (Properties::getPropertyAsBool("debug.draw_vectors")) {
-		debugDrawLine(p_gc, 0, 0, accelerationVector.x/10, accelerationVector.y/10, CL_Colorf::blue);
-		debugDrawLine(p_gc, 0, 0, m_moveVector.x/10, m_moveVector.y/10, CL_Colorf::black);
-	}
-#endif // NDEBUG
-
-
-	p_gc.pop_modelview();
-
-#ifndef NDEBUG
-
-	if (Properties::getPropertyAsBool("debug.draw_checkpoints")) {
-
-		// draw checkpoints
-		const CL_Vec4f red_color(1.0f, 0.0f, 0.0f, 0.3f);
-		const CL_Vec4f green_color(0.0f, 1.0f, 0.0f, 0.3f);
-
-		for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
-			const CL_Rectf &rect = itor->getRect();
-			const CL_Vec4f color = itor->isPassed() ? green_color : red_color;
-
-	//		CL_Console::write_line(CL_String8("rect: left=") + CL_StringHelp::float_to_local8(rect.left) + CL_String8(", top=") + CL_StringHelp::float_to_local8(rect.top));
-
-			CL_Vec2f positions[] = {
-					CL_Vec2f(rect.left, rect.top),
-					CL_Vec2f(rect.left, rect.bottom),
-					CL_Vec2f(rect.right, rect.bottom),
-					CL_Vec2f(rect.right, rect.top)
-			};
-
-			CL_Vec4f colors[] = { color, color, color, color };
-
-			CL_PrimitivesArray vertices(p_gc);
-			vertices.set_attributes(0, positions);
-			vertices.set_attributes(1, colors);
-
-			p_gc.set_program_object(cl_program_color_only);
-			p_gc.draw_primitives(cl_quads, 4, vertices);
-		}
-
-	}
-#endif // NDEBUG
-}
-
-#ifndef NDEBUG
-void Car::debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, float y2, const CL_Color& p_color) {
-
-	CL_Vec4f color(p_color.get_red_f(), p_color.get_green_f(), p_color.get_blue_f(), p_color.get_alpha_f());
-
-	CL_Vec2f positions[] = {
-			CL_Vec2f(x1, y1),
-			CL_Vec2f(x2, y2),
-	};
-
-	CL_Vec4f colors[] = { color, color };
-
-	CL_PrimitivesArray vertices(p_gc);
-	vertices.set_attributes(0, positions);
-	vertices.set_attributes(1, colors);
-
-	p_gc.set_program_object(cl_program_color_only);
-	p_gc.draw_primitives(cl_lines, 2, vertices);
-}
-#endif // NDEBUG
-
-void Car::load(CL_GraphicContext &p_gc) {
-
-}
-
-#endif // CLIENT
 
 void Car::update(unsigned int elapsedTime) {
 	
@@ -216,15 +112,12 @@ void Car::update(unsigned int elapsedTime) {
 	}
 	
 	// mark checkpoints
-	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
+	foreach(Checkpoint &checkpoint, m_checkpoints) {
 
-		if (itor->isPassed()) {
-			continue;
+		if (!checkpoint.isPassed() && checkpoint.getRect().contains(m_position)) {
+			checkpoint.setPassed(true);
 		}
 
-		if (itor->getRect().contains(m_position)) {
-			itor->setPassed(true);
-		}
 	}
 	
 	// check lap progress
@@ -445,8 +338,9 @@ int Car::calculateInputChecksum() const {
 }
 
 bool Car::areAllCheckpointsPassed() const {
-	for (std::vector<Checkpoint>::const_iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
-		if (!itor->isPassed()) {
+
+	foreach (const Checkpoint &cp, m_checkpoints) {
+		if (cp.isPassed()) {
 			return false;
 		}
 	}
@@ -455,9 +349,11 @@ bool Car::areAllCheckpointsPassed() const {
 }
 
 void Car::resetCheckpoints() {
-	for (std::vector<Checkpoint>::iterator itor = m_checkpoints.begin(); itor != m_checkpoints.end(); ++itor) {
-		itor->setPassed(false);
+
+	foreach (Checkpoint &cp, m_checkpoints) {
+		cp.setPassed(false);
 	}
+
 }
 
 void Car::setStartPosition(int p_startPosition) {
@@ -512,4 +408,6 @@ CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
 
 	return outline;
 }
-#endif
+#endif // CLIENT
+
+} // namespace

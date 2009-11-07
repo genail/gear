@@ -35,8 +35,9 @@
 #include "common.h"
 #include "race/Checkpoint.h"
 
+namespace Race {
+
 Level::Level() :
-	m_blocks(NULL),
 	m_loaded(false),
 	m_width(0),
 	m_height(0)
@@ -50,30 +51,27 @@ void Level::initialize(const CL_String &p_filename)
 
 void Level::destroy()
 {
-	if (m_blocks != NULL) {
-		unload();
-	}
+	m_blocks.clear();
+	m_loaded = false;
 }
 
 Level::~Level() {
-	if (m_blocks != NULL) {
-		unload();
-	}
+	m_blocks.clear();
 }
 
 #ifdef CLIENT
 void Level::draw(CL_GraphicContext &p_gc) {
 
-	// draw tiles
-	for (int x = 0; x < 10; ++x) {
-		for (int y = 0; y < 10; ++y) {
-			p_gc.push_translate(x * BOX_WIDTH, y * BOX_WIDTH);
-
-			m_blocks[m_width * y + x].draw(p_gc);
-
-			p_gc.pop_modelview();
-		}
-	}
+//	// draw tiles
+//	for (int x = 0; x < 10; ++x) {
+//		for (int y = 0; y < 10; ++y) {
+//			p_gc.push_translate(x * BOX_WIDTH, y * BOX_WIDTH);
+//
+//			m_blocks[m_width * y + x].draw(p_gc);
+//
+//			p_gc.pop_modelview();
+//		}
+//	}
 
 	// draw tyre stripes
 	m_tyreStripes.draw(p_gc);
@@ -95,12 +93,6 @@ void Level::draw(CL_GraphicContext &p_gc) {
 void Level::load(CL_GraphicContext &p_gc) {
 
 	cl_log_event("debug", "Level::load()");
-
-	for (int x = 0; x < m_width; ++x) {
-		for (int y = 0; y < m_height; ++y) {
-			m_blocks[m_width * y + x].load(p_gc);
-		}
-	}
 }
 
 #endif // CLIENT
@@ -114,6 +106,8 @@ CL_String8 Level::readLine(CL_File& p_file) {
 
 void Level::loadFromFile(const CL_String& p_filename)
 {
+	assert(!m_loaded && "level is already loaded");
+
 	try {
 		CL_File file(p_filename, CL_File::open_existing, CL_File::access_read);
 		CL_String8 line;
@@ -125,8 +119,7 @@ void Level::loadFromFile(const CL_String& p_filename)
 		m_width = CL_StringHelp::text_to_int(parts[0]);
 		m_height = CL_StringHelp::text_to_int(parts[2]);
 
-		m_blocks = new Block[m_width * m_height];
-
+		m_blocks.reserve(m_width * m_height);
 
 		for (int i = 0; i < m_height; ++i) {
 			line = readLine(file);
@@ -134,7 +127,7 @@ void Level::loadFromFile(const CL_String& p_filename)
 			parts = CL_StringHelp::split_text(line, " ", true);
 
 			for (int j = 0; j < m_width; ++j) {
-				m_blocks[m_width * i + j] = Block(decodeBlock(parts[j]), BOX_WIDTH);
+				m_blocks.push_back(CL_SharedPtr<Race::Block>(new Race::Block(decodeBlock(parts[j]), BOX_WIDTH)));
 			}
 
 		}
@@ -189,18 +182,13 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 }
 
-void Level::unload()
-{
-	delete[] m_blocks;
-}
-
 Block::BlockType Level::decodeBlock(const CL_String8& p_str) {
 
 	const char c = p_str[0];
 
 	switch (c) {
 		case '0':
-			return Block::BT_NONE;
+			return Block::BT_GRASS;
 		case '|':
 			return Block::BT_STREET_VERT;
 		case '-':
@@ -219,7 +207,7 @@ Block::BlockType Level::decodeBlock(const CL_String8& p_str) {
 			assert(0 && "unknown char");
 	}
 
-	return Block::BT_NONE;
+	return Block::BT_GRASS;
 
 }
 
@@ -234,7 +222,7 @@ float Level::getResistance(float p_x, float p_y) {
 	int localX = (int) (p_x - blockX * BOX_WIDTH);
 	int localY = (int) (p_y - blockY * BOX_WIDTH);
 
-	return m_blocks[blockY * m_width + blockX].getResistance(localX, localY);
+	return m_blocks[blockY * m_width + blockX]->getResistance(localX, localY);
 }
 
 void Level::addCar(Car *p_car) {
@@ -249,7 +237,7 @@ void Level::addCar(Car *p_car) {
 
 			const Block &block = getBlock(x, y);
 
-			if (block.getType() != Block::BT_NONE) {
+			if (block.getType() != Block::BT_GRASS) {
 
 				const CL_Rectf rect(x * BOX_WIDTH, y * BOX_WIDTH, (x + 1) * BOX_WIDTH, (y + 1) * BOX_WIDTH);
 				const Checkpoint checkpoint(rect);
@@ -399,3 +387,5 @@ void Level::checkCollistions()
 
 }
 #endif // CLIENT
+
+} // namespace

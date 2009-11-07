@@ -51,7 +51,7 @@ void RaceUI::displayCountdown()
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
 
-	const Car &car = Game::getInstance().getPlayer().getCar();
+	const Race::Car &car = Game::getInstance().getPlayer().getCar();
 
 
 	int currentLap = car.getLap();

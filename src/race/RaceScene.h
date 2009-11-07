@@ -40,6 +40,7 @@
 #include "race/ScoreTable.h"
 #include "graphics/Drawable.h"
 #include "graphics/Car.h"
+#include "graphics/GroundBlock.h"
 
 #include "graphics/Scene.h"
 
@@ -121,8 +122,12 @@ class RaceScene: public Scene
 		unsigned m_lastFpsRegisterTime;
 
 		/** Logic car to gfx car mapping */
-		typedef std::map<const Car*, CL_SharedPtr<Gfx::Car> > carsMapping_t;
-		carsMapping_t m_carsMapping;
+		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > carMapping_t;
+		carMapping_t m_carMapping;
+
+		/** Block types to gfx ground blocks */
+		typedef std::map<Gfx::GroundBlock::BlockType, CL_SharedPtr<Gfx::GroundBlock> > blockMapping_t;
+		blockMapping_t m_blockMapping;
 
 		// other
 
@@ -140,7 +145,11 @@ class RaceScene: public Scene
 
 		void drawCars(CL_GraphicContext &p_gc);
 
-		void drawCar(CL_GraphicContext &p_gc, const Car &p_car);
+		void drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car);
+
+		void drawLevel(CL_GraphicContext &p_gc);
+
+		void drawGroundBlock(const Race::Block& p_block, size_t x, size_t y);
 
 		// input
 
@@ -180,7 +189,7 @@ class RaceScene: public Scene
 
 		void onCarStateReceived(const Net::CarState &p_carState);
 
-		void onCarStateChangedLocal(Car &p_car);
+		void onCarStateChangedLocal(Race::Car &p_car);
 
 		void onPlayerJoined(const CL_String &p_name);
 

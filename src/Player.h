@@ -42,9 +42,9 @@ class Player {
 
 		virtual ~Player();
 
-		Car &getCar() { return m_car; }
+		Race::Car &getCar() { return m_car; }
 
-		const Car &getCar() const { return m_car; }
+		const Race::Car &getCar() const { return m_car; }
 
 		const CL_String &getName() const { return m_name; }
 
@@ -55,7 +55,7 @@ class Player {
 		CL_String8 m_name;
 
 		/** The car */
-		Car m_car;
+		Race::Car m_car;
 
 };
 

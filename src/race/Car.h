@@ -36,26 +36,14 @@
 
 #include "race/Bound.h"
 
-class Level;
-
 #include "common.h"
 #include "network/CarState.h"
 
-#ifdef CLIENT // client-only code
+namespace Race {
 
-#include "graphics/Stage.h"
-#include "graphics/Drawable.h"
+class Level;
 
-#define CLASS_CAR class Car : public Gfx::Drawable
-
-
-#else // server-only code
-
-#define CLASS_CAR class Car
-
-#endif // CLIENT
-
-CLASS_CAR
+class Car
 {
 
 	public:
@@ -85,23 +73,9 @@ CLASS_CAR
 
 		void applyCarState(const Net::CarState &p_carState);
 
-		void setAcceleration(bool p_value) {
-			m_acceleration = p_value;
-#ifndef NDEBUG
-#ifdef CLIENT
-			Gfx::Stage::getDebugLayer()->putMessage(CL_String8("accel"),  CL_StringHelp::bool_to_local8(p_value));
-#endif // CLIENT
-#endif // !NDEBUG
-		}
+		void setAcceleration(bool p_value) { m_acceleration = p_value; }
 
-		void setBrake(bool p_value) {
-			m_brake = p_value;
-#ifndef NDEBUG
-#ifdef CLIENT
-			Gfx::Stage::getDebugLayer()->putMessage(CL_String8("brake"),  CL_StringHelp::bool_to_local8(p_value));
-#endif // CLIENT
-#endif // !NDEBUG
-		}
+		void setBrake(bool p_value) { m_brake = p_value; }
 
 		void setLap(int p_lap) { m_lap = p_lap; }
 
@@ -110,14 +84,7 @@ CLASS_CAR
 		 */
 		void setLocked(bool p_locked);
 
-		void setTurn(float p_value) {
-			m_turn = normalize(p_value);
-#ifndef NDEBUG
-#ifdef CLIENT
-			Gfx::Stage::getDebugLayer()->putMessage(CL_String8("turn"),  CL_StringHelp::float_to_local8(p_value));
-#endif // CLIENT
-#endif // !NDEBUG
-		}
+		void setTurn(float p_value) { m_turn = normalize(p_value); }
 
 		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
 
@@ -138,10 +105,6 @@ CLASS_CAR
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
 #ifndef SERVER
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-
 		/** @return Current collision outline based on car position and rotation */
 		CL_CollisionOutline calculateCurrentCollisionOutline() const;
 
@@ -178,7 +141,7 @@ CLASS_CAR
 	private:
 		
 		/** Parent level */
-		Level* m_level;
+		Race::Level* m_level;
 
 		/** Locked state. If true then car shoudn't move. */
 		bool m_locked;
@@ -234,15 +197,9 @@ CLASS_CAR
 
 		void resetCheckpoints();
 
-		friend class Level;
+		friend class Race::Level;
 
 #ifdef CLIENT
-		/** Car sprite */
-		CL_Sprite m_sprite;
-
-		/** Nickname display font */
-		CL_Font_Freetype m_nickDisplayFont;
-
 		/** Body outline for collision check */
 		CL_CollisionOutline m_collisionOutline;
 
@@ -263,5 +220,7 @@ inline float Car::normalize(float p_value) const {
 
 	return p_value;
 }
+
+} // namespace
 
 #endif /* CAR_H_ */

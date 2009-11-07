@@ -25,6 +25,7 @@ SET(CLIENT_SRCS
     graphics/Car.cpp
     graphics/DebugLayer.cpp
     graphics/GameWindow.cpp
+    graphics/GroundBlock.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
     gui/MainMenuScene.cpp

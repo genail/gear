@@ -29,13 +29,28 @@
 #ifndef GFX_GROUNDBLOCK_H_
 #define GFX_GROUNDBLOCK_H_
 
+#include <boost/utility.hpp>
+
+#include <ClanLib/core.h>
+
 #include "graphics/Drawable.h"
 
 namespace Gfx {
 
-class GroundBlock : public Gfx::Drawable {
+class GroundBlock : public boost::noncopyable, public Gfx::Drawable {
 
 	public:
+
+		enum BlockType {
+			BT_GRASS,
+			BT_STREET_HORIZ,
+			BT_STREET_VERT,
+			BT_TURN_BOTTOM_RIGHT,
+			BT_TURN_BOTTOM_LEFT,
+			BT_TURN_TOP_RIGHT,
+			BT_TURN_TOP_LEFT,
+			BT_START_LINE
+		};
 
 		GroundBlock();
 
@@ -45,8 +60,23 @@ class GroundBlock : public Gfx::Drawable {
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);
+
+
+		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
+
+	private:
+
+		/** This block type (what is displays) */
+		BlockType m_type;
+
+		/** This block sprite */
+		CL_Sprite m_sprite;
+
+		/** Draw position. Where top left point should lay. */
+		CL_Pointf m_position;
+
 };
 
-}
+} // namespace
 
 #endif /* GFX_GROUNDBLOCK_H_ */

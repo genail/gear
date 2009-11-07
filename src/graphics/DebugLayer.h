@@ -44,7 +44,7 @@ class DebugLayer : public Gfx::Drawable {
 
 	private:
 		/** Debug messages */
-		std::map<CL_String8, CL_String8> m_messages;
+		::std::map<CL_String8, CL_String8> m_messages;
 
 		/** Display font */
 		CL_Font m_font;

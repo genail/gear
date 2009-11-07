@@ -39,7 +39,7 @@ TyreStripes::~TyreStripes()
 {
 }
 
-void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car *p_owner)
+void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner)
 {
 	static const unsigned STRIPE_LIMIT = 400;
 	static const unsigned STRIPE_LENGTH_LIMIT = 15;

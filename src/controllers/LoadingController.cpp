@@ -83,7 +83,7 @@ void LoadingController::loadLevel(const CL_String &p_name)
 {
 
 	Game &game = Game::getInstance();
-	Level &level = game.getLevel();
+	Race::Level &level = game.getLevel();
 
 	level.destroy();
 	level.initialize(p_name);

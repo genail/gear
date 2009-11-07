@@ -35,6 +35,8 @@
 #include "network/events.h"
 #include "network/Client.h"
 
+namespace Race {
+
 Race::Race(CL_GUIComponent *p_parent, Player *p_player, Client *p_client) :
 	m_close(false),
 	m_lapsNum(20),
@@ -466,3 +468,5 @@ void Race::slotWindowClose()
 {
 	m_close = true;
 }
+
+} // namespace

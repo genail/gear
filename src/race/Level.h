@@ -49,6 +49,8 @@
 
 #endif // CLIENT
 
+namespace Race {
+
 CLASS_LEVEL
 {
 
@@ -80,6 +82,12 @@ CLASS_LEVEL
 
 		const Car &getCar(size_t p_index) const { return *m_cars[p_index]; }
 
+		int getWidth() const { return m_width; }
+
+		int getHeight() const { return m_height; }
+
+		const Block& getBlock(int x, int y) const { return *m_blocks[y * m_width + x].get(); }
+
 
 		void removeCar(Car *p_car);
 
@@ -95,7 +103,7 @@ CLASS_LEVEL
 	private:
 
 		/** level blocks */
-		Block *m_blocks;
+		std::vector< CL_SharedPtr<Race::Block> > m_blocks;
 
 		/** Level bounds */
 		std::vector<Bound> m_bounds;
@@ -121,11 +129,7 @@ CLASS_LEVEL
 
 		Block::BlockType decodeBlock(const CL_String8& p_str);
 
-		const Block& getBlock(int x, int y) const { return m_blocks[y * m_width + x]; }
-
 		CL_String8 readLine(CL_File& p_file);
-
-		void unload();
 
 		void loadFromFile(const CL_String& p_filename);
 
@@ -139,5 +143,7 @@ CLASS_LEVEL
 #endif // CLIENT
 
 };
+
+} // namespace
 
 #endif /* LEVEL_H_ */

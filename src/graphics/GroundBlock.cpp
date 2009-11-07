@@ -28,27 +28,59 @@
 
 #include "GroundBlock.h"
 
+#include <assert.h>
+
+#include <graphics/Stage.h>
+
 namespace Gfx {
 
 GroundBlock::GroundBlock()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 GroundBlock::~GroundBlock()
 {
-	// TODO Auto-generated destructor stub
 }
 
 void GroundBlock::draw(CL_GraphicContext &p_gc)
 {
-
+	m_sprite.draw(p_gc, m_position.x, m_position.y);
 }
 
 void GroundBlock::load(CL_GraphicContext &p_gc)
 {
+	CL_String spriteName;
+
+	switch (m_type) {
+		case BT_GRASS:
+			spriteName = "race/block";
+			break;
+		case BT_STREET_VERT:
+			spriteName = "race/street_vert";
+			break;
+		case BT_STREET_HORIZ:
+			spriteName = "race/street_horiz";
+			break;
+		case BT_TURN_BOTTOM_RIGHT:
+			spriteName = "race/turn_bottom_right";
+			break;
+		case BT_TURN_BOTTOM_LEFT:
+			spriteName = "race/turn_bottom_left";
+			break;
+		case BT_TURN_TOP_RIGHT:
+			spriteName = "race/turn_top_right";
+			break;
+		case BT_TURN_TOP_LEFT:
+			spriteName = "race/turn_top_left";
+			break;
+		case BT_START_LINE:
+			spriteName = "race/street_vert";
+		default:
+			assert(0 && "unknown block type");
+	}
+
+	m_sprite = CL_Sprite(p_gc, spriteName, Gfx::Stage::getResourceManager());
 
 }
 
-}
+} // namespace

@@ -157,10 +157,19 @@ void RaceScene::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_bl
 {
 	assert(m_blockMapping.find(p_block.getType()) != m_blockMapping.end() && "not loaded block type");
 
-	CL_SharedPtr<Gfx::GroundBlock> gfxBlock = m_blockMapping[p_block.getType()];
-	gfxBlock->setPosition(CL_Pointf(x, y));
+	// always draw grass block
+	CL_SharedPtr<Gfx::GroundBlock> gfxGrassBlock = m_blockMapping[Common::BT_GRASS];
+	gfxGrassBlock->setPosition(CL_Pointf(x, y));
 
-	gfxBlock->draw(p_gc);
+	gfxGrassBlock->draw(p_gc);
+
+	// then draw selected block
+	if (p_block.getType() != Common::BT_GRASS) {
+		CL_SharedPtr<Gfx::GroundBlock> gfxBlock = m_blockMapping[p_block.getType()];
+		gfxBlock->setPosition(CL_Pointf(x, y));
+
+		gfxBlock->draw(p_gc);
+	}
 
 }
 

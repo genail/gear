@@ -30,8 +30,13 @@
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
-#include <ClanLib/gl1.h>
 #include <ClanLib/application.h>
+
+#ifdef GL1
+#include <ClanLib/gl1.h>
+#elif GL2
+#include <ClanLib/gl.h>
+#endif // GL1/2
 
 #include "Game.h"
 #include "graphics/GameWindow.h"
@@ -109,28 +114,45 @@ int Application::main(const std::vector<CL_String> &args)
 		}
 	}
 
-	Gfx::Stage::m_width = 1024;
-	Gfx::Stage::m_height = 768;
+	Gfx::Stage::m_width = 800;
+	Gfx::Stage::m_height = 600;
 
 	// Setup clanlib modules:
 	CL_SetupCore 	setup_core;
 	CL_SetupDisplay setup_display;
-	CL_SetupGL1     setup_gl;
-	CL_SetupNetwork setup_network;
 	CL_SetupGUI 	setup_gui;
 
+#ifdef GL1
+	CL_SetupGL1     setup_gl;
+#elif GL2
+	CL_SetupGL     setup_gl;
+#endif // GL1/2
+	CL_SetupNetwork setup_network;
+
 	CL_ConsoleLogger logger;
+
+	CL_DisplayWindow display_window("Gear", Gfx::Stage::m_width, Gfx::Stage::m_height);
 
 	// load resources
 	CL_ResourceManager resources("resources/resources.xml");
 	Gfx::Stage::m_resourceManager = &resources;
 
+	CL_GUIWindowManagerTexture wm(display_window);
+
 	// load GUI
 	CL_GUIManager gui;
 	CL_GUIThemeDefault theme;
-	CL_GUIWindowManagerSystem window_manager;
+//	CL_GUIWindowManagerSystem window_manager;
 
-	gui.set_window_manager(window_manager);
+	gui.set_window_manager(wm);
+
+#ifdef GL1
+	//  Note - If you are using the GL1 target, you will get a perfomance increase by enabling these 2 lines
+	//   It reduces the number of internal CL_FrameBuffer swaps. The GL1 target (OpenGL 1.3), performs this slowly
+	//   Setting the texture group here, lets the GUI Texture Window Manager know the optimum texture size of all root components
+	CL_TextureGroup texture_group(display_window.get_gc(), CL_Size(512, 512));
+	wm.set_texture_group(texture_group);
+#endif //GL1
 
 	CL_ResourceManager res("resources/GUIThemeAeroPacked/resources.xml");
 	CL_CSSDocument css_document;
@@ -160,6 +182,9 @@ int Application::main(const std::vector<CL_String> &args)
 
 		// run the gui
 		gui.exec(true);
+//		while (!gui.exec(false)) {
+//
+//		}
 
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);

@@ -38,8 +38,9 @@ GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescripti
 	func_render().set(this, &GameWindow::onRender);
 
 	// invoke repaint 60 times per second
-	m_timer.func_expired().set(this, &GameWindow::repaint);
-	m_timer.start(1000 / 60, true);
+	set_constant_repaint(true);
+//	m_timer.func_expired().set(this, &GameWindow::repaint);
+//	m_timer.start(1000 / 60, true);
 }
 
 GameWindow::~GameWindow()
@@ -104,6 +105,7 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 
 		// load scene when not loaded yet
 		if (!p_scene->isLoaded()) {
+			cl_log_event("debug", "load()");
 			p_scene->load(p_gc);
 		}
 

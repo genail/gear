@@ -127,7 +127,7 @@ CLASS_LEVEL
 
 		Level(const Level& p_level);
 
-		Block::BlockType decodeBlock(const CL_String8& p_str);
+		Common::GroundBlockType decodeBlock(const CL_String8& p_str);
 
 		CL_String8 readLine(CL_File& p_file);
 

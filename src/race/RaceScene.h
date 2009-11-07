@@ -126,7 +126,7 @@ class RaceScene: public Scene
 		carMapping_t m_carMapping;
 
 		/** Block types to gfx ground blocks */
-		typedef std::map<Gfx::GroundBlock::BlockType, CL_SharedPtr<Gfx::GroundBlock> > blockMapping_t;
+		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > blockMapping_t;
 		blockMapping_t m_blockMapping;
 
 		// other
@@ -141,6 +141,8 @@ class RaceScene: public Scene
 
 		// display
 
+		void loadGroundBlocks(CL_GraphicContext &p_gc);
+
 		void countFps();
 
 		void drawCars(CL_GraphicContext &p_gc);
@@ -149,7 +151,7 @@ class RaceScene: public Scene
 
 		void drawLevel(CL_GraphicContext &p_gc);
 
-		void drawGroundBlock(const Race::Block& p_block, size_t x, size_t y);
+		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
 
 		// input
 

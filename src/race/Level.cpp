@@ -182,32 +182,32 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 }
 
-Block::BlockType Level::decodeBlock(const CL_String8& p_str) {
+Common::GroundBlockType Level::decodeBlock(const CL_String8& p_str) {
 
 	const char c = p_str[0];
 
 	switch (c) {
 		case '0':
-			return Block::BT_GRASS;
+			return Common::BT_GRASS;
 		case '|':
-			return Block::BT_STREET_VERT;
+			return Common::BT_STREET_VERT;
 		case '-':
-			return Block::BT_STREET_HORIZ;
+			return Common::BT_STREET_HORIZ;
 		case '1':
-			return Block::BT_TURN_BOTTOM_RIGHT;
+			return Common::BT_TURN_BOTTOM_RIGHT;
 		case '2':
-			return Block::BT_TURN_BOTTOM_LEFT;
+			return Common::BT_TURN_BOTTOM_LEFT;
 		case '3':
-			return Block::BT_TURN_TOP_LEFT;
+			return Common::BT_TURN_TOP_LEFT;
 		case '4':
-			return Block::BT_TURN_TOP_RIGHT;
+			return Common::BT_TURN_TOP_RIGHT;
 		case '5':
-			return Block::BT_START_LINE;
+			return Common::BT_START_LINE;
 		default:
 			assert(0 && "unknown char");
 	}
 
-	return Block::BT_GRASS;
+	return Common::BT_GRASS;
 
 }
 
@@ -237,7 +237,7 @@ void Level::addCar(Car *p_car) {
 
 			const Block &block = getBlock(x, y);
 
-			if (block.getType() != Block::BT_GRASS) {
+			if (block.getType() != Common::BT_GRASS) {
 
 				const CL_Rectf rect(x * BOX_WIDTH, y * BOX_WIDTH, (x + 1) * BOX_WIDTH, (y + 1) * BOX_WIDTH);
 				const Checkpoint checkpoint(rect);
@@ -247,7 +247,7 @@ void Level::addCar(Car *p_car) {
 			}
 
 			// if this is a start/finish line, then add finish line checkpoint
-			if (block.getType() == Block::BT_START_LINE) {
+			if (block.getType() == Common::BT_START_LINE) {
 				const CL_Rectf rect(x * BOX_WIDTH, (y - 1) * BOX_WIDTH, (x + 1) * BOX_WIDTH, y * BOX_WIDTH);
 				p_car->m_lapCheckpoint = Checkpoint(rect);
 			}

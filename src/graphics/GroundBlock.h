@@ -34,6 +34,7 @@
 #include <ClanLib/core.h>
 
 #include "graphics/Drawable.h"
+#include "common/GroundBlockType.h"
 
 namespace Gfx {
 
@@ -41,18 +42,7 @@ class GroundBlock : public boost::noncopyable, public Gfx::Drawable {
 
 	public:
 
-		enum BlockType {
-			BT_GRASS,
-			BT_STREET_HORIZ,
-			BT_STREET_VERT,
-			BT_TURN_BOTTOM_RIGHT,
-			BT_TURN_BOTTOM_LEFT,
-			BT_TURN_TOP_RIGHT,
-			BT_TURN_TOP_LEFT,
-			BT_START_LINE
-		};
-
-		GroundBlock();
+		GroundBlock(Common::GroundBlockType p_type);
 
 		virtual ~GroundBlock();
 
@@ -67,7 +57,7 @@ class GroundBlock : public boost::noncopyable, public Gfx::Drawable {
 	private:
 
 		/** This block type (what is displays) */
-		BlockType m_type;
+		Common::GroundBlockType m_type;
 
 		/** This block sprite */
 		CL_Sprite m_sprite;

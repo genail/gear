@@ -34,7 +34,8 @@
 
 namespace Gfx {
 
-GroundBlock::GroundBlock()
+GroundBlock::GroundBlock(Common::GroundBlockType p_type) :
+	m_type(p_type)
 {
 }
 
@@ -44,37 +45,44 @@ GroundBlock::~GroundBlock()
 
 void GroundBlock::draw(CL_GraphicContext &p_gc)
 {
-	m_sprite.draw(p_gc, m_position.x, m_position.y);
+	CL_Rect rect(
+			m_position.x, m_position.y,
+			m_position.x + 200, m_position.y + 200
+	);
+	m_sprite.draw(p_gc, rect);
 }
 
 void GroundBlock::load(CL_GraphicContext &p_gc)
 {
 	CL_String spriteName;
 
+//	cl_log_event("debug", "block type: %1", m_type);
+
 	switch (m_type) {
-		case BT_GRASS:
+		case Common::BT_GRASS:
 			spriteName = "race/block";
 			break;
-		case BT_STREET_VERT:
+		case Common::BT_STREET_VERT:
 			spriteName = "race/street_vert";
 			break;
-		case BT_STREET_HORIZ:
+		case Common::BT_STREET_HORIZ:
 			spriteName = "race/street_horiz";
 			break;
-		case BT_TURN_BOTTOM_RIGHT:
+		case Common::BT_TURN_BOTTOM_RIGHT:
 			spriteName = "race/turn_bottom_right";
 			break;
-		case BT_TURN_BOTTOM_LEFT:
+		case Common::BT_TURN_BOTTOM_LEFT:
 			spriteName = "race/turn_bottom_left";
 			break;
-		case BT_TURN_TOP_RIGHT:
+		case Common::BT_TURN_TOP_RIGHT:
 			spriteName = "race/turn_top_right";
 			break;
-		case BT_TURN_TOP_LEFT:
+		case Common::BT_TURN_TOP_LEFT:
 			spriteName = "race/turn_top_left";
 			break;
-		case BT_START_LINE:
+		case Common::BT_START_LINE:
 			spriteName = "race/street_vert";
+			break;
 		default:
 			assert(0 && "unknown block type");
 	}

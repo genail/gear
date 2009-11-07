@@ -148,14 +148,20 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 
 	for (size_t iw = 0; iw < w; ++iw) {
 		for (size_t ih = 0; ih < h; ++ih) {
-			drawGroundBlock(level.getBlock(iw, ih), iw, ih);
+			drawGroundBlock(p_gc, level.getBlock(iw, ih), iw * 200, ih * 200); // FIXME: Magic numers
 		}
 	}
 }
 
-void RaceScene::drawGroundBlock(const Race::Block& p_block, size_t x, size_t y)
+void RaceScene::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y)
 {
-//	CL_SharedPtr<Gfx::GroundBlock> gfxBlock = m_blockMapping[p_block.]
+	assert(m_blockMapping.find(p_block.getType()) != m_blockMapping.end() && "not loaded block type");
+
+	CL_SharedPtr<Gfx::GroundBlock> gfxBlock = m_blockMapping[p_block.getType()];
+	gfxBlock->setPosition(CL_Pointf(x, y));
+
+	gfxBlock->draw(p_gc);
+
 }
 
 void RaceScene::drawCars(CL_GraphicContext &p_gc)
@@ -221,6 +227,21 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 	Game::getInstance().getLevel().load(p_gc);
 
 	m_raceUI.load(p_gc);
+
+	loadGroundBlocks(p_gc);
+}
+
+void RaceScene::loadGroundBlocks(CL_GraphicContext &p_gc)
+{
+	const int first = Common::BT_GRASS;
+	const int last = Common::BT_START_LINE;
+
+	for (int i = first; i <= last; ++i) {
+		CL_SharedPtr<Gfx::GroundBlock> gfxBlock(new Gfx::GroundBlock((Common::GroundBlockType) i));
+		gfxBlock->load(p_gc);
+
+		m_blockMapping[(Common::GroundBlockType) i] = gfxBlock;
+	}
 }
 
 void RaceScene::updateScale() {

@@ -31,36 +31,27 @@
 
 #include "boost/utility.hpp"
 
+#include "common/GroundBlockType.h"
+
 namespace Race {
 
 class Block : public boost::noncopyable
 {
 	public:
 
-		enum BlockType {
-			BT_GRASS,
-			BT_STREET_HORIZ,
-			BT_STREET_VERT,
-			BT_TURN_BOTTOM_RIGHT,
-			BT_TURN_BOTTOM_LEFT,
-			BT_TURN_TOP_RIGHT,
-			BT_TURN_TOP_LEFT,
-			BT_START_LINE
-		};
-
 		Block() {}
 
-		Block(BlockType p_type, int p_width);
+		Block(Common::GroundBlockType p_type, int p_width);
 
 		virtual ~Block();
 
 		float getResistance(int x, int y) const;
 
-		BlockType getType() const { return m_type; }
+		Common::GroundBlockType getType() const { return m_type; }
 
 	private:
 		/** Subtype of this block */
-		BlockType m_type;
+		Common::GroundBlockType m_type;
 
 		/** Resistance map */
 		float *m_resistanceMap;

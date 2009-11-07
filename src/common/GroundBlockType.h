@@ -26,34 +26,21 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define GROUND_RESIST 1.5f;
+#ifndef COMMON_GROUNDBLOCKTYPE_H_
+#define COMMON_GROUNDBLOCKTYPE_H_
 
-#include "Block.h"
-
-#include <cstdlib>
-#include <assert.h>
-
-namespace Race {
-
-Block::Block(Common::GroundBlockType p_type, int p_width) :
-	m_type(p_type),
-	m_resistanceMap(NULL),
-	m_width(p_width)
+namespace Common
 {
-
-}
-
-Block::~Block() {
-}
-
-
-float Block::getResistance(int x, int y) const {
-	if (m_resistanceMap == NULL) {
-//		return GROUND_RESIST;
-		return 0.0f;
-	}
-
-	return m_resistanceMap[y * m_width + x];
-}
-
+	enum GroundBlockType {
+		BT_GRASS,
+		BT_STREET_HORIZ,
+		BT_STREET_VERT,
+		BT_TURN_BOTTOM_RIGHT,
+		BT_TURN_BOTTOM_LEFT,
+		BT_TURN_TOP_RIGHT,
+		BT_TURN_TOP_LEFT,
+		BT_START_LINE
+	};
 } // namespace
+
+#endif /* COMMON_GROUNDBLOCKTYPE_H_ */

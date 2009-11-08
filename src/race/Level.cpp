@@ -74,7 +74,7 @@ void Level::draw(CL_GraphicContext &p_gc) {
 //	}
 
 	// draw tyre stripes
-	m_tyreStripes.draw(p_gc);
+//	m_tyreStripes.draw(p_gc);
 
 	// draw bounds
 	for (std::vector<Bound>::iterator itor = m_bounds.begin(); itor != m_bounds.end(); ++itor) {

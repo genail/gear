@@ -34,11 +34,11 @@
 #include "race/Car.h"
 #include "race/Block.h"
 #include "race/Bound.h"
+#include "race/TyreStripes.h"
 
 #ifdef CLIENT
 
 #include "graphics/Stage.h"
-#include "race/TyreStripes.h"
 #include "graphics/Drawable.h"
 
 #define CLASS_LEVEL class Level : public Gfx::Drawable
@@ -88,6 +88,8 @@ CLASS_LEVEL
 
 		const Block& getBlock(int x, int y) const { return *m_blocks[y * m_width + x].get(); }
 
+		const TyreStripes &getTyreStripes() const { return m_tyreStripes; }
+
 
 		void removeCar(Car *p_car);
 
@@ -133,14 +135,11 @@ CLASS_LEVEL
 
 		void loadFromFile(const CL_String& p_filename);
 
-#ifdef CLIENT
 		/** Tyre stripes */
 		TyreStripes m_tyreStripes;
 
-
 		/** Collision checking */
 		void checkCollistions();
-#endif // CLIENT
 
 };
 

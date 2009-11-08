@@ -31,6 +31,8 @@
 #include "common.h"
 #include "graphics/Stage.h"
 
+namespace Race {
+
 TyreStripes::TyreStripes()
 {
 }
@@ -51,7 +53,7 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race
 	unsigned foundCount = 0;
 
 	for (
-			std::list<Stripe>::iterator itor = m_stripes.begin();
+			stripeList_t::iterator itor = m_stripes.begin();
 			itor != m_stripes.end();
 			++itor
 	) {
@@ -93,19 +95,5 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race
 
 }
 
-void TyreStripes::draw(CL_GraphicContext &p_gc)
-{
-	CL_Pen pen;
-	pen.set_line_width(3);
-	p_gc.set_pen(pen);
+} // namespace
 
-	CL_Colorf color(0.0f, 0.0f, 0.0f, 0.5f);
-
-	foreach (const Stripe& stripe,  m_stripes) {
-		CL_Draw::line(p_gc, stripe.m_from, stripe.m_to, color);
-	}
-
-#ifndef NDEBUG
-	Gfx::Stage::getDebugLayer()->putMessage("stripes_num", CL_StringHelp::int_to_local8(m_stripes.size()));
-#endif // !NDEBUG
-}

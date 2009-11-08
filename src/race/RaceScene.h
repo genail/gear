@@ -153,6 +153,8 @@ class RaceScene: public Scene
 
 		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
 
+		void drawTireTracks(CL_GraphicContext &p_gc);
+
 		// input
 
 		void grabInput();

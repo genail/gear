@@ -13,6 +13,7 @@ SET(COMMON_SRCS
     race/Checkpoint.cpp
     race/Level.cpp
     race/ScoreTable.cpp
+    race/TyreStripes.cpp
 )
 
 # Game client sources
@@ -35,7 +36,6 @@ SET(CLIENT_SRCS
 #    race/Race.cpp
     race/RaceScene.cpp
     race/RaceUI.cpp
-    race/TyreStripes.cpp
     race/Viewport.cpp
     network/Client.cpp
 )

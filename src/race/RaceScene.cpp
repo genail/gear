@@ -36,6 +36,7 @@
 #include "race/Race.h"
 #include "network/events.h"
 #include "network/Client.h"
+#include "graphics/TireTrack.h"
 
 RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	Scene(p_guiParent),
@@ -122,6 +123,9 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 	// draw pure level
 	drawLevel(p_gc);
 
+	// draw tire tracks
+	drawTireTracks(p_gc);
+
 	Game::getInstance().getLevel().draw(p_gc);
 
 	drawCars(p_gc);
@@ -137,6 +141,22 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 
 	Gfx::Stage::getDebugLayer()->draw(p_gc);
 #endif // NDEBUG
+}
+
+void RaceScene::drawTireTracks(CL_GraphicContext &p_gc)
+{
+	Race::Level &level = Game::getInstance().getLevel();
+	const Race::TyreStripes &tireStripes = level.getTyreStripes();
+
+	Gfx::TireTrack track;
+
+	foreach (const Race::TyreStripes::Stripe &stripe, tireStripes.getStripeList()) {
+		track.setFromPoint(stripe.getFromPoint());
+		track.setToPoint(stripe.getToPoint());
+
+		track.draw(p_gc);
+	}
+
 }
 
 void RaceScene::drawLevel(CL_GraphicContext &p_gc)

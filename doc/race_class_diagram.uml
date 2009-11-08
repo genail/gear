@@ -26,7 +26,7 @@
       <fontname>Arial</fontname>
       <fontsize>11</fontsize>
       <defaultstereotypeview>0</defaultstereotypeview>
-      <activediagram>Graphics System</activediagram>
+      <activediagram>Logic System</activediagram>
     </settings>
     <searchpath href="PROJECT_DIR" />
     <members>
@@ -72,7 +72,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Nov 07 18:23:21 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Nov 07 23:36:02 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -2283,6 +2283,47 @@
                     </UML:Parameter>
                   </UML:BehavioralFeature.parameter>
                 </UML:Operation>
+                <UML:Attribute xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:000000000000125B'
+                  name = 'm_groundBlocks' visibility = 'public' isSpecification = 'false'
+                  ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                  <UML:StructuralFeature.multiplicity>
+                    <UML:Multiplicity xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:0000000000001261'>
+                      <UML:Multiplicity.range>
+                        <UML:MultiplicityRange xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:0000000000001260'
+                          lower = '1' upper = '1'/>
+                      </UML:Multiplicity.range>
+                    </UML:Multiplicity>
+                  </UML:StructuralFeature.multiplicity>
+                  <UML:StructuralFeature.type>
+                    <UML:DataType xmi.idref = '127-0-1-1--6cf7376d:124cf984252:-8000:0000000000001262'/>
+                  </UML:StructuralFeature.type>
+                </UML:Attribute>
+                <UML:Operation xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:0000000000001263'
+                  name = 'getWidth' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:0000000000001264'
+                      name = 'return' isSpecification = 'false' kind = 'return'>
+                      <UML:Parameter.type>
+                        <UML:Class xmi.idref = '127-0-1-1--c22cd78:1248731786f:-8000:0000000000000F5F'/>
+                      </UML:Parameter.type>
+                    </UML:Parameter>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
+                <UML:Operation xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:0000000000001265'
+                  name = 'getHeight' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:0000000000001266'
+                      name = 'return' isSpecification = 'false' kind = 'return'>
+                      <UML:Parameter.type>
+                        <UML:Class xmi.idref = '127-0-1-1--c22cd78:1248731786f:-8000:0000000000000F5F'/>
+                      </UML:Parameter.type>
+                    </UML:Parameter>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
               </UML:Classifier.feature>
             </UML:Class>
             <UML:Class xmi.id = '127-0-1-1-dd023ae:124b6b7688c:-8000:000000000000121C'
@@ -2432,6 +2473,9 @@
                 </UML:AssociationEnd>
               </UML:Association.connection>
             </UML:Association>
+            <UML:DataType xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:0000000000001262'
+              name = 'std::vector&lt;GroundBlock&gt;' isSpecification = 'false' isRoot = 'false'
+              isLeaf = 'false' isAbstract = 'false'/>
           </UML:Namespace.ownedElement>
         </UML:Package>
         <UML:Package xmi.id = '127-0-1-1--78503d1b:124ab3e9e31:-8000:0000000000001103'
@@ -4100,6 +4144,18 @@
     <UML:Multiplicity xmi.id = '127-0-1-1-dd023ae:124b6b7688c:-8000:0000000000001244'>
       <UML:Multiplicity.range>
         <UML:MultiplicityRange xmi.id = '127-0-1-1-dd023ae:124b6b7688c:-8000:0000000000001245'
+          lower = '1' upper = '1'/>
+      </UML:Multiplicity.range>
+    </UML:Multiplicity>
+    <UML:Multiplicity xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:000000000000125C'>
+      <UML:Multiplicity.range>
+        <UML:MultiplicityRange xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:000000000000125D'
+          lower = '1' upper = '1'/>
+      </UML:Multiplicity.range>
+    </UML:Multiplicity>
+    <UML:Multiplicity xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:000000000000125F'>
+      <UML:Multiplicity.range>
+        <UML:MultiplicityRange xmi.id = '127-0-1-1--6cf7376d:124cf984252:-8000:000000000000125E'
           lower = '1' upper = '1'/>
       </UML:Multiplicity.range>
     </UML:Multiplicity>
@@ -8781,7 +8837,7 @@ getters and setters.</text>
         x="464"
         y="1268"
         width="59"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -10655,7 +10711,7 @@ getters and setters.</text>
         x="120"
         y="508"
         width="59"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="255 200 255"
         stroke="0"
@@ -11259,7 +11315,7 @@ getters and setters.</text>
         x="512"
         y="919"
         width="75"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11275,7 +11331,7 @@ getters and setters.</text>
         x="512"
         y="933"
         width="75"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11291,7 +11347,7 @@ getters and setters.</text>
         x="512"
         y="947"
         width="113"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11307,7 +11363,7 @@ getters and setters.</text>
         x="512"
         y="961"
         width="112"
-        height="20"
+        height="23"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11357,7 +11413,7 @@ getters and setters.</text>
         x="512"
         y="862"
         width="66"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11373,7 +11429,7 @@ getters and setters.</text>
         x="512"
         y="876"
         width="66"
-        height="20"
+        height="23"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11855,7 +11911,7 @@ getters and setters.</text>
         x="1024"
         y="901"
         width="107"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11871,7 +11927,7 @@ getters and setters.</text>
         x="1024"
         y="915"
         width="200"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11887,7 +11943,7 @@ getters and setters.</text>
         x="1024"
         y="929"
         width="210"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -12491,7 +12547,7 @@ getters and setters.</text>
         x="792"
         y="1174"
         width="89"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="255 200 255"
         stroke="0"
@@ -12507,7 +12563,7 @@ getters and setters.</text>
         x="792"
         y="1188"
         width="120"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="255 200 255"
         stroke="0"
@@ -12621,7 +12677,7 @@ getters and setters.</text>
         x="792"
         y="1142"
         width="79"
-        height="20"
+        height="23"
         fill="0"
         fillcolor="255 200 255"
         stroke="0"
@@ -13165,7 +13221,7 @@ getters and setters.</text>
         x="560"
         y="505"
         width="170"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -13898,7 +13954,7 @@ getters and setters.</text>
       name="Logic System"
 >
   <group name="Fig0"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[600, 144, 153, 102]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[600, 144, 224, 141]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1-dd023ae:124b6b7688c:-8000:000000000000121B"
        fill="1"
        fillcolor="200 200 255"
@@ -13911,15 +13967,15 @@ getters and setters.</text>
     <rectangle name="Fig0.0"
       x="600"
       y="144"
-      width="153"
-      height="102"
+      width="224"
+      height="141"
       fill="1"
       fillcolor="200 200 255"
       stroke="0"
       strokecolor="black"
     />
     <group name="Fig0.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[600, 144, 153, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[600, 144, 224, 0]"
          href="127-0-1-1-dd023ae:124b6b7688c:-8000:000000000000121B"
          fill="1"
          fillcolor="200 200 255"
@@ -13932,7 +13988,7 @@ getters and setters.</text>
       <rectangle name="Fig0.1.0"
         x="600"
         y="144"
-        width="153"
+        width="224"
         height="0"
         fill="1"
         fillcolor="200 200 255"
@@ -13943,7 +13999,7 @@ getters and setters.</text>
     <text name="Fig0.2"
       x="600"
       y="144"
-      width="153"
+      width="224"
       height="21"
       fill="1"
       fillcolor="200 200 255"
@@ -13957,7 +14013,7 @@ getters and setters.</text>
       justification="Center"
     >Level</text>
     <group name="Fig0.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[600, 189, 153, 56]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[600, 202, 224, 82]"
          href="127-0-1-1-dd023ae:124b6b7688c:-8000:000000000000121B"
          fill="1"
          fillcolor="200 200 255"
@@ -13969,9 +14025,9 @@ getters and setters.</text>
       
       <rectangle name="Fig0.3.0"
         x="600"
-        y="189"
-        width="153"
-        height="56"
+        y="202"
+        width="224"
+        height="82"
         fill="1"
         fillcolor="200 200 255"
         stroke="0"
@@ -13985,13 +14041,13 @@ getters and setters.</text>
         strokecolor="black"
       >
         <moveto x="600"
-                y="189" />
-        <lineto x="752"
-                y="189" />
+                y="202" />
+        <lineto x="823"
+                y="202" />
       </path>
       <text name="Fig0.3.2"
         x="600"
-        y="190"
+        y="203"
         width="94"
         height="14"
         fill="0"
@@ -14007,7 +14063,7 @@ getters and setters.</text>
       >getCarCount() : int</text>
       <text name="Fig0.3.3"
         x="600"
-        y="204"
+        y="217"
         width="104"
         height="14"
         fill="0"
@@ -14023,9 +14079,9 @@ getters and setters.</text>
       >getCar(p_index : int)</text>
       <text name="Fig0.3.4"
         x="600"
-        y="218"
+        y="231"
         width="103"
-        height="20"
+        height="14"
         fill="0"
         fillcolor="200 200 255"
         stroke="0"
@@ -14037,9 +14093,41 @@ getters and setters.</text>
         textsize="11"
         justification="Left"
       >addCar(p_car : Car)</text>
+      <text name="Fig0.3.5"
+        x="600"
+        y="245"
+        width="76"
+        height="14"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >getWidth() : int</text>
+      <text name="Fig0.3.6"
+        x="600"
+        y="259"
+        width="79"
+        height="23"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >getHeight() : int</text>
     </group>
     <group name="Fig0.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[600, 165, 153, 24]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[600, 165, 224, 37]"
          href="127-0-1-1-dd023ae:124b6b7688c:-8000:000000000000121B"
          fill="1"
          fillcolor="200 200 255"
@@ -14052,8 +14140,8 @@ getters and setters.</text>
       <rectangle name="Fig0.4.0"
         x="600"
         y="165"
-        width="153"
-        height="24"
+        width="224"
+        height="37"
         fill="1"
         fillcolor="200 200 255"
         stroke="0"
@@ -14068,14 +14156,14 @@ getters and setters.</text>
       >
         <moveto x="600"
                 y="165" />
-        <lineto x="752"
+        <lineto x="823"
                 y="165" />
       </path>
       <text name="Fig0.4.2"
         x="600"
         y="166"
         width="114"
-        height="20"
+        height="14"
         fill="0"
         fillcolor="200 200 255"
         stroke="0"
@@ -14087,12 +14175,28 @@ getters and setters.</text>
         textsize="11"
         justification="Left"
       >m_cars : std::list&lt;Car&gt;</text>
+      <text name="Fig0.4.3"
+        x="600"
+        y="180"
+        width="221"
+        height="20"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >m_groundBlocks : std::vector&lt;GroundBlock&gt;</text>
     </group>
     <rectangle name="Fig0.5"
       x="600"
       y="144"
-      width="153"
-      height="102"
+      width="224"
+      height="141"
       fill="0"
       fillcolor="200 200 255"
       stroke="1"
@@ -14288,7 +14392,7 @@ getters and setters.</text>
       strokecolor="black"
     >
       <moveto x="648"
-              y="246" />
+              y="285" />
       <lineto x="648"
               y="344" />
     </path>
@@ -14513,7 +14617,7 @@ getters and setters.</text>
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="753"
+      <moveto x="824"
               y="192" />
       <lineto x="928"
               y="192" />

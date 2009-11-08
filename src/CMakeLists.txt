@@ -28,6 +28,7 @@ SET(CLIENT_SRCS
     graphics/GroundBlock.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
+    graphics/TireTrack.cpp
     gui/MainMenuScene.cpp
     gui/LoadingScene.cpp
     gui/SceneContainer.cpp

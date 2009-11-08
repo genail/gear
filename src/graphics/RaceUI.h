@@ -26,11 +26,11 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACEUI_H_
-#define RACEUI_H_
+#ifndef GFX_RACEUI_H_
+#define GFX_RACEUI_H_
 
-#include "graphics/Drawable.h"
-#include "graphics/SpeedMeter.h"
+#include "Drawable.h"
+#include "SpeedMeter.h"
 
 class RaceScene;
 

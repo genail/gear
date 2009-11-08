@@ -45,7 +45,7 @@
 #include "race/RaceScene.h"
 #include "Player.h"
 #include "Properties.h"
-#include "race/RaceUI.h"
+#include "graphics/RaceUI.h"
 #include "race/Race.h"
 #include "network/Client.h"
 #include "gui/MainMenuScene.h"

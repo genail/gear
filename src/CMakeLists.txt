@@ -27,6 +27,7 @@ SET(CLIENT_SRCS
     graphics/DebugLayer.cpp
     graphics/GameWindow.cpp
     graphics/GroundBlock.cpp
+    graphics/RaceUI.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
     graphics/TireTrack.cpp
@@ -35,7 +36,6 @@ SET(CLIENT_SRCS
     gui/SceneContainer.cpp
 #    race/Race.cpp
     race/RaceScene.cpp
-    race/RaceUI.cpp
     race/Viewport.cpp
     network/Client.cpp
 )

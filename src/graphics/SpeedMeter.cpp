@@ -30,6 +30,8 @@
 
 #include "graphics/Stage.h"
 
+namespace Gfx {
+
 SpeedMeter::SpeedMeter() :
 	m_speedKMS(0)
 {
@@ -99,3 +101,5 @@ void SpeedMeter::setSpeed(unsigned p_speedKMS)
 {
 	m_speedKMS = p_speedKMS;
 }
+
+} // namespace

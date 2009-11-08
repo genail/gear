@@ -32,43 +32,28 @@
 #include "Drawable.h"
 #include "SpeedMeter.h"
 
-class RaceScene;
+namespace Gfx {
 
 class RaceUI: public Gfx::Drawable {
+
 	public:
-		RaceUI(RaceScene *p_raceScene);
+
+		RaceUI();
+
 		virtual ~RaceUI();
 
-		/**
-		 * Displays the countdown as "3, 2, 1, START". Total
-		 * Time needed to display "START" label equals 3 seconds from
-		 * the moment of calling this method.
-		 */
-		void displayCountdown();
-
 		virtual void draw(CL_GraphicContext &p_gc);
+
 		virtual void load(CL_GraphicContext &p_gc);
 
-		void update(unsigned p_timeElapsed);
+		SpeedMeter &getSpeedMeter() { return m_speedMeter; }
 
 	private:
 
-		/** Parent scene of this object */
-		RaceScene *m_raceScene;
-
-		/** Countdown start time. If 0 then countdown didn't start or its already finished */
-		unsigned m_countDownStart;
-
-		/** Countdown font */
-		CL_Font_Freetype m_countdownFont;
-
-		/** Lap display font */
-		CL_Font_Freetype m_lapDisplayFont;
-
 		/** Speed control widget */
 		SpeedMeter m_speedMeter;
-
-		void drawCountdownLabel(CL_GraphicContext &p_gc, const CL_String &p_label);
 };
 
-#endif /* RACEUI_H_ */
+} // namespace
+
+#endif /* GFX_RACEUI_H_ */

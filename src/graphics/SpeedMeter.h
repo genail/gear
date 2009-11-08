@@ -34,7 +34,9 @@
 
 #include "graphics/Drawable.h"
 
-class Gfx::SpeedMeter : public Gfx::Drawable {
+namespace Gfx {
+
+class SpeedMeter : public Gfx::Drawable {
 
 	public:
 
@@ -59,5 +61,7 @@ class Gfx::SpeedMeter : public Gfx::Drawable {
 		/** Current speed in KM/S */
 		unsigned m_speedKMS;
 };
+
+} // namespace
 
 #endif /* GFX_SPEEDMETER_H_ */

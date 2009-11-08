@@ -35,7 +35,7 @@
 #include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
-#include "race/RaceUI.h"
+#include "graphics/RaceUI.h"
 #include "race/Viewport.h"
 #include "race/ScoreTable.h"
 #include "graphics/Drawable.h"
@@ -60,7 +60,7 @@ class RaceScene: public Scene
 
 		int getLapsTotal() const { return m_lapsTotal; }
 
-		RaceUI& getUI() { return m_raceUI; }
+		Gfx::RaceUI& getUI() { return m_raceUI; }
 
 		Viewport& getViewport() { return m_viewport; }
 
@@ -104,7 +104,7 @@ class RaceScene: public Scene
 		// display
 
 		/** Race user interface */
-		RaceUI m_raceUI;
+		Gfx::RaceUI m_raceUI;
 
 		/** How player sees the scene */
 		Viewport m_viewport;
@@ -154,6 +154,8 @@ class RaceScene: public Scene
 		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
 
 		void drawTireTracks(CL_GraphicContext &p_gc);
+
+		void drawUI(CL_GraphicContext &p_gc);
 
 		// input
 

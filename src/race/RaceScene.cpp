@@ -45,7 +45,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	m_inputLock(false),
 	m_turnLeft(false),
 	m_turnRight(false),
-	m_raceUI(this),
+	m_raceUI(),
 	m_fps(0),
 	m_nextFps(0),
 	m_lastFpsRegisterTime(0)
@@ -132,6 +132,9 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 
 	m_viewport.finalizeGC(p_gc);
 
+	// draw the user interface
+	drawUI(p_gc);
+
 	m_raceUI.draw(p_gc);
 
 	countFps();
@@ -141,6 +144,14 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 
 	Gfx::Stage::getDebugLayer()->draw(p_gc);
 #endif // NDEBUG
+}
+
+void RaceScene::drawUI(CL_GraphicContext &p_gc)
+{
+	Gfx::SpeedMeter &speedMeter = m_raceUI.getSpeedMeter();
+	speedMeter.setSpeed(Game::getInstance().getPlayer().getCar().getSpeedKMS());
+
+	m_raceUI.draw(p_gc);
 }
 
 void RaceScene::drawTireTracks(CL_GraphicContext &p_gc)
@@ -316,8 +327,6 @@ void RaceScene::update(unsigned p_timeElapsed)
 		m_viewport.detach();
 	}
 
-	// update race UI
-	m_raceUI.update(p_timeElapsed);
 }
 
 void RaceScene::updateCars(unsigned p_timeElapsed)
@@ -480,7 +489,7 @@ void RaceScene::onStartCountdown()
 	static const unsigned RACE_START_COUNTDOWN_TIME = 3000;
 
 	m_raceStartTimer.start(RACE_START_COUNTDOWN_TIME, false);
-	m_raceUI.displayCountdown();
+//	m_raceUI.displayCountdown();
 
 	// mark all players state as not finished
 //	Game::getInstance().getPlayer().setFinished(false);

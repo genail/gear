@@ -37,6 +37,7 @@
 #include "network/events.h"
 #include "network/Client.h"
 #include "graphics/TireTrack.h"
+#include "graphics/Bound.h"
 
 RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	Scene(p_guiParent),
@@ -174,6 +175,8 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 {
 	Race::Level &level = Game::getInstance().getLevel();
 
+	// draw blocks
+
 	const size_t w = level.getWidth();
 	const size_t h = level.getHeight();
 
@@ -181,6 +184,17 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 		for (size_t ih = 0; ih < h; ++ih) {
 			drawGroundBlock(p_gc, level.getBlock(iw, ih), iw * 200, ih * 200); // FIXME: Magic numers
 		}
+	}
+
+	// draw bounds
+	const size_t boundCount = level.getBoundCount();
+	Gfx::Bound gfxBound;
+
+	for (size_t i = 0; i < boundCount; ++i) {
+		const Race::Bound &bound = level.getBound(i);
+		gfxBound.setSegment(bound.getSegment());
+
+		gfxBound.draw(p_gc);
 	}
 }
 

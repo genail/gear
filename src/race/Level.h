@@ -68,7 +68,7 @@ CLASS_LEVEL
 
 		const Bound& getBound(int p_index) const { return m_bounds[p_index]; }
 
-		int getBoundCount() const { return m_bounds.size(); }
+		size_t getBoundCount() const { return m_bounds.size(); }
 
 		float getResistance(float p_x, float p_y);
 

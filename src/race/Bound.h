@@ -26,24 +26,17 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef BOUND_H_
-#define BOUND_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
-#ifndef SERVER
+#ifdef CLIENT
+#include <ClanLib/display.h>
+#endif // CLIENT
 
-#include "graphics/Drawable.h"
+namespace Race {
 
-#define CLASS_BOUND class Bound : public Gfx::Drawable
-
-#else // !SERVER
-
-#define CLASS_BOUND class Bound
-
-#endif // !SERVER
-
-CLASS_BOUND
+class Bound
 {
 	public:
 
@@ -61,11 +54,7 @@ CLASS_BOUND
 #ifndef SERVER
 	public:
 
-		virtual void draw(CL_GraphicContext &p_gc);
-
 		const CL_CollisionOutline &getCollisionOutline() const { return m_collisionOutline; }
-
-		virtual void load(CL_GraphicContext &p_gc) {}
 
 	private:
 
@@ -76,4 +65,4 @@ CLASS_BOUND
 
 };
 
-#endif /* BOUND_H_ */
+} // namespace

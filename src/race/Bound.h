@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <boost/utility.hpp>
 #include <ClanLib/core.h>
 
 #ifdef CLIENT
@@ -36,7 +37,7 @@
 
 namespace Race {
 
-class Bound
+class Bound : public boost::noncopyable
 {
 	public:
 

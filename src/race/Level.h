@@ -52,7 +52,7 @@ class Level
 
 		void addCar(Car *p_car);
 
-		const Bound& getBound(int p_index) const { return m_bounds[p_index]; }
+		const Bound& getBound(int p_index) const { return *m_bounds[p_index].get(); }
 
 		size_t getBoundCount() const { return m_bounds.size(); }
 
@@ -88,7 +88,7 @@ class Level
 		std::vector< CL_SharedPtr<Race::Block> > m_blocks;
 
 		/** Level bounds */
-		std::vector<Bound> m_bounds;
+		std::vector< CL_SharedPtr<Bound> > m_bounds;
 
 		/** All cars */
 		std::vector<Car*> m_cars;
@@ -127,6 +127,8 @@ class Level
 		void loadMetaElement(const CL_DomNode &p_metaNode);
 
 		void loadTrackElement(const CL_DomNode &p_trackNode);
+
+		void loadBoundsElement(const CL_DomNode &p_boundsNode);
 
 };
 

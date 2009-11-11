@@ -48,9 +48,9 @@
         
         <bounds>
             <!--generate style="thick" /-->
-            <bound from="2.0, 2.0" to="4.0, 2.0" />
-            <bound from="4.0, 2.0" to="4.0, 5.0" />
-            <bound from="4.0, 5.0" to="8.0, 5.0" />
+            <bound x1="2.0" y1="2.0" x2="4.0" y2="2.0" />
+            <bound x1="4.0" y1="2.0" x2="4.0" y2="5.0" />
+            <bound x1="4.0" y1="5.0" x2="8.0" y2="5.0" />
         </bounds>
     </content>
 </level>

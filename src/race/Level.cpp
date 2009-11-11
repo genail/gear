@@ -88,6 +88,10 @@ void Level::loadFromFile(const CL_String& p_filename)
 		const CL_DomNode trackNode = contentNode.named_item("track");
 		loadTrackElement(trackNode);
 
+		// load track bounds
+		const CL_DomNode boundsNode = contentNode.named_item("bounds");
+		loadBoundsElement(boundsNode);
+
 
 		// read level content
 
@@ -207,7 +211,6 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 		if (blockNode.get_node_name() == "block") {
 			CL_DomNamedNodeMap attrs = blockNode.get_attributes();
 
-
 			const int x = CL_StringHelp::local8_to_int(attrs.get_named_item("x").get_node_value());
 			const int y = CL_StringHelp::local8_to_int(attrs.get_named_item("y").get_node_value());
 			const CL_String typeStr = attrs.get_named_item("type").get_node_value();
@@ -231,6 +234,30 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 	}
 
+}
+
+void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)
+{
+	const CL_DomNodeList boundList = p_boundsNode.get_child_nodes();
+	const int boundListSize = boundList.get_length();
+
+	for (int i = 0; i < boundListSize; ++i) {
+		const CL_DomNode boundNode = boundList.item(i);
+
+		if (boundNode.get_node_name() == "bound") {
+			CL_DomNamedNodeMap attrs = boundNode.get_attributes();
+
+			const float x1 = CL_StringHelp::local8_to_float(attrs.get_named_item("x1").get_node_value());
+			const float y1 = CL_StringHelp::local8_to_float(attrs.get_named_item("y1").get_node_value());
+			const float x2 = CL_StringHelp::local8_to_float(attrs.get_named_item("x2").get_node_value());
+			const float y2 = CL_StringHelp::local8_to_float(attrs.get_named_item("y2").get_node_value());
+
+			const CL_LineSegment2f segment(CL_Pointf(x1, y1), CL_Pointf(x2, y2));
+			m_bounds.push_back(CL_SharedPtr<Bound>(new Bound(segment)));
+		} else {
+			cl_log_event("race", "Unknown node '%1', ignoring", boundNode.get_node_name());
+		}
+	}
 }
 
 Common::GroundBlockType Level::decodeBlock(const CL_String8& p_str) {
@@ -429,9 +456,9 @@ void Level::checkCollistions()
 //		}
 
 		// check bounds collisions
-		foreach (const Bound &bound, m_bounds) {
-			if (coll1.collide(bound.getCollisionOutline())) {
-				c1->performBoundCollision(bound);
+		foreach (const CL_SharedPtr<Bound> &bound, m_bounds) {
+			if (coll1.collide(bound->getCollisionOutline())) {
+				c1->performBoundCollision(*bound);
 			}
 		}
 	}

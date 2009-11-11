@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STAGE_H_
-#define STAGE_H_
+#pragma once
 
 #include <stack>
 #include <ClanLib/core.h>
@@ -82,5 +81,3 @@ class Stage {
 };
 
 } // namespace
-
-#endif /* STAGE_H_ */

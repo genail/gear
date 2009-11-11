@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACESCENE_H_
-#define RACESCENE_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
@@ -214,5 +213,3 @@ class RaceScene: public Scene
 		void onPlayerFinished(const CL_NetGameEvent &p_event);
 
 };
-
-#endif /* RACESCENE_H_ */

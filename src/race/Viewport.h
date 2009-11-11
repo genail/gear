@@ -26,9 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#ifndef VIEWPORT_H_
-#define VIEWPORT_H_
+#pragma once
 
 #include <ClanLib/display.h>
 
@@ -60,5 +58,3 @@ class Viewport {
 		/** Scale (only when attached) */
 		float m_scale;
 };
-
-#endif /* VIEWPORT_H_ */

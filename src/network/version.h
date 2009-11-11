@@ -26,10 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef VERSION_H_
-#define VERSION_H_
+#pragma once
 
 #define PROTOCOL_VERSION_MAJOR 1
 #define PROTOCOL_VERSION_MINOR 0
-
-#endif /* VERSION_H_ */

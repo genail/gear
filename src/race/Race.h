@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACE_RACE_H_
-#define RACE_RACE_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
@@ -151,5 +150,3 @@ class Race {
 };
 
 } // namespace
-
-#endif /* RACE_RACE_H_ */

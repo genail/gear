@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GAMESTATE_H_
-#define GAMESTATE_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
@@ -74,5 +73,3 @@ class GameState : public Packet {
 };
 
 }
-
-#endif /* GAMESTATE_H_ */

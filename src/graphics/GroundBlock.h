@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GFX_GROUNDBLOCK_H_
-#define GFX_GROUNDBLOCK_H_
+#pragma once
 
 #include <boost/utility.hpp>
 
@@ -69,4 +68,3 @@ class GroundBlock : public boost::noncopyable, public Gfx::Drawable {
 
 } // namespace
 
-#endif /* GFX_GROUNDBLOCK_H_ */

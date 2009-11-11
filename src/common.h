@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#pragma once
 
 #include <boost/foreach.hpp>
 
@@ -62,6 +61,3 @@
 #pragma message("WARNING: You need to implement DEPRECATED for this compiler")
 #define DEPRECATED(func) func
 #endif
-
-
-#endif /* COMMON_H_ */

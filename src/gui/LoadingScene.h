@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LOADINGSCENE_H_
-#define LOADINGSCENE_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -66,5 +65,3 @@ class LoadingScene: public Scene {
 
 		bool m_sceneVisibleSigInvoked;
 };
-
-#endif /* LOADINGSCENE_H_ */

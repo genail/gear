@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EVENTS_H_
-#define EVENTS_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -81,5 +80,3 @@
 //#define EVENT_START_COUNTDOWN		"race:start_countdown"
 //#define EVENT_RACE_STATE			"race:race_state"
 //#define EVENT_PLAYER_FINISHED		"race:player_finished"
-
-#endif /* EVENTS_H_ */

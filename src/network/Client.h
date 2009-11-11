@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CLIENT_H_
-#define CLIENT_H_
+#pragma once
 
 #include "ClanLib/core.h"
 #include "ClanLib/network.h"
@@ -137,5 +136,3 @@ class Client {
 };
 
 } // namespace
-
-#endif /* CLIENT_H_ */

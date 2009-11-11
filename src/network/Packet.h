@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PACKET_H_
-#define PACKET_H_
+#pragma once
 
 #include <ClanLib/network.h>
 
@@ -47,5 +46,3 @@ class Packet {
 };
 
 }
-
-#endif /* PACKET_H_ */

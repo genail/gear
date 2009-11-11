@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LOADINGCONTROLLER_H_
-#define LOADINGCONTROLLER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -64,4 +63,3 @@ class LoadingController {
 		void onGameState(const Net::GameState &p_gameState);
 };
 
-#endif /* LOADINGCONTROLLER_H_ */

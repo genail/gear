@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GFX_TIRETRACK_H_
-#define GFX_TIRETRACK_H_
+#pragma once
 
 #define TIRE_TRACK_DEFAULT_ALPHA 0.5f
 
@@ -66,5 +65,3 @@ class TireTrack : public Gfx::Drawable {
 };
 
 }
-
-#endif /* GFX_TIRETRACK_H_ */

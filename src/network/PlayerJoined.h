@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLAYERJOINED_H_
-#define PLAYERJOINED_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -60,5 +59,3 @@ class PlayerJoined: public Net::Packet {
 };
 
 }
-
-#endif /* PLAYERJOINED_H_ */

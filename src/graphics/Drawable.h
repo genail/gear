@@ -26,10 +26,9 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <ClanLib/display.h>
+#pragma once
 
-#ifndef DRAWABLE_H_
-#define DRAWABLE_H_
+#include <ClanLib/display.h>
 
 namespace Gfx
 {
@@ -57,4 +56,4 @@ class Drawable {
 
 } // namespace
 
-#endif /* DRAWABLE_H_ */
+#pragma once

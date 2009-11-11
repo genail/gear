@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CAR_H_
-#define CAR_H_
+#pragma once
 
 #include "race/Checkpoint.h"
 
@@ -222,5 +221,3 @@ inline float Car::normalize(float p_value) const {
 }
 
 } // namespace
-
-#endif /* CAR_H_ */

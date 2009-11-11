@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACE_BLOCK_H_
-#define RACE_BLOCK_H_
+#pragma once
 
 #include "boost/utility.hpp"
 
@@ -94,5 +93,3 @@ class PixelTranslator90 : public PixelTranslator {
 };
 
 } // namespace
-
-#endif /* RACE_BLOCK_H_ */

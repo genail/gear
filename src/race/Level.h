@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LEVEL_H_
-#define LEVEL_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -125,5 +124,3 @@ class Level
 };
 
 } // namespace
-
-#endif /* LEVEL_H_ */

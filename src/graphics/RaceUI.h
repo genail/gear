@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GFX_RACEUI_H_
-#define GFX_RACEUI_H_
+#pragma once
 
 #include "Drawable.h"
 #include "SpeedMeter.h"
@@ -56,4 +55,3 @@ class RaceUI: public Gfx::Drawable {
 
 } // namespace
 
-#endif /* GFX_RACEUI_H_ */

@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GFX_SPEEDMETER_H_
-#define GFX_SPEEDMETER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
@@ -63,5 +62,3 @@ class SpeedMeter : public Gfx::Drawable {
 };
 
 } // namespace
-
-#endif /* GFX_SPEEDMETER_H_ */

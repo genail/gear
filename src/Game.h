@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GAME_H_
-#define GAME_H_
+#pragma once
 
 #include <assert.h>
 
@@ -72,4 +71,3 @@ class Game {
 		friend class Application;
 };
 
-#endif /* GAME_H_ */

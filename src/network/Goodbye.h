@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GOODBYE_H_
-#define GOODBYE_H_
+#pragma once
 
 #include "network/Packet.h"
 
@@ -65,5 +64,3 @@ class Goodbye : public Packet {
 };
 
 }
-
-#endif /* GOODBYE_H_ */

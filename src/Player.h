@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLAYER_H_
-#define PLAYER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include "race/Car.h"
@@ -58,5 +57,3 @@ class Player {
 		Race::Car m_car;
 
 };
-
-#endif /* PLAYER_H_ */

@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TYRESTRIPES_H_
-#define TYRESTRIPES_H_
+#pragma once
 
 #include <list>
 #include <ClanLib/core.h>
@@ -76,5 +75,3 @@ class TyreStripes {
 };
 
 } // namespace
-
-#endif /* TYRESTRIPES_H_ */

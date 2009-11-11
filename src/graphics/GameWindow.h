@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GAMEWINDOW_H_
-#define GAMEWINDOW_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
@@ -69,4 +68,3 @@ class GameWindow : public CL_Window {
 
 };
 
-#endif /* GAMEWINDOW_H_ */

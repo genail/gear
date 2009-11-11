@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef COMMON_GROUNDBLOCKTYPE_H_
-#define COMMON_GROUNDBLOCKTYPE_H_
+#pragma once
 
 namespace Common
 {
@@ -43,4 +42,3 @@ namespace Common
 	};
 } // namespace
 
-#endif /* COMMON_GROUNDBLOCKTYPE_H_ */

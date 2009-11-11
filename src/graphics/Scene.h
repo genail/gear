@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SCENE_H_
-#define SCENE_H_
+#pragma once
 
 #include <ClanLib/gui.h>
 #include <ClanLib/display.h>
@@ -62,6 +61,3 @@ class Scene : public CL_GUIComponent {
 		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect) { draw(p_gc); }
 
 };
-
-
-#endif /* SCENE_H_ */

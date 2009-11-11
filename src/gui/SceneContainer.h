@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SCENECONTAINER_H_
-#define SCENECONTAINER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -61,5 +60,3 @@ class SceneContainer {
 
 		RaceScene m_raceScene;
 };
-
-#endif /* SCENECONTAINER_H_ */

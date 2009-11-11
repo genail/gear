@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SERVER_H_
-#define SERVER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
@@ -109,5 +108,3 @@ class Server {
 };
 
 } // namespace
-
-#endif /* SERVER_H_ */

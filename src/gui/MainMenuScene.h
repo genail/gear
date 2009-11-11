@@ -25,9 +25,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef MAINMENUSCENE_H_
-#define MAINMENUSCENE_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -87,5 +85,3 @@ class MainMenuScene: public Scene {
 		void onQuitClicked();
 
 };
-
-#endif /* MAINMENUSCENE_H_ */

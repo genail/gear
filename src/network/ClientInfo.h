@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLAYERINFO_H_
-#define CLIENTINFO_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -63,6 +62,4 @@ class ClientInfo : public Packet {
 		CL_String m_name;
 };
 
-}
-
-#endif /* CLIENTINFO_H_ */
+} // namespace

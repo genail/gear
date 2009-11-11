@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CARSTATE_H_
-#define CARSTATE_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -95,5 +94,3 @@ class CarState : public Net::Packet {
 };
 
 }
-
-#endif /* CARSTATE_H_ */

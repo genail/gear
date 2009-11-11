@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAINMENUCONTROLLER_H_
-#define MAINMENUCONTROLLER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -56,4 +55,3 @@ class MainMenuController {
 		void onQuitClicked();
 };
 
-#endif /* MAINMENUCONTROLLER_H_ */

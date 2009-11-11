@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SCORETABLE_H_
-#define SCORETABLE_H_
+#pragma once
 
 #include <list>
 
@@ -69,5 +68,3 @@ class ScoreTable {
 
 
 };
-
-#endif /* SCORETABLE_H_ */

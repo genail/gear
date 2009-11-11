@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DEBUGLAYER_H_
-#define DEBUGLAYER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include "graphics/Drawable.h"
@@ -53,4 +52,3 @@ class DebugLayer : public Gfx::Drawable {
 		CL_FontMetrics m_fontMetrics;
 };
 
-#endif /* DEBUGLAYER_H_ */

@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PROTOCOLVERSION_H_
-#define PROTOCOLVERSION_H_
+#pragma once
 
 #include "network/version.h"
 
@@ -62,5 +61,3 @@ class ProtocolVersion {
 };
 
 }
-
-#endif /* PROTOCOLVERSION_H_ */

@@ -119,6 +119,7 @@ void RaceScene::init(const CL_String &p_levelName)
 
 void RaceScene::draw(CL_GraphicContext &p_gc)
 {
+	// initialize player's viewport
 	m_viewport.prepareGC(p_gc);
 
 	// draw pure level
@@ -127,16 +128,13 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 	// draw tire tracks
 	drawTireTracks(p_gc);
 
-	Game::getInstance().getLevel().draw(p_gc);
-
 	drawCars(p_gc);
 
+	// revert player's viewport
 	m_viewport.finalizeGC(p_gc);
 
 	// draw the user interface
 	drawUI(p_gc);
-
-	m_raceUI.draw(p_gc);
 
 	countFps();
 
@@ -277,8 +275,6 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 	cl_log_event("debug", "RaceScene::load()");
 
 	Scene::load(p_gc);
-
-	Game::getInstance().getLevel().load(p_gc);
 
 	m_raceUI.load(p_gc);
 

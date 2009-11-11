@@ -36,22 +36,9 @@
 #include "race/Bound.h"
 #include "race/TyreStripes.h"
 
-#ifdef CLIENT
-
-#include "graphics/Stage.h"
-#include "graphics/Drawable.h"
-
-#define CLASS_LEVEL class Level : public Gfx::Drawable
-
-#else // CLIENT
-
-#define CLASS_LEVEL class Level
-
-#endif // CLIENT
-
 namespace Race {
 
-CLASS_LEVEL
+class Level
 {
 
 	public:
@@ -94,12 +81,6 @@ CLASS_LEVEL
 		void removeCar(Car *p_car);
 
 		void update(unsigned p_timeElapsed);
-
-#ifdef CLIENT
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-#endif // CLIENT
 
 
 	private:

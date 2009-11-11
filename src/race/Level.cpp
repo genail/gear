@@ -59,44 +59,6 @@ Level::~Level() {
 	m_blocks.clear();
 }
 
-#ifdef CLIENT
-void Level::draw(CL_GraphicContext &p_gc) {
-
-//	// draw tiles
-//	for (int x = 0; x < 10; ++x) {
-//		for (int y = 0; y < 10; ++y) {
-//			p_gc.push_translate(x * BOX_WIDTH, y * BOX_WIDTH);
-//
-//			m_blocks[m_width * y + x].draw(p_gc);
-//
-//			p_gc.pop_modelview();
-//		}
-//	}
-
-	// draw tyre stripes
-//	m_tyreStripes.draw(p_gc);
-
-//	// draw bounds
-//	for (std::vector<Bound>::iterator itor = m_bounds.begin(); itor != m_bounds.end(); ++itor) {
-//		(*itor).draw(p_gc);
-//	}
-
-#ifdef DRAW_COLLISION_OUTLINE
-	// draw collision outlines
-	foreach (Car *car, m_cars) {
-		car->calculateCurrentCollisionOutline().draw(0, 0, CL_Colorf::red, p_gc);
-	}
-#endif // DRAW_COLLISION_OUTLINE
-
-}
-
-void Level::load(CL_GraphicContext &p_gc) {
-
-	cl_log_event("debug", "Level::load()");
-}
-
-#endif // CLIENT
-
 CL_String8 Level::readLine(CL_File& p_file) {
 	CL_String8 line = p_file.read_string_text("", "\n", false);
 	p_file.seek(1, CL_File::seek_cur);

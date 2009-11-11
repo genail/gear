@@ -26,17 +26,24 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLAYER_H_
-#define PLAYER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include "race/Car.h"
 
 class Player {
+
 	public:
+
 		Player() {}
+
 		Player(const CL_String8 &p_name);
+
 		virtual ~Player();
+
+		Race::Car &getCar() { return m_car; }
+
+		const Race::Car &getCar() const { return m_car; }
 
 		const CL_String &getName() const { return m_name; }
 
@@ -46,6 +53,7 @@ class Player {
 		/** Nickname of this player */
 		CL_String8 m_name;
 
-};
+		/** The car */
+		Race::Car m_car;
 
-#endif /* PLAYER_H_ */
+};

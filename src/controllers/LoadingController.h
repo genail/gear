@@ -26,49 +26,40 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACEUI_H_
-#define RACEUI_H_
+#pragma once
 
-#include "graphics/Drawable.h"
-#include "graphics/SpeedMeter.h"
+#include <ClanLib/core.h>
 
-class Race;
+#include "network/GameState.h"
 
-class RaceUI: public Drawable {
+class LoadingScene;
+
+class LoadingController {
+
 	public:
-		RaceUI(Race *p_race);
-		virtual ~RaceUI();
 
-		/**
-		 * Displays the countdown as "3, 2, 1, START". Total
-		 * Time needed to display "START" label equals 3 seconds from
-		 * the moment of calling this method.
-		 */
-		void displayCountdown();
+		LoadingController(LoadingScene *p_scene);
 
-		virtual void draw(CL_GraphicContext &p_gc);
-		virtual void load(CL_GraphicContext &p_gc);
+		virtual ~LoadingController();
 
-		void update(unsigned p_timeElapsed);
+		void loadRace();
 
 	private:
 
-		/** The Race pointer */
-		Race *m_race;
+		LoadingScene *m_scene;
 
-		/** Countdown start time. If 0 then countdown didn't start or its already finished */
-		unsigned m_countDownStart;
+		/** The slot container */
+		CL_SlotContainer m_slots;
 
-		/** Countdown font */
-		CL_Font_Freetype m_countdownFont;
 
-		/** Lap display font */
-		CL_Font_Freetype m_lapDisplayFont;
+		void loadLevel(const CL_String &p_name);
 
-		/** Speed control widget */
-		SpeedMeter m_speedMeter;
+		// signal handlers
 
-		void drawCountdownLabel(CL_GraphicContext &p_gc, const CL_String &p_label);
+		void onClientConnected();
+
+		void onSceneVisible();
+
+		void onGameState(const Net::GameState &p_gameState);
 };
 
-#endif /* RACEUI_H_ */

@@ -26,77 +26,37 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef BLOCK_H_
-#define BLOCK_H_
+#pragma once
 
-#ifdef CLIENT
+#include "boost/utility.hpp"
 
-#include "graphics/Stage.h"
-#include "graphics/Drawable.h"
+#include "common/GroundBlockType.h"
 
-#define CLASS_BLOCK class Block : public Drawable
+namespace Race {
 
-#else
-
-#define CLASS_BLOCK class Block
-
-#endif //CLIENT
-
-CLASS_BLOCK
+class Block : public boost::noncopyable
 {
 	public:
 
-		enum BlockType {
-			BT_NONE,
-			BT_STREET_HORIZ,
-			BT_STREET_VERT,
-			BT_TURN_BOTTOM_RIGHT,
-			BT_TURN_BOTTOM_LEFT,
-			BT_TURN_TOP_RIGHT,
-			BT_TURN_TOP_LEFT,
-			BT_START_LINE
-		};
-
 		Block() {}
 
-		Block(BlockType p_type, int p_width);
+		Block(Common::GroundBlockType p_type, int p_width);
 
 		virtual ~Block();
 
 		float getResistance(int x, int y) const;
 
-		BlockType getType() const { return m_type; }
-
-#ifdef CLIENT
-
-		virtual void draw(CL_GraphicContext& p_gc);
-
-		virtual void load(CL_GraphicContext& p_gc);
-
-#endif // CLIENT
+		Common::GroundBlockType getType() const { return m_type; }
 
 	private:
 		/** Subtype of this block */
-		BlockType m_type;
+		Common::GroundBlockType m_type;
 
 		/** Resistance map */
 		float *m_resistanceMap;
 
-		/** Width of block side */
+		/** Width of block in pixels */
 		int m_width;
-
-#ifdef CLIENT
-
-		/** Background sprite */
-		CL_Sprite m_bgSprite;
-
-		/** Primary Foreground sprite */
-		CL_Sprite m_fgSprite;
-
-		/** Secondary Foreground sprite */
-		CL_Sprite m_fgSprite2;
-
-#endif // CLIENT
 
 };
 
@@ -132,4 +92,4 @@ class PixelTranslator90 : public PixelTranslator {
 		}
 };
 
-#endif /* BLOCK_H_ */
+} // namespace

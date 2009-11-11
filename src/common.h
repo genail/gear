@@ -26,11 +26,38 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#pragma once
 
 #include <boost/foreach.hpp>
 
 #define foreach BOOST_FOREACH
 
-#endif /* COMMON_H_ */
+#define DEFAULT_PORT 2500
+
+#define SIGNAL_0(name) \
+	public: \
+		CL_Signal_v0 &sig_##name() { return m_sig_##name; } \
+	private: \
+		CL_Signal_v0 m_sig_##name;
+
+#define SIGNAL_1(T1, name) \
+	public: \
+		CL_Signal_v1<T1> &sig_##name() { return m_sig_##name; } \
+	private: \
+		CL_Signal_v1<T1> m_sig_##name;
+
+
+#define INVOKE_0(name) \
+		m_sig_##name.invoke()
+
+#define INVOKE_1(name, arg1) \
+		m_sig_##name.invoke(arg1)
+
+#ifdef __GNUC__
+#define DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+#define DEPRECATED(func) __declspec(deprecated) func
+#else
+#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+#define DEPRECATED(func) func
+#endif

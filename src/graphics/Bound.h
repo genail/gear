@@ -26,15 +26,34 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RacePlayer.h"
+#pragma once
 
-RacePlayer::RacePlayer(Player *p_player) :
-	m_finished(false),
-	m_car(this),
-	m_player(p_player)
+#include <ClanLib/core.h>
 
-{
+#include "Drawable.h"
+
+namespace Gfx {
+
+class Bound : public Drawable {
+
+	public:
+
+		Bound();
+
+		virtual ~Bound();
+
+
+		virtual void draw(CL_GraphicContext &p_gc);
+
+		virtual void load(CL_GraphicContext &p_gc);
+
+
+		void setSegment(const CL_LineSegment2f &p_segment) { m_segment = p_segment; }
+
+	private:
+
+		CL_LineSegment2f m_segment;
+};
+
 }
 
-RacePlayer::~RacePlayer() {
-}

@@ -26,51 +26,190 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACESCENE_H_
-#define RACESCENE_H_
+#pragma once
 
+#include <ClanLib/core.h>
+#include <ClanLib/gui.h>
+
+#include "Player.h"
 #include "race/Car.h"
 #include "race/Level.h"
-#include "race/RaceUI.h"
+#include "graphics/RaceUI.h"
 #include "race/Viewport.h"
-#include "race/RacePlayer.h"
+#include "race/ScoreTable.h"
 #include "graphics/Drawable.h"
+#include "graphics/Car.h"
+#include "graphics/GroundBlock.h"
 
-class Race;
+#include "graphics/Scene.h"
 
-class RaceScene: public Drawable {
+class RaceScene: public Scene
+{
 	public:
-		RaceScene(Race* p_race);
+		RaceScene(CL_GUIComponent *p_guiParent);
 		virtual ~RaceScene();
 
+		void initialize();
+
+		void destroy();
+
 		virtual void draw(CL_GraphicContext &p_gc);
+
 		virtual void load(CL_GraphicContext &p_gc);
 
-		RaceUI& getUI() { return m_raceUI; }
+		int getLapsTotal() const { return m_lapsTotal; }
+
+		Gfx::RaceUI& getUI() { return m_raceUI; }
 
 		Viewport& getViewport() { return m_viewport; }
 
-		void update(unsigned timeElapsed);
+		void init(const CL_String &p_levelName);
+
+		virtual void update(unsigned p_timeElapsed);
 
 	private:
-		void updateScale();
-		float oldSpeed;
 
-		/** Last drift car position. If null, then no drift was doing last time. */
-		CL_Pointf m_lastDriftPoint;
+		enum InputState {
+			Pressed,
+			Released
+		};
 
-		/** The Race pointer */
-		Race *m_race;
+		/** All players list */
+		std::list<Player*> m_players;
+
+		/** Total number of laps */
+		int m_lapsTotal;
+
+		/** The score table */
+		ScoreTable m_scoreTable;
+
+		/** Race start timer */
+		CL_Timer m_raceStartTimer;
+
+		/** Race start time */
+		unsigned m_raceStartTime;
+
+		/** If this race is initialized */
+		bool m_initialized;
+
+		// input
+
+		/** Set to true if user interaction should be locked */
+		bool m_inputLock;
+
+		/** Keys down */
+		bool m_turnLeft, m_turnRight;
+
+		// display
+
+		/** Race user interface */
+		Gfx::RaceUI m_raceUI;
 
 		/** How player sees the scene */
 		Viewport m_viewport;
 
-		/** Race user interface */
-		RaceUI m_raceUI;
+		/** Last drift car position. If null, then no drift was doing last time. */
+		CL_Pointf m_lastDriftPoint;
+
+		/** TODO: What is this? */
+		float oldSpeed;
+
+		/** FPS counter */
+		unsigned m_fps, m_nextFps;
+
+		/** Last fps count time */
+		unsigned m_lastFpsRegisterTime;
+
+		/** Logic car to gfx car mapping */
+		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > carMapping_t;
+		carMapping_t m_carMapping;
+
+		/** Block types to gfx ground blocks */
+		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > blockMapping_t;
+		blockMapping_t m_blockMapping;
+
+		// other
+
+		/** The slots container */
+		CL_SlotContainer m_slots;
 
 
+		//
+		// Methods
+		//
 
+		// display
+
+		void loadGroundBlocks(CL_GraphicContext &p_gc);
+
+		void countFps();
+
+		void drawCars(CL_GraphicContext &p_gc);
+
+		void drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car);
+
+		void drawLevel(CL_GraphicContext &p_gc);
+
+		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
+
+		void drawTireTracks(CL_GraphicContext &p_gc);
+
+		void drawUI(CL_GraphicContext &p_gc);
+
+		// input
+
+		void grabInput();
+
+		bool onInputPressed(const CL_InputEvent &p_event);
+
+		bool onInputReleased(const CL_InputEvent &p_event);
+
+		void handleInput(InputState p_state, const CL_InputEvent& p_event);
+
+		void updateCarTurn();
+
+		// logic
+
+		void updateCars(unsigned p_timeElapsed);
+
+		void updateScale();
+
+		// flow control
+
+		void startRace();
+
+		void endRace();
+
+		bool isRaceFinished();
+
+		void markPlayerFinished(const CL_String &p_name, unsigned p_time);
+
+		// helpers
+
+		Player *findPlayer(const CL_String& p_name);
+
+		// event handlers
+
+		void onCarStateChangedRemote(const CL_NetGameEvent& p_event);
+
+		void onCarStateReceived(const Net::CarState &p_carState);
+
+		void onCarStateChangedLocal(Race::Car &p_car);
+
+		void onPlayerJoined(const CL_String &p_name);
+
+		void onPlayerLeaved(const CL_String &p_name);
+
+		void onStartCountdown();
+
+		void onCountdownEnds();
+
+		void onInputLock();
+
+		void onRaceStateChanged(int p_lapsNum);
+
+		void onInitRace(const CL_String& p_levelName);
+
+		void onPlayerFinished(const CL_NetGameEvent &p_event);
 
 };
-
-#endif /* RACESCENE_H_ */

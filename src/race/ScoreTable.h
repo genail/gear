@@ -26,21 +26,20 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SCORETABLE_H_
-#define SCORETABLE_H_
+#pragma once
 
 #include <list>
 
-#include "race/RacePlayer.h"
+#include "Player.h"
 
 class ScoreTable {
 
 		struct Entry {
-				const RacePlayer *m_racePlayer;
+				const Player *m_player;
 				const unsigned m_time;
 
-				Entry(const RacePlayer *p_racePlayer, unsigned p_time) :
-					m_racePlayer(p_racePlayer),
+				Entry(const Player *p_player, unsigned p_time) :
+					m_player(p_player),
 					m_time(p_time)
 					{}
 		};
@@ -51,13 +50,13 @@ class ScoreTable {
 
 		virtual ~ScoreTable();
 
-		void add(const RacePlayer *p_racePlayer, unsigned p_time);
+		void add(const Player *p_player, unsigned p_time);
 
 		void clear();
 
 		int getEntriesCount() const;
 
-		const RacePlayer* getEntryPlayer(size_t index) const;
+		const Player* getEntryPlayer(size_t index) const;
 
 		unsigned getEntryTime(size_t index) const;
 
@@ -69,5 +68,3 @@ class ScoreTable {
 
 
 };
-
-#endif /* SCORETABLE_H_ */

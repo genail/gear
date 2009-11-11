@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CHECKPOINT_H_
-#define CHECKPOINT_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -47,5 +46,3 @@ class Checkpoint {
 		CL_Rectf m_rect;
 		bool m_passed;
 };
-
-#endif /* CHECKPOINT_H_ */

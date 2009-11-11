@@ -32,8 +32,6 @@
 
 /* Configuration file location */
 const CL_String CONFIG_FILE = "config.xml";
-/* Default server port */
-const int DEFAULT_PORT = 2500;
 
 ServerConfiguration::ServerConfiguration() :
 	m_port(DEFAULT_PORT)
@@ -52,7 +50,7 @@ void ServerConfiguration::load(const CL_String &p_configFile)
 
 		cl_log_event("config", "Loading configuration from %1", p_configFile);
 
-		CL_File file(p_configFile, CL_File::open_existing);
+		CL_File file(p_configFile, CL_File::open_existing, CL_File::access_read);
 
 
 		CL_DomDocument document(file);

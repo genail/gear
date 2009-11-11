@@ -26,74 +26,75 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACESERVER_H_
-#define RACESERVER_H_
+#include "GameState.h"
 
-#include <ClanLib/core.h>
+#include <assert.h>
 
-#include "race/Level.h"
-#include "race/RacePlayer.h"
+#include "network/events.h"
 
-class Server;
+namespace Net {
 
-class RaceServer {
-	public:
-		RaceServer(Server* p_server);
-		virtual ~RaceServer();
+CL_NetGameEvent GameState::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_GAME_STATE);
 
-		void destroy();
+	event.add_argument(m_level);
 
-		const CL_String& getLevelName() const { return m_levelName; }
+	const size_t playerCount = m_names.size();
+	event.add_argument(playerCount);
 
-		void handleEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+	for (size_t i = 0; i < playerCount; ++i) {
+		event.add_argument(m_names[i]);
 
-		void initialize(const CL_String& p_levelName);
+		// inline car state event arguments
+		const CarState &carState = m_carStates[i];
+		const CL_NetGameEvent carStateEvent = carState.buildEvent();
 
-		bool isInitialized() const { return m_initialized; }
+		const size_t argumentCount = carStateEvent.get_argument_count();
+		event.add_argument(argumentCount);
 
-	private:
-		/** Is this server initialized */
-		bool m_initialized;
+		for (size_t j = 0; j < argumentCount; ++j) {
+			event.add_argument(carStateEvent.get_argument(j));
+		}
+	}
 
-		/** Number of laps in this race */
-		int m_lapsNum;
+	return event;
+}
 
-		/** Name of chosen level */
-		CL_String m_levelName;
+void GameState::parseEvent(const CL_NetGameEvent &p_event)
+{
+	assert(p_event.get_name() == EVENT_GAME_STATE);
 
-		/** The level */
-		Level *m_level;
+	unsigned arg = 0;
+	m_level = p_event.get_argument(arg++);
 
-		/** All race players */
-		std::map<CL_NetGameConnection*, RacePlayer*> m_racePlayers;
+	const size_t playerCount = p_event.get_argument(arg++);
 
-		/** Main server */
-		Server *m_server;
+	m_names.clear();
+	m_carStates.clear();
 
-		/** Slots container */
-		CL_SlotContainer m_slots;
+	for (size_t i = 0; i < playerCount; ++i) {
+		m_names.push_back(p_event.get_argument(arg++));
 
-		/** Are the slots connected */
-		bool m_slotsConnected;
+		// read inline car state event
+		const size_t argumentCount = p_event.get_argument(arg++);
+		CL_NetGameEvent carStateEvent(EVENT_CAR_STATE);
 
-		//
-		// slots
-		//
+		for (size_t j = 0; j < argumentCount; ++j) {
+			carStateEvent.add_argument(p_event.get_argument(arg++));
+		}
 
-		void slotPlayerConnected(CL_NetGameConnection *p_connection, Player *p_player);
+		CarState carState;
+		carState.parseEvent(carStateEvent);
 
-		void slotPlayerDisconnected(CL_NetGameConnection *p_connection, Player *p_player);
+		m_carStates.push_back(carState);
+	}
+}
 
-		//
-		// event handlers
-		//
+void GameState::addPlayer(const CL_String &p_name, const CarState &p_carState)
+{
+	m_names.push_back(p_name);
+	m_carStates.push_back(p_carState);
+}
 
-		void handleCarStateChangeEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		void handlePlayerFinishedEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		void handleTriggerRaceStartEvent(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-};
-
-#endif /* RACESERVER_H_ */
+} // namespace

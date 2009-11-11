@@ -26,37 +26,35 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RACEPLAYER_H_
-#define RACEPLAYER_H_
+#include "RaceUI.h"
 
-#include "Player.h"
+#include "Game.h"
 #include "race/Car.h"
+#include "race/RaceScene.h"
+#include "graphics/Stage.h"
 
-class RacePlayer {
-	public:
-		RacePlayer(Player *p_player);
-		virtual ~RacePlayer();
+namespace Gfx {
 
-		Car& getCar() { return m_car; }
+RaceUI::RaceUI()
+{
+}
 
-		Player& getPlayer() { return *m_player; }
+RaceUI::~RaceUI()
+{
+}
 
-		const Player& getPlayer() const { return *m_player; }
+void RaceUI::draw(CL_GraphicContext &p_gc)
+{
 
-		bool isFinished() const { return m_finished; }
+	// draw speed control
+	m_speedMeter.draw(p_gc);
+}
 
-		void setFinished(bool p_finished) { m_finished = p_finished; }
+void RaceUI::load(CL_GraphicContext &p_gc)
+{
+	// load speed meter
+	m_speedMeter.load(p_gc);
 
-	private:
+}
 
-		/** Finished state */
-		bool m_finished;
-
-		/** The car */
-		Car m_car;
-
-		/** Base player */
-		Player* m_player;
-};
-
-#endif /* RACEPLAYER_H_ */
+} // namespace

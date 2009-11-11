@@ -26,14 +26,17 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STAGE_H_
-#define STAGE_H_
+#pragma once
 
+#include <stack>
 #include <ClanLib/core.h>
 
 #include "graphics/DebugLayer.h"
 
+class Scene;
 class Application;
+
+namespace Gfx {
 
 class Stage {
 	public:
@@ -41,10 +44,20 @@ class Stage {
 		virtual ~Stage() {
 		}
 
+		static DebugLayer* getDebugLayer() { return m_debugLayer; }
+
 		static int getWidth() { return m_width; }
+
 		static int getHeight() { return m_height; }
 
-		static DebugLayer* getDebugLayer() { return m_debugLayer; }
+		static void pushScene(Scene *p_scene);
+
+		static void popScene();
+
+		static Scene *peekScene();
+
+		static void replaceScene(Scene *p_scene);
+
 		static CL_ResourceManager* getResourceManager() { return m_resourceManager; }
 
 
@@ -53,15 +66,18 @@ class Stage {
 		/** Resource Manager */
 		static CL_ResourceManager *m_resourceManager;
 
-		/** Debug layer */
-		static DebugLayer *m_debugLayer;
-
 		/** Stage size */
 		static int m_width, m_height;
 
+		/** Scene stack */
+		static std::stack<Scene*> m_sceneStack;
+
+		/** Debug layer */
+		static DebugLayer *m_debugLayer;
+
 		Stage() {}
 
-		friend class Application;
+		friend class ::Application;
 };
 
-#endif /* STAGE_H_ */
+} // namespace

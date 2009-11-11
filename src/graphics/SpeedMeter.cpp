@@ -30,6 +30,8 @@
 
 #include "graphics/Stage.h"
 
+namespace Gfx {
+
 SpeedMeter::SpeedMeter() :
 	m_speedKMS(0)
 {
@@ -41,8 +43,8 @@ SpeedMeter::~SpeedMeter()
 
 void SpeedMeter::load(CL_GraphicContext &p_gc)
 {
-	m_speedControlBg = CL_Sprite(p_gc, "race/speed_meter_bg", Stage::getResourceManager());
-	m_speedControlArrow = CL_Sprite(p_gc, "race/speed_meter_arrow", Stage::getResourceManager());
+	m_speedControlBg = CL_Sprite(p_gc, "race/speed_meter_bg", Gfx::Stage::getResourceManager());
+	m_speedControlArrow = CL_Sprite(p_gc, "race/speed_meter_arrow", Gfx::Stage::getResourceManager());
 
 	m_speedControlBg.set_linear_filter(true);
 	m_speedControlArrow.set_linear_filter(true);
@@ -72,7 +74,7 @@ void SpeedMeter::draw(CL_GraphicContext &p_gc)
 	// set the right modelview matrix
 	p_gc.push_modelview();
 
-	p_gc.mult_translate(rwidth / 2 + margin, Stage::getHeight() - rheight / 2 - margin);
+	p_gc.mult_translate(rwidth / 2 + margin, Gfx::Stage::getHeight() - rheight / 2 - margin);
 	p_gc.mult_scale(0.40f, 0.40f);
 
 
@@ -99,3 +101,5 @@ void SpeedMeter::setSpeed(unsigned p_speedKMS)
 {
 	m_speedKMS = p_speedKMS;
 }
+
+} // namespace

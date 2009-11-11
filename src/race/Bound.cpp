@@ -28,6 +28,8 @@
 
 #include "Bound.h"
 
+namespace Race {
+
 Bound::Bound(const CL_LineSegment2f &p_segment) :
 	m_segment(p_segment)
 {
@@ -50,22 +52,4 @@ Bound::Bound(const CL_LineSegment2f &p_segment) :
 Bound::~Bound() {
 }
 
-#ifndef SERVER
-
-void Bound::draw(CL_GraphicContext &p_gc) {
-	CL_Vec4f white_color(1.0f, 1.0f, 1.0f, 1.0f);
-
-	CL_Pen pen;
-	pen.set_line_width(3.0);
-
-	p_gc.set_pen(pen);
-
-
-	CL_Draw::line(p_gc, m_segment.p, m_segment.q, CL_Colorf::white);
-
-#if !defined(SERVER) && defined(DRAW_COLLISION_OUTLINE)
-	m_collisionOutline.draw(0, 0, CL_Colorf::red, p_gc);
-#endif //!SERVER && DRAW_COLLISION_OUTLINE
-}
-
-#endif // !SERVER
+} // namespace

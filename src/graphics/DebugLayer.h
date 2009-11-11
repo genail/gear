@@ -26,13 +26,12 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DEBUGLAYER_H_
-#define DEBUGLAYER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include "graphics/Drawable.h"
 
-class DebugLayer : public Drawable {
+class DebugLayer : public Gfx::Drawable {
 	public:
 		DebugLayer();
 		virtual ~DebugLayer();
@@ -44,7 +43,7 @@ class DebugLayer : public Drawable {
 
 	private:
 		/** Debug messages */
-		std::map<CL_String8, CL_String8> m_messages;
+		::std::map<CL_String8, CL_String8> m_messages;
 
 		/** Display font */
 		CL_Font m_font;
@@ -53,4 +52,3 @@ class DebugLayer : public Drawable {
 		CL_FontMetrics m_fontMetrics;
 };
 
-#endif /* DEBUGLAYER_H_ */

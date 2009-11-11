@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SERVERCONFIGURATION_H_
-#define SERVERCONFIGURATION_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
@@ -49,4 +48,3 @@ class ServerConfiguration {
 		void load(const CL_String &p_configFile);
 };
 
-#endif /* SERVERCONFIGURATION_H_ */

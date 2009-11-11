@@ -26,38 +26,52 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TYRESTRIPES_H_
-#define TYRESTRIPES_H_
+#pragma once
 
 #include <list>
 #include <ClanLib/core.h>
 
 #include "race/Car.h"
-#include "graphics/Drawable.h"
 
-class TyreStripes : public Drawable {
+namespace Race {
 
-		struct Stripe {
-				CL_Pointf m_from, m_to;
-				const Car *m_owner;
-
-				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car *p_owner) :
-					m_from(p_from), m_to(p_to), m_owner(p_owner) {}
-
-				float length() const
-				{ return m_from.distance(m_to); }
-		};
+class TyreStripes {
 
 	public:
+		class Stripe {
+
+			public:
+
+				float length() const { return m_from.distance(m_to); }
+
+				const CL_Pointf &getFromPoint() const { return m_from; }
+
+				const CL_Pointf &getToPoint() const { return m_to; }
+
+			private:
+
+				CL_Pointf m_from, m_to;
+				const Race::Car *m_owner;
+
+				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner) :
+					m_from(p_from), m_to(p_to), m_owner(p_owner) {}
+
+				friend class TyreStripes;
+		};
+
+		typedef std::list<Stripe> stripeList_t;
+
+
 		TyreStripes();
 		virtual ~TyreStripes();
 
-		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Car *p_owner);
+		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner);
 
-		virtual void draw(CL_GraphicContext &p_gc);
+		const stripeList_t &getStripeList() const { return m_stripes; }
 
 	private:
-		std::list<Stripe> m_stripes;
+
+		stripeList_t m_stripes;
 };
 
-#endif /* TYRESTRIPES_H_ */
+} // namespace

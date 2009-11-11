@@ -26,30 +26,18 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LEVEL_H_
-#define LEVEL_H_
+#pragma once
 
 #include <ClanLib/core.h>
 
 #include "race/Car.h"
 #include "race/Block.h"
 #include "race/Bound.h"
-
-#ifdef CLIENT
-
-#include "graphics/Stage.h"
 #include "race/TyreStripes.h"
-#include "graphics/Drawable.h"
 
-#define CLASS_LEVEL class Level : public Drawable
+namespace Race {
 
-#else // CLIENT
-
-#define CLASS_LEVEL class Level
-
-#endif // CLIENT
-
-CLASS_LEVEL
+class Level
 {
 
 	public:
@@ -58,11 +46,15 @@ CLASS_LEVEL
 
 		virtual ~Level();
 
+		void initialize(const CL_String &p_filename);
+
+		void destroy();
+
 		void addCar(Car *p_car);
 
 		const Bound& getBound(int p_index) const { return m_bounds[p_index]; }
 
-		int getBoundCount() const { return m_bounds.size(); }
+		size_t getBoundCount() const { return m_bounds.size(); }
 
 		float getResistance(float p_x, float p_y);
 
@@ -71,23 +63,29 @@ CLASS_LEVEL
 		 */
 		CL_Pointf getStartPosition(int p_num) const;
 
-		void loadFromFile(const CL_String& p_filename);
+
+		size_t getCarCount() const { return m_cars.size(); }
+
+		const Car &getCar(size_t p_index) const { return *m_cars[p_index]; }
+
+		int getWidth() const { return m_width; }
+
+		int getHeight() const { return m_height; }
+
+		const Block& getBlock(int x, int y) const { return *m_blocks[y * m_width + x].get(); }
+
+		const TyreStripes &getTyreStripes() const { return m_tyreStripes; }
+
 
 		void removeCar(Car *p_car);
 
 		void update(unsigned p_timeElapsed);
 
-#ifdef CLIENT
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-#endif // CLIENT
-
 
 	private:
 
 		/** level blocks */
-		Block *m_blocks;
+		std::vector< CL_SharedPtr<Race::Block> > m_blocks;
 
 		/** Level bounds */
 		std::vector<Bound> m_bounds;
@@ -111,23 +109,18 @@ CLASS_LEVEL
 
 		Level(const Level& p_level);
 
-		Block::BlockType decodeBlock(const CL_String8& p_str);
-
-		const Block& getBlock(int x, int y) const { return m_blocks[y * m_width + x]; }
+		Common::GroundBlockType decodeBlock(const CL_String8& p_str);
 
 		CL_String8 readLine(CL_File& p_file);
 
-		void unload();
+		void loadFromFile(const CL_String& p_filename);
 
-#ifdef CLIENT
 		/** Tyre stripes */
 		TyreStripes m_tyreStripes;
 
-
 		/** Collision checking */
 		void checkCollistions();
-#endif // CLIENT
 
 };
 
-#endif /* LEVEL_H_ */
+} // namespace

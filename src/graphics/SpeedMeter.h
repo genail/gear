@@ -26,15 +26,16 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SPEEDMETER_H_
-#define SPEEDMETER_H_
+#pragma once
 
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
 #include "graphics/Drawable.h"
 
-class SpeedMeter : public Drawable {
+namespace Gfx {
+
+class SpeedMeter : public Gfx::Drawable {
 
 	public:
 
@@ -60,4 +61,4 @@ class SpeedMeter : public Drawable {
 		unsigned m_speedKMS;
 };
 
-#endif /* SPEEDMETER_H_ */
+} // namespace

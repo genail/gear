@@ -35,66 +35,29 @@
 #include "common.h"
 #include "race/Checkpoint.h"
 
+namespace Race {
+
 Level::Level() :
-	m_blocks(NULL),
 	m_loaded(false),
 	m_width(0),
 	m_height(0)
 {
-	loadFromFile("resources/level.txt");
+}
+
+void Level::initialize(const CL_String &p_filename)
+{
+	loadFromFile(p_filename);
+}
+
+void Level::destroy()
+{
+	m_blocks.clear();
+	m_loaded = false;
 }
 
 Level::~Level() {
-	if (m_blocks != NULL) {
-		unload();
-	}
+	m_blocks.clear();
 }
-
-#ifdef CLIENT
-void Level::draw(CL_GraphicContext &p_gc) {
-
-	// draw tiles
-	for (int x = 0; x < 10; ++x) {
-		for (int y = 0; y < 10; ++y) {
-			p_gc.push_translate(x * BOX_WIDTH, y * BOX_WIDTH);
-
-			m_blocks[m_width * y + x].draw(p_gc);
-
-			p_gc.pop_modelview();
-		}
-	}
-
-	// draw tyre stripes
-	m_tyreStripes.draw(p_gc);
-
-	// draw cars
-	for (std::vector<Car*>::iterator itor = m_cars.begin(); itor != m_cars.end(); ++itor) {
-		(*itor)->draw(p_gc);
-	}
-
-	// draw bounds
-	for (std::vector<Bound>::iterator itor = m_bounds.begin(); itor != m_bounds.end(); ++itor) {
-		(*itor).draw(p_gc);
-	}
-
-#ifdef DRAW_COLLISION_OUTLINE
-	// draw collision outlines
-	foreach (Car *car, m_cars) {
-		car->calculateCurrentCollisionOutline().draw(0, 0, CL_Colorf::red, p_gc);
-	}
-#endif // DRAW_COLLISION_OUTLINE
-
-}
-
-void Level::load(CL_GraphicContext &p_gc) {
-	for (int x = 0; x < m_width; ++x) {
-		for (int y = 0; y < m_height; ++y) {
-			m_blocks[m_width * y + x].load(p_gc);
-		}
-	}
-}
-
-#endif // CLIENT
 
 CL_String8 Level::readLine(CL_File& p_file) {
 	CL_String8 line = p_file.read_string_text("", "\n", false);
@@ -105,9 +68,11 @@ CL_String8 Level::readLine(CL_File& p_file) {
 
 void Level::loadFromFile(const CL_String& p_filename)
 {
-	try {
+	assert(!m_loaded && "level is already loaded");
 
-		CL_File file(p_filename, CL_File::open_existing);
+	try {
+		CL_File file(p_filename, CL_File::open_existing, CL_File::access_read);
+
 
 		CL_DomDocument document(file);
 		const CL_DomElement root = document.get_document_element();
@@ -116,6 +81,7 @@ void Level::loadFromFile(const CL_String& p_filename)
 		// read required meta values
 		const CL_DomNode metaName = meta.named_item("name");
 		const CL_DomNode metaSize = meta.named_item("size");
+
 
 		if (metaName.is_null() || metaSize.is_null()) {
 			cl_log_event("error", "Missing meta data in level file");
@@ -207,37 +173,32 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 }
 
-void Level::unload()
-{
-	delete[] m_blocks;
-}
-
-Block::BlockType Level::decodeBlock(const CL_String8& p_str) {
+Common::GroundBlockType Level::decodeBlock(const CL_String8& p_str) {
 
 	const char c = p_str[0];
 
 	switch (c) {
 		case '0':
-			return Block::BT_NONE;
+			return Common::BT_GRASS;
 		case '|':
-			return Block::BT_STREET_VERT;
+			return Common::BT_STREET_VERT;
 		case '-':
-			return Block::BT_STREET_HORIZ;
+			return Common::BT_STREET_HORIZ;
 		case '1':
-			return Block::BT_TURN_BOTTOM_RIGHT;
+			return Common::BT_TURN_BOTTOM_RIGHT;
 		case '2':
-			return Block::BT_TURN_BOTTOM_LEFT;
+			return Common::BT_TURN_BOTTOM_LEFT;
 		case '3':
-			return Block::BT_TURN_TOP_LEFT;
+			return Common::BT_TURN_TOP_LEFT;
 		case '4':
-			return Block::BT_TURN_TOP_RIGHT;
+			return Common::BT_TURN_TOP_RIGHT;
 		case '5':
-			return Block::BT_START_LINE;
+			return Common::BT_START_LINE;
 		default:
 			assert(0 && "unknown char");
 	}
 
-	return Block::BT_NONE;
+	return Common::BT_GRASS;
 
 }
 
@@ -252,7 +213,7 @@ float Level::getResistance(float p_x, float p_y) {
 	int localX = (int) (p_x - blockX * BOX_WIDTH);
 	int localY = (int) (p_y - blockY * BOX_WIDTH);
 
-	return m_blocks[blockY * m_width + blockX].getResistance(localX, localY);
+	return m_blocks[blockY * m_width + blockX]->getResistance(localX, localY);
 }
 
 void Level::addCar(Car *p_car) {
@@ -267,7 +228,7 @@ void Level::addCar(Car *p_car) {
 
 			const Block &block = getBlock(x, y);
 
-			if (block.getType() != Block::BT_NONE) {
+			if (block.getType() != Common::BT_GRASS) {
 
 				const CL_Rectf rect(x * BOX_WIDTH, y * BOX_WIDTH, (x + 1) * BOX_WIDTH, (y + 1) * BOX_WIDTH);
 				const Checkpoint checkpoint(rect);
@@ -277,7 +238,7 @@ void Level::addCar(Car *p_car) {
 			}
 
 			// if this is a start/finish line, then add finish line checkpoint
-			if (block.getType() == Block::BT_START_LINE) {
+			if (block.getType() == Common::BT_START_LINE) {
 				const CL_Rectf rect(x * BOX_WIDTH, (y - 1) * BOX_WIDTH, (x + 1) * BOX_WIDTH, y * BOX_WIDTH);
 				p_car->m_lapCheckpoint = Checkpoint(rect);
 			}
@@ -417,3 +378,5 @@ void Level::checkCollistions()
 
 }
 #endif // CLIENT
+
+} // namespace

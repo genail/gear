@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CAR_H_
-#define CAR_H_
+#pragma once
 
 #include "race/Checkpoint.h"
 
@@ -36,33 +35,21 @@
 
 #include "race/Bound.h"
 
+#include "common.h"
+#include "network/CarState.h"
+
+namespace Race {
+
 class Level;
-class RacePlayer;
 
-#ifdef CLIENT // client-only code
-
-#include "graphics/Stage.h"
-#include "graphics/Drawable.h"
-
-#define CLASS_CAR class Car : public Drawable
-
-
-#else // server-only code
-
-#define CLASS_CAR class Car
-
-#endif // CLIENT
-
-CLASS_CAR
+class Car
 {
 
 	public:
-		Car(RacePlayer* p_player);
+		Car();
 		virtual ~Car();
 
 		int getLap() const { return m_lap; }
-
-		RacePlayer* getPlayer() const { return m_player; }
 
 		const CL_Pointf& getPosition() const { return m_position; }
 
@@ -77,27 +64,17 @@ CLASS_CAR
 		
 		bool isDrifting() const;
 
-		int prepareStatusEvent(CL_NetGameEvent &p_event);
+		DEPRECATED(int prepareStatusEvent(CL_NetGameEvent &p_event));
 
-		int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0);
+		Net::CarState prepareCarState();
 
-		void setAcceleration(bool p_value) {
-			m_acceleration = p_value;
-#ifndef NDEBUG
-#ifdef CLIENT
-			Stage::getDebugLayer()->putMessage(CL_String8("accel"),  CL_StringHelp::bool_to_local8(p_value));
-#endif // CLIENT
-#endif // !NDEBUG
-		}
+		DEPRECATED(int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0));
 
-		void setBrake(bool p_value) {
-			m_brake = p_value;
-#ifndef NDEBUG
-#ifdef CLIENT
-			Stage::getDebugLayer()->putMessage(CL_String8("brake"),  CL_StringHelp::bool_to_local8(p_value));
-#endif // CLIENT
-#endif // !NDEBUG
-		}
+		void applyCarState(const Net::CarState &p_carState);
+
+		void setAcceleration(bool p_value) { m_acceleration = p_value; }
+
+		void setBrake(bool p_value) { m_brake = p_value; }
 
 		void setLap(int p_lap) { m_lap = p_lap; }
 
@@ -106,14 +83,7 @@ CLASS_CAR
 		 */
 		void setLocked(bool p_locked);
 
-		void setTurn(float p_value) {
-			m_turn = normalize(p_value);
-#ifndef NDEBUG
-#ifdef CLIENT
-			Stage::getDebugLayer()->putMessage(CL_String8("turn"),  CL_StringHelp::float_to_local8(p_value));
-#endif // CLIENT
-#endif // !NDEBUG
-		}
+		void setTurn(float p_value) { m_turn = normalize(p_value); }
 
 		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
 
@@ -134,10 +104,6 @@ CLASS_CAR
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
 #ifndef SERVER
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-
 		/** @return Current collision outline based on car position and rotation */
 		CL_CollisionOutline calculateCurrentCollisionOutline() const;
 
@@ -173,11 +139,8 @@ CLASS_CAR
 
 	private:
 		
-		/** Parent player */
-		RacePlayer* m_player;
-
 		/** Parent level */
-		Level* m_level;
+		Race::Level* m_level;
 
 		/** Locked state. If true then car shoudn't move. */
 		bool m_locked;
@@ -233,15 +196,9 @@ CLASS_CAR
 
 		void resetCheckpoints();
 
-		friend class Level;
+		friend class Race::Level;
 
 #ifdef CLIENT
-		/** Car sprite */
-		CL_Sprite m_sprite;
-
-		/** Nickname display font */
-		CL_Font_Freetype m_nickDisplayFont;
-
 		/** Body outline for collision check */
 		CL_CollisionOutline m_collisionOutline;
 
@@ -263,4 +220,4 @@ inline float Car::normalize(float p_value) const {
 	return p_value;
 }
 
-#endif /* CAR_H_ */
+} // namespace

@@ -2,29 +2,43 @@
 SET(COMMON_SRCS
     Player.cpp
     Properties.cpp
+    network/CarState.cpp
+    network/ClientInfo.cpp
+    network/GameState.cpp
+    network/Goodbye.cpp
+    network/PlayerJoined.cpp
     race/Block.cpp
     race/Bound.cpp
     race/Car.cpp
     race/Checkpoint.cpp
     race/Level.cpp
-    race/RacePlayer.cpp
     race/ScoreTable.cpp
+    race/TyreStripes.cpp
 )
 
 # Game client sources
 SET(CLIENT_SRCS
     ${COMMON_SRCS}
     Application.cpp
+    Game.cpp
+    controllers/LoadingController.cpp
+    controllers/MainMenuController.cpp
+    graphics/Bound.cpp
+    graphics/Car.cpp
     graphics/DebugLayer.cpp
+    graphics/GameWindow.cpp
+    graphics/GroundBlock.cpp
+    graphics/RaceUI.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
-    race/Race.cpp
+    graphics/TireTrack.cpp
+    gui/MainMenuScene.cpp
+    gui/LoadingScene.cpp
+    gui/SceneContainer.cpp
+#    race/Race.cpp
     race/RaceScene.cpp
-    race/RaceUI.cpp
-    race/TyreStripes.cpp
     race/Viewport.cpp
     network/Client.cpp
-    network/RaceClient.cpp
 )
 
 # Server sources
@@ -32,11 +46,10 @@ SET(SERVER_SRCS
     ${COMMON_SRCS}
     ServerApplication.cpp
     ServerConfiguration.cpp
-    network/RaceServer.cpp
     network/Server.cpp
 )
 
-FIND_PACKAGE(ClanLib REQUIRED)
+FIND_PACKAGE(ClanLib-2.1 REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
 
 INCLUDE_DIRECTORIES(
@@ -49,8 +62,9 @@ SET(CLIENT_LIBS ${LIBS}
     ${ClanLib_App_LIBRARY}
     ${ClanLib_Core_LIBRARY}
     ${ClanLib_Display_LIBRARY}
-    ${ClanLib_GL_LIBRARY}
+    ${ClanLib_GL1_LIBRARY}
     ${ClanLib_Network_LIBRARY}
+    ${ClanLib_GUI_LIBRARY}
 )
 
 SET(SERVER_LIBS ${LIBS}
@@ -59,13 +73,22 @@ SET(SERVER_LIBS ${LIBS}
     ${ClanLib_Network_LIBRARY}
 )
 
+SET(GUI_LIBS ${LIBS}
+    ${ClanLib_App_LIBRARY}
+    ${ClanLib_Core_LIBRARY}
+    ${ClanLib_GUI_LIBRARY}
+    ${ClanLib_Display_LIBRARY}
+    ${ClanLib_GL_LIBRARY}
+
+)
+
 
 # Game client configuration
 
 add_executable(game ${CLIENT_SRCS})
 TARGET_LINK_LIBRARIES(game ${CLIENT_LIBS})
 SET_TARGET_PROPERTIES(game PROPERTIES LINK_FLAGS "-lz -lfontconfig -lX11 -lXxf86vm -lpng -ljpeg -lfreetype")
-SET_TARGET_PROPERTIES(game PROPERTIES COMPILE_FLAGS "-Wall -DCLIENT $ENV{CXXFLAGS}")
+SET_TARGET_PROPERTIES(game PROPERTIES COMPILE_FLAGS "-Wall -DCLIENT -DGL1 $ENV{CXXFLAGS}")
 
 # Server configuration
 add_executable(server ${SERVER_SRCS})

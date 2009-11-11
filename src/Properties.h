@@ -26,8 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PROPERTIES_H_
-#define PROPERTIES_H_
+#pragma once
 
 #include <map>
 #include <ClanLib/core.h>
@@ -51,5 +50,3 @@ class Properties {
 		Properties();
 		virtual ~Properties();
 };
-
-#endif /* PROPERTIES_H_ */

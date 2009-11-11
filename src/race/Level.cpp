@@ -76,29 +76,20 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 		CL_DomDocument document(file);
 		const CL_DomElement root = document.get_document_element();
-		const CL_DomNode meta = document.named_item("meta");
 
-		// read required meta values
-		const CL_DomNode metaName = meta.named_item("name");
-		const CL_DomNode metaSize = meta.named_item("size");
+		// load meta element
+		const CL_DomNode metaNode = root.named_item("meta");
+		loadMetaElement(metaNode);
+
+		// load level's content
+		const CL_DomNode contentNode = root.named_item("content");
+
+		// load track
+		const CL_DomNode trackNode = contentNode.named_item("track");
+		loadTrackElement(trackNode);
 
 
-		if (metaName.is_null() || metaSize.is_null()) {
-			cl_log_event("error", "Missing meta data in level file");
-			return;
-		}
-
-		// read level size
-		const CL_DomNode metaSizeWidth = metaSize.named_item("width");
-		const CL_DomNode metaSizeHeigth = metaSize.named_item("height");
-
-		if (metaSizeWidth.is_null() || metaSizeHeigth.is_null()) {
-			cl_log_event("error", "Missing meta size in level file");
-			return;
-		}
-
-		// assign these meta values
-		m_width = CL_StringHelp::local8_to_int(metaSizeWidth.get_);
+		// read level content
 
 //		CL_String8 line;
 //
@@ -170,6 +161,75 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 	m_loaded = true;
 
+
+}
+
+void Level::loadMetaElement(const CL_DomNode &p_metaNode)
+{
+	m_width = p_metaNode.select_int("size/width");
+	m_height = p_metaNode.select_int("size/height");
+
+	cl_log_event("race", "level size set to %1 x %2", m_width, m_height);
+}
+
+void Level::loadTrackElement(const CL_DomNode &p_trackNode)
+{
+	// build block type map
+	typedef std::map<CL_String, Common::GroundBlockType> blockMap_t;
+	blockMap_t blockMap;
+	blockMap_t::iterator blockMapItor;
+
+	blockMap["vert"] = Common::BT_STREET_VERT;
+	blockMap["horiz"] = Common::BT_STREET_HORIZ;
+	blockMap["turn_bottom_right"] = Common::BT_TURN_BOTTOM_RIGHT;
+	blockMap["turn_bottom_left"] = Common::BT_TURN_BOTTOM_LEFT;
+	blockMap["turn_top_right"] = Common::BT_TURN_TOP_RIGHT;
+	blockMap["turn_top_left"] = Common::BT_TURN_TOP_LEFT;
+
+	// prepare level blocks
+	const int blocksCount = m_width * m_height;
+	m_blocks.clear();
+	m_blocks.reserve(blocksCount);
+
+	for (int i = 0; i < blocksCount; ++i) {
+		m_blocks.push_back(CL_SharedPtr<Block>(new Block(Common::BT_GRASS)));
+	}
+
+	// read blocks
+	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
+	const int blockListSize = blockList.get_length();
+
+	cl_log_event("debug", "Track node child count: %1", blockListSize);
+
+	for (int i = 0; i < blockListSize; ++i) {
+		const CL_DomNode blockNode = blockList.item(i);
+
+		if (blockNode.get_node_name() == "block") {
+			CL_DomNamedNodeMap attrs = blockNode.get_attributes();
+
+
+			const int x = CL_StringHelp::local8_to_int(attrs.get_named_item("x").get_node_value());
+			const int y = CL_StringHelp::local8_to_int(attrs.get_named_item("y").get_node_value());
+			const CL_String typeStr = attrs.get_named_item("type").get_node_value();
+
+			if (x < 0 || y < 0 || x >= m_width || y >= m_height) {
+				cl_log_event("debug", "coords x=%1, y=%2", x, y);
+				throw CL_Exception("Blocks coords out of bounds");
+			}
+
+			blockMapItor = blockMap.find(typeStr);
+
+			if (blockMapItor != blockMap.end()) {
+				m_blocks[m_width * y + x]->setType(blockMapItor->second);
+			} else {
+				cl_log_event("race", "Unknown block type: %1", typeStr);
+			}
+
+		} else {
+			cl_log_event("race", "Unknown node '%1', ignoring", blockNode.get_node_name());
+		}
+
+	}
 
 }
 

@@ -16,19 +16,34 @@
     <content>
         <!-- Define how track leads to -->
         <track>
-            <starts at="1, 6" />
-            <and_goes>
-                <!-- The order is important -->
-                <up    for="4" />
-                <right for="3" />
-                <down  for="3" />
-                <right for="4" />
-                <down  for="2" />
-                <left  for="3" />
-                <down  for="2" />
-                <left  for="4" />
-                <up    for="2" />
-            </and_goes>
+            <block x="1" y="5" type="vert" start="yes" />
+            <block x="1" y="4" type="vert" />
+            <block x="1" y="3" type="vert" />
+            <block x="1" y="2" type="vert" />
+            <block x="1" y="1" type="turn_bottom_right" />
+            <block x="2" y="1" type="horiz" />
+            <block x="3" y="1" type="horiz" />
+            <block x="4" y="1" type="turn_bottom_left" />
+            <block x="4" y="2" type="vert" />
+            <block x="4" y="3" type="vert" />
+            <block x="4" y="4" type="turn_top_right" />
+            <block x="5" y="4" type="horiz" />
+            <block x="6" y="4" type="horiz" />
+            <block x="7" y="4" type="horiz" />
+            <block x="8" y="4" type="turn_bottom_left" />
+            <block x="8" y="5" type="vert" />
+            <block x="8" y="6" type="turn_top_left" />
+            <block x="7" y="6" type="horiz" />
+            <block x="6" y="6" type="horiz" />
+            <block x="5" y="6" type="turn_bottom_right" />
+            <block x="5" y="7" type="vert" />
+            <block x="5" y="8" type="turn_top_left" />
+            <block x="4" y="8" type="horiz" />
+            <block x="3" y="8" type="horiz" />
+            <block x="2" y="8" type="horiz" />
+            <block x="1" y="8" type="turn_top_right" />
+            <block x="1" y="7" type="vert" />
+            <block x="1" y="6" type="vert" />
         </track>
         
         <bounds>

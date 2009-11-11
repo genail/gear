@@ -62,7 +62,7 @@ void LoadingController::loadRace()
 		cl_log_event("debug", "Starting offline game");
 		m_scene->setMessage("Loading level");
 
-		loadLevel("resources/level.txt");
+		loadLevel("resources/level.xml");
 
 		Game &game = Game::getInstance();
 		RaceScene &raceScene = game.getSceneContainer().getRaceScene();

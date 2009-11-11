@@ -35,10 +35,11 @@
 
 namespace Race {
 
-Block::Block(Common::GroundBlockType p_type, int p_width) :
+const int Block::WIDTH = 200;
+
+Block::Block(Common::GroundBlockType p_type) :
 	m_type(p_type),
-	m_resistanceMap(NULL),
-	m_width(p_width)
+	m_resistanceMap(NULL)
 {
 
 }
@@ -53,7 +54,7 @@ float Block::getResistance(int x, int y) const {
 		return 0.0f;
 	}
 
-	return m_resistanceMap[y * m_width + x];
+	return m_resistanceMap[y * WIDTH + x];
 }
 
 } // namespace

@@ -38,13 +38,15 @@ class Block : public boost::noncopyable
 {
 	public:
 
-		Block() {}
+		static const int WIDTH;
 
-		Block(Common::GroundBlockType p_type, int p_width);
+		Block(Common::GroundBlockType p_type);
 
 		virtual ~Block();
 
 		float getResistance(int x, int y) const;
+
+		void setType(Common::GroundBlockType p_type) { m_type = p_type; }
 
 		Common::GroundBlockType getType() const { return m_type; }
 
@@ -54,9 +56,6 @@ class Block : public boost::noncopyable
 
 		/** Resistance map */
 		float *m_resistanceMap;
-
-		/** Width of block in pixels */
-		int m_width;
 
 };
 

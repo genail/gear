@@ -105,6 +105,9 @@ class Level
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
 
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
+
 
 
 		Level(const Level& p_level);
@@ -113,13 +116,17 @@ class Level
 
 		CL_String8 readLine(CL_File& p_file);
 
-		void loadFromFile(const CL_String& p_filename);
-
-		/** Tyre stripes */
-		TyreStripes m_tyreStripes;
 
 		/** Collision checking */
 		void checkCollistions();
+
+		// level loading
+
+		void loadFromFile(const CL_String& p_filename);
+
+		void loadMetaElement(const CL_DomNode &p_metaNode);
+
+		void loadTrackElement(const CL_DomNode &p_trackNode);
 
 };
 

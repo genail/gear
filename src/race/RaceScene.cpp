@@ -128,7 +128,7 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 
 	// draw tire tracks
 	drawTireTracks(p_gc);
-
+	drawSmokes(p_gc);
 	drawCars(p_gc);
 
 	// revert player's viewport
@@ -144,6 +144,17 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 
 	Gfx::Stage::getDebugLayer()->draw(p_gc);
 #endif // NDEBUG
+}
+
+void RaceScene::drawSmokes(CL_GraphicContext &p_gc)
+{
+	foreach(CL_SharedPtr<Gfx::Smoke> &smoke, m_smokes) {
+		if (!smoke->isLoaded()) {
+			smoke->load(p_gc);
+		}
+
+		smoke->draw(p_gc);
+	}
 }
 
 void RaceScene::drawUI(CL_GraphicContext &p_gc)
@@ -363,6 +374,35 @@ void RaceScene::update(unsigned p_timeElapsed)
 
 	if (car.getLap() > m_lapsTotal) {
 		m_viewport.detach();
+	}
+
+	updateSmokes(p_timeElapsed);
+
+}
+
+void RaceScene::updateSmokes(unsigned p_timeElapsed)
+{
+	// remove finished smokes and update the ongoing
+	smokeList_t::iterator itor = m_smokes.begin();
+
+	while (itor != m_smokes.end()) {
+		if ((*itor)->isFinished()) {
+			m_smokes.erase(itor++);
+		} else {
+			(*itor)->update(p_timeElapsed);
+			++itor;
+		}
+	}
+
+	// if car is drifting then add new smokes
+	Player &player = Game::getInstance().getPlayer();
+	const Race::Car &car = player.getCar();
+
+	if (car.isDrifting()) {
+		CL_SharedPtr<Gfx::Smoke> smoke(new Gfx::Smoke(car.getPosition()));
+		smoke->start();
+
+		m_smokes.push_back(smoke);
 	}
 
 }

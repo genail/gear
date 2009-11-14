@@ -43,6 +43,7 @@
         <sprite name="smoke">
             <image file="smoke.png" />
             <translation origin="center" />
+            <scale x="0.05" y="0.05" />
         </sprite>
         
         <!-- Speed control -->

@@ -56,6 +56,8 @@ void Smoke::draw(CL_GraphicContext &p_gc)
 		m_smokeSprite.set_alpha(alpha);
 
 		m_smokeSprite.draw(p_gc, m_position.x, m_position.y);
+	} else {
+		setFinished(true);
 	}
 
 }

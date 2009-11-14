@@ -38,21 +38,29 @@ class Animation : public Gfx::Drawable {
 
 		virtual ~Animation() {}
 
-		void start() { m_timeFromStart = 0; }
 
-		void update(unsigned p_timeElapsed) { m_timeFromStart += p_timeElapsed; }
+		bool isFinished() const { return m_finished; }
+
+		void start() { m_timeFromStart = 0; m_finished = false; }
+
+		virtual void update(unsigned p_timeElapsed) { m_timeFromStart += p_timeElapsed; }
 
 	protected:
 
 		Animation() :
-			m_timeFromStart(0)
+			m_timeFromStart(0),
+			m_finished(false)
 		{}
 
 		unsigned getTimeFromStart() const { return m_timeFromStart; }
 
+		void setFinished(bool p_value) { m_finished = p_value; }
+
 	private:
 
 		unsigned m_timeFromStart;
+
+		bool m_finished;
 };
 
 } // namespace

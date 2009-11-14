@@ -41,6 +41,7 @@
 #include "graphics/Car.h"
 #include "graphics/GroundBlock.h"
 #include "graphics/DecorationSprite.h"
+#include "graphics/Smoke.h"
 
 #include "graphics/Scene.h"
 
@@ -129,6 +130,10 @@ class RaceScene: public Scene
 		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > blockMapping_t;
 		blockMapping_t m_blockMapping;
 
+		/** Car smoke clounds */
+		typedef std::list< CL_SharedPtr<Gfx::Smoke> > smokeList_t;
+		smokeList_t m_smokes;
+
 		/** Decorations */
 		typedef std::list< CL_SharedPtr<Gfx::DecorationSprite> > decorationList_t;
 		decorationList_t m_decorations;
@@ -161,6 +166,8 @@ class RaceScene: public Scene
 
 		void drawUI(CL_GraphicContext &p_gc);
 
+		void drawSmokes(CL_GraphicContext &p_gc);
+
 		// input
 
 		void grabInput();
@@ -178,6 +185,8 @@ class RaceScene: public Scene
 		void updateCars(unsigned p_timeElapsed);
 
 		void updateScale();
+
+		void updateSmokes(unsigned p_timeElapsed);
 
 		// flow control
 

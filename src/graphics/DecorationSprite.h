@@ -46,6 +46,8 @@ class DecorationSprite: public Drawable {
 		virtual void load(CL_GraphicContext &p_gc);
 
 
+		const CL_Pointf &getPosition() const { return m_position; }
+
 		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
 
 	private:

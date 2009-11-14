@@ -128,8 +128,8 @@ void RaceScene::draw(CL_GraphicContext &p_gc)
 
 	// draw tire tracks
 	drawTireTracks(p_gc);
-	drawSmokes(p_gc);
 	drawCars(p_gc);
+	drawSmokes(p_gc);
 
 	// revert player's viewport
 	m_viewport.finalizeGC(p_gc);
@@ -192,13 +192,8 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 
 	for (size_t iw = 0; iw < w; ++iw) {
 		for (size_t ih = 0; ih < h; ++ih) {
-			drawGroundBlock(p_gc, level.getBlock(iw, ih), iw * 200, ih * 200); // FIXME: Magic numers
+			drawGroundBlock(p_gc, level.getBlock(iw, ih), iw * Race::Block::WIDTH, ih * Race::Block::WIDTH);
 		}
-	}
-
-	// draw grass on it
-	foreach(CL_SharedPtr<Gfx::DecorationSprite> &decoration, m_decorations) {
-		decoration->draw(p_gc);
 	}
 
 	// draw bounds
@@ -222,6 +217,15 @@ void RaceScene::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_bl
 	gfxGrassBlock->setPosition(CL_Pointf(x, y));
 
 	gfxGrassBlock->draw(p_gc);
+
+	// draw grass decoration sprites
+	foreach(CL_SharedPtr<Gfx::DecorationSprite> &decoration, m_decorations) {
+		const CL_Pointf &position = decoration->getPosition();
+
+		if (position.x >= x && position.x < x + Race::Block::WIDTH && position.y >= y && position.y < y + Race::Block::WIDTH) {
+			decoration->draw(p_gc);
+		}
+	}
 
 	// then draw selected block
 	if (p_block.getType() != Common::BT_GRASS) {

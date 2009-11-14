@@ -50,8 +50,8 @@ class Game {
 		Player &getPlayer() { return m_player; }
 
 		SceneContainer &getSceneContainer() {
-			assert(m_sceneContainer.get() != NULL && "scene container must be set by Application");
-			return *m_sceneContainer.get();
+			assert(m_sceneContainer != NULL && "scene container must be set by Application");
+			return *m_sceneContainer;
 		}
 
 	private:
@@ -62,11 +62,11 @@ class Game {
 
 		Race::Level m_level;
 
-		CL_AutoPtr<SceneContainer> m_sceneContainer;
+		SceneContainer *m_sceneContainer;
 
 		Game();
 
-		void setSceneContainer(SceneContainer *p_sceneContainer) { m_sceneContainer.reset(p_sceneContainer); }
+		void setSceneContainer(SceneContainer *p_sceneContainer) { m_sceneContainer = p_sceneContainer; }
 
 		friend class Application;
 };

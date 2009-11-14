@@ -30,7 +30,8 @@
 
 Game::Game() :
 	m_networkConnection(),
-	m_player()
+	m_player(),
+	m_sceneContainer(NULL)
 {
 }
 

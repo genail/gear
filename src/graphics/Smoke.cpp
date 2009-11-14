@@ -49,11 +49,17 @@ void Smoke::draw(CL_GraphicContext &p_gc)
 
 	const unsigned now = getTimeFromStart();
 
-	static const unsigned ANIMATION_END = 3000;
+	static const unsigned ANIMATION_END = 6000;
 
 	if (now < ANIMATION_END) {
-		const float alpha = 1.0f - ((float) now / ANIMATION_END);
+
+		const float animationProgress = (float) now / ANIMATION_END;
+
+		const float alpha = (1.0f - animationProgress) * 0.5f;
 		m_smokeSprite.set_alpha(alpha);
+
+		const float size = (0.1f + animationProgress) * 0.8f;
+		m_smokeSprite.set_scale(size, size);
 
 		m_smokeSprite.draw(p_gc, m_position.x, m_position.y);
 	} else {

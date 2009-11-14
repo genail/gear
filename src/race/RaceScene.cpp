@@ -398,11 +398,26 @@ void RaceScene::updateSmokes(unsigned p_timeElapsed)
 	Player &player = Game::getInstance().getPlayer();
 	const Race::Car &car = player.getCar();
 
-	if (car.isDrifting()) {
-		CL_SharedPtr<Gfx::Smoke> smoke(new Gfx::Smoke(car.getPosition()));
+	// but keep this limit on mind
+	static const unsigned SMOKE_PERIOD = 25;
+	static unsigned timeFromLastSmoke = SMOKE_PERIOD;
+
+	timeFromLastSmoke += p_timeElapsed;
+
+	static const int RAND_LIMIT = 10;
+
+	if (car.isDrifting() && timeFromLastSmoke >= SMOKE_PERIOD) {
+
+		CL_Pointf smokePosition = car.getPosition();
+		smokePosition.x += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);
+		smokePosition.y += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);
+
+		CL_SharedPtr<Gfx::Smoke> smoke(new Gfx::Smoke(smokePosition));
 		smoke->start();
 
 		m_smokes.push_back(smoke);
+
+		timeFromLastSmoke = 0;
 	}
 
 }

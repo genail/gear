@@ -247,10 +247,17 @@ void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)
 		if (boundNode.get_node_name() == "bound") {
 			CL_DomNamedNodeMap attrs = boundNode.get_attributes();
 
-			const float x1 = CL_StringHelp::local8_to_float(attrs.get_named_item("x1").get_node_value());
-			const float y1 = CL_StringHelp::local8_to_float(attrs.get_named_item("y1").get_node_value());
-			const float x2 = CL_StringHelp::local8_to_float(attrs.get_named_item("x2").get_node_value());
-			const float y2 = CL_StringHelp::local8_to_float(attrs.get_named_item("y2").get_node_value());
+			float x1 = CL_StringHelp::local8_to_float(attrs.get_named_item("x1").get_node_value());
+			float y1 = CL_StringHelp::local8_to_float(attrs.get_named_item("y1").get_node_value());
+			float x2 = CL_StringHelp::local8_to_float(attrs.get_named_item("x2").get_node_value());
+			float y2 = CL_StringHelp::local8_to_float(attrs.get_named_item("y2").get_node_value());
+
+			x1 *= Block::WIDTH;
+			y1 *= Block::WIDTH;
+			x2 *= Block::WIDTH;
+			y2 *= Block::WIDTH;
+
+			cl_log_event("debug", "Loading bound %1 x %2 -> %3 x %4", x1, y1, x2, y2);
 
 			const CL_LineSegment2f segment(CL_Pointf(x1, y1), CL_Pointf(x2, y2));
 			m_bounds.push_back(CL_SharedPtr<Bound>(new Bound(segment)));

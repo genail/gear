@@ -51,5 +51,11 @@
             <translation x="-200" y="-200"/>
         </sprite>
         
+        <section name="decorations">
+            <sprite name="grass">
+                <image file="grass.png" />
+            </sprite>
+        </section>
+        
     </section>
 </resources>

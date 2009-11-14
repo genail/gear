@@ -25,6 +25,7 @@ SET(CLIENT_SRCS
     controllers/MainMenuController.cpp
     graphics/Bound.cpp
     graphics/Car.cpp
+    graphics/DecorationSprite.cpp
     graphics/DebugLayer.cpp
     graphics/GameWindow.cpp
     graphics/GroundBlock.cpp

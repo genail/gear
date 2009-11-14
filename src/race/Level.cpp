@@ -26,8 +26,6 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define BOX_WIDTH 200
-
 #include "Level.h"
 
 #include <assert.h>
@@ -297,15 +295,15 @@ Common::GroundBlockType Level::decodeBlock(const CL_String8& p_str) {
 }
 
 float Level::getResistance(float p_x, float p_y) {
-	if (p_x < 0 || p_y < 0 || p_x >= BOX_WIDTH * m_width || p_y >= BOX_WIDTH * m_height) {
+	if (p_x < 0 || p_y < 0 || p_x >= Block::WIDTH * m_width || p_y >= Block::WIDTH * m_height) {
 		return 0.0f;
 	}
 
-	int blockX = (int) floor(p_x / BOX_WIDTH);
-	int blockY = (int) floor(p_y / BOX_WIDTH);
+	int blockX = (int) floor(p_x / Block::WIDTH);
+	int blockY = (int) floor(p_y / Block::WIDTH);
 
-	int localX = (int) (p_x - blockX * BOX_WIDTH);
-	int localY = (int) (p_y - blockY * BOX_WIDTH);
+	int localX = (int) (p_x - blockX * Block::WIDTH);
+	int localY = (int) (p_y - blockY * Block::WIDTH);
 
 	return m_blocks[blockY * m_width + blockX]->getResistance(localX, localY);
 }
@@ -324,7 +322,7 @@ void Level::addCar(Car *p_car) {
 
 			if (block.getType() != Common::BT_GRASS) {
 
-				const CL_Rectf rect(x * BOX_WIDTH, y * BOX_WIDTH, (x + 1) * BOX_WIDTH, (y + 1) * BOX_WIDTH);
+				const CL_Rectf rect(x * Block::WIDTH, y * Block::WIDTH, (x + 1) * Block::WIDTH, (y + 1) * Block::WIDTH);
 				const Checkpoint checkpoint(rect);
 
 				p_car->m_checkpoints.push_back(checkpoint);
@@ -333,7 +331,7 @@ void Level::addCar(Car *p_car) {
 
 			// if this is a start/finish line, then add finish line checkpoint
 			if (block.getType() == Common::BT_START_LINE) {
-				const CL_Rectf rect(x * BOX_WIDTH, (y - 1) * BOX_WIDTH, (x + 1) * BOX_WIDTH, y * BOX_WIDTH);
+				const CL_Rectf rect(x * Block::WIDTH, (y - 1) * Block::WIDTH, (x + 1) * Block::WIDTH, y * Block::WIDTH);
 				p_car->m_lapCheckpoint = Checkpoint(rect);
 			}
 		}

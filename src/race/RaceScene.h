@@ -40,6 +40,7 @@
 #include "graphics/Drawable.h"
 #include "graphics/Car.h"
 #include "graphics/GroundBlock.h"
+#include "graphics/DecorationSprite.h"
 
 #include "graphics/Scene.h"
 
@@ -127,6 +128,10 @@ class RaceScene: public Scene
 		/** Block types to gfx ground blocks */
 		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > blockMapping_t;
 		blockMapping_t m_blockMapping;
+
+		/** Decorations */
+		typedef std::list< CL_SharedPtr<Gfx::DecorationSprite> > decorationList_t;
+		decorationList_t m_decorations;
 
 		// other
 

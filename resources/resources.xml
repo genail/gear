@@ -54,6 +54,7 @@
         <section name="decorations">
             <sprite name="grass">
                 <image file="grass.png" />
+                <scale x="0.15" y="0.15" />
             </sprite>
         </section>
         

@@ -131,7 +131,12 @@ int Application::main(const std::vector<CL_String> &args)
 
 	CL_ConsoleLogger logger;
 
-	CL_DisplayWindow display_window("Gear", Gfx::Stage::m_width, Gfx::Stage::m_height);
+	CL_OpenGLWindowDescription desc;
+	desc.set_title("Gear");
+	desc.set_size(CL_Size(Gfx::Stage::m_width, Gfx::Stage::m_height), false);
+	desc.set_multisampling(4);
+
+	CL_DisplayWindow display_window(desc);
 
 	// load resources
 	CL_ResourceManager resources("resources/resources.xml");
@@ -162,10 +167,10 @@ int Application::main(const std::vector<CL_String> &args)
 	theme.set_resources(res);
 	gui.set_theme(theme);
 
-	CL_DisplayWindowDescription desc("Gear");
-	desc.set_position(CL_Rect(0, 0, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()), true);
+	CL_DisplayWindowDescription guiDesc("Gear");
+	guiDesc.set_position(CL_Rect(0, 0, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()), true);
 
-	GameWindow gameWindow(&gui, desc);
+	GameWindow gameWindow(&gui, guiDesc);
 
 	// load debug layer
 	DebugLayer debugLayer;

@@ -34,6 +34,7 @@
 #include "Game.h"
 #include "common.h"
 #include "race/Race.h"
+#include "race/Block.h"
 #include "network/events.h"
 #include "network/Client.h"
 #include "graphics/TireTrack.h"
@@ -184,6 +185,11 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 		}
 	}
 
+	// draw grass on it
+	foreach(CL_SharedPtr<Gfx::DecorationSprite> &decoration, m_decorations) {
+		decoration->draw(p_gc);
+	}
+
 	// draw bounds
 	const size_t boundCount = level.getBoundCount();
 	Gfx::Bound gfxBound;
@@ -279,6 +285,28 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 	m_raceUI.load(p_gc);
 
 	loadGroundBlocks(p_gc);
+
+	// load decorations
+	Race::Level &level = Game::getInstance().getLevel();
+	const int w = level.getWidth();
+	const int h = level.getHeight();
+
+	for (int x = 0; x < w; ++x) {
+		for (int y = 0; y < h; ++y) {
+
+			for (int i = 0; i < 3; ++i) {
+				CL_SharedPtr<Gfx::DecorationSprite> decoration(new Gfx::DecorationSprite("race/decorations/grass"));
+
+				const CL_Pointf point(x * Race::Block::WIDTH + rand() % Race::Block::WIDTH, y * Race::Block::WIDTH + rand() % Race::Block::WIDTH);
+				decoration->setPosition(point);
+
+				decoration->load(p_gc);
+
+				m_decorations.push_back(decoration);
+			}
+
+		}
+	}
 }
 
 void RaceScene::loadGroundBlocks(CL_GraphicContext &p_gc)

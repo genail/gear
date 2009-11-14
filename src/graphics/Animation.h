@@ -28,34 +28,31 @@
 
 #pragma once
 
-#include <ClanLib/display.h>
+#include "Drawable.h"
 
-namespace Gfx
-{
+namespace Gfx {
 
-class Drawable {
+class Animation : public Gfx::Drawable {
 
 	public:
 
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
+		virtual ~Animation() {}
 
-		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
+		void start() { m_timeFromStart = 0; }
 
-
-		bool isLoaded() const { return m_loaded; }
+		void update(unsigned p_timeElapsed) { m_timeFromStart += p_timeElapsed; }
 
 	protected:
 
-		Drawable() :
-			m_loaded(false)
-			{}
+		Animation() :
+			m_timeFromStart(0)
+		{}
+
+		unsigned getTimeFromStart() const { return m_timeFromStart; }
 
 	private:
 
-		bool m_loaded;
-
+		unsigned m_timeFromStart;
 };
 
 } // namespace
-
-#pragma once

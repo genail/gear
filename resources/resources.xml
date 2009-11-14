@@ -40,6 +40,11 @@
             <image file="start_line.png" />
         </sprite>
         
+        <sprite name="smoke">
+            <image file="smoke.png" />
+            <translation origin="center" />
+        </sprite>
+        
         <!-- Speed control -->
         <sprite name="speed_meter_bg">
             <image file="speed_meter_bg.png" />

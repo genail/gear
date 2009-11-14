@@ -26,36 +26,43 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Smoke.h"
 
-#include <ClanLib/display.h>
+#include <assert.h>
 
-namespace Gfx
+#include "Stage.h"
+
+namespace Gfx {
+
+Smoke::Smoke(const CL_Pointf &p_position) :
+		m_position(p_position)
 {
+}
 
-class Drawable {
+Smoke::~Smoke()
+{
+}
 
-	public:
+void Smoke::draw(CL_GraphicContext &p_gc)
+{
+	assert(!m_smokeSprite.is_null());
 
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
+	const unsigned now = getTimeFromStart();
 
-		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
+	static const unsigned ANIMATION_END = 3000;
 
+	if (now < ANIMATION_END) {
+		const float alpha = 1.0f - ((float) now / ANIMATION_END);
+		m_smokeSprite.set_alpha(alpha);
 
-		bool isLoaded() const { return m_loaded; }
+		m_smokeSprite.draw(p_gc, m_position.x, m_position.y);
+	}
 
-	protected:
+}
 
-		Drawable() :
-			m_loaded(false)
-			{}
+void Smoke::load(CL_GraphicContext &p_gc)
+{
+	m_smokeSprite = CL_Sprite(p_gc, "race/smoke", Stage::getResourceManager());
+}
 
-	private:
-
-		bool m_loaded;
-
-};
-
-} // namespace
-
-#pragma once
+}

@@ -28,34 +28,31 @@
 
 #pragma once
 
-#include <ClanLib/display.h>
+#include "Animation.h"
 
-namespace Gfx
-{
+namespace Gfx {
 
-class Drawable {
+class Smoke: public Gfx::Animation {
 
 	public:
 
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
+		Smoke(const CL_Pointf &p_position);
 
-		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
+		virtual ~Smoke();
 
+		virtual void draw(CL_GraphicContext &p_gc);
 
-		bool isLoaded() const { return m_loaded; }
-
-	protected:
-
-		Drawable() :
-			m_loaded(false)
-			{}
+		virtual void load(CL_GraphicContext &p_gc);
 
 	private:
 
-		bool m_loaded;
+		/** The sprite */
+		CL_Sprite m_smokeSprite;
+
+		/** The position */
+		CL_Pointf m_position;
 
 };
 
-} // namespace
+}
 
-#pragma once

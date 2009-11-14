@@ -30,6 +30,7 @@ SET(CLIENT_SRCS
     graphics/GameWindow.cpp
     graphics/GroundBlock.cpp
     graphics/RaceUI.cpp
+    graphics/Smoke.cpp
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
     graphics/TireTrack.cpp
@@ -63,7 +64,7 @@ SET(CLIENT_LIBS ${LIBS}
     ${ClanLib_App_LIBRARY}
     ${ClanLib_Core_LIBRARY}
     ${ClanLib_Display_LIBRARY}
-    ${ClanLib_GL1_LIBRARY}
+    ${ClanLib_GL_LIBRARY}
     ${ClanLib_Network_LIBRARY}
     ${ClanLib_GUI_LIBRARY}
 )
@@ -89,7 +90,7 @@ SET(GUI_LIBS ${LIBS}
 add_executable(game ${CLIENT_SRCS})
 TARGET_LINK_LIBRARIES(game ${CLIENT_LIBS})
 SET_TARGET_PROPERTIES(game PROPERTIES LINK_FLAGS "-lz -lfontconfig -lX11 -lXxf86vm -lpng -ljpeg -lfreetype")
-SET_TARGET_PROPERTIES(game PROPERTIES COMPILE_FLAGS "-Wall -DCLIENT -DGL1 $ENV{CXXFLAGS}")
+SET_TARGET_PROPERTIES(game PROPERTIES COMPILE_FLAGS "-Wall -DCLIENT -DGL2 $ENV{CXXFLAGS}")
 
 # Server configuration
 add_executable(server ${SERVER_SRCS})

@@ -37,7 +37,6 @@ SET(CLIENT_SRCS
     gui/MainMenuScene.cpp
     gui/LoadingScene.cpp
     gui/SceneContainer.cpp
-#    race/Race.cpp
     race/RaceScene.cpp
     race/Viewport.cpp
     network/Client.cpp
@@ -53,10 +52,22 @@ SET(SERVER_SRCS
 
 FIND_PACKAGE(ClanLib-2.1 REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
+FIND_PACKAGE(JPEG REQUIRED)
+FIND_PACKAGE(PNG REQUIRED)
+FIND_PACKAGE(Freetype REQUIRED)
+FIND_PACKAGE(ZLIB REQUIRED)
+FIND_PACKAGE(X11 REQUIRED)
+FIND_PACKAGE(Threads REQUIRED)
 
 INCLUDE_DIRECTORIES(
     ${ClanLib_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
+    ${JPEG_INCLUDE_DIRS}
+    ${PNG_INCLUDE_DIRS}
+    ${Freetype_INCLUDE_DIRS}
+    ${ZLIB_INCLUDE_DIRS}
+    ${X11_INCLUDE_DIRS}
+    ${Threads_INCLUDE_DIRS}
     .
 )
 
@@ -64,37 +75,62 @@ SET(CLIENT_LIBS ${LIBS}
     ${ClanLib_App_LIBRARY}
     ${ClanLib_Core_LIBRARY}
     ${ClanLib_Display_LIBRARY}
-    ${ClanLib_GL_LIBRARY}
     ${ClanLib_Network_LIBRARY}
     ${ClanLib_GUI_LIBRARY}
+    ${JPEG_LIBRARY}
+    ${PNG_LIBRARY}
+    ${Freetype_LIBRARY}
+    ${ZLIB_LIBRARY}
+    ${X11_LIBRARY}
+    ${Threads_LIBRARY}
 )
 
 SET(SERVER_LIBS ${LIBS}
     ${ClanLib_App_LIBRARY}
     ${ClanLib_Core_LIBRARY}
     ${ClanLib_Network_LIBRARY}
+    ${Threads_LIBRARY}
 )
-
-SET(GUI_LIBS ${LIBS}
-    ${ClanLib_App_LIBRARY}
-    ${ClanLib_Core_LIBRARY}
-    ${ClanLib_GUI_LIBRARY}
-    ${ClanLib_Display_LIBRARY}
-    ${ClanLib_GL_LIBRARY}
-
-)
-
 
 # Game client configuration
 
-add_executable(game ${CLIENT_SRCS})
+IF (USE_GL2)
+    SET(CLIENT_FLAGS "-DGL2")
+    SET(CLIENT_LIBS ${CLIENT_LIBS} ${ClanLib_GL_LIBRARY})
+ELSE(USE_GL2)
+    SET(CLIENT_FLAGS "-DGL1")
+    SET(CLIENT_LIBS ${CLIENT_LIBS} ${ClanLib_GL1_LIBRARY})
+ENDIF(USE_GL2)
+
+ADD_EXECUTABLE(game ${CLIENT_SRCS})
 TARGET_LINK_LIBRARIES(game ${CLIENT_LIBS})
-SET_TARGET_PROPERTIES(game PROPERTIES LINK_FLAGS "-lz -lfontconfig -lX11 -lXxf86vm -lpng -ljpeg -lfreetype")
-SET_TARGET_PROPERTIES(game PROPERTIES COMPILE_FLAGS "-Wall -DCLIENT -DGL2 $ENV{CXXFLAGS}")
+
+SET_TARGET_PROPERTIES(
+    game PROPERTIES
+    LINK_FLAGS
+    "-lfontconfig -lXxf86vm"
+)
+
+SET_TARGET_PROPERTIES(
+    game PROPERTIES
+    COMPILE_FLAGS
+    "-Wall -DCLIENT ${CLIENT_FLAGS} $ENV{CXXFLAGS}"
+)
+
 
 # Server configuration
-add_executable(server ${SERVER_SRCS})
+
+ADD_EXECUTABLE(server ${SERVER_SRCS})
 TARGET_LINK_LIBRARIES(server ${SERVER_LIBS})
-SET_TARGET_PROPERTIES(server PROPERTIES LINK_FLAGS "-pthread -lfontconfig")
-SET_TARGET_PROPERTIES(server PROPERTIES COMPILE_FLAGS "-Wall -DSERVER $ENV{CXXFLAGS}")
+
+SET_TARGET_PROPERTIES(
+    server PROPERTIES
+    LINK_FLAGS
+    "-lfontconfig"
+)
+SET_TARGET_PROPERTIES(
+    server PROPERTIES
+    COMPILE_FLAGS
+    "-Wall -DSERVER $ENV{CXXFLAGS}"
+)
 

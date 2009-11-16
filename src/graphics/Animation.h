@@ -41,7 +41,7 @@ class Animation : public Gfx::Drawable {
 
 		bool isFinished() const { return m_finished; }
 
-		void start() { m_timeFromStart = 0; m_finished = false; }
+		virtual void start() { m_timeFromStart = 0; m_finished = false; }
 
 		virtual void update(unsigned p_timeElapsed) { m_timeFromStart += p_timeElapsed; }
 

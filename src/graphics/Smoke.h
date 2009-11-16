@@ -30,6 +30,8 @@
 
 #include "Animation.h"
 
+#include "math/Float.h"
+
 namespace Gfx {
 
 class Smoke: public Gfx::Animation {
@@ -44,6 +46,10 @@ class Smoke: public Gfx::Animation {
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+		virtual void start();
+
+		virtual void update(unsigned p_timeElapsed);
+
 	private:
 
 		/** The sprite */
@@ -51,6 +57,9 @@ class Smoke: public Gfx::Animation {
 
 		/** The position */
 		CL_Pointf m_position;
+
+		/** Smoke alpha animation float value */
+		Math::Float m_alpha;
 
 };
 

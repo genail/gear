@@ -67,7 +67,7 @@ void Float::update(unsigned p_timeElapsed)
 	for (TAnimationMap::iterator itor = m_animationMap.begin(); itor != m_animationMap.end();) {
 		if (itor->first <= m_timeFromStart) {
 			setCurrentAnimation(itor->second);
-			m_animationMap.erase(itor);
+			m_animationMap.erase(itor++);
 		} else {
 			++itor;
 		}
@@ -97,6 +97,7 @@ void Float::update(unsigned p_timeElapsed)
 					m_currentAnimation->m_easing,
 					progress
 			);
+
 		}
 	}
 }

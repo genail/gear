@@ -28,6 +28,7 @@
 
 #include "Easing.h"
 
+#include <iostream>
 #include <assert.h>
 
 namespace Math {
@@ -41,7 +42,7 @@ float easingCalculate(float p_from, float p_to, Easing p_easing, float p_progres
 {
 	switch (p_easing) {
 		case E_NONE:
-			easingCalculateNone(p_from, p_to, p_easing, p_progress);
+			return easingCalculateNone(p_from, p_to, p_easing, p_progress);
 			break;
 		default:
 			assert(0 && "Easing not implemented yet");

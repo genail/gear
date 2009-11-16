@@ -37,6 +37,8 @@ SET(CLIENT_SRCS
     gui/MainMenuScene.cpp
     gui/LoadingScene.cpp
     gui/SceneContainer.cpp
+    math/Easing.cpp
+    math/Float.cpp
     race/RaceScene.cpp
     race/Viewport.cpp
     network/Client.cpp

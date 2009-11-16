@@ -48,40 +48,31 @@ void Smoke::start()
 	Animation::start();
 
 	m_alpha.animate(0.3f, 0.5f, 500, Math::E_NONE, 0);
-	m_alpha.animate(0.5f, 0.0f, 5000, Math::E_NONE, 500);
+	m_alpha.animate(0.5f, 0.0f, 5500, Math::E_NONE, 500);
+
+	m_size.animate(0.2f, 1.0f, 6000);
 }
 
 void Smoke::update(unsigned p_timeElapsed)
 {
 	Animation::update(p_timeElapsed);
+
 	m_alpha.update(p_timeElapsed);
+	m_size.update(p_timeElapsed);
 }
 
 void Smoke::draw(CL_GraphicContext &p_gc)
 {
 	assert(!m_smokeSprite.is_null());
 
-	const unsigned now = getTimeFromStart();
-
 	static const unsigned ANIMATION_END = 6000;
+
+	const unsigned now = getTimeFromStart();
 
 	if (now < ANIMATION_END) {
 
-		const float animationProgress = (float) now / ANIMATION_END;
-
-//		float alpha;
-//
-//		if (animationProgress < 0.5f) {
-//			alpha = animationProgress * 2.0f * 0.5f;
-//		} else {
-//			alpha = (1.0f - (animationProgress - 0.5f) * 2.0f) * 0.5f;
-//		}
-
-//		const float alpha = (1.0f - animationProgress) * 0.5f;
 		m_smokeSprite.set_alpha(m_alpha.get());
-
-		const float size = (0.2f + animationProgress) * 0.8f;
-		m_smokeSprite.set_scale(size, size);
+		m_smokeSprite.set_scale(m_size.get(), m_size.get());
 
 		m_smokeSprite.draw(p_gc, m_position.x, m_position.y);
 	} else {

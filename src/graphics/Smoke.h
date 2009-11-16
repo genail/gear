@@ -61,6 +61,8 @@ class Smoke: public Gfx::Animation {
 		/** Smoke alpha animation float value */
 		Math::Float m_alpha;
 
+		/** Smoke size animation float value */
+		Math::Float m_size;
 };
 
 }

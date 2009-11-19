@@ -54,7 +54,8 @@ Car::Car() :
 	m_angle(0.0f),
 	m_inputChecksum(0),
 	m_lap(0),
-	m_handbrake(false)
+	m_handbrake(false),
+	m_timeFromLastUpdate(0)
 {
 #ifndef SERVER
 	// build car contour for collision check
@@ -78,9 +79,19 @@ Car::Car() :
 
 Car::~Car() {
 }
+void Car::update(unsigned p_timeElapsed)
+{
+	m_timeFromLastUpdate += p_timeElapsed;
 
+	static const unsigned breakPoint = 1000 / 60;
 
-void Car::update(unsigned int elapsedTime) {
+	while (m_timeFromLastUpdate >= breakPoint) {
+		update1_60();
+		m_timeFromLastUpdate -= breakPoint;
+	}
+}
+
+void Car::update1_60() {
 	
 	// don't do anything if car is locked
 	if (m_locked) {
@@ -100,7 +111,7 @@ void Car::update(unsigned int elapsedTime) {
 	static const float MIN_TENACITY = 0.05f;
 	
 	
-	const float delta = elapsedTime / 1000.0f;
+	const static float delta = (1000.f / 60.0f) / 1000.0f;
 	
 	// calculate input checksum and if its different than last one, then
 	// invoke the signal

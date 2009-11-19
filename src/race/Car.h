@@ -101,6 +101,8 @@ class Car
 
 		void update(unsigned int elapsedTime);
 
+		void update1_60();
+
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
 #ifndef SERVER
@@ -187,6 +189,8 @@ class Car
 
 		/** Final lap checkpoint. Filled by parent Level */
 		Checkpoint m_lapCheckpoint;
+
+		unsigned m_timeFromLastUpdate;
 
 		int calculateInputChecksum() const;
 

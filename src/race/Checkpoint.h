@@ -33,7 +33,7 @@
 
 namespace Race {
 
-class Checkpoint {
+class Checkpoint : public boost::noncopyable {
 
 	public:
 

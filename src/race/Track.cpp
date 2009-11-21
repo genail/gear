@@ -45,9 +45,9 @@ Track::~Track()
 	clear();
 }
 
-void Track::addCheckpoint(const Checkpoint &p_checkpoint)
+void Track::addCheckpointAtPosition(const CL_Pointf &p_position)
 {
-	m_checkpoints.add(new Checkpoint(p_checkpoint));
+	m_checkpoints.push_back(new Checkpoint(p_position));
 }
 
 unsigned Track::getCheckpointCount() const
@@ -63,7 +63,7 @@ const Checkpoint *Track::getCheckpoint(unsigned p_index) const
 
 const Checkpoint *Track::getFirst() const
 {
-	assert(m_checkpoint.size() > 0);
+	assert(m_checkpoints.size() > 0);
 	return m_checkpoints[0];
 }
 
@@ -89,7 +89,7 @@ const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_
 
 	p_newLap = false;
 	p_movingForward = true;
-	Chackpoint *result;
+	Checkpoint *result;
 
 	if (nextDistance < currentDistance && nextDistance < prevDistance) {
 		// moving forward
@@ -107,13 +107,13 @@ const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_
 		result = prev;
 	} else {
 		// moving forward without a change
-		result = p_lastCheckPoint;
+		result = const_cast<Checkpoint*>(p_lastCheckPoint);
 	}
 
 	return result;
 }
 
-void Track::getPrevAndNext(Checkpoint *p_current, Checkpoint **p_prev, Checkpoint **p_next)
+void Track::getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_prev, Checkpoint **p_next)
 {
 	assert(m_checkpoints.size() >= 3);
 

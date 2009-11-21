@@ -43,7 +43,7 @@ class Track {
 		virtual ~Track();
 
 
-		void addCheckpoint(const Checkpoint &p_checkpoint);
+		void addCheckpointAtPosition(const CL_Pointf &p_position);
 
 		unsigned getCheckpointCount() const;
 
@@ -62,7 +62,7 @@ class Track {
 		typedef std::vector<Checkpoint*> TCheckpointVector;
 		TCheckpointVector m_checkpoints;
 
-		void getPrevAndNext(Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after);
+		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after);
 
 };
 

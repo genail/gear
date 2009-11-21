@@ -28,8 +28,6 @@
 
 #pragma once
 
-#include "race/Checkpoint.h"
-
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 
@@ -184,21 +182,11 @@ class Car
 		/** Lap number */
 		int m_lap;
 
-		/** Level checkpoints and pass state. Filled in by parent Level */
-		std::vector<Checkpoint> m_checkpoints;
-
-		/** Final lap checkpoint. Filled by parent Level */
-		Checkpoint m_lapCheckpoint;
-
 		unsigned m_timeFromLastUpdate;
 
 		int calculateInputChecksum() const;
 
 		float normalize(float p_value) const;
-
-		bool areAllCheckpointsPassed() const;
-
-		void resetCheckpoints();
 
 		friend class Race::Level;
 

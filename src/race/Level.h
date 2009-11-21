@@ -30,10 +30,11 @@
 
 #include <ClanLib/core.h>
 
-#include "race/Car.h"
-#include "race/Block.h"
-#include "race/Bound.h"
-#include "race/TyreStripes.h"
+#include "Car.h"
+#include "Block.h"
+#include "Bound.h"
+#include "Track.h"
+#include "TyreStripes.h"
 
 namespace Race {
 
@@ -74,6 +75,8 @@ class Level
 
 		const Block& getBlock(int x, int y) const { return *m_blocks[y * m_width + x].get(); }
 
+		const Track &getTrack() const { return m_track; }
+
 		const TyreStripes &getTyreStripes() const { return m_tyreStripes; }
 
 
@@ -86,6 +89,9 @@ class Level
 
 		/** level blocks */
 		std::vector< CL_SharedPtr<Race::Block> > m_blocks;
+
+		/** The track (checkpoint system) */
+		Track m_track;
 
 		/** Level bounds */
 		std::vector< CL_SharedPtr<Bound> > m_bounds;

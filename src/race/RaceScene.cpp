@@ -206,6 +206,20 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 
 		gfxBound.draw(p_gc);
 	}
+
+#if !defined(NDEBUG) && defined(DRAW_CHECKPOINTS)
+
+	const Race::Track &track = level.getTrack();
+	const unsigned checkpointCount = track.getCheckpointCount();
+
+	for (unsigned i = 0; i < checkpointCount; ++i) {
+		const Race::Checkpoint *checkpoint = track.getCheckpoint(i);
+		const CL_Pointf &point = checkpoint->getPosition();
+
+		CL_Draw::circle(p_gc, point.x, point.y, 10, CL_Colorf::red);
+	}
+
+#endif // !NDEBUG && DRAW_CHECKPOINTS
 }
 
 void RaceScene::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y)

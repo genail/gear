@@ -122,25 +122,6 @@ void Car::update1_60() {
 		m_inputChecksum = inputChecksum;
 	}
 	
-	// mark checkpoints
-	foreach(Checkpoint &checkpoint, m_checkpoints) {
-
-		if (!checkpoint.isPassed() && checkpoint.getRect().contains(m_position)) {
-			checkpoint.setPassed(true);
-		}
-
-	}
-	
-	// check lap progress
-	if (areAllCheckpointsPassed()) {
-		// check for last lap checkpoint
-		if (m_lapCheckpoint.getRect().contains(m_position)) {
-			// got lap
-			++m_lap;
-			resetCheckpoints();
-		}
-	}
-	
 	//turning
 	const float angle = MAX_ANGLE * m_turn;
 	
@@ -346,25 +327,6 @@ int Car::calculateInputChecksum() const {
 	checksum += m_turn * 10000.0f;
 
 	return checksum;
-}
-
-bool Car::areAllCheckpointsPassed() const {
-
-	foreach (const Checkpoint &cp, m_checkpoints) {
-		if (cp.isPassed()) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void Car::resetCheckpoints() {
-
-	foreach (Checkpoint &cp, m_checkpoints) {
-		cp.setPassed(false);
-	}
-
 }
 
 void Car::setStartPosition(int p_startPosition) {

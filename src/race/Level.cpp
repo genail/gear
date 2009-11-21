@@ -50,6 +50,7 @@ void Level::initialize(const CL_String &p_filename)
 void Level::destroy()
 {
 	m_blocks.clear();
+	m_track.clear();
 	m_loaded = false;
 }
 
@@ -90,79 +91,12 @@ void Level::loadFromFile(const CL_String& p_filename)
 		const CL_DomNode boundsNode = contentNode.named_item("bounds");
 		loadBoundsElement(boundsNode);
 
-
-		// read level content
-
-//		CL_String8 line;
-//
-//		line = readLine(file);
-//
-//		std::vector<CL_TempString> parts = CL_StringHelp::split_text(line, " ", true);
-//
-//		m_width = CL_StringHelp::text_to_int(parts[0]);
-//		m_height = CL_StringHelp::text_to_int(parts[2]);
-//
-//		m_blocks = new Block[m_width * m_height];
-//
-//
-//		for (int i = 0; i < m_height; ++i) {
-//			line = readLine(file);
-//
-//			parts = CL_StringHelp::split_text(line, " ", true);
-//
-//			for (int j = 0; j < m_width; ++j) {
-//				m_blocks[m_width * i + j] = Block(decodeBlock(parts[j]), BOX_WIDTH);
-//			}
-//
-//		}
-//
-//		// read bounds num
-//		line = readLine(file);
-//		const int boundsCount = CL_StringHelp::text_to_int(line);
-//
-//		// read all bounds
-//		float x1, y1, x2, y2;
-//
-//		for (int i = 0; i < boundsCount; ++i) {
-//			line = readLine(file);
-//			parts = CL_StringHelp::split_text(line, " ", true);
-//
-//			x1 = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
-//			y1 = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
-//			x2 = CL_StringHelp::text_to_float(parts[2]) * BOX_WIDTH;
-//			y2 = CL_StringHelp::text_to_float(parts[3]) * BOX_WIDTH;
-//
-//			Bound bound(CL_LineSegment2f(CL_Vec2f(x1, y1), CL_Vec2f(x2, y2)));
-//			m_bounds.push_back(bound);
-//		}
-//
-//		// read start positions num
-//		line = readLine(file);
-//		const int startPositionsCount = CL_StringHelp::text_to_int(line);
-//
-//		// read start positions
-//		float x,y;
-//
-//		for (int i = 0; i < startPositionsCount; ++i) {
-//			line = readLine(file);
-//			parts = CL_StringHelp::split_text(line, " ", true);
-//
-//			x = CL_StringHelp::text_to_float(parts[0]) * BOX_WIDTH;
-//			y = CL_StringHelp::text_to_float(parts[1]) * BOX_WIDTH;
-//
-//			m_startPositions[i + 1] = CL_Pointf(x, y);
-//		}
-
-
 		file.close();
-
+		m_loaded = true;
 
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);
 	}
-
-	m_loaded = true;
-
 
 }
 
@@ -222,6 +156,10 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 			if (blockMapItor != blockMap.end()) {
 				m_blocks[m_width * y + x]->setType(blockMapItor->second);
+
+				// add to track
+				const CL_Pointf checkPosition((x + 0.5f) * Block::WIDTH, (y + 0.5f) * Block::WIDTH);
+				m_track.addCheckpointAtPosition(checkPosition);
 			} else {
 				cl_log_event("race", "Unknown block type: %1", typeStr);
 			}
@@ -313,29 +251,6 @@ void Level::addCar(Car *p_car) {
 	assert(m_loaded && "Level is not loaded");
 
 	p_car->m_level = this;
-
-	// fill car checkpoints
-	for (int x = 0; x < m_width; ++x) {
-		for (int y = 0; y < m_height; ++y) {
-
-			const Block &block = getBlock(x, y);
-
-			if (block.getType() != Common::BT_GRASS) {
-
-				const CL_Rectf rect(x * Block::WIDTH, y * Block::WIDTH, (x + 1) * Block::WIDTH, (y + 1) * Block::WIDTH);
-				const Checkpoint checkpoint(rect);
-
-				p_car->m_checkpoints.push_back(checkpoint);
-
-			}
-
-			// if this is a start/finish line, then add finish line checkpoint
-			if (block.getType() == Common::BT_START_LINE) {
-				const CL_Rectf rect(x * Block::WIDTH, (y - 1) * Block::WIDTH, (x + 1) * Block::WIDTH, y * Block::WIDTH);
-				p_car->m_lapCheckpoint = Checkpoint(rect);
-			}
-		}
-	}
 
 
 	m_cars.push_back(p_car);

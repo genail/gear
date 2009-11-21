@@ -31,6 +31,8 @@
 #include <boost/utility.hpp>
 #include <ClanLib/core.h>
 
+namespace Race {
+
 class Checkpoint : public boost::noncopyable {
 
 	public:
@@ -47,3 +49,5 @@ class Checkpoint : public boost::noncopyable {
 		/** Real checkpoint position */
 		CL_Pointf m_position;
 };
+
+} // namespace

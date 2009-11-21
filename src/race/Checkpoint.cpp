@@ -28,6 +28,8 @@
 
 #include "Checkpoint.h"
 
+namespace Race {
+
 Checkpoint::Checkpoint(const CL_Pointf &p_position) :
 	m_position(p_position)
 {
@@ -35,3 +37,5 @@ Checkpoint::Checkpoint(const CL_Pointf &p_position) :
 
 Checkpoint::~Checkpoint() {
 }
+
+} // namespace

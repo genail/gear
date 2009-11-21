@@ -28,26 +28,43 @@
 
 #pragma once
 
-#include <boost/utility.hpp>
-#include <ClanLib/core.h>
+#include <vector>
+
+#include "Checkpoint.h"
 
 namespace Race {
 
-class Checkpoint {
+class Track {
 
 	public:
 
-		Checkpoint(const CL_Pointf &p_position);
+		Track();
 
-		virtual ~Checkpoint();
+		virtual ~Track();
 
 
-		const CL_Pointf &getPosition() const { return m_position; }
+		void addCheckpoint(const Checkpoint &p_checkpoint);
+
+		unsigned getCheckpointCount() const;
+
+		const Checkpoint *getCheckpoint(unsigned p_index) const;
+
+		const Checkpoint *getFirst() const;
+
+		void clear();
+
+
+		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool &p_movingForward, bool &p_newLap);
 
 	private:
 
-		/** Real checkpoint position */
-		CL_Pointf m_position;
+		/** Registered checkpoints */
+		typedef std::vector<Checkpoint*> TCheckpointVector;
+		TCheckpointVector m_checkpoints;
+
+		void getPrevAndNext(Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after);
+
 };
 
-} // namespace
+}
+

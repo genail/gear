@@ -72,7 +72,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Nov 21 14:51:17 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Nov 21 17:05:59 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -2481,7 +2481,7 @@
               isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
               <UML:Classifier.feature>
                 <UML:Attribute xmi.id = '127-0-1-1-ab60c3e:12516e94e4a:-8000:000000000000129D'
-                  name = 'm_nodes' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  name = 'm_checkpoints' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
                   changeability = 'changeable' targetScope = 'instance'>
                   <UML:StructuralFeature.multiplicity>
                     <UML:Multiplicity xmi.id = '127-0-1-1-ab60c3e:12516e94e4a:-8000:000000000000129E'>
@@ -2554,7 +2554,7 @@
                     <UML:Parameter xmi.id = '127-0-1-1-ab60c3e:12516e94e4a:-8000:00000000000012B3'
                       name = 'p_lastCheckPoint' isSpecification = 'false' kind = 'in'>
                       <UML:Parameter.type>
-                        <UML:Class xmi.idref = '127-0-1-1-ab60c3e:12516e94e4a:-8000:00000000000012B2'/>
+                        <UML:Class xmi.idref = '127-0-1-1-ab60c3e:12516e94e4a:-8000:000000000000128A'/>
                       </UML:Parameter.type>
                     </UML:Parameter>
                     <UML:Parameter xmi.id = '127-0-1-1-ab60c3e:12516e94e4a:-8000:00000000000012B5'
@@ -2692,7 +2692,7 @@
               </UML:Association.connection>
             </UML:Association>
             <UML:DataType xmi.id = '127-0-1-1-ab60c3e:12516e94e4a:-8000:00000000000012A0'
-              name = 'std::vector&lt;Node&gt;' isSpecification = 'false' isRoot = 'false'
+              name = 'std::vector&lt;Checkpoint&gt;' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'false'/>
           </UML:Namespace.ownedElement>
         </UML:Package>
@@ -15519,7 +15519,7 @@ getters and setters.</text>
     </path>
   </group>
   <group name="Fig5"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[112, 160, 434, 120]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[112, 160, 474, 120]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1-ab60c3e:12516e94e4a:-8000:0000000000001289"
        fill="1"
        fillcolor="200 200 255"
@@ -15532,7 +15532,7 @@ getters and setters.</text>
     <rectangle name="Fig5.0"
       x="112"
       y="160"
-      width="434"
+      width="474"
       height="120"
       fill="1"
       fillcolor="200 200 255"
@@ -15540,7 +15540,7 @@ getters and setters.</text>
       strokecolor="0 255 255"
     />
     <group name="Fig5.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[112, 160, 434, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[112, 160, 474, 0]"
          href="127-0-1-1-ab60c3e:12516e94e4a:-8000:0000000000001289"
          fill="1"
          fillcolor="200 200 255"
@@ -15553,7 +15553,7 @@ getters and setters.</text>
       <rectangle name="Fig5.1.0"
         x="112"
         y="160"
-        width="434"
+        width="474"
         height="0"
         fill="1"
         fillcolor="200 200 255"
@@ -15564,7 +15564,7 @@ getters and setters.</text>
     <text name="Fig5.2"
       x="112"
       y="160"
-      width="434"
+      width="474"
       height="21"
       fill="1"
       fillcolor="200 200 255"
@@ -15578,7 +15578,7 @@ getters and setters.</text>
       justification="Center"
     >Track</text>
     <group name="Fig5.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[112, 207, 434, 72]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[112, 207, 474, 72]"
          href="127-0-1-1-ab60c3e:12516e94e4a:-8000:0000000000001289"
          fill="1"
          fillcolor="200 200 255"
@@ -15591,7 +15591,7 @@ getters and setters.</text>
       <rectangle name="Fig5.3.0"
         x="112"
         y="207"
-        width="434"
+        width="474"
         height="72"
         fill="1"
         fillcolor="200 200 255"
@@ -15607,7 +15607,7 @@ getters and setters.</text>
       >
         <moveto x="112"
                 y="207" />
-        <lineto x="545"
+        <lineto x="585"
                 y="207" />
       </path>
       <text name="Fig5.3.2"
@@ -15661,7 +15661,7 @@ getters and setters.</text>
       <text name="Fig5.3.5"
         x="112"
         y="250"
-        width="434"
+        width="467"
         height="23"
         fill="0"
         fillcolor="white"
@@ -15673,10 +15673,10 @@ getters and setters.</text>
         bold="false"
         textsize="11"
         justification="Left"
-      >check(p_lastCheckPoint : void,&amp;p_movingForward : void,&amp;p_newLap : void) : Checkpoint</text>
+      >check(p_lastCheckPoint : Checkpoint,&amp;p_movingForward : void,&amp;p_newLap : void) : Checkpoint</text>
     </group>
     <group name="Fig5.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[112, 181, 434, 26]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[112, 181, 474, 26]"
          href="127-0-1-1-ab60c3e:12516e94e4a:-8000:0000000000001289"
          fill="1"
          fillcolor="200 200 255"
@@ -15689,7 +15689,7 @@ getters and setters.</text>
       <rectangle name="Fig5.4.0"
         x="112"
         y="181"
-        width="434"
+        width="474"
         height="26"
         fill="1"
         fillcolor="200 200 255"
@@ -15705,13 +15705,13 @@ getters and setters.</text>
       >
         <moveto x="112"
                 y="181" />
-        <lineto x="545"
+        <lineto x="585"
                 y="181" />
       </path>
       <text name="Fig5.4.2"
         x="112"
         y="182"
-        width="148"
+        width="204"
         height="20"
         fill="0"
         fillcolor="white"
@@ -15723,12 +15723,12 @@ getters and setters.</text>
         bold="false"
         textsize="11"
         justification="Left"
-      >m_nodes : std::vector&lt;Node&gt;</text>
+      >m_checkpoints : std::vector&lt;Checkpoint&gt;</text>
     </group>
     <rectangle name="Fig5.5"
       x="112"
       y="160"
-      width="434"
+      width="474"
       height="120"
       fill="0"
       fillcolor="200 200 255"

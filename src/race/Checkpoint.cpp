@@ -28,9 +28,8 @@
 
 #include "Checkpoint.h"
 
-Checkpoint::Checkpoint(const CL_Rectf &p_rect) :
-	m_rect(p_rect),
-	m_passed(false)
+Checkpoint::Checkpoint(const CL_Pointf &p_position) :
+	m_position(p_position)
 {
 }
 

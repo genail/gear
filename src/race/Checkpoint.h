@@ -28,21 +28,22 @@
 
 #pragma once
 
+#include <boost/utility.hpp>
 #include <ClanLib/core.h>
 
-class Checkpoint {
+class Checkpoint : public boost::noncopyable {
+
 	public:
-		Checkpoint() {}
-		Checkpoint(const CL_Rectf &p_rect);
+
+		Checkpoint(const CL_Pointf &p_position);
+
 		virtual ~Checkpoint();
 
-		const CL_Rectf &getRect() { return m_rect; }
 
-		bool isPassed() const { return m_passed; }
-
-		void setPassed(bool p_passed) { m_passed = p_passed; }
+		const CL_Pointf &getPosition() const { return m_position; }
 
 	private:
-		CL_Rectf m_rect;
-		bool m_passed;
+
+		/** Real checkpoint position */
+		CL_Pointf m_position;
 };

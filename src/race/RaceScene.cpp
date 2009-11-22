@@ -209,6 +209,17 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 
 #if !defined(NDEBUG) && defined(DRAW_CHECKPOINTS)
 
+	// draw car -> checkpoint links
+	foreach (const Player *player, m_players) {
+		const Race::Car &car = player->getCar();
+
+		const Race::Checkpoint *cp = car.getCurrentCheckpoint();
+
+		if (cp != NULL) {
+			CL_Draw::line(p_gc, car.getPosition(), cp->getPosition(), CL_Colorf::green);
+		}
+	}
+
 	const Race::Track &track = level.getTrack();
 	const unsigned checkpointCount = track.getCheckpointCount();
 

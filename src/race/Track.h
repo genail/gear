@@ -54,7 +54,7 @@ class Track {
 		void clear();
 
 
-		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool &p_movingForward, bool &p_newLap);
+		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap);
 
 	private:
 

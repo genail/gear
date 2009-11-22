@@ -31,9 +31,9 @@
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 
-#include "race/Bound.h"
-
 #include "common.h"
+#include "Bound.h"
+#include "Checkpoint.h"
 #include "network/CarState.h"
 
 namespace Race {
@@ -46,6 +46,8 @@ class Car
 	public:
 		Car();
 		virtual ~Car();
+
+		const Checkpoint *getCurrentCheckpoint() const { return m_currentCheckpoint; }
 
 		int getLap() const { return m_lap; }
 
@@ -73,6 +75,8 @@ class Car
 		void setAcceleration(bool p_value) { m_acceleration = p_value; }
 
 		void setBrake(bool p_value) { m_brake = p_value; }
+
+		void setCurrentCheckpoint(const Checkpoint *p_checkpoint);
 
 		void setLap(int p_lap) { m_lap = p_lap; }
 
@@ -183,6 +187,14 @@ class Car
 		int m_lap;
 
 		unsigned m_timeFromLastUpdate;
+
+		// checkpoint system
+
+		/** The greatest checkpoint id met on this lap */
+		int m_greatestCheckpointId;
+
+		/** Current checkpoint position */
+		const Checkpoint *m_currentCheckpoint;
 
 		int calculateInputChecksum() const;
 

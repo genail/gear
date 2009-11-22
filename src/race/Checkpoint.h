@@ -37,14 +37,18 @@ class Checkpoint : public boost::noncopyable {
 
 	public:
 
-		Checkpoint(const CL_Pointf &p_position);
+		Checkpoint(int p_id, const CL_Pointf &p_position);
 
 		virtual ~Checkpoint();
 
 
+		int getId() const { return m_id; }
+
 		const CL_Pointf &getPosition() const { return m_position; }
 
 	private:
+
+		int m_id;
 
 		/** Real checkpoint position */
 		CL_Pointf m_position;

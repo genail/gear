@@ -47,7 +47,8 @@ Track::~Track()
 
 void Track::addCheckpointAtPosition(const CL_Pointf &p_position)
 {
-	m_checkpoints.push_back(new Checkpoint(p_position));
+	const int id = m_checkpoints.size() + 1;
+	m_checkpoints.push_back(new Checkpoint(id, p_position));
 }
 
 unsigned Track::getCheckpointCount() const
@@ -76,7 +77,7 @@ void Track::clear()
 	m_checkpoints.clear();
 }
 
-const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool &p_movingForward, bool &p_newLap)
+const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap)
 {
 	// get before and after checkpoint
 	Checkpoint *prev, *next;
@@ -87,8 +88,8 @@ const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_
 	const float currentDistance = p_position.distance(p_lastCheckPoint->getPosition());
 	const float nextDistance = p_position.distance(next->getPosition());
 
-	p_newLap = false;
-	p_movingForward = true;
+	*p_newLap = false;
+	*p_movingForward = true;
 	Checkpoint *result;
 
 	if (nextDistance < currentDistance && nextDistance < prevDistance) {
@@ -96,13 +97,13 @@ const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_
 
 		if (next == m_checkpoints[0]) {
 			// made a lap
-			p_newLap = true;
+			*p_newLap = true;
 		}
 
 		result = next;
 	} else if (prevDistance < currentDistance && prevDistance < nextDistance) {
 		// moving backwards
-		p_movingForward = false;
+		*p_movingForward = false;
 
 		result = prev;
 	} else {

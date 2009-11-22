@@ -55,7 +55,9 @@ Car::Car() :
 	m_inputChecksum(0),
 	m_lap(0),
 	m_handbrake(false),
-	m_timeFromLastUpdate(0)
+	m_timeFromLastUpdate(0),
+	m_greatestCheckpointId(0),
+	m_currentCheckpoint(NULL)
 {
 #ifndef SERVER
 	// build car contour for collision check
@@ -382,5 +384,15 @@ CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
 	return outline;
 }
 #endif // CLIENT
+
+void Car::setCurrentCheckpoint(const Checkpoint *p_checkpoint)
+{
+	m_currentCheckpoint = p_checkpoint;
+	const int id = p_checkpoint->getId();
+
+	if (id > m_greatestCheckpointId) {
+		m_greatestCheckpointId = id;
+	}
+}
 
 } // namespace

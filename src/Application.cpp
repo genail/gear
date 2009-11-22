@@ -130,7 +130,7 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_SetupGL1     setup_gl;
 
 		CL_DisplayWindow displayWindow("Gear", Gfx::Stage::m_width, Gfx::Stage::m_height);
-#else defined(GL2)
+#elif defined(GL2)
 		cl_log_event("init", "initializing OpenGL 2.x");
 		CL_SetupGL     setup_gl;
 

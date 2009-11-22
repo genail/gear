@@ -48,6 +48,8 @@ LoadingController::~LoadingController()
 void LoadingController::loadRace()
 {
 
+#if !defined(RACE_SCENE_ONLY)
+
 	Game &game = Game::getInstance();
 	Net::Client &client = game.getNetworkConnection();
 
@@ -64,7 +66,6 @@ void LoadingController::loadRace()
 
 		loadLevel("resources/level.xml");
 
-		Game &game = Game::getInstance();
 		RaceScene &raceScene = game.getSceneContainer().getRaceScene();
 
 		raceScene.destroy();
@@ -72,6 +73,8 @@ void LoadingController::loadRace()
 
 		Gfx::Stage::replaceScene(&raceScene);
 	}
+
+#endif // !RACE_SCENE_ONLY
 }
 
 void LoadingController::onClientConnected()
@@ -105,5 +108,7 @@ void LoadingController::onGameState(const Net::GameState &p_gameState)
 	raceScene.destroy();
 	raceScene.initialize();
 
+#if !defined(RACE_SCENE_ONLY)
 	Gfx::Stage::replaceScene(&raceScene);
+#endif // !RACE_SCENE_ONLY
 }

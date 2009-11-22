@@ -128,6 +128,8 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_DisplayWindow displayWindow(displayWindowDescription);
 #endif // GL1 || GL2
 
+#if !defined(RACE_SCENE_ONLY)
+
 		cl_log_event("init", "loading gui components");
 
 		CL_GUIWindowManagerTexture windowManager(displayWindow);
@@ -178,6 +180,25 @@ int Application::main(const std::vector<CL_String> &args)
 
 		Gfx::Stage::pushScene(&sceneContainer.getMainMenuScene());
 		guiManager.exec(true);
+
+#else // !RACE_SCENE_ONLY
+
+		Game &game = Game::getInstance();
+
+		cl_log_event("debug", "Starting offline game");
+
+		Race::Level &level = game.getLevel();
+
+		level.destroy();
+		level.initialize("resources/level.xml");
+
+		RaceScene raceScene(NULL);
+
+		raceScene.destroy();
+		raceScene.initialize();
+
+
+#endif // RACE_SCENE_ONLY
 
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);

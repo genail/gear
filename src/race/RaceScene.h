@@ -45,10 +45,22 @@
 
 #include "graphics/Scene.h"
 
+#if defined(RACE_SCENE_ONLY)
+
+class RaceScene
+{
+
+#else // RACE_SCENE_ONLY
+
 class RaceScene: public Scene
 {
+
+#endif // !RACE_SCENE_ONLY
+
 	public:
+
 		RaceScene(CL_GUIComponent *p_guiParent);
+
 		virtual ~RaceScene();
 
 		void initialize();

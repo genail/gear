@@ -40,8 +40,16 @@
 #include "graphics/TireTrack.h"
 #include "graphics/Bound.h"
 
+#if defined(RACE_SCENE_ONLY)
+
+RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
+
+#else // RACE_SCENE_ONLY
+
 RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	Scene(p_guiParent),
+
+#endif // !RACE_SCENE_ONLY
 	m_lapsTotal(3),
 	m_initialized(false),
 	m_inputLock(false),
@@ -52,11 +60,14 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	m_nextFps(0),
 	m_lastFpsRegisterTime(0)
 {
+#if !defined(RACE_SCENE_ONLY)
 	set_class_name("RaceScene");
 
 	// listen for input
 	func_input_pressed().set(this, &RaceScene::onInputPressed);
 	func_input_released().set(this, &RaceScene::onInputReleased);
+
+#endif
 
 	Game &game = Game::getInstance();
 	Net::Client &client = game.getNetworkConnection();
@@ -295,7 +306,9 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 {
 	cl_log_event("debug", "RaceScene::load()");
 
+#if !defined(RACE_SCENE_ONLY)
 	Scene::load(p_gc);
+#endif // !RACE_SCENE_ONLY
 
 	m_raceUI.load(p_gc);
 

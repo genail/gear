@@ -352,7 +352,7 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 void RaceScene::loadGroundBlocks(CL_GraphicContext &p_gc)
 {
 	const int first = Common::BT_GRASS;
-	const int last = Common::BT_START_LINE;
+	const int last = Common::BT_START_LINE_UP; // FIXME: this is dangerous
 
 	for (int i = first; i <= last; ++i) {
 		CL_SharedPtr<Gfx::GroundBlock> gfxBlock(new Gfx::GroundBlock((Common::GroundBlockType) i));
@@ -616,9 +616,9 @@ void RaceScene::onStartCountdown()
 	// mark all players state as not finished
 //	Game::getInstance().getPlayer().setFinished(false);
 
-	foreach (Player *player, m_players) {
-//		player->setFinished(false);
-	}
+//	foreach (Player *player, m_players) {
+////		player->setFinished(false);
+//	}
 }
 
 void RaceScene::onCountdownEnds()

@@ -121,6 +121,7 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 	blockMap["turn_bottom_left"] = Common::BT_TURN_BOTTOM_LEFT;
 	blockMap["turn_top_right"] = Common::BT_TURN_TOP_RIGHT;
 	blockMap["turn_top_left"] = Common::BT_TURN_TOP_LEFT;
+	blockMap["start_line_up"] = Common::BT_START_LINE_UP;
 
 	// prepare level blocks
 	const int blocksCount = m_width * m_height;
@@ -137,6 +138,8 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 	cl_log_event("debug", "Track node child count: %1", blockListSize);
 
+	CL_Pointf lastCP; // last checkpoint
+
 	for (int i = 0; i < blockListSize; ++i) {
 		const CL_DomNode blockNode = blockList.item(i);
 
@@ -146,6 +149,15 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 			const int x = CL_StringHelp::local8_to_int(attrs.get_named_item("x").get_node_value());
 			const int y = CL_StringHelp::local8_to_int(attrs.get_named_item("y").get_node_value());
 			const CL_String typeStr = attrs.get_named_item("type").get_node_value();
+//			bool isStart;
+//
+//			const CL_DomNode startNode = attrs.get_named_item("start");
+//
+//			if (!startNode.is_null() && startNode.get_node_type() == "yes") {
+//				isStart = true;
+//			} else {
+//				isStart = false;
+//			}
 
 			if (x < 0 || y < 0 || x >= m_width || y >= m_height) {
 				cl_log_event("debug", "coords x=%1, y=%2", x, y);
@@ -155,11 +167,21 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 			blockMapItor = blockMap.find(typeStr);
 
 			if (blockMapItor != blockMap.end()) {
+
 				m_blocks[m_width * y + x]->setType(blockMapItor->second);
 
-				// add to track
-				const CL_Pointf checkPosition((x + 0.5f) * Block::WIDTH, (y + 0.5f) * Block::WIDTH);
-				m_track.addCheckpointAtPosition(checkPosition);
+				// add checkpoint to track
+
+				if (blockMapItor->second == Common::BT_START_LINE_UP) {
+					lastCP = CL_Pointf((x + 0.5f) * Block::WIDTH, (y + 0.2f) * Block::WIDTH);
+					const CL_Pointf firstCP((x + 0.5f) * Block::WIDTH, (y + 0.2 - 0.01f) * Block::WIDTH);
+
+					m_track.addCheckpointAtPosition(firstCP);
+				} else {
+					const CL_Pointf checkPosition((x + 0.5f) * Block::WIDTH, (y + 0.5f) * Block::WIDTH);
+
+					m_track.addCheckpointAtPosition(checkPosition);
+				}
 			} else {
 				cl_log_event("race", "Unknown block type: %1", typeStr);
 			}
@@ -169,6 +191,9 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 		}
 
 	}
+
+	m_track.addCheckpointAtPosition(lastCP);
+	m_track.close();
 
 }
 
@@ -201,35 +226,6 @@ void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)
 			cl_log_event("race", "Unknown node '%1', ignoring", boundNode.get_node_name());
 		}
 	}
-}
-
-Common::GroundBlockType Level::decodeBlock(const CL_String8& p_str) {
-
-	const char c = p_str[0];
-
-	switch (c) {
-		case '0':
-			return Common::BT_GRASS;
-		case '|':
-			return Common::BT_STREET_VERT;
-		case '-':
-			return Common::BT_STREET_HORIZ;
-		case '1':
-			return Common::BT_TURN_BOTTOM_RIGHT;
-		case '2':
-			return Common::BT_TURN_BOTTOM_LEFT;
-		case '3':
-			return Common::BT_TURN_TOP_LEFT;
-		case '4':
-			return Common::BT_TURN_TOP_RIGHT;
-		case '5':
-			return Common::BT_START_LINE;
-		default:
-			assert(0 && "unknown char");
-	}
-
-	return Common::BT_GRASS;
-
 }
 
 float Level::getResistance(float p_x, float p_y) {
@@ -300,6 +296,14 @@ void Level::updateCheckpoints()
 		// apply to car
 		if (nextCheckpoint != currentCheckpoint) {
 			car->setCurrentCheckpoint(nextCheckpoint);
+
+			if (!movingForward) {
+				cl_log_event("debug", "Wrong way");
+			}
+
+			if (newLap) {
+				cl_log_event("debug", "New lap");
+			}
 		}
 
 	}

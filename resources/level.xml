@@ -16,7 +16,7 @@
     <content>
         <!-- Define how track leads to -->
         <track>
-            <block x="1" y="5" type="vert" start="yes" />
+            <block x="1" y="5" type="start_line_up" />
             <block x="1" y="4" type="vert" />
             <block x="1" y="3" type="vert" />
             <block x="1" y="2" type="vert" />

@@ -53,6 +53,9 @@ class Track {
 
 		void clear();
 
+		/** Closes the track.  */
+		void close();
+
 
 		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap);
 
@@ -61,6 +64,9 @@ class Track {
 		/** Registered checkpoints */
 		typedef std::vector<Checkpoint*> TCheckpointVector;
 		TCheckpointVector m_checkpoints;
+
+		/** Closed track cannot get new checkpoints */
+		bool m_closed;
 
 		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after);
 

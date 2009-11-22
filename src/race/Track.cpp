@@ -34,10 +34,9 @@
 
 namespace Race {
 
-Track::Track()
+Track::Track() :
+	m_closed(false)
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 Track::~Track()
@@ -47,6 +46,8 @@ Track::~Track()
 
 void Track::addCheckpointAtPosition(const CL_Pointf &p_position)
 {
+	assert(!m_closed);
+
 	const int id = m_checkpoints.size() + 1;
 	m_checkpoints.push_back(new Checkpoint(id, p_position));
 }
@@ -59,12 +60,16 @@ unsigned Track::getCheckpointCount() const
 const Checkpoint *Track::getCheckpoint(unsigned p_index) const
 {
 	assert(p_index < m_checkpoints.size());
+	assert(m_closed);
+
 	return m_checkpoints[p_index];
 }
 
 const Checkpoint *Track::getFirst() const
 {
 	assert(m_checkpoints.size() > 0);
+	assert(m_closed);
+
 	return m_checkpoints[0];
 }
 
@@ -75,10 +80,13 @@ void Track::clear()
 	}
 
 	m_checkpoints.clear();
+	m_closed = false;
 }
 
 const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap)
 {
+	assert(m_closed);
+
 	// get before and after checkpoint
 	Checkpoint *prev, *next;
 	getPrevAndNext(p_lastCheckPoint, &prev, &next);
@@ -117,6 +125,7 @@ const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_
 void Track::getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_prev, Checkpoint **p_next)
 {
 	assert(m_checkpoints.size() >= 3);
+	assert(m_closed);
 
 	Checkpoint *current;
 	Checkpoint *prev = NULL;
@@ -157,6 +166,21 @@ void Track::getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_prev, Che
 	// assign pointers
 	*p_prev = prev;
 	*p_next = next;
+}
+
+void Track::close()
+{
+	// set progress to every checkpoint
+	const unsigned size = m_checkpoints.size();
+
+	for (unsigned i = 0; i < size - 1; ++i) {
+		m_checkpoints[i]->m_progress = i / (float) (size - 1);
+	}
+
+	m_checkpoints[size - 1]->m_progress = 1.0f;
+
+	// set track closed
+	m_closed = true;
 }
 
 } // namespace

@@ -33,6 +33,8 @@
 
 namespace Race {
 
+class Track;
+
 class Checkpoint : public boost::noncopyable {
 
 	public:
@@ -42,16 +44,24 @@ class Checkpoint : public boost::noncopyable {
 		virtual ~Checkpoint();
 
 
-		int getId() const { return m_id; }
+		int getId() const;
 
-		const CL_Pointf &getPosition() const { return m_position; }
+		const CL_Pointf &getPosition() const;
+
+		float getProgress() const;
 
 	private:
 
+		/** Id of checkpoint. Starts with 1. */
 		int m_id;
 
 		/** Real checkpoint position */
 		CL_Pointf m_position;
+
+		/** Track's progress. 0.0 is start position, 1.0 finish line. */
+		float m_progress;
+
+		friend class Race::Track;
 };
 
 } // namespace

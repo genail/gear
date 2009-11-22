@@ -38,7 +38,7 @@ namespace Common
 		BT_TURN_BOTTOM_LEFT,
 		BT_TURN_TOP_RIGHT,
 		BT_TURN_TOP_LEFT,
-		BT_START_LINE
+		BT_START_LINE_UP
 	};
 } // namespace
 

@@ -390,8 +390,8 @@ void Car::setCurrentCheckpoint(const Checkpoint *p_checkpoint)
 	m_currentCheckpoint = p_checkpoint;
 	const int id = p_checkpoint->getId();
 
-	if (id > m_greatestCheckpointId) {
-		m_greatestCheckpointId = id;
+	if (id == m_greatestCheckpointId + 1) {
+		++m_greatestCheckpointId;
 	}
 }
 

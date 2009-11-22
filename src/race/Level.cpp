@@ -295,7 +295,7 @@ void Level::updateCheckpoints()
 
 		// apply to car
 		if (nextCheckpoint != currentCheckpoint) {
-			car->setCurrentCheckpoint(nextCheckpoint);
+			car->updateCurrentCheckpoint(nextCheckpoint);
 
 			if (!movingForward) {
 				cl_log_event("debug", "Wrong way");

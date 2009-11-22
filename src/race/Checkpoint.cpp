@@ -31,6 +31,7 @@
 namespace Race {
 
 Checkpoint::Checkpoint(int p_id, const CL_Pointf &p_position) :
+	m_id(p_id),
 	m_position(p_position),
 	m_progress(0.0f)
 {

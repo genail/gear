@@ -76,8 +76,6 @@ class Car
 
 		void setBrake(bool p_value) { m_brake = p_value; }
 
-		void setCurrentCheckpoint(const Checkpoint *p_checkpoint);
-
 		void setLap(int p_lap) { m_lap = p_lap; }
 
 		/**
@@ -104,6 +102,12 @@ class Car
 		void update(unsigned int elapsedTime);
 
 		void update1_60();
+
+		/**
+		 * Sets the new checkpoint and calculates car progress on track.
+		 * If lap is reached, then lap number will increase by one.
+		 */
+		void updateCurrentCheckpoint(const Checkpoint *p_checkpoint);
 
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 

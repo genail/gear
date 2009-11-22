@@ -238,4 +238,8 @@ class RaceScene: public Scene
 
 		void onPlayerFinished(const CL_NetGameEvent &p_event);
 
+#if defined(RACE_SCENE_ONLY)
+		friend class Application;
+#endif // RACE_SCENE_ONLY
+
 };

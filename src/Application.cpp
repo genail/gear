@@ -54,10 +54,25 @@
 #include "gui/SceneContainer.h"
 
 
+#if defined(RACE_SCENE_ONLY)
+RaceScene *m_raceScene;
+#endif // RACE_SCENE_ONLY
+
 class Application
 {
 	public:
 		static int main(const std::vector<CL_String> &args);
+
+#if defined(RACE_SCENE_ONLY)
+		static void onInputPressed(const CL_InputEvent &p_event, const CL_InputState &p_state) {
+			m_raceScene->onInputPressed(p_event);
+		}
+
+		static void onInputReleased(const CL_InputEvent &p_event, const CL_InputState &p_state) {
+			m_raceScene->onInputReleased(p_event);
+		}
+
+#endif // RACE_SCENE_ONLY
 };
 
 // Create global application object:
@@ -185,7 +200,13 @@ int Application::main(const std::vector<CL_String> &args)
 
 		Game &game = Game::getInstance();
 
-		cl_log_event("debug", "Starting offline game");
+		// load resources
+		CL_ResourceManager generalResources("resources/resources.xml");
+		Gfx::Stage::m_resourceManager = &generalResources;
+
+		// load debug layer
+		DebugLayer debugLayer;
+		Gfx::Stage::m_debugLayer = &debugLayer;
 
 		Race::Level &level = game.getLevel();
 
@@ -196,6 +217,42 @@ int Application::main(const std::vector<CL_String> &args)
 
 		raceScene.destroy();
 		raceScene.initialize();
+
+		bool quit = false;
+
+		CL_GraphicContext &gc = displayWindow.get_gc();
+		raceScene.load(gc);
+		m_raceScene = &raceScene;
+
+		CL_InputDevice &keyboard = displayWindow.get_ic().get_keyboard();
+
+		CL_SlotContainer slots;
+		slots.connect_functor(keyboard.sig_key_down(), &Application::onInputPressed);
+		slots.connect_functor(keyboard.sig_key_up(), &Application::onInputReleased);
+
+		unsigned lastTime = CL_System::get_time();
+
+		while(!quit) {
+			CL_KeepAlive::process();
+
+			const unsigned delta = CL_System::get_time() - lastTime;
+			lastTime += delta;
+
+			raceScene.update(delta);
+			raceScene.draw(gc);
+
+			displayWindow.flip();
+
+			// Avoid using 100% CPU in the loop:
+			static const int MS_60 = 1000 / 60;
+			const int sleepTime = MS_60 - delta;
+
+			if (sleepTime > 0) {
+				CL_System::sleep(sleepTime);
+				CL_KeepAlive::process();
+			}
+
+		}
 
 
 #endif // RACE_SCENE_ONLY

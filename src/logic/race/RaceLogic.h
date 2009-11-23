@@ -28,18 +28,33 @@
 
 #pragma once
 
+#include "logic/race/Level.h"
+
 namespace Race {
 
 class RaceLogic {
 
 	public:
 
-		RaceLogic();
+		RaceLogic(Race::Level *p_level);
 
 		virtual ~RaceLogic();
 
+
+		const Race::Level *getLevel() { return m_level; }
+
+
+		void update(unsigned p_timeElapsed);
+
 	private:
+
+		Race::Level *m_level;
+
+		// update methods
+
+		void updateCarPhysics(unsigned p_timeElapsed);
+
 };
 
-}
+} // namespace
 

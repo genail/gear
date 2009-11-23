@@ -30,15 +30,28 @@
 
 namespace Race {
 
-RaceLogic::RaceLogic()
+RaceLogic::RaceLogic(Race::Level *p_level) :
+	m_level(p_level)
 {
-	// TODO Auto-generated constructor stub
 
 }
 
 RaceLogic::~RaceLogic()
 {
-	// TODO Auto-generated destructor stub
 }
 
+void RaceLogic::update(unsigned p_timeElapsed)
+{
+	updateCarPhysics(p_timeElapsed);
 }
+
+void RaceLogic::updateCarPhysics(unsigned p_timeElapsed)
+{
+	const unsigned carCount = m_level->getCarCount();
+	for (unsigned i = 0; i < carCount; ++i) {
+		Race::Car &car = m_level->getCar(i);
+		car.update(p_timeElapsed);
+	}
+}
+
+} // namespace

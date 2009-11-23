@@ -30,6 +30,7 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
 #include "logic/race/Car.h"
 #include "logic/race/Block.h"
 #include "logic/race/Bound.h"
@@ -69,6 +70,8 @@ class Level
 
 		const Car &getCar(size_t p_index) const { return *m_cars[p_index]; }
 
+		Car &getCar(size_t p_index) { return *m_cars[p_index]; }
+
 		int getWidth() const { return m_width; }
 
 		int getHeight() const { return m_height; }
@@ -82,7 +85,7 @@ class Level
 
 		void removeCar(Car *p_car);
 
-		void update(unsigned p_timeElapsed);
+		DEPRECATED(void update(unsigned p_timeElapsed));
 
 
 	private:

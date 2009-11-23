@@ -30,7 +30,6 @@
 
 #include <assert.h>
 
-#include "common.h"
 #include "logic/race/Checkpoint.h"
 
 namespace Race {

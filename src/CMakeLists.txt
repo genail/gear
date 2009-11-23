@@ -12,6 +12,7 @@ SET(COMMON_SRCS
     logic/race/Car.cpp
     logic/race/Checkpoint.cpp
     logic/race/Level.cpp
+    logic/race/RaceLogic.cpp
     logic/race/ScoreTable.cpp
     logic/race/Track.cpp
     logic/race/TyreStripes.cpp

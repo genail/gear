@@ -217,6 +217,31 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 
 		gfxBound.draw(p_gc);
 	}
+
+#if !defined(NDEBUG) && defined(DRAW_CHECKPOINTS)
+
+	// draw car -> checkpoint links
+	foreach (const Player *player, m_players) {
+		const Race::Car &car = player->getCar();
+
+		const Race::Checkpoint *cp = car.getCurrentCheckpoint();
+
+		if (cp != NULL) {
+			CL_Draw::line(p_gc, car.getPosition(), cp->getPosition(), CL_Colorf::green);
+		}
+	}
+
+	const Race::Track &track = level.getTrack();
+	const unsigned checkpointCount = track.getCheckpointCount();
+
+	for (unsigned i = 0; i < checkpointCount; ++i) {
+		const Race::Checkpoint *checkpoint = track.getCheckpoint(i);
+		const CL_Pointf &point = checkpoint->getPosition();
+
+		CL_Draw::circle(p_gc, point.x, point.y, 10, CL_Colorf::red);
+	}
+
+#endif // !NDEBUG && DRAW_CHECKPOINTS
 }
 
 void RaceScene::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y)
@@ -340,7 +365,7 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 void RaceScene::loadGroundBlocks(CL_GraphicContext &p_gc)
 {
 	const int first = Common::BT_GRASS;
-	const int last = Common::BT_START_LINE;
+	const int last = Common::BT_START_LINE_UP; // FIXME: this is dangerous
 
 	for (int i = first; i <= last; ++i) {
 		CL_SharedPtr<Gfx::GroundBlock> gfxBlock(new Gfx::GroundBlock((Common::GroundBlockType) i));
@@ -604,9 +629,9 @@ void RaceScene::onStartCountdown()
 	// mark all players state as not finished
 //	Game::getInstance().getPlayer().setFinished(false);
 
-	foreach (Player *player, m_players) {
-//		player->setFinished(false);
-	}
+//	foreach (Player *player, m_players) {
+////		player->setFinished(false);
+//	}
 }
 
 void RaceScene::onCountdownEnds()

@@ -28,21 +28,40 @@
 
 #pragma once
 
+#include <boost/utility.hpp>
 #include <ClanLib/core.h>
 
-class Checkpoint {
+namespace Race {
+
+class Track;
+
+class Checkpoint : public boost::noncopyable {
+
 	public:
-		Checkpoint() {}
-		Checkpoint(const CL_Rectf &p_rect);
+
+		Checkpoint(int p_id, const CL_Pointf &p_position);
+
 		virtual ~Checkpoint();
 
-		const CL_Rectf &getRect() { return m_rect; }
 
-		bool isPassed() const { return m_passed; }
+		int getId() const;
 
-		void setPassed(bool p_passed) { m_passed = p_passed; }
+		const CL_Pointf &getPosition() const;
+
+		float getProgress() const;
 
 	private:
-		CL_Rectf m_rect;
-		bool m_passed;
+
+		/** Id of checkpoint. Starts with 1. */
+		int m_id;
+
+		/** Real checkpoint position */
+		CL_Pointf m_position;
+
+		/** Track's progress. 0.0 is start position, 1.0 finish line. */
+		float m_progress;
+
+		friend class Race::Track;
 };
+
+} // namespace

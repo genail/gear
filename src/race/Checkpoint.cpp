@@ -28,11 +28,31 @@
 
 #include "Checkpoint.h"
 
-Checkpoint::Checkpoint(const CL_Rectf &p_rect) :
-	m_rect(p_rect),
-	m_passed(false)
+namespace Race {
+
+Checkpoint::Checkpoint(int p_id, const CL_Pointf &p_position) :
+	m_id(p_id),
+	m_position(p_position),
+	m_progress(0.0f)
 {
 }
 
 Checkpoint::~Checkpoint() {
 }
+
+int Checkpoint::getId() const
+{
+	return m_id;
+}
+
+const CL_Pointf &Checkpoint::getPosition() const
+{
+	return m_position;
+}
+
+float Checkpoint::getProgress() const
+{
+	return m_progress;
+}
+
+} // namespace

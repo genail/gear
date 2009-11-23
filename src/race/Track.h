@@ -28,17 +28,49 @@
 
 #pragma once
 
-namespace Common
-{
-	enum GroundBlockType {
-		BT_GRASS,
-		BT_STREET_HORIZ,
-		BT_STREET_VERT,
-		BT_TURN_BOTTOM_RIGHT,
-		BT_TURN_BOTTOM_LEFT,
-		BT_TURN_TOP_RIGHT,
-		BT_TURN_TOP_LEFT,
-		BT_START_LINE_UP
-	};
-} // namespace
+#include <vector>
+
+#include "Checkpoint.h"
+
+namespace Race {
+
+class Track {
+
+	public:
+
+		Track();
+
+		virtual ~Track();
+
+
+		void addCheckpointAtPosition(const CL_Pointf &p_position);
+
+		unsigned getCheckpointCount() const;
+
+		const Checkpoint *getCheckpoint(unsigned p_index) const;
+
+		const Checkpoint *getFirst() const;
+
+		void clear();
+
+		/** Closes the track.  */
+		void close();
+
+
+		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap);
+
+	private:
+
+		/** Registered checkpoints */
+		typedef std::vector<Checkpoint*> TCheckpointVector;
+		TCheckpointVector m_checkpoints;
+
+		/** Closed track cannot get new checkpoints */
+		bool m_closed;
+
+		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after);
+
+};
+
+}
 

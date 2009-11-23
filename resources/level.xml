@@ -16,7 +16,7 @@
     <content>
         <!-- Define how track leads to -->
         <track>
-            <block x="1" y="5" type="vert" start="yes" />
+            <block x="1" y="5" type="start_line_up" />
             <block x="1" y="4" type="vert" />
             <block x="1" y="3" type="vert" />
             <block x="1" y="2" type="vert" />
@@ -49,14 +49,15 @@
         <bounds>
             <!--generate style="thick" /-->
             <!-- inner -->
-            <bound x1="2.0" y1="2.0" x2="4.0" y2="2.0" />
+            <bound x1="3.0" y1="2.0" x2="4.0" y2="2.0" />
             <bound x1="4.0" y1="2.0" x2="4.0" y2="5.0" />
             <bound x1="4.0" y1="5.0" x2="8.0" y2="5.0" />
             <bound x1="8.0" y1="5.0" x2="8.0" y2="6.0" />
             <bound x1="8.0" y1="6.0" x2="5.0" y2="6.0" />
             <bound x1="5.0" y1="6.0" x2="5.0" y2="8.0" />
             <bound x1="5.0" y1="8.0" x2="2.0" y2="8.0" />
-            <bound x1="2.0" y1="8.0" x2="2.0" y2="2.0" />
+            <bound x1="2.0" y1="8.0" x2="2.0" y2="3.0" />
+            <bound x1="2.0" y1="3.0" x2="3.0" y2="2.0" />
             
             <!-- outer -->
             <bound x1="1.0" y1="1.0" x2="5.0" y2="1.0" />

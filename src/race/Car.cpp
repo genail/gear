@@ -55,7 +55,9 @@ Car::Car() :
 	m_inputChecksum(0),
 	m_lap(0),
 	m_handbrake(false),
-	m_timeFromLastUpdate(0)
+	m_timeFromLastUpdate(0),
+	m_greatestCheckpointId(0),
+	m_currentCheckpoint(NULL)
 {
 #ifndef SERVER
 	// build car contour for collision check
@@ -120,25 +122,6 @@ void Car::update1_60() {
 	if (inputChecksum != m_inputChecksum) {
 		m_statusChangeSignal.invoke(*this);
 		m_inputChecksum = inputChecksum;
-	}
-	
-	// mark checkpoints
-	foreach(Checkpoint &checkpoint, m_checkpoints) {
-
-		if (!checkpoint.isPassed() && checkpoint.getRect().contains(m_position)) {
-			checkpoint.setPassed(true);
-		}
-
-	}
-	
-	// check lap progress
-	if (areAllCheckpointsPassed()) {
-		// check for last lap checkpoint
-		if (m_lapCheckpoint.getRect().contains(m_position)) {
-			// got lap
-			++m_lap;
-			resetCheckpoints();
-		}
 	}
 	
 	//turning
@@ -348,25 +331,6 @@ int Car::calculateInputChecksum() const {
 	return checksum;
 }
 
-bool Car::areAllCheckpointsPassed() const {
-
-	foreach (const Checkpoint &cp, m_checkpoints) {
-		if (cp.isPassed()) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void Car::resetCheckpoints() {
-
-	foreach (Checkpoint &cp, m_checkpoints) {
-		cp.setPassed(false);
-	}
-
-}
-
 void Car::setStartPosition(int p_startPosition) {
 	if (m_level != NULL) {
 		m_position = m_level->getStartPosition(p_startPosition);
@@ -420,5 +384,26 @@ CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
 	return outline;
 }
 #endif // CLIENT
+
+void Car::updateCurrentCheckpoint(const Checkpoint *p_checkpoint)
+{
+	// check if lap is reached
+	if (
+			p_checkpoint->getProgress() == 0.0f &&
+			m_currentCheckpoint->getProgress() == 1.0f &&
+			m_greatestCheckpointId == m_currentCheckpoint->getId()
+	) {
+		++m_lap;
+		cl_log_event("race", "Going for lap %1", m_lap);
+		m_greatestCheckpointId = 0;
+	}
+
+	m_currentCheckpoint = p_checkpoint;
+	const int id = p_checkpoint->getId();
+
+	if (id == m_greatestCheckpointId + 1) {
+		++m_greatestCheckpointId;
+	}
+}
 
 } // namespace

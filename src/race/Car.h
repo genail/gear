@@ -28,14 +28,12 @@
 
 #pragma once
 
-#include "race/Checkpoint.h"
-
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 
-#include "race/Bound.h"
-
 #include "common.h"
+#include "Bound.h"
+#include "Checkpoint.h"
 #include "network/CarState.h"
 
 namespace Race {
@@ -48,6 +46,8 @@ class Car
 	public:
 		Car();
 		virtual ~Car();
+
+		const Checkpoint *getCurrentCheckpoint() const { return m_currentCheckpoint; }
 
 		int getLap() const { return m_lap; }
 
@@ -102,6 +102,12 @@ class Car
 		void update(unsigned int elapsedTime);
 
 		void update1_60();
+
+		/**
+		 * Sets the new checkpoint and calculates car progress on track.
+		 * If lap is reached, then lap number will increase by one.
+		 */
+		void updateCurrentCheckpoint(const Checkpoint *p_checkpoint);
 
 		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
@@ -184,21 +190,19 @@ class Car
 		/** Lap number */
 		int m_lap;
 
-		/** Level checkpoints and pass state. Filled in by parent Level */
-		std::vector<Checkpoint> m_checkpoints;
-
-		/** Final lap checkpoint. Filled by parent Level */
-		Checkpoint m_lapCheckpoint;
-
 		unsigned m_timeFromLastUpdate;
+
+		// checkpoint system
+
+		/** The greatest checkpoint id met on this lap */
+		int m_greatestCheckpointId;
+
+		/** Current checkpoint position */
+		const Checkpoint *m_currentCheckpoint;
 
 		int calculateInputChecksum() const;
 
 		float normalize(float p_value) const;
-
-		bool areAllCheckpointsPassed() const;
-
-		void resetCheckpoints();
 
 		friend class Race::Level;
 

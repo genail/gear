@@ -80,7 +80,7 @@ void GroundBlock::load(CL_GraphicContext &p_gc)
 		case Common::BT_TURN_TOP_LEFT:
 			spriteName = "race/turn_top_left";
 			break;
-		case Common::BT_START_LINE:
+		case Common::BT_START_LINE_UP:
 			spriteName = "race/street_vert";
 			break;
 		default:

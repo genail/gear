@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include "Drawable.h"
-#include "SpeedMeter.h"
+#include "gfx/Drawable.h"
+#include "gfx/race/ui/SpeedMeter.h"
 
 namespace Gfx {
 

@@ -28,9 +28,9 @@
 
 #include "MainMenuController.h"
 
-#include "Game.h"
-#include "graphics/Stage.h"
-#include "gui/MainMenuScene.h"
+#include "common/Game.h"
+#include "gfx/Stage.h"
+#include "gfx/scenes/MainMenuScene.h"
 
 MainMenuController::MainMenuController(MainMenuScene *p_scene) :
 	m_scene(p_scene)

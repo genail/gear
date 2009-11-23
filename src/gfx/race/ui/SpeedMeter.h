@@ -31,7 +31,7 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
-#include "graphics/Drawable.h"
+#include "gfx/Drawable.h"
 
 namespace Gfx {
 

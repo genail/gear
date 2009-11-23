@@ -31,7 +31,7 @@
 #include <ClanLib/gui.h>
 #include <ClanLib/display.h>
 
-#include "graphics/Stage.h"
+#include "gfx/Stage.h"
 
 class Scene : public CL_GUIComponent {
 

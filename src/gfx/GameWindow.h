@@ -31,7 +31,7 @@
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
 
-#include "graphics/Scene.h"
+#include "gfx/Scene.h"
 
 class GameWindow : public CL_Window {
 	public:

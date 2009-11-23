@@ -28,7 +28,7 @@
 
 #include "GameWindow.h"
 
-#include "graphics/Stage.h"
+#include "gfx/Stage.h"
 
 GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc) :
 	CL_Window(p_manager, p_desc),

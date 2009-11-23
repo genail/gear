@@ -32,7 +32,7 @@
 
 #include <ClanLib/core.h>
 
-#include "Drawable.h"
+#include "gfx/Drawable.h"
 
 namespace Gfx {
 

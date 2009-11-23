@@ -28,7 +28,7 @@
 
 #include "DecorationSprite.h"
 
-#include "Stage.h"
+#include "gfx/Stage.h"
 
 namespace Gfx {
 

@@ -28,10 +28,10 @@
 
 #include "RaceUI.h"
 
-#include "Game.h"
-#include "race/Car.h"
-#include "race/RaceScene.h"
-#include "graphics/Stage.h"
+#include "common/Game.h"
+#include "logic/race/Car.h"
+#include "gfx/scenes/RaceScene.h"
+#include "gfx/Stage.h"
 
 namespace Gfx {
 

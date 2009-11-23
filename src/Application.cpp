@@ -40,18 +40,18 @@
 #error must define GL1 or GL2
 #endif // GL1 || GL2
 
-#include "Game.h"
-#include "graphics/GameWindow.h"
-#include "graphics/DebugLayer.h"
-#include "graphics/Stage.h"
-#include "race/RaceScene.h"
-#include "Player.h"
-#include "Properties.h"
-#include "graphics/RaceUI.h"
-#include "race/Race.h"
+#include "common/Game.h"
+#include "gfx/GameWindow.h"
+#include "gfx/DebugLayer.h"
+#include "gfx/Stage.h"
+#include "gfx/scenes/RaceScene.h"
+#include "common/Player.h"
+#include "common/Properties.h"
+#include "gfx/race/ui/RaceUI.h"
+#include "logic/race/Race.h"
 #include "network/Client.h"
-#include "gui/MainMenuScene.h"
-#include "gui/SceneContainer.h"
+#include "gfx/scenes/MainMenuScene.h"
+#include "gfx/scenes/SceneContainer.h"
 
 
 #if defined(RACE_SCENE_ONLY)

@@ -28,7 +28,7 @@
 
 #include "network/Client.h"
 
-#include "Game.h"
+#include "common/Game.h"
 #include "common.h"
 #include "network/events.h"
 #include "network/Goodbye.h"

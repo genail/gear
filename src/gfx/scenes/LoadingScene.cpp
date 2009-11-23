@@ -28,7 +28,7 @@
 
 #include "LoadingScene.h"
 
-#include "graphics/Stage.h"
+#include "gfx/Stage.h"
 
 LoadingScene::LoadingScene(CL_GUIComponent *p_parent) :
 	Scene(p_parent),

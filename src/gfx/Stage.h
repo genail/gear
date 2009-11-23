@@ -31,7 +31,7 @@
 #include <stack>
 #include <ClanLib/core.h>
 
-#include "graphics/DebugLayer.h"
+#include "gfx/DebugLayer.h"
 
 class Scene;
 class Application;

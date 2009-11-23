@@ -30,7 +30,7 @@
 
 #include <vector>
 
-#include "Checkpoint.h"
+#include "logic/race/Checkpoint.h"
 
 namespace Race {
 

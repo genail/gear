@@ -30,11 +30,11 @@
 
 #include <ClanLib/core.h>
 
-#include "graphics/GameWindow.h"
+#include "gfx/GameWindow.h"
 
-#include "gui/MainMenuScene.h"
-#include "gui/LoadingScene.h"
-#include "race/RaceScene.h"
+#include "gfx/scenes/MainMenuScene.h"
+#include "gfx/scenes/LoadingScene.h"
+#include "gfx/scenes/RaceScene.h"
 
 class SceneContainer {
 

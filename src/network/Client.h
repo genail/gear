@@ -32,9 +32,9 @@
 #include "ClanLib/network.h"
 
 #include "common.h"
-#include "Player.h"
-#include "race/Car.h"
-#include "race/Level.h"
+#include "common/Player.h"
+#include "logic/race/Car.h"
+#include "logic/race/Level.h"
 #include "network/CarState.h"
 #include "network/GameState.h"
 

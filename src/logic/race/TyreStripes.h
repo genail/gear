@@ -31,7 +31,7 @@
 #include <list>
 #include <ClanLib/core.h>
 
-#include "race/Car.h"
+#include "logic/race/Car.h"
 
 namespace Race {
 

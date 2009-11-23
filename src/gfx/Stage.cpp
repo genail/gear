@@ -28,7 +28,7 @@
 
 #include "Stage.h"
 
-#include "graphics/Scene.h"
+#include "gfx/Scene.h"
 
 namespace Gfx {
 

@@ -32,8 +32,8 @@
 #include <ClanLib/network.h>
 
 #include "common.h"
-#include "Bound.h"
-#include "Checkpoint.h"
+#include "logic/race/Bound.h"
+#include "logic/race/Checkpoint.h"
 #include "network/CarState.h"
 
 namespace Race {

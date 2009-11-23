@@ -31,19 +31,19 @@
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
 
-#include "Player.h"
-#include "race/Car.h"
-#include "race/Level.h"
-#include "graphics/RaceUI.h"
-#include "graphics/Viewport.h"
-#include "race/ScoreTable.h"
-#include "graphics/Drawable.h"
-#include "graphics/Car.h"
-#include "graphics/GroundBlock.h"
-#include "graphics/DecorationSprite.h"
-#include "graphics/Smoke.h"
+#include "common/Player.h"
+#include "logic/race/Car.h"
+#include "logic/race/Level.h"
+#include "gfx/race/ui/RaceUI.h"
+#include "gfx/Viewport.h"
+#include "logic/race/ScoreTable.h"
+#include "gfx/Drawable.h"
+#include "gfx/race/level/Car.h"
+#include "gfx/race/level/GroundBlock.h"
+#include "gfx/race/level/DecorationSprite.h"
+#include "gfx/race/level/Smoke.h"
 
-#include "graphics/Scene.h"
+#include "gfx/Scene.h"
 
 #if defined(RACE_SCENE_ONLY)
 

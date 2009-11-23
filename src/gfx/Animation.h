@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "Drawable.h"
+#include "gfx/Drawable.h"
 
 namespace Gfx {
 

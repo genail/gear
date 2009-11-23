@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "Animation.h"
+#include "gfx/Animation.h"
 
 #include "math/Float.h"
 

@@ -29,7 +29,6 @@
 #include "TyreStripes.h"
 
 #include "common.h"
-#include "graphics/Stage.h"
 
 namespace Race {
 

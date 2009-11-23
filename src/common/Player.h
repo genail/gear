@@ -29,7 +29,7 @@
 #pragma once
 
 #include <ClanLib/core.h>
-#include "race/Car.h"
+#include "logic/race/Car.h"
 
 class Player {
 

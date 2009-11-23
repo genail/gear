@@ -29,7 +29,7 @@
 #pragma once
 
 #include <ClanLib/core.h>
-#include "graphics/Drawable.h"
+#include "gfx/Drawable.h"
 
 class DebugLayer : public Gfx::Drawable {
 	public:

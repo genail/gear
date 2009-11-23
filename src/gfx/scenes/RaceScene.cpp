@@ -31,14 +31,14 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "Game.h"
+#include "common/Game.h"
 #include "common.h"
-#include "race/Race.h"
-#include "race/Block.h"
+#include "logic/race/Race.h"
+#include "logic/race/Block.h"
 #include "network/events.h"
 #include "network/Client.h"
-#include "graphics/TireTrack.h"
-#include "graphics/Bound.h"
+#include "gfx/race/level/TireTrack.h"
+#include "gfx/race/level/Bound.h"
 
 #if defined(RACE_SCENE_ONLY)
 

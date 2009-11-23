@@ -1,47 +1,47 @@
 # Common source files
 SET(COMMON_SRCS
-    Player.cpp
-    Properties.cpp
+    common/Player.cpp
+    common/Properties.cpp
     network/CarState.cpp
     network/ClientInfo.cpp
     network/GameState.cpp
     network/Goodbye.cpp
     network/PlayerJoined.cpp
-    race/Block.cpp
-    race/Bound.cpp
-    race/Car.cpp
-    race/Checkpoint.cpp
-    race/Level.cpp
-    race/ScoreTable.cpp
-    race/Track.cpp
-    race/TyreStripes.cpp
+    logic/race/Block.cpp
+    logic/race/Bound.cpp
+    logic/race/Car.cpp
+    logic/race/Checkpoint.cpp
+    logic/race/Level.cpp
+    logic/race/ScoreTable.cpp
+    logic/race/Track.cpp
+    logic/race/TyreStripes.cpp
 )
 
 # Game client sources
 SET(CLIENT_SRCS
     ${COMMON_SRCS}
     Application.cpp
-    Game.cpp
+    common/Game.cpp
     controllers/LoadingController.cpp
     controllers/MainMenuController.cpp
-    graphics/Bound.cpp
-    graphics/Car.cpp
-    graphics/DecorationSprite.cpp
-    graphics/DebugLayer.cpp
-    graphics/GameWindow.cpp
-    graphics/GroundBlock.cpp
-    graphics/RaceUI.cpp
-    graphics/Smoke.cpp
-    graphics/SpeedMeter.cpp
-    graphics/Stage.cpp
-    graphics/TireTrack.cpp
-    graphics/Viewport.cpp
-    gui/MainMenuScene.cpp
-    gui/LoadingScene.cpp
-    gui/SceneContainer.cpp
+    gfx/DebugLayer.cpp
+    gfx/GameWindow.cpp
+    gfx/Stage.cpp
+    gfx/Viewport.cpp
+    gfx/race/level/Bound.cpp
+    gfx/race/level/Car.cpp
+    gfx/race/level/DecorationSprite.cpp
+    gfx/race/level/GroundBlock.cpp
+    gfx/race/level/Smoke.cpp
+    gfx/race/level/TireTrack.cpp
+    gfx/race/ui/RaceUI.cpp
+    gfx/race/ui/SpeedMeter.cpp
+    gfx/scenes/MainMenuScene.cpp
+    gfx/scenes/LoadingScene.cpp
+    gfx/scenes/RaceScene.cpp
+    gfx/scenes/SceneContainer.cpp
     math/Easing.cpp
     math/Float.cpp
-    race/RaceScene.cpp
     network/Client.cpp
 )
 

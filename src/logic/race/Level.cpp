@@ -31,7 +31,7 @@
 #include <assert.h>
 
 #include "common.h"
-#include "race/Checkpoint.h"
+#include "logic/race/Checkpoint.h"
 
 namespace Race {
 

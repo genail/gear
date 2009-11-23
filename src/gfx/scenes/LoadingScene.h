@@ -31,7 +31,7 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "graphics/Scene.h"
+#include "gfx/Scene.h"
 #include "controllers/LoadingController.h"
 
 class LoadingScene: public Scene {

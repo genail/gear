@@ -31,7 +31,7 @@
 #include <stdlib.h>
 
 #include "common.h"
-#include "graphics/Stage.h"
+#include "gfx/Stage.h" // FIXME: Remove this include
 #include "network/events.h"
 #include "network/Client.h"
 

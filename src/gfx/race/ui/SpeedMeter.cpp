@@ -28,7 +28,7 @@
 
 #include "SpeedMeter.h"
 
-#include "graphics/Stage.h"
+#include "gfx/Stage.h"
 
 namespace Gfx {
 

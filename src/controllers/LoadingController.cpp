@@ -28,7 +28,7 @@
 
 #include "LoadingController.h"
 
-#include "Game.h"
+#include "common/Game.h"
 
 LoadingController::LoadingController(LoadingScene *p_scene) :
 	m_scene(p_scene)

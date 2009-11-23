@@ -30,11 +30,11 @@
 
 #include <ClanLib/core.h>
 
-#include "Car.h"
-#include "Block.h"
-#include "Bound.h"
-#include "Track.h"
-#include "TyreStripes.h"
+#include "logic/race/Car.h"
+#include "logic/race/Block.h"
+#include "logic/race/Bound.h"
+#include "logic/race/Track.h"
+#include "logic/race/TyreStripes.h"
 
 namespace Race {
 

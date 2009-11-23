@@ -31,9 +31,9 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
-#include "race/Level.h"
-#include "race/RaceScene.h"
-#include "race/ScoreTable.h"
+#include "logic/race/Level.h"
+#include "gfx/scenes/RaceScene.h" // FIXME: remove this include
+#include "logic/race//ScoreTable.h"
 
 namespace Race {
 

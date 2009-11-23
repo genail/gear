@@ -27,10 +27,10 @@
  */
 
 #include "common.h"
-#include "race/Car.h"
-#include "Properties.h"
-#include "race/Level.h"
-#include "Game.h"
+#include "logic/race/Car.h"
+#include "common/Properties.h"
+#include "logic/race/Level.h"
+#include "common/Game.h"
 
 #include <ClanLib/core.h>
 

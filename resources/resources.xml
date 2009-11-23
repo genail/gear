@@ -36,7 +36,7 @@
         </sprite>
         
         <!-- Special -->
-        <sprite name="start_line">
+        <sprite name="start_line_up">
             <image file="start_line.png" />
         </sprite>
         

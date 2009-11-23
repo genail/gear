@@ -238,7 +238,7 @@ void RaceScene::drawLevel(CL_GraphicContext &p_gc)
 		const Race::Checkpoint *checkpoint = track.getCheckpoint(i);
 		const CL_Pointf &point = checkpoint->getPosition();
 
-		CL_Draw::circle(p_gc, point.x, point.y, 10, CL_Colorf::red);
+		CL_Draw::circle(p_gc, point.x, point.y, 5, CL_Colorf::red);
 	}
 
 #endif // !NDEBUG && DRAW_CHECKPOINTS

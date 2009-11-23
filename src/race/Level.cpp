@@ -149,15 +149,6 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 			const int x = CL_StringHelp::local8_to_int(attrs.get_named_item("x").get_node_value());
 			const int y = CL_StringHelp::local8_to_int(attrs.get_named_item("y").get_node_value());
 			const CL_String typeStr = attrs.get_named_item("type").get_node_value();
-//			bool isStart;
-//
-//			const CL_DomNode startNode = attrs.get_named_item("start");
-//
-//			if (!startNode.is_null() && startNode.get_node_type() == "yes") {
-//				isStart = true;
-//			} else {
-//				isStart = false;
-//			}
 
 			if (x < 0 || y < 0 || x >= m_width || y >= m_height) {
 				cl_log_event("debug", "coords x=%1, y=%2", x, y);

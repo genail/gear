@@ -81,7 +81,7 @@ void GroundBlock::load(CL_GraphicContext &p_gc)
 			spriteName = "race/turn_top_left";
 			break;
 		case Common::BT_START_LINE_UP:
-			spriteName = "race/street_vert";
+			spriteName = "race/start_line_up";
 			break;
 		default:
 			assert(0 && "unknown block type");

@@ -35,7 +35,7 @@
 #include "race/Car.h"
 #include "race/Level.h"
 #include "graphics/RaceUI.h"
-#include "race/Viewport.h"
+#include "graphics/Viewport.h"
 #include "race/ScoreTable.h"
 #include "graphics/Drawable.h"
 #include "graphics/Car.h"
@@ -75,7 +75,7 @@ class RaceScene: public Scene
 
 		Gfx::RaceUI& getUI() { return m_raceUI; }
 
-		Viewport& getViewport() { return m_viewport; }
+		Gfx::Viewport& getViewport() { return m_viewport; }
 
 		void init(const CL_String &p_levelName);
 
@@ -120,7 +120,7 @@ class RaceScene: public Scene
 		Gfx::RaceUI m_raceUI;
 
 		/** How player sees the scene */
-		Viewport m_viewport;
+		Gfx::Viewport m_viewport;
 
 		/** Last drift car position. If null, then no drift was doing last time. */
 		CL_Pointf m_lastDriftPoint;

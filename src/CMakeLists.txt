@@ -35,13 +35,13 @@ SET(CLIENT_SRCS
     graphics/SpeedMeter.cpp
     graphics/Stage.cpp
     graphics/TireTrack.cpp
+    graphics/Viewport.cpp
     gui/MainMenuScene.cpp
     gui/LoadingScene.cpp
     gui/SceneContainer.cpp
     math/Easing.cpp
     math/Float.cpp
     race/RaceScene.cpp
-    race/Viewport.cpp
     network/Client.cpp
 )
 

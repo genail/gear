@@ -30,6 +30,9 @@
 
 #include <ClanLib/display.h>
 
+namespace Gfx
+{
+
 class Viewport {
 	public:
 		Viewport();
@@ -58,3 +61,5 @@ class Viewport {
 		/** Scale (only when attached) */
 		float m_scale;
 };
+
+} // namespace

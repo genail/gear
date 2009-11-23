@@ -26,9 +26,12 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "Viewport.h"
 
-#include "graphics/Stage.h"
-#include "race/Viewport.h"
+#include "Stage.h"
+
+namespace Gfx
+{
 
 Viewport::Viewport() :
 	m_x(0),
@@ -69,3 +72,5 @@ void Viewport::prepareGC(CL_GraphicContext &p_gc) {
 void Viewport::finalizeGC(CL_GraphicContext &p_gc) {
 	p_gc.pop_modelview();
 }
+
+} // namespace

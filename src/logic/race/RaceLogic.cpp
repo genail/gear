@@ -28,6 +28,8 @@
 
 #include "RaceLogic.h"
 
+#include "common/Game.h"
+
 namespace Race {
 
 RaceLogic::RaceLogic(Race::Level *p_level) :
@@ -43,6 +45,7 @@ RaceLogic::~RaceLogic()
 void RaceLogic::update(unsigned p_timeElapsed)
 {
 	updateCarPhysics(p_timeElapsed);
+	updateLevel(p_timeElapsed);
 }
 
 void RaceLogic::updateCarPhysics(unsigned p_timeElapsed)
@@ -52,6 +55,25 @@ void RaceLogic::updateCarPhysics(unsigned p_timeElapsed)
 		Race::Car &car = m_level->getCar(i);
 		car.update(p_timeElapsed);
 	}
+}
+
+void RaceLogic::updateLevel(unsigned p_timeElapsed)
+{
+	Game &game = Game::getInstance();
+	Race::Level &level = game.getLevel();
+
+	level.update(p_timeElapsed);
+}
+
+Player *RaceLogic::findPlayer(const CL_String& p_name)
+{
+	foreach(Player *player, m_players) {
+		if (player->getName() == p_name) {
+			return player;
+		}
+	}
+
+	return NULL;
 }
 
 } // namespace

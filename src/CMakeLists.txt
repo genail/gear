@@ -1,8 +1,10 @@
 # Common source files
 SET(COMMON_SRCS
+    common/Game.cpp
     common/Player.cpp
     common/Properties.cpp
     network/CarState.cpp
+    network/Client.cpp
     network/ClientInfo.cpp
     network/GameState.cpp
     network/Goodbye.cpp
@@ -22,13 +24,13 @@ SET(COMMON_SRCS
 SET(CLIENT_SRCS
     ${COMMON_SRCS}
     Application.cpp
-    common/Game.cpp
     controllers/LoadingController.cpp
     controllers/MainMenuController.cpp
     gfx/DebugLayer.cpp
     gfx/GameWindow.cpp
     gfx/Stage.cpp
     gfx/Viewport.cpp
+    gfx/race/RaceGraphics.cpp
     gfx/race/level/Bound.cpp
     gfx/race/level/Car.cpp
     gfx/race/level/DecorationSprite.cpp

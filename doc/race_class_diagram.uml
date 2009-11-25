@@ -62,6 +62,10 @@
               name="race_class_diagram_LogicSystem.pgml"
               diagramclass="org.argouml.uml.diagram.static_structure.ui.UMLClassDiagram"
               diagramname="Logic System" />
+      <member type="pgml"
+              name="race_class_diagram_CollaborationDiagram.pgml"
+              diagramclass="org.argouml.uml.diagram.collaboration.ui.UMLCollaborationDiagram"
+              diagramname="Collaboration Diagram" />
       <member type="todo"
               name="race_class_diagram.todo" />
     </members>
@@ -72,7 +76,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Nov 23 22:53:07 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Nov 25 20:53:37 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -4958,6 +4962,9 @@
             </UML:Association>
           </UML:Namespace.ownedElement>
         </UML:Package>
+        <UML:Collaboration xmi.id = '127-0-1-1--38b84d0a:1252caf0085:-8000:0000000000001313'
+          name = 'unattachedCollaboration' isSpecification = 'false' isRoot = 'false'
+          isLeaf = 'false' isAbstract = 'false'/>
       </UML:Namespace.ownedElement>
     </UML:Model>
     <UML:ActionExpression xmi.id = '127-0-1-1--a31ec9e:124a6cfc264:-8000:00000000000010CD'
@@ -5406,7 +5413,7 @@
         x="824"
         y="613"
         width="147"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -5536,7 +5543,7 @@
         x="824"
         y="582"
         width="77"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -6108,7 +6115,7 @@
         x="1464"
         y="344"
         width="169"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -6472,7 +6479,7 @@
         x="1792"
         y="278"
         width="102"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -6875,7 +6882,7 @@ getters and setters.</text>
         x="1344"
         y="820"
         width="169"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -7117,7 +7124,7 @@ getters and setters.</text>
         x="1088"
         y="851"
         width="159"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -7633,7 +7640,7 @@ getters and setters.</text>
         x="440"
         y="579"
         width="185"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -9286,7 +9293,7 @@ getters and setters.</text>
         x="464"
         y="1073"
         width="98"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -9352,7 +9359,7 @@ getters and setters.</text>
         x="464"
         y="1036"
         width="89"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -9714,7 +9721,7 @@ getters and setters.</text>
         x="464"
         y="1254"
         width="132"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -11588,7 +11595,7 @@ getters and setters.</text>
         x="120"
         y="494"
         width="132"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="255 200 255"
         stroke="0"
@@ -11926,7 +11933,7 @@ getters and setters.</text>
         x="672"
         y="638"
         width="112"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -11958,7 +11965,7 @@ getters and setters.</text>
         x="672"
         y="666"
         width="150"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -12040,7 +12047,7 @@ getters and setters.</text>
         x="672"
         y="612"
         width="102"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -12514,7 +12521,7 @@ getters and setters.</text>
         x="1360"
         y="684"
         width="157"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -12788,7 +12795,7 @@ getters and setters.</text>
         x="1024"
         y="887"
         width="111"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -12820,7 +12827,7 @@ getters and setters.</text>
         x="1024"
         y="915"
         width="200"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -12852,7 +12859,7 @@ getters and setters.</text>
         x="1024"
         y="943"
         width="263"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -12902,7 +12909,7 @@ getters and setters.</text>
         x="1024"
         y="830"
         width="98"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -13152,7 +13159,7 @@ getters and setters.</text>
         x="1360"
         y="854"
         width="102"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -13690,7 +13697,7 @@ getters and setters.</text>
         x="832"
         y="885"
         width="112"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -13706,7 +13713,7 @@ getters and setters.</text>
         x="832"
         y="899"
         width="150"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -13756,7 +13763,7 @@ getters and setters.</text>
         x="832"
         y="862"
         width="102"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="200 255 255"
         stroke="0"
@@ -13994,7 +14001,7 @@ getters and setters.</text>
         x="152"
         y="284"
         width="129"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -14114,7 +14121,7 @@ getters and setters.</text>
         x="624"
         y="505"
         width="170"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -14180,7 +14187,7 @@ getters and setters.</text>
         x="624"
         y="476"
         width="112"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -14350,7 +14357,7 @@ getters and setters.</text>
         x="824"
         y="476"
         width="112"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -14520,7 +14527,7 @@ getters and setters.</text>
         x="496"
         y="470"
         width="97"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -14536,7 +14543,7 @@ getters and setters.</text>
         x="496"
         y="484"
         width="84"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -15433,8 +15440,8 @@ getters and setters.</text>
       <text name="Fig0.3.4"
         x="624"
         y="951"
-        width="104"
-        height="17"
+        width="103"
+        height="14"
         fill="0"
         fillcolor="200 200 255"
         stroke="0"
@@ -15879,8 +15886,8 @@ getters and setters.</text>
       <text name="Fig3.4.2"
         x="952"
         y="894"
-        width="101"
-        height="17"
+        width="97"
+        height="14"
         fill="0"
         fillcolor="200 200 255"
         stroke="0"
@@ -15895,8 +15902,8 @@ getters and setters.</text>
       <text name="Fig3.4.3"
         x="952"
         y="908"
-        width="88"
-        height="23"
+        width="84"
+        height="20"
         fill="0"
         fillcolor="200 200 255"
         stroke="0"
@@ -16289,8 +16296,8 @@ getters and setters.</text>
       <text name="Fig6.3.2"
         x="280"
         y="1179"
-        width="176"
-        height="23"
+        width="171"
+        height="20"
         fill="0"
         fillcolor="200 200 255"
         stroke="0"
@@ -16339,8 +16346,8 @@ getters and setters.</text>
       <text name="Fig6.4.2"
         x="280"
         y="1142"
-        width="117"
-        height="17"
+        width="112"
+        height="14"
         fill="0"
         fillcolor="200 200 255"
         stroke="0"
@@ -16437,7 +16444,7 @@ getters and setters.</text>
     </path>
   </group>
   <group name="Fig8"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[528, 48, 65, 67]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[888, 280, 65, 67]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012B8"
        fill="1"
        fillcolor="white"
@@ -16448,17 +16455,17 @@ getters and setters.</text>
     </private>
     
     <rectangle name="Fig8.0"
-      x="528"
-      y="48"
+      x="888"
+      y="280"
       width="65"
       height="67"
       fill="1"
       fillcolor="white"
       stroke="0"
-      strokecolor="0 255 255"
+      strokecolor="black"
     />
     <group name="Fig8.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[528, 48, 65, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[888, 280, 65, 0]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012B8"
          fill="1"
          fillcolor="white"
@@ -16469,8 +16476,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig8.1.0"
-        x="528"
-        y="48"
+        x="888"
+        y="280"
         width="65"
         height="0"
         fill="1"
@@ -16480,8 +16487,8 @@ getters and setters.</text>
       />
     </group>
     <text name="Fig8.2"
-      x="528"
-      y="48"
+      x="888"
+      y="280"
       width="65"
       height="21"
       fill="1"
@@ -16496,7 +16503,7 @@ getters and setters.</text>
       justification="Center"
     >RaceScene</text>
     <group name="Fig8.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[528, 90, 65, 24]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[888, 322, 65, 24]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012B8"
          fill="1"
          fillcolor="white"
@@ -16507,8 +16514,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig8.3.0"
-        x="528"
-        y="90"
+        x="888"
+        y="322"
         width="65"
         height="24"
         fill="1"
@@ -16523,14 +16530,14 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="528"
-                y="90" />
-        <lineto x="592"
-                y="90" />
+        <moveto x="888"
+                y="322" />
+        <lineto x="952"
+                y="322" />
       </path>
     </group>
     <group name="Fig8.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[528, 69, 65, 21]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[888, 301, 65, 21]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012B8"
          fill="1"
          fillcolor="white"
@@ -16541,8 +16548,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig8.4.0"
-        x="528"
-        y="69"
+        x="888"
+        y="301"
         width="65"
         height="21"
         fill="1"
@@ -16557,15 +16564,15 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="528"
-                y="69" />
-        <lineto x="592"
-                y="69" />
+        <moveto x="888"
+                y="301" />
+        <lineto x="952"
+                y="301" />
       </path>
     </group>
     <rectangle name="Fig8.5"
-      x="528"
-      y="48"
+      x="888"
+      y="280"
       width="65"
       height="67"
       fill="0"
@@ -16575,7 +16582,7 @@ getters and setters.</text>
     />
   </group>
   <group name="Fig9"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[264, 192, 174, 71]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[624, 424, 174, 71]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012B9"
        fill="1"
        fillcolor="white"
@@ -16586,17 +16593,17 @@ getters and setters.</text>
     </private>
     
     <rectangle name="Fig9.0"
-      x="264"
-      y="192"
+      x="624"
+      y="424"
       width="174"
       height="71"
       fill="1"
       fillcolor="white"
       stroke="0"
-      strokecolor="0 255 255"
+      strokecolor="black"
     />
     <group name="Fig9.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[264, 192, 174, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[624, 424, 174, 0]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012B9"
          fill="1"
          fillcolor="white"
@@ -16607,8 +16614,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig9.1.0"
-        x="264"
-        y="192"
+        x="624"
+        y="424"
         width="174"
         height="0"
         fill="1"
@@ -16618,8 +16625,8 @@ getters and setters.</text>
       />
     </group>
     <text name="Fig9.2"
-      x="264"
-      y="192"
+      x="624"
+      y="424"
       width="174"
       height="21"
       fill="1"
@@ -16634,7 +16641,7 @@ getters and setters.</text>
       justification="Center"
     >RaceLogic</text>
     <group name="Fig9.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[264, 236, 174, 26]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[624, 468, 174, 26]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012B9"
          fill="1"
          fillcolor="white"
@@ -16645,8 +16652,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig9.3.0"
-        x="264"
-        y="236"
+        x="624"
+        y="468"
         width="174"
         height="26"
         fill="1"
@@ -16661,16 +16668,16 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="264"
-                y="236" />
-        <lineto x="437"
-                y="236" />
+        <moveto x="624"
+                y="468" />
+        <lineto x="797"
+                y="468" />
       </path>
       <text name="Fig9.3.2"
-        x="264"
-        y="237"
-        width="174"
-        height="23"
+        x="624"
+        y="469"
+        width="169"
+        height="20"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -16684,7 +16691,7 @@ getters and setters.</text>
       >update(p_timeElapsed : unsigned)</text>
     </group>
     <group name="Fig9.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[264, 213, 174, 23]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[624, 445, 174, 23]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012B9"
          fill="1"
          fillcolor="white"
@@ -16695,8 +16702,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig9.4.0"
-        x="264"
-        y="213"
+        x="624"
+        y="445"
         width="174"
         height="23"
         fill="1"
@@ -16711,14 +16718,14 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="264"
-                y="213" />
-        <lineto x="437"
-                y="213" />
+        <moveto x="624"
+                y="445" />
+        <lineto x="797"
+                y="445" />
       </path>
       <text name="Fig9.4.2"
-        x="264"
-        y="214"
+        x="624"
+        y="446"
         width="77"
         height="20"
         fill="0"
@@ -16734,8 +16741,8 @@ getters and setters.</text>
       >m_level : Level</text>
     </group>
     <rectangle name="Fig9.5"
-      x="264"
-      y="192"
+      x="624"
+      y="424"
       width="174"
       height="71"
       fill="0"
@@ -16745,7 +16752,7 @@ getters and setters.</text>
     />
   </group>
   <group name="Fig10"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[688, 192, 271, 83]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[1048, 424, 271, 83]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012BA"
        fill="1"
        fillcolor="white"
@@ -16756,17 +16763,17 @@ getters and setters.</text>
     </private>
     
     <rectangle name="Fig10.0"
-      x="688"
-      y="192"
+      x="1048"
+      y="424"
       width="271"
       height="83"
       fill="1"
       fillcolor="white"
       stroke="0"
-      strokecolor="0 255 255"
+      strokecolor="black"
     />
     <group name="Fig10.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[688, 192, 271, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[1048, 424, 271, 0]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012BA"
          fill="1"
          fillcolor="white"
@@ -16777,8 +16784,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig10.1.0"
-        x="688"
-        y="192"
+        x="1048"
+        y="424"
         width="271"
         height="0"
         fill="1"
@@ -16788,8 +16795,8 @@ getters and setters.</text>
       />
     </group>
     <text name="Fig10.2"
-      x="688"
-      y="192"
+      x="1048"
+      y="424"
       width="271"
       height="21"
       fill="1"
@@ -16804,7 +16811,7 @@ getters and setters.</text>
       justification="Center"
     >RaceGraphics</text>
     <group name="Fig10.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[688, 234, 271, 40]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[1048, 466, 271, 40]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012BA"
          fill="1"
          fillcolor="white"
@@ -16815,8 +16822,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig10.3.0"
-        x="688"
-        y="234"
+        x="1048"
+        y="466"
         width="271"
         height="40"
         fill="1"
@@ -16831,14 +16838,14 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="688"
-                y="234" />
-        <lineto x="958"
-                y="234" />
+        <moveto x="1048"
+                y="466" />
+        <lineto x="1318"
+                y="466" />
       </path>
       <text name="Fig10.3.2"
-        x="688"
-        y="235"
+        x="1048"
+        y="467"
         width="270"
         height="14"
         fill="0"
@@ -16853,8 +16860,8 @@ getters and setters.</text>
         justification="Left"
       >draw(p_gc : CL_GraphicsContext,p_logic : RaceLogic)</text>
       <text name="Fig10.3.3"
-        x="688"
-        y="249"
+        x="1048"
+        y="481"
         width="169"
         height="20"
         fill="0"
@@ -16870,7 +16877,7 @@ getters and setters.</text>
       >update(p_timeElapsed : unsigned)</text>
     </group>
     <group name="Fig10.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[688, 213, 271, 21]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[1048, 445, 271, 21]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012BA"
          fill="1"
          fillcolor="white"
@@ -16881,8 +16888,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig10.4.0"
-        x="688"
-        y="213"
+        x="1048"
+        y="445"
         width="271"
         height="21"
         fill="1"
@@ -16897,15 +16904,15 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="688"
-                y="213" />
-        <lineto x="958"
-                y="213" />
+        <moveto x="1048"
+                y="445" />
+        <lineto x="1318"
+                y="445" />
       </path>
     </group>
     <rectangle name="Fig10.5"
-      x="688"
-      y="192"
+      x="1048"
+      y="424"
       width="271"
       height="83"
       fill="0"
@@ -16958,16 +16965,16 @@ getters and setters.</text>
                         offset="5" />
     </private>
     <path name="Fig11.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="593"
-              y="115" />
-      <lineto x="688"
-              y="192" />
+      <moveto x="953"
+              y="347" />
+      <lineto x="1048"
+              y="424" />
     </path>
   </group>
   <group name="Fig12"
@@ -17014,16 +17021,16 @@ getters and setters.</text>
                         offset="5" />
     </private>
     <path name="Fig12.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="438"
-              y="192" />
-      <lineto x="528"
-              y="115" />
+      <moveto x="798"
+              y="424" />
+      <lineto x="888"
+              y="347" />
     </path>
   </group>
   <group name="Fig13"
@@ -17070,20 +17077,20 @@ getters and setters.</text>
                         offset="5" />
     </private>
     <path name="Fig13.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="688"
-              y="224" />
-      <lineto x="438"
-              y="224" />
+      <moveto x="1048"
+              y="456" />
+      <lineto x="798"
+              y="456" />
     </path>
   </group>
   <group name="Fig14"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[56, 384, 112, 69]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[448, 584, 112, 69]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012DD"
        fill="1"
        fillcolor="white"
@@ -17094,17 +17101,17 @@ getters and setters.</text>
     </private>
     
     <rectangle name="Fig14.0"
-      x="56"
-      y="384"
+      x="448"
+      y="584"
       width="112"
       height="69"
       fill="1"
       fillcolor="white"
       stroke="0"
-      strokecolor="0 255 255"
+      strokecolor="black"
     />
     <group name="Fig14.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[56, 384, 112, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[448, 584, 112, 0]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012DD"
          fill="1"
          fillcolor="white"
@@ -17115,8 +17122,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig14.1.0"
-        x="56"
-        y="384"
+        x="448"
+        y="584"
         width="112"
         height="0"
         fill="1"
@@ -17126,8 +17133,8 @@ getters and setters.</text>
       />
     </group>
     <text name="Fig14.2"
-      x="56"
-      y="384"
+      x="448"
+      y="584"
       width="112"
       height="21"
       fill="1"
@@ -17142,7 +17149,7 @@ getters and setters.</text>
       justification="Center"
     >Level</text>
     <group name="Fig14.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[56, 428, 112, 24]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[448, 628, 112, 24]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012DD"
          fill="1"
          fillcolor="white"
@@ -17153,8 +17160,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig14.3.0"
-        x="56"
-        y="428"
+        x="448"
+        y="628"
         width="112"
         height="24"
         fill="1"
@@ -17169,14 +17176,14 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="56"
-                y="428" />
-        <lineto x="167"
-                y="428" />
+        <moveto x="448"
+                y="628" />
+        <lineto x="559"
+                y="628" />
       </path>
     </group>
     <group name="Fig14.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[56, 405, 112, 23]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[448, 605, 112, 23]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012DD"
          fill="1"
          fillcolor="white"
@@ -17187,8 +17194,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig14.4.0"
-        x="56"
-        y="405"
+        x="448"
+        y="605"
         width="112"
         height="23"
         fill="1"
@@ -17203,15 +17210,15 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="56"
-                y="405" />
-        <lineto x="167"
-                y="405" />
+        <moveto x="448"
+                y="605" />
+        <lineto x="559"
+                y="605" />
       </path>
       <text name="Fig14.4.2"
-        x="56"
-        y="406"
-        width="111"
+        x="448"
+        y="606"
+        width="112"
         height="20"
         fill="0"
         fillcolor="white"
@@ -17226,8 +17233,8 @@ getters and setters.</text>
       >m_cars : vector&lt;Car&gt;</text>
     </group>
     <rectangle name="Fig14.5"
-      x="56"
-      y="384"
+      x="448"
+      y="584"
       width="112"
       height="69"
       fill="0"
@@ -17280,20 +17287,20 @@ getters and setters.</text>
                         offset="5" />
     </private>
     <path name="Fig15.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="168"
-              y="384" />
-      <lineto x="264"
-              y="263" />
+      <moveto x="560"
+              y="584" />
+      <lineto x="624"
+              y="495" />
     </path>
   </group>
   <group name="Fig16"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[264, 592, 117, 83]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[264, 432, 117, 83]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012E9"
        fill="1"
        fillcolor="white"
@@ -17305,16 +17312,16 @@ getters and setters.</text>
     
     <rectangle name="Fig16.0"
       x="264"
-      y="592"
+      y="432"
       width="117"
       height="83"
       fill="1"
       fillcolor="white"
       stroke="0"
-      strokecolor="0 255 255"
+      strokecolor="black"
     />
     <group name="Fig16.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[264, 592, 117, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[264, 432, 117, 0]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012E9"
          fill="1"
          fillcolor="white"
@@ -17326,7 +17333,7 @@ getters and setters.</text>
       
       <rectangle name="Fig16.1.0"
         x="264"
-        y="592"
+        y="432"
         width="117"
         height="0"
         fill="1"
@@ -17337,7 +17344,7 @@ getters and setters.</text>
     </group>
     <text name="Fig16.2"
       x="264"
-      y="592"
+      y="432"
       width="117"
       height="21"
       fill="1"
@@ -17352,7 +17359,7 @@ getters and setters.</text>
       justification="Center"
     >Car</text>
     <group name="Fig16.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[264, 650, 117, 24]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[264, 490, 117, 24]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012E9"
          fill="1"
          fillcolor="white"
@@ -17364,7 +17371,7 @@ getters and setters.</text>
       
       <rectangle name="Fig16.3.0"
         x="264"
-        y="650"
+        y="490"
         width="117"
         height="24"
         fill="1"
@@ -17380,13 +17387,13 @@ getters and setters.</text>
         strokecolor="black"
       >
         <moveto x="264"
-                y="650" />
+                y="490" />
         <lineto x="380"
-                y="650" />
+                y="490" />
       </path>
     </group>
     <group name="Fig16.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[264, 613, 117, 37]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[264, 453, 117, 37]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012E9"
          fill="1"
          fillcolor="white"
@@ -17398,7 +17405,7 @@ getters and setters.</text>
       
       <rectangle name="Fig16.4.0"
         x="264"
-        y="613"
+        y="453"
         width="117"
         height="37"
         fill="1"
@@ -17414,13 +17421,13 @@ getters and setters.</text>
         strokecolor="black"
       >
         <moveto x="264"
-                y="613" />
+                y="453" />
         <lineto x="380"
-                y="613" />
+                y="453" />
       </path>
       <text name="Fig16.4.2"
         x="264"
-        y="614"
+        y="454"
         width="112"
         height="14"
         fill="0"
@@ -17436,7 +17443,7 @@ getters and setters.</text>
       >m_position : CL_Pointf</text>
       <text name="Fig16.4.3"
         x="264"
-        y="628"
+        y="468"
         width="89"
         height="20"
         fill="0"
@@ -17453,7 +17460,7 @@ getters and setters.</text>
     </group>
     <rectangle name="Fig16.5"
       x="264"
-      y="592"
+      y="432"
       width="117"
       height="83"
       fill="0"
@@ -17506,20 +17513,20 @@ getters and setters.</text>
                         offset="5" />
     </private>
     <path name="Fig17.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="168"
-              y="453" />
-      <lineto x="264"
-              y="592" />
+      <moveto x="448"
+              y="584" />
+      <lineto x="381"
+              y="515" />
     </path>
   </group>
   <group name="Fig18"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[440, 416, 107, 83]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[136, 576, 107, 83]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012F9"
        fill="1"
        fillcolor="white"
@@ -17530,17 +17537,17 @@ getters and setters.</text>
     </private>
     
     <rectangle name="Fig18.0"
-      x="440"
-      y="416"
+      x="136"
+      y="576"
       width="107"
       height="83"
       fill="1"
       fillcolor="white"
       stroke="0"
-      strokecolor="0 255 255"
+      strokecolor="black"
     />
     <group name="Fig18.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[440, 416, 107, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[136, 576, 107, 0]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012F9"
          fill="1"
          fillcolor="white"
@@ -17551,8 +17558,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig18.1.0"
-        x="440"
-        y="416"
+        x="136"
+        y="576"
         width="107"
         height="0"
         fill="1"
@@ -17562,8 +17569,8 @@ getters and setters.</text>
       />
     </group>
     <text name="Fig18.2"
-      x="440"
-      y="416"
+      x="136"
+      y="576"
       width="107"
       height="21"
       fill="1"
@@ -17578,7 +17585,7 @@ getters and setters.</text>
       justification="Center"
     >Player</text>
     <group name="Fig18.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[440, 474, 107, 24]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[136, 634, 107, 24]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012F9"
          fill="1"
          fillcolor="white"
@@ -17589,8 +17596,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig18.3.0"
-        x="440"
-        y="474"
+        x="136"
+        y="634"
         width="107"
         height="24"
         fill="1"
@@ -17605,14 +17612,14 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="440"
-                y="474" />
-        <lineto x="546"
-                y="474" />
+        <moveto x="136"
+                y="634" />
+        <lineto x="242"
+                y="634" />
       </path>
     </group>
     <group name="Fig18.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[440, 437, 107, 37]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[136, 597, 107, 37]"
          href="127-0-1-1--16b4bdb5:12522d49fe8:-8000:00000000000012F9"
          fill="1"
          fillcolor="white"
@@ -17623,8 +17630,8 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig18.4.0"
-        x="440"
-        y="437"
+        x="136"
+        y="597"
         width="107"
         height="37"
         fill="1"
@@ -17639,14 +17646,14 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="440"
-                y="437" />
-        <lineto x="546"
-                y="437" />
+        <moveto x="136"
+                y="597" />
+        <lineto x="242"
+                y="597" />
       </path>
       <text name="Fig18.4.2"
-        x="440"
-        y="438"
+        x="136"
+        y="598"
         width="102"
         height="14"
         fill="0"
@@ -17661,10 +17668,10 @@ getters and setters.</text>
         justification="Left"
       >m_name : CL_String</text>
       <text name="Fig18.4.3"
-        x="440"
-        y="452"
+        x="136"
+        y="612"
         width="62"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -17678,8 +17685,8 @@ getters and setters.</text>
       >m_car : Car</text>
     </group>
     <rectangle name="Fig18.5"
-      x="440"
-      y="416"
+      x="136"
+      y="576"
       width="107"
       height="83"
       fill="0"
@@ -17732,18 +17739,22 @@ getters and setters.</text>
                         offset="5" />
     </private>
     <path name="Fig19.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="381"
-              y="592" />
-      <lineto x="440"
-              y="499" />
+      <moveto x="264"
+              y="515" />
+      <lineto x="243"
+              y="576" />
     </path>
   </group>
+</pgml>
+<pgml description="org.argouml.uml.diagram.collaboration.ui.UMLCollaborationDiagram|127-0-1-1--38b84d0a:1252caf0085:-8000:0000000000001313"
+      name="Collaboration Diagram"
+>
 </pgml>
 <todo>
 <todolist>

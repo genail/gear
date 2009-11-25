@@ -29,12 +29,15 @@
 #pragma once
 
 #include "logic/race/Level.h"
+#include "common/Player.h"
 
 namespace Race {
 
 class RaceLogic {
 
 	public:
+
+		typedef std::list<Player*> TPlayerList;
 
 		RaceLogic(Race::Level *p_level);
 
@@ -43,16 +46,30 @@ class RaceLogic {
 
 		const Race::Level *getLevel() { return m_level; }
 
+		const TPlayerList &getPlayerList() const { return m_players; }
+
 
 		void update(unsigned p_timeElapsed);
 
 	private:
 
+		/** The level */
 		Race::Level *m_level;
 
-		// update methods
+		/** This race players */
+		TPlayerList m_players;
+
+
+		// update routines
 
 		void updateCarPhysics(unsigned p_timeElapsed);
+
+		void updateLevel(unsigned p_timeElapsed);
+
+
+		// helper routines
+
+		Player *findPlayer(const CL_String& p_name);
 
 };
 

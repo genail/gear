@@ -50,15 +50,13 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	Scene(p_guiParent),
 
 #endif // !RACE_SCENE_ONLY
+	m_logic(&Game::getInstance().getLevel()),
+	m_graphics(&m_logic),
 	m_lapsTotal(3),
 	m_initialized(false),
 	m_inputLock(false),
 	m_turnLeft(false),
-	m_turnRight(false),
-	m_raceUI(),
-	m_fps(0),
-	m_nextFps(0),
-	m_lastFpsRegisterTime(0)
+	m_turnRight(false)
 {
 #if !defined(RACE_SCENE_ONLY)
 	set_class_name("RaceScene");
@@ -72,8 +70,6 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	Game &game = Game::getInstance();
 	Net::Client &client = game.getNetworkConnection();
 	Player &player = game.getPlayer();
-
-	oldSpeed = 0.0f;
 
 	// wait for race init
 //	m_slots.connect(client.signalInitRace(), this, &RaceScene::onInitRace);
@@ -105,18 +101,17 @@ RaceScene::~RaceScene() {
 
 void RaceScene::initialize()
 {
+	// add player's car to level
 	Game &game = Game::getInstance();
-
 	Player &player = game.getPlayer();
-	m_viewport.attachTo(&(player.getCar().getPosition()));
-	m_players.push_back(&player);
-
 	Race::Level &level = game.getLevel();
+
 	level.addCar(&player.getCar());
 }
 
 void RaceScene::destroy()
 {
+	// remove player's car from level
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 	Race::Level &level = game.getLevel();
@@ -126,350 +121,36 @@ void RaceScene::destroy()
 
 void RaceScene::init(const CL_String &p_levelName)
 {
-//	Game::getInstance().getNetworkRaceConnection().initRace(p_levelName);
 }
 
 void RaceScene::draw(CL_GraphicContext &p_gc)
 {
-	// initialize player's viewport
-	m_viewport.prepareGC(p_gc);
-
-	// draw pure level
-	drawLevel(p_gc);
-
-	// draw tire tracks
-	drawTireTracks(p_gc);
-	drawCars(p_gc);
-	drawSmokes(p_gc);
-
-	// revert player's viewport
-	m_viewport.finalizeGC(p_gc);
-
-	// draw the user interface
-	drawUI(p_gc);
-
-	countFps();
-
-#ifndef NDEBUG
-	Gfx::Stage::getDebugLayer()->putMessage("fps", CL_StringHelp::int_to_local8(m_fps));
-
-	Gfx::Stage::getDebugLayer()->draw(p_gc);
-#endif // NDEBUG
+	m_graphics.draw(p_gc);
 }
 
-void RaceScene::drawSmokes(CL_GraphicContext &p_gc)
-{
-	foreach(CL_SharedPtr<Gfx::Smoke> &smoke, m_smokes) {
-		if (!smoke->isLoaded()) {
-			smoke->load(p_gc);
-		}
 
-		smoke->draw(p_gc);
-	}
-}
-
-void RaceScene::drawUI(CL_GraphicContext &p_gc)
-{
-	Gfx::SpeedMeter &speedMeter = m_raceUI.getSpeedMeter();
-	speedMeter.setSpeed(Game::getInstance().getPlayer().getCar().getSpeedKMS());
-
-	m_raceUI.draw(p_gc);
-}
-
-void RaceScene::drawTireTracks(CL_GraphicContext &p_gc)
-{
-	Race::Level &level = Game::getInstance().getLevel();
-	const Race::TyreStripes &tireStripes = level.getTyreStripes();
-
-	Gfx::TireTrack track;
-
-	foreach (const Race::TyreStripes::Stripe &stripe, tireStripes.getStripeList()) {
-		track.setFromPoint(stripe.getFromPoint());
-		track.setToPoint(stripe.getToPoint());
-
-		track.draw(p_gc);
-	}
-
-}
-
-void RaceScene::drawLevel(CL_GraphicContext &p_gc)
-{
-	Race::Level &level = Game::getInstance().getLevel();
-
-	// draw blocks
-
-	const size_t w = level.getWidth();
-	const size_t h = level.getHeight();
-
-	for (size_t iw = 0; iw < w; ++iw) {
-		for (size_t ih = 0; ih < h; ++ih) {
-			drawGroundBlock(p_gc, level.getBlock(iw, ih), iw * Race::Block::WIDTH, ih * Race::Block::WIDTH);
-		}
-	}
-
-	// draw bounds
-	const size_t boundCount = level.getBoundCount();
-	Gfx::Bound gfxBound;
-
-	for (size_t i = 0; i < boundCount; ++i) {
-		const Race::Bound &bound = level.getBound(i);
-		gfxBound.setSegment(bound.getSegment());
-
-		gfxBound.draw(p_gc);
-	}
-
-#if !defined(NDEBUG) && defined(DRAW_CHECKPOINTS)
-
-	// draw car -> checkpoint links
-	foreach (const Player *player, m_players) {
-		const Race::Car &car = player->getCar();
-
-		const Race::Checkpoint *cp = car.getCurrentCheckpoint();
-
-		if (cp != NULL) {
-			CL_Draw::line(p_gc, car.getPosition(), cp->getPosition(), CL_Colorf::green);
-		}
-	}
-
-	const Race::Track &track = level.getTrack();
-	const unsigned checkpointCount = track.getCheckpointCount();
-
-	for (unsigned i = 0; i < checkpointCount; ++i) {
-		const Race::Checkpoint *checkpoint = track.getCheckpoint(i);
-		const CL_Pointf &point = checkpoint->getPosition();
-
-		CL_Draw::circle(p_gc, point.x, point.y, 5, CL_Colorf::red);
-	}
-
-#endif // !NDEBUG && DRAW_CHECKPOINTS
-}
-
-void RaceScene::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y)
-{
-	assert(m_blockMapping.find(p_block.getType()) != m_blockMapping.end() && "not loaded block type");
-
-	// always draw grass block
-	CL_SharedPtr<Gfx::GroundBlock> gfxGrassBlock = m_blockMapping[Common::BT_GRASS];
-	gfxGrassBlock->setPosition(CL_Pointf(x, y));
-
-	gfxGrassBlock->draw(p_gc);
-
-	// draw grass decoration sprites
-	foreach(CL_SharedPtr<Gfx::DecorationSprite> &decoration, m_decorations) {
-		const CL_Pointf &position = decoration->getPosition();
-
-		if (position.x >= x && position.x < x + Race::Block::WIDTH && position.y >= y && position.y < y + Race::Block::WIDTH) {
-			decoration->draw(p_gc);
-		}
-	}
-
-	// then draw selected block
-	if (p_block.getType() != Common::BT_GRASS) {
-		CL_SharedPtr<Gfx::GroundBlock> gfxBlock = m_blockMapping[p_block.getType()];
-		gfxBlock->setPosition(CL_Pointf(x, y));
-
-		gfxBlock->draw(p_gc);
-	}
-
-}
-
-void RaceScene::drawCars(CL_GraphicContext &p_gc)
-{
-	Race::Level &level = Game::getInstance().getLevel();
-	size_t carCount = level.getCarCount();
-
-	for (size_t i = 0; i < carCount; ++i) {
-		const Race::Car &car = level.getCar(i);
-		drawCar(p_gc, car);
-	}
-}
-
-void RaceScene::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
-{
-	carMapping_t::iterator itor = m_carMapping.find(&p_car);
-
-	CL_SharedPtr<Gfx::Car> gfxCar;
-
-	if (itor == m_carMapping.end()) {
-		gfxCar = CL_SharedPtr<Gfx::Car>(cl_new Gfx::Car());
-		gfxCar->load(p_gc);
-
-		m_carMapping[&p_car] = gfxCar;
-	} else {
-		gfxCar = itor->second;
-	}
-
-	gfxCar->setPosition(p_car.getPosition());
-	gfxCar->setRotation(CL_Angle(p_car.getRotationRad(), cl_radians));
-
-	gfxCar->draw(p_gc);
-
-//		gfxCar = (*itor->second);
-////		(&itor->second)->get()->draw(p_gc);
-//		cl_log_event("debug", "a");
-//	} else {
-//
-////		m_carsMapping[&p_car]->draw(p_gc);
-//		cl_log_event("debug", "b");
-//	}
-}
-
-void RaceScene::countFps()
-{
-	const unsigned now = CL_System::get_time();
-
-	if (now - m_lastFpsRegisterTime >= 1000) {
-		m_fps = m_nextFps;
-		m_nextFps = 0;
-		m_lastFpsRegisterTime = now;
-	}
-
-	++m_nextFps;
-}
 
 void RaceScene::load(CL_GraphicContext &p_gc)
 {
 	cl_log_event("debug", "RaceScene::load()");
 
+	m_graphics.load(p_gc);
+
 #if !defined(RACE_SCENE_ONLY)
 	Scene::load(p_gc);
 #endif // !RACE_SCENE_ONLY
 
-	m_raceUI.load(p_gc);
-
-	loadGroundBlocks(p_gc);
-
-	// load decorations
-	Race::Level &level = Game::getInstance().getLevel();
-	const int w = level.getWidth();
-	const int h = level.getHeight();
-
-	for (int x = 0; x < w; ++x) {
-		for (int y = 0; y < h; ++y) {
-
-			for (int i = 0; i < 3; ++i) {
-				CL_SharedPtr<Gfx::DecorationSprite> decoration(new Gfx::DecorationSprite("race/decorations/grass"));
-
-				const CL_Pointf point(x * Race::Block::WIDTH + rand() % Race::Block::WIDTH, y * Race::Block::WIDTH + rand() % Race::Block::WIDTH);
-				decoration->setPosition(point);
-
-				decoration->load(p_gc);
-
-				m_decorations.push_back(decoration);
-			}
-
-		}
-	}
 }
 
-void RaceScene::loadGroundBlocks(CL_GraphicContext &p_gc)
-{
-	const int first = Common::BT_GRASS;
-	const int last = Common::BT_START_LINE_UP; // FIXME: this is dangerous
 
-	for (int i = first; i <= last; ++i) {
-		CL_SharedPtr<Gfx::GroundBlock> gfxBlock(new Gfx::GroundBlock((Common::GroundBlockType) i));
-		gfxBlock->load(p_gc);
-
-		m_blockMapping[(Common::GroundBlockType) i] = gfxBlock;
-	}
-}
-
-void RaceScene::updateScale() {
-	static const float ZOOM_SPEED = 0.005f;
-	static const float MAX_SPEED = 500.0f; // FIXME
-	
-	float speed = fabs( ceil(Game::getInstance().getPlayer().getCar().getSpeed() * 10.0f ) / 10.0f);
-	
-	float properScale = -( 1.0f / MAX_SPEED ) * speed + 2.0f;
-	properScale = ceil( properScale * 100.0f ) / 100.0f;
-	
-	float scale =  m_viewport.getScale();
-	
-	if( properScale > scale ) {
-		m_viewport.setScale( scale + ZOOM_SPEED );
-	} else if ( properScale < scale ){
-		m_viewport.setScale( scale - ZOOM_SPEED );
-	}
-	
-	oldSpeed = speed;
-	
-		
-#ifndef NDEBUG
-	Gfx::Stage::getDebugLayer()->putMessage(CL_String8("scale"),  CL_StringHelp::float_to_local8(scale));
-#endif
-}
 
 void RaceScene::update(unsigned p_timeElapsed)
 {
-	updateScale();
-
-	updateCars(p_timeElapsed);
-
-	Game &game = Game::getInstance();
-	Race::Level &level = game.getLevel();
-
-	level.update(p_timeElapsed);
-
-	Player &player = game.getPlayer();
-	const Race::Car &car = player.getCar();
-
-	if (car.getLap() > m_lapsTotal) {
-		m_viewport.detach();
-	}
-
-	updateSmokes(p_timeElapsed);
+	m_logic.update(p_timeElapsed);
+	m_graphics.update(p_timeElapsed);
 
 }
 
-void RaceScene::updateSmokes(unsigned p_timeElapsed)
-{
-	// remove finished smokes and update the ongoing
-	smokeList_t::iterator itor = m_smokes.begin();
-
-	while (itor != m_smokes.end()) {
-		if ((*itor)->isFinished()) {
-			m_smokes.erase(itor++);
-		} else {
-			(*itor)->update(p_timeElapsed);
-			++itor;
-		}
-	}
-
-	// if car is drifting then add new smokes
-	Player &player = Game::getInstance().getPlayer();
-	const Race::Car &car = player.getCar();
-
-	// but keep this limit on mind
-	static const unsigned SMOKE_PERIOD = 25;
-	static unsigned timeFromLastSmoke = SMOKE_PERIOD;
-
-	timeFromLastSmoke += p_timeElapsed;
-
-	static const int RAND_LIMIT = 10;
-
-	if (car.isDrifting() && timeFromLastSmoke >= SMOKE_PERIOD) {
-
-		CL_Pointf smokePosition = car.getPosition();
-		smokePosition.x += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);
-		smokePosition.y += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);
-
-		CL_SharedPtr<Gfx::Smoke> smoke(new Gfx::Smoke(smokePosition));
-		smoke->start();
-
-		m_smokes.push_back(smoke);
-
-		timeFromLastSmoke = 0;
-	}
-
-}
-
-void RaceScene::updateCars(unsigned p_timeElapsed)
-{
-	foreach(Player *player, m_players) {
-		player->getCar().update(p_timeElapsed);
-	}
-}
 
 
 bool RaceScene::onInputPressed(const CL_InputEvent &p_event)
@@ -550,36 +231,27 @@ void RaceScene::startRace()
 
 void RaceScene::onCarStateReceived(const Net::CarState &p_carState)
 {
-	const CL_String name = p_carState.getName();
-
-	if (name == Game::getInstance().getPlayer().getName()) {
-		// this is about me!
-		cl_log_event("event", "setting myself to start position");
-		Game::getInstance().getPlayer().getCar().applyCarState(p_carState);
-	} else {
-		// remote player state
-		Player *player = findPlayer(name);
-
-		if (player == NULL) {
-			cl_log_event("error", "remote player '%1' not found", name);
-			return;
-		}
-
-		Race::Car &car = player->getCar();
-		car.applyCarState(p_carState);
-	}
+//	const CL_String name = p_carState.getName();
+//
+//	if (name == Game::getInstance().getPlayer().getName()) {
+//		// this is about me!
+//		cl_log_event("event", "setting myself to start position");
+//		Game::getInstance().getPlayer().getCar().applyCarState(p_carState);
+//	} else {
+//		// remote player state
+//		Player *player = findPlayer(name);
+//
+//		if (player == NULL) {
+//			cl_log_event("error", "remote player '%1' not found", name);
+//			return;
+//		}
+//
+//		Race::Car &car = player->getCar();
+//		car.applyCarState(p_carState);
+//	}
 }
 
-Player *RaceScene::findPlayer(const CL_String& p_name)
-{
-	foreach(Player *player, m_players) {
-		if (player->getName() == p_name) {
-			return player;
-		}
-	}
 
-	return NULL;
-}
 
 void RaceScene::onCarStateChangedLocal(Race::Car &p_car)
 {
@@ -592,29 +264,29 @@ void RaceScene::onCarStateChangedLocal(Race::Car &p_car)
 void RaceScene::onPlayerJoined(const CL_String &p_name)
 {
 
-	Player *player = new Player(p_name);
-
-	m_players.push_back(player);
-	Game::getInstance().getLevel().addCar(&player->getCar());
+//	Player *player = new Player(p_name);
+//
+//	m_players.push_back(player);
+//	Game::getInstance().getLevel().addCar(&player->getCar());
 }
 
 void RaceScene::onPlayerLeaved(const CL_String &p_name)
 {
 
-	for (
-		std::list<Player*>::iterator itor = m_players.begin();
-		itor != m_players.end();
-		++itor
-	) {
-		if ((*itor)->getName() == p_name) {
-
-			// remove car
-			Game::getInstance().getLevel().removeCar(&(*itor)->getCar());
-
-			delete *itor;
-			m_players.erase(itor);
-		}
-	}
+//	for (
+//		std::list<Player*>::iterator itor = m_players.begin();
+//		itor != m_players.end();
+//		++itor
+//	) {
+//		if ((*itor)->getName() == p_name) {
+//
+//			// remove car
+//			Game::getInstance().getLevel().removeCar(&(*itor)->getCar());
+//
+//			delete *itor;
+//			m_players.erase(itor);
+//		}
+//	}
 }
 
 void RaceScene::onStartCountdown()

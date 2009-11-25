@@ -45,6 +45,9 @@
 
 #include "gfx/Scene.h"
 
+#include "logic/race/RaceLogic.h"
+#include "gfx/race/RaceGraphics.h"
+
 #if defined(RACE_SCENE_ONLY)
 
 class RaceScene
@@ -71,11 +74,8 @@ class RaceScene: public Scene
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+
 		int getLapsTotal() const { return m_lapsTotal; }
-
-		Gfx::RaceUI& getUI() { return m_raceUI; }
-
-		Gfx::Viewport& getViewport() { return m_viewport; }
 
 		void init(const CL_String &p_levelName);
 
@@ -88,8 +88,14 @@ class RaceScene: public Scene
 			Released
 		};
 
-		/** All players list */
-		std::list<Player*> m_players;
+
+		/** Logic subsystem */
+		Race::RaceLogic m_logic;
+
+		/** Graphics subsystem */
+		Gfx::RaceGraphics m_graphics;
+
+
 
 		/** Total number of laps */
 		int m_lapsTotal;
@@ -116,39 +122,9 @@ class RaceScene: public Scene
 
 		// display
 
-		/** Race user interface */
-		Gfx::RaceUI m_raceUI;
-
-		/** How player sees the scene */
-		Gfx::Viewport m_viewport;
-
 		/** Last drift car position. If null, then no drift was doing last time. */
 		CL_Pointf m_lastDriftPoint;
 
-		/** TODO: What is this? */
-		float oldSpeed;
-
-		/** FPS counter */
-		unsigned m_fps, m_nextFps;
-
-		/** Last fps count time */
-		unsigned m_lastFpsRegisterTime;
-
-		/** Logic car to gfx car mapping */
-		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > carMapping_t;
-		carMapping_t m_carMapping;
-
-		/** Block types to gfx ground blocks */
-		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > blockMapping_t;
-		blockMapping_t m_blockMapping;
-
-		/** Car smoke clounds */
-		typedef std::list< CL_SharedPtr<Gfx::Smoke> > smokeList_t;
-		smokeList_t m_smokes;
-
-		/** Decorations */
-		typedef std::list< CL_SharedPtr<Gfx::DecorationSprite> > decorationList_t;
-		decorationList_t m_decorations;
 
 		// other
 
@@ -159,26 +135,6 @@ class RaceScene: public Scene
 		//
 		// Methods
 		//
-
-		// display
-
-		void loadGroundBlocks(CL_GraphicContext &p_gc);
-
-		void countFps();
-
-		void drawCars(CL_GraphicContext &p_gc);
-
-		void drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car);
-
-		void drawLevel(CL_GraphicContext &p_gc);
-
-		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
-
-		void drawTireTracks(CL_GraphicContext &p_gc);
-
-		void drawUI(CL_GraphicContext &p_gc);
-
-		void drawSmokes(CL_GraphicContext &p_gc);
 
 		// input
 
@@ -192,14 +148,6 @@ class RaceScene: public Scene
 
 		void updateCarTurn();
 
-		// logic
-
-		void updateCars(unsigned p_timeElapsed);
-
-		void updateScale();
-
-		void updateSmokes(unsigned p_timeElapsed);
-
 		// flow control
 
 		void startRace();
@@ -209,10 +157,6 @@ class RaceScene: public Scene
 		bool isRaceFinished();
 
 		void markPlayerFinished(const CL_String &p_name, unsigned p_time);
-
-		// helpers
-
-		Player *findPlayer(const CL_String& p_name);
 
 		// event handlers
 

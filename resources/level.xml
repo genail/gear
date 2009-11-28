@@ -69,5 +69,12 @@
             <bound x1="6.0" y1="9.0" x2="1.0" y2="9.0" />
             <bound x1="1.0" y1="9.0" x2="1.0" y2="1.0" />
         </bounds>
+        
+        <sand>
+            <group>
+                <circle x="1.1" y="1.1" radius="0.1" />
+                <circle x="1.2" y="1.2" radius="0.1" />
+            </group>
+        </sand>
     </content>
 </level>

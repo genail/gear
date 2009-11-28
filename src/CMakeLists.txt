@@ -18,6 +18,7 @@ SET(COMMON_SRCS
     logic/race/ScoreTable.cpp
     logic/race/Track.cpp
     logic/race/TyreStripes.cpp
+    logic/race/resistance/Circle.cpp
     logic/race/resistance/Primitive.cpp
     logic/race/resistance/Rectangle.cpp
 )

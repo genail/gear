@@ -34,7 +34,7 @@
 #include "common.h"
 #include "Primitive.h"
 
-namespace Race {
+namespace RaceResistance {
 
 class Geometry {
 

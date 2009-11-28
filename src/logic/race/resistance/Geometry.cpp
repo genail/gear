@@ -33,7 +33,7 @@
 #include "Circle.h"
 #include "Rectangle.h"
 
-namespace Race {
+namespace RaceResistance {
 
 Geometry::Geometry() :
 	m_boundsSet(false)

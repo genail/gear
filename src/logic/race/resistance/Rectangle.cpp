@@ -28,7 +28,7 @@
 
 #include "Rectangle.h"
 
-namespace Race {
+namespace RaceResistance {
 
 Rectangle::Rectangle(const CL_Rectf &p_rectangle, Primitive::InsertionType p_insertionType) :
 	Primitive(p_insertionType),

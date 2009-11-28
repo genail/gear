@@ -32,9 +32,9 @@
 
 #include "Primitive.h"
 
-namespace Race {
+namespace RaceResistance {
 
-class Rectangle: public Race::Primitive {
+class Rectangle: public RaceResistance::Primitive {
 
 	public:
 

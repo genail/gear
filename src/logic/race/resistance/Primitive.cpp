@@ -28,7 +28,7 @@
 
 #include "Primitive.h"
 
-namespace Race {
+namespace RaceResistance {
 
 Primitive::Primitive(InsertionType p_insertionType) :
 	m_insertionType(p_insertionType)

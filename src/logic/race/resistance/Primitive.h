@@ -32,7 +32,7 @@
 
 #include "common.h"
 
-namespace Race {
+namespace RaceResistance {
 
 class Primitive : public boost::noncopyable {
 

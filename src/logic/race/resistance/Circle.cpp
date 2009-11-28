@@ -28,7 +28,7 @@
 
 #include "Circle.h"
 
-namespace Race {
+namespace RaceResistance {
 
 Circle::Circle(const CL_Circlef &p_circle, Primitive::InsertionType p_insertionType) :
 	Primitive(p_insertionType),

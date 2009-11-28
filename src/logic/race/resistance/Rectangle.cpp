@@ -40,7 +40,7 @@ Rectangle::~Rectangle()
 {
 }
 
-bool Rectangle::contains(const CL_Pointf &p_point)
+bool Rectangle::contains(const CL_Pointf &p_point) const
 {
 	return m_rectangle.contains(p_point);
 }

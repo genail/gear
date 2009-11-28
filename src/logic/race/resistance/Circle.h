@@ -34,7 +34,7 @@
 
 namespace Race {
 
-class Circle: public Race::Primitive {
+class Circle : public Race::Primitive {
 
 	public:
 
@@ -43,7 +43,7 @@ class Circle: public Race::Primitive {
 		virtual ~Circle();
 
 
-		virtual bool contains(const CL_Pointf &p_point);
+		virtual bool contains(const CL_Pointf &p_point) const;
 
 
 	private:

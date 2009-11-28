@@ -26,23 +26,56 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Circle.h"
+#pragma once
+
+#include <ClanLib/core.h>
+#include <list>
+
+#include "common.h"
+#include "Primitive.h"
 
 namespace Race {
 
-Circle::Circle(const CL_Circlef &p_circle, Primitive::InsertionType p_insertionType) :
-	Primitive(p_insertionType),
-	m_circle(p_circle)
-{
-}
+class Geometry {
 
-Circle::~Circle()
-{
-}
+	public:
 
-bool Circle::contains(const CL_Pointf &p_point) const
-{
-	return p_point.distance(m_circle.position) <= m_circle.radius;
-}
+		Geometry();
 
-}
+		virtual ~Geometry();
+
+
+		const CL_Rectf &getBounds() const;
+
+
+		void addCircle(const CL_Circlef &p_circle);
+
+		void addRectangle(const CL_Rectf &p_rectangle);
+
+		bool contains(const CL_Pointf &p_point) const;
+
+		void subtractCircle(const CL_Circlef &p_circle);
+
+		void subtractRect(const CL_Rectf &p_rectangle);
+
+	private:
+
+		CL_Rectf m_bounds;
+
+		/** False from the beggining. Set to true if bounds are first time set to real value. */
+		bool m_boundsSet;
+
+		typedef std::list<const Primitive*> TPrimitivesList;
+		TPrimitivesList m_primitives;
+
+
+		void updateBounds(const CL_Circlef &p_circle);
+
+		void updateBounds(const CL_Rectf &p_rect);
+
+		void updateBounds(float p_l, float p_t, float p_r, float p_b);
+
+};
+
+} // namespace
+

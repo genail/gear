@@ -30,9 +30,11 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
+
 namespace Race {
 
-class Primitive {
+class Primitive : public boost::noncopyable {
 
 	public:
 
@@ -49,7 +51,7 @@ class Primitive {
 		InsertionType getInsertionType() const;
 
 
-		virtual bool contains(const CL_Pointf &p_point) = 0;
+		virtual bool contains(const CL_Pointf &p_point) const = 0;
 
 	private:
 

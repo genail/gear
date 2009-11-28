@@ -43,7 +43,7 @@ class Rectangle: public Race::Primitive {
 		virtual ~Rectangle();
 
 
-		virtual bool contains(const CL_Pointf &p_point);
+		virtual bool contains(const CL_Pointf &p_point) const;
 
 	private:
 

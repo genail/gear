@@ -18,6 +18,8 @@ SET(COMMON_SRCS
     logic/race/ScoreTable.cpp
     logic/race/Track.cpp
     logic/race/TyreStripes.cpp
+    logic/race/resistance/Primitive.cpp
+    logic/race/resistance/Rectangle.cpp
 )
 
 # Game client sources
@@ -46,7 +48,6 @@ SET(CLIENT_SRCS
     gfx/scenes/SceneContainer.cpp
     math/Easing.cpp
     math/Float.cpp
-    network/Client.cpp
 )
 
 # Server sources

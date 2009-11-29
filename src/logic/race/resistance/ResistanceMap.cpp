@@ -58,6 +58,8 @@ float ResistanceMap::resistance(const CL_Pointf &p_point)
 			result = pair.second;
 		}
 	}
+
+	return result;
 }
 
 } // namespace

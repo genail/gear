@@ -175,6 +175,8 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 				// add resistance geometry based on block
 				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(x, y, blockType);
+				m_resistanceMap.addGeometry(resGeom);
+
 			} else {
 				cl_log_event("race", "Unknown block type: %1", typeStr);
 			}
@@ -194,14 +196,9 @@ CL_SharedPtr<RaceResistance::Geometry> Level::buildResistanceGeometry(int p_x, i
 {
 	CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
 
-	const float left = p_x * Block::WIDTH;
-	const float top = p_y * Block::WIDTH;
-	const float right = left + Block::WIDTH;
-	const float bottom = top + Block::WIDTH;
-
-//	geom->addRectangle(CL_Rectf(p_x, p_y, p_x + Block::WIDTH, p_y + Block::WIDTH));
-
 	CL_Pointf p, q;
+	CL_Pointf topLeft = real(CL_Pointf(p_x, p_y));
+	CL_Pointf bottomRight = real(CL_Pointf(p_x + 1, p_y + 1));
 
 	switch (p_blockType) {
 		case Common::BT_GRASS:
@@ -224,14 +221,45 @@ CL_SharedPtr<RaceResistance::Geometry> Level::buildResistanceGeometry(int p_x, i
 			geom->addCircle(CL_Circlef(p, real(0.9f)));
 			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
 
+			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
+
 			break;
 		case Common::BT_TURN_BOTTOM_LEFT:
-			p = real(CL_Pointf(p_x + 1, p_y + 1));
+			p = real(CL_Pointf(p_x, p_y + 1));
 
-//		BT_TURN_TOP_RIGHT,
-//		BT_TURN_TOP_LEFT,
-//		BT_START_LINE_UP
+			geom->addCircle(CL_Circlef(p, real(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+
+			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
+
+			break;
+		case Common::BT_TURN_TOP_RIGHT:
+			p = real(CL_Pointf(p_x + 1, p_y));
+
+			geom->addCircle(CL_Circlef(p, real(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+
+			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
+			break;
+		case Common::BT_TURN_TOP_LEFT:
+			p = real(CL_Pointf(p_x, p_y));
+
+			geom->addCircle(CL_Circlef(p, real(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+
+			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
+			break;
+		case Common::BT_START_LINE_UP:
+			p = real(CL_Pointf(p_x + 0.1f, p_y));
+			q = real(CL_Pointf(p_x + 0.9f, p_y + 1));
+
+			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
+			break;
+		default:
+			assert(0 && "unknown block type");
 	}
+
+	return geom;
 }
 
 void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)

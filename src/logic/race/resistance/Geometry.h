@@ -52,6 +52,10 @@ class Geometry : public boost::noncopyable {
 
 		void addRectangle(const CL_Rectf &p_rectangle);
 
+		void andCircle(const CL_Circlef &p_circle);
+
+		void andRect(const CL_Rectf &p_rectangle);
+
 		bool contains(const CL_Pointf &p_point) const;
 
 		void subtractCircle(const CL_Circlef &p_circle);

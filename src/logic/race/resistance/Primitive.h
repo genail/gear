@@ -40,7 +40,8 @@ class Primitive : public boost::noncopyable {
 
 		enum InsertionType {
 			IT_ADD,
-			IT_SUB
+			IT_SUB,
+			IT_AND
 		};
 
 		Primitive(InsertionType p_insertionType);

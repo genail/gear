@@ -148,9 +148,9 @@ class Level
 
 		// helpers
 
-		CL_Pointf real(const CL_Pointf &p_point);
+		CL_Pointf real(const CL_Pointf &p_point) const;
 
-		float real(float p_coord);
+		float real(float p_coord) const;
 
 };
 

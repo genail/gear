@@ -85,6 +85,22 @@ void Geometry::subtractRect(const CL_Rectf &p_rectangle)
 	updateBounds(p_rectangle);
 }
 
+void Geometry::andCircle(const CL_Circlef &p_circle)
+{
+	const Primitive *pr = new Circle(p_circle, Primitive::IT_AND);
+	m_primitives.push_back(pr);
+
+	updateBounds(p_circle);
+}
+
+void Geometry::andRect(const CL_Rectf &p_rectangle)
+{
+	const Primitive *pr = new Rectangle(p_rectangle, Primitive::IT_AND);
+	m_primitives.push_back(pr);
+
+	updateBounds(p_rectangle);
+}
+
 void Geometry::updateBounds(const CL_Circlef &p_circle)
 {
 	const float l = p_circle.position.x - p_circle.radius;
@@ -133,8 +149,19 @@ bool Geometry::contains(const CL_Pointf &p_point) const
 	bool result = false;
 
 	foreach (const Primitive *pr, m_primitives) {
-		if (pr->contains(p_point)) {
-			result = pr->getInsertionType() == Primitive::IT_ADD ? true : false;
+		switch (pr->getInsertionType()) {
+			case Primitive::IT_ADD:
+				if (result == false) {
+					result = pr->contains(p_point);
+				}
+				break;
+			case Primitive::IT_SUB:
+				if (result == true) {
+					result = !pr->contains(p_point);
+				}
+				break;
+			case Primitive::IT_AND:
+				result = result && pr->contains(p_point);
 		}
 	}
 

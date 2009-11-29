@@ -174,7 +174,7 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 				}
 
 				// add resistance geometry based on block
-				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(blockType);
+				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(x, y, blockType);
 			} else {
 				cl_log_event("race", "Unknown block type: %1", typeStr);
 			}
@@ -204,33 +204,33 @@ CL_SharedPtr<RaceResistance::Geometry> Level::buildResistanceGeometry(int p_x, i
 	CL_Pointf p, q;
 
 	switch (p_blockType) {
-		case BT_GRASS:
+		case Common::BT_GRASS:
 			break;
-		case BT_BT_STREET_HORIZ:
+		case Common::BT_STREET_HORIZ:
 			p = real(CL_Pointf(p_x, p_y + 0.1f));
 			q = real(CL_Pointf(p_x + 1, p_y + 0.9f));
 
 			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
 			break;
-		case BT_STREET_VERT:
+		case Common::BT_STREET_VERT:
 			p = real(CL_Pointf(p_x + 0.1f, p_y));
 			q = real(CL_Pointf(p_x + 0.9f, p_y + 1));
 
 			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
 			break;
-		case BT_TURN_BOTTOM_RIGHT:
+		case Common::BT_TURN_BOTTOM_RIGHT:
 			p = real(CL_Pointf(p_x + 1, p_y + 1));
 
 			geom->addCircle(CL_Circlef(p, real(0.9f)));
 			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
 
 			break;
-		case BT_TURN_BOTTOM_LEFT:
+		case Common::BT_TURN_BOTTOM_LEFT:
 			p = real(CL_Pointf(p_x + 1, p_y + 1));
 
-		BT_TURN_TOP_RIGHT,
-		BT_TURN_TOP_LEFT,
-		BT_START_LINE_UP
+//		BT_TURN_TOP_RIGHT,
+//		BT_TURN_TOP_LEFT,
+//		BT_START_LINE_UP
 	}
 }
 
@@ -446,12 +446,12 @@ void Level::checkCollistions()
 }
 #endif // CLIENT
 
-CL_Pointf Level::real(const CL_Pointf &p_point)
+CL_Pointf Level::real(const CL_Pointf &p_point) const
 {
 	return CL_Pointf(real(p_point.x), real(p_point.y));
 }
 
-float real(float p_coord)
+float Level::real(float p_coord) const
 {
 	return p_coord * Block::WIDTH;
 }

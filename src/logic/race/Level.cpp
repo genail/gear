@@ -175,7 +175,7 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 				// add resistance geometry based on block
 				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(x, y, blockType);
-				m_resistanceMap.addGeometry(resGeom);
+				m_resistanceMap.addGeometry(resGeom, 0.3f);
 
 			} else {
 				cl_log_event("race", "Unknown block type: %1", typeStr);
@@ -293,18 +293,9 @@ void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)
 	}
 }
 
-float Level::getResistance(float p_x, float p_y) {
-	if (p_x < 0 || p_y < 0 || p_x >= Block::WIDTH * m_width || p_y >= Block::WIDTH * m_height) {
-		return 0.0f;
-	}
-
-	int blockX = (int) floor(p_x / Block::WIDTH);
-	int blockY = (int) floor(p_y / Block::WIDTH);
-
-	int localX = (int) (p_x - blockX * Block::WIDTH);
-	int localY = (int) (p_y - blockY * Block::WIDTH);
-
-	return m_blocks[blockY * m_width + blockX]->getResistance(localX, localY);
+float Level::getResistance(float p_realX, float p_realY)
+{
+	return m_resistanceMap.resistance(CL_Pointf(p_realX, p_realY));
 }
 
 void Level::addCar(Car *p_car) {

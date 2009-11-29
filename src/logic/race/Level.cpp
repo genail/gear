@@ -158,11 +158,11 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 			if (blockMapItor != blockMap.end()) {
 
-				m_blocks[m_width * y + x]->setType(blockMapItor->second);
+				const Common::GroundBlockType blockType = blockMapItor->second;
+				m_blocks[m_width * y + x]->setType(blockType);
 
 				// add checkpoint to track
-
-				if (blockMapItor->second == Common::BT_START_LINE_UP) {
+				if (blockType == Common::BT_START_LINE_UP) {
 					lastCP = CL_Pointf((x + 0.5f) * Block::WIDTH, (y + 0.2f) * Block::WIDTH);
 					const CL_Pointf firstCP((x + 0.5f) * Block::WIDTH, (y + 0.2 - 0.01f) * Block::WIDTH);
 
@@ -172,6 +172,9 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 					m_track.addCheckpointAtPosition(checkPosition);
 				}
+
+				// add resistance geometry based on block
+				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(blockType);
 			} else {
 				cl_log_event("race", "Unknown block type: %1", typeStr);
 			}
@@ -185,6 +188,50 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 	m_track.addCheckpointAtPosition(lastCP);
 	m_track.close();
 
+}
+
+CL_SharedPtr<RaceResistance::Geometry> Level::buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const
+{
+	CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
+
+	const float left = p_x * Block::WIDTH;
+	const float top = p_y * Block::WIDTH;
+	const float right = left + Block::WIDTH;
+	const float bottom = top + Block::WIDTH;
+
+//	geom->addRectangle(CL_Rectf(p_x, p_y, p_x + Block::WIDTH, p_y + Block::WIDTH));
+
+	CL_Pointf p, q;
+
+	switch (p_blockType) {
+		case BT_GRASS:
+			break;
+		case BT_BT_STREET_HORIZ:
+			p = real(CL_Pointf(p_x, p_y + 0.1f));
+			q = real(CL_Pointf(p_x + 1, p_y + 0.9f));
+
+			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
+			break;
+		case BT_STREET_VERT:
+			p = real(CL_Pointf(p_x + 0.1f, p_y));
+			q = real(CL_Pointf(p_x + 0.9f, p_y + 1));
+
+			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
+			break;
+		case BT_TURN_BOTTOM_RIGHT:
+			p = real(CL_Pointf(p_x + 1, p_y + 1));
+
+			geom->addCircle(CL_Circlef(p, real(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+
+			break;
+		case BT_TURN_BOTTOM_LEFT:
+			p = real(CL_Pointf(p_x + 1, p_y + 1));
+
+		BT_TURN_TOP_RIGHT,
+		BT_TURN_TOP_LEFT,
+		BT_START_LINE_UP
+	}
 }
 
 void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)
@@ -398,5 +445,15 @@ void Level::checkCollistions()
 
 }
 #endif // CLIENT
+
+CL_Pointf Level::real(const CL_Pointf &p_point)
+{
+	return CL_Pointf(real(p_point.x), real(p_point.y));
+}
+
+float real(float p_coord)
+{
+	return p_coord * Block::WIDTH;
+}
 
 } // namespace

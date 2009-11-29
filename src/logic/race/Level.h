@@ -31,11 +31,12 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "logic/race/Car.h"
-#include "logic/race/Block.h"
-#include "logic/race/Bound.h"
-#include "logic/race/Track.h"
-#include "logic/race/TyreStripes.h"
+#include "Car.h"
+#include "Block.h"
+#include "Bound.h"
+#include "Track.h"
+#include "TyreStripes.h"
+#include "resistance/ResistanceMap.h"
 
 namespace Race {
 
@@ -99,6 +100,9 @@ class Level
 		/** Level bounds */
 		std::vector< CL_SharedPtr<Bound> > m_bounds;
 
+		/** Resistance mapping */
+		RaceResistance::ResistanceMap m_resistanceMap;
+
 		/** All cars */
 		std::vector<Car*> m_cars;
 
@@ -138,6 +142,15 @@ class Level
 		void loadTrackElement(const CL_DomNode &p_trackNode);
 
 		void loadBoundsElement(const CL_DomNode &p_boundsNode);
+
+		CL_SharedPtr<RaceResistance::Geometry> buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const;
+
+
+		// helpers
+
+		CL_Pointf real(const CL_Pointf &p_point);
+
+		float real(float p_coord);
 
 };
 

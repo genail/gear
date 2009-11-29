@@ -22,6 +22,7 @@ SET(COMMON_SRCS
     logic/race/resistance/Geometry.cpp
     logic/race/resistance/Primitive.cpp
     logic/race/resistance/Rectangle.cpp
+    logic/race/resistance/ResistanceMap.cpp
 )
 
 # Game client sources

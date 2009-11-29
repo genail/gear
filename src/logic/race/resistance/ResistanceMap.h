@@ -28,13 +28,32 @@
 
 #pragma once
 
+#include <map>
+#include <ClanLib/core.h>
+
+#include "Geometry.h"
+
 namespace RaceResistance {
 
 class ResistanceMap {
+
 	public:
+
 		ResistanceMap();
+
 		virtual ~ResistanceMap();
+
+
+		void addGeometry(const CL_SharedPtr<Geometry> &p_geometry, float p_resistanceValue);
+
+
+		float resistance(const CL_Pointf &p_point);
+
+	private:
+
+		typedef std::map<CL_SharedPtr<Geometry>, float> TGeometryMap;
+		TGeometryMap m_geometries;
 };
 
-}
+} // namespace
 

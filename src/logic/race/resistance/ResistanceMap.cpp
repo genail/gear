@@ -28,17 +28,36 @@
 
 #include "ResistanceMap.h"
 
+#include "common.h"
+
 namespace RaceResistance {
 
 ResistanceMap::ResistanceMap()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 ResistanceMap::~ResistanceMap()
 {
-	// TODO Auto-generated destructor stub
 }
 
+void ResistanceMap::addGeometry(const CL_SharedPtr<Geometry> &p_geometry, float p_resistanceValue)
+{
+	m_geometries[p_geometry] = p_resistanceValue;
 }
+
+float ResistanceMap::resistance(const CL_Pointf &p_point)
+{
+	float result = 0.0f;
+
+	std::pair<CL_SharedPtr<Geometry>, float> pair;
+	foreach(pair, m_geometries) {
+		const CL_SharedPtr<Geometry> &geom = pair.first;
+		const CL_Rectf &bounds = geom->getBounds();
+
+		if (bounds.contains(p_point) && geom->contains(p_point)) {
+			result = pair.second;
+		}
+	}
+}
+
+} // namespace

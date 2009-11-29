@@ -36,7 +36,7 @@
 
 namespace RaceResistance {
 
-class Geometry {
+class Geometry : public boost::noncopyable {
 
 	public:
 

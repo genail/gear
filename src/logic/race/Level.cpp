@@ -131,6 +131,12 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 		m_blocks.push_back(CL_SharedPtr<Block>(new Block(Common::BT_GRASS)));
 	}
 
+	// create global resistance geometry
+	CL_SharedPtr<RaceResistance::Geometry> globalResGeom(new RaceResistance::Geometry());
+	globalResGeom->addRectangle(CL_Rectf(real(0), real(0), real(m_width), real(m_height)));
+
+	m_resistanceMap.addGeometry(globalResGeom, 1.0f);
+
 	// read blocks
 	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
 	const int blockListSize = blockList.get_length();
@@ -175,7 +181,7 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 				// add resistance geometry based on block
 				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(x, y, blockType);
-				m_resistanceMap.addGeometry(resGeom, 0.3f);
+				m_resistanceMap.addGeometry(resGeom, 0.0f);
 
 			} else {
 				cl_log_event("race", "Unknown block type: %1", typeStr);

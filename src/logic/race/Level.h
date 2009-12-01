@@ -143,6 +143,8 @@ class Level
 
 		void loadBoundsElement(const CL_DomNode &p_boundsNode);
 
+		void loadSandElement(const CL_DomNode &p_sandNode);
+
 		CL_SharedPtr<RaceResistance::Geometry> buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const;
 
 

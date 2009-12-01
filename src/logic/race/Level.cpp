@@ -198,6 +198,43 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 }
 
+void Level::loadSandElement(const CL_DomNode &p_sandNode)
+{
+	const CL_DomNodeList sandChildren = p_sandNode.get_child_nodes();
+	const int sandChildrenCount = sandChildren.get_length();
+
+	CL_DomNode sandChildNode, groupChildNode;
+
+	for (int i = 0; i < sandChildrenCount; ++i) {
+		sandChildNode = sandChildren.item(i);
+
+		if (sandChildNode.get_node_name() == "group") {
+			const CL_DomNodeList groupChildren = sandChildNode.get_child_nodes();
+			const int groupChildrenCount = groupChildren.get_length();
+
+			for (int j = 0; j < groupChildrenCount; ++j) {
+				groupChildNode = groupChildren.item(j);
+
+				if (groupChildNode.get_node_name() == "circle") {
+					const float x = groupChildNode.select_float("x");
+					const float y = groupChildNode.select_float("y");
+					const float radius = groupChildNode.select_float("radius");
+
+					// build resistance geometry
+					CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
+					geom->addCircle(CL_Circlef(real(x), real(y), real(radius)));
+
+					m_resistanceMap.addGeometry(geom, 0.8f);
+				} else {
+					cl_log_event("error", "unknown element in <sand><group></group></sand>: <%1>", sandChildNode.get_node_name());
+				}
+			}
+		} else {
+			cl_log_event("error", "unknown element in <sand></sand>: <%1>", sandChildNode.get_node_name());
+		}
+	}
+}
+
 CL_SharedPtr<RaceResistance::Geometry> Level::buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const
 {
 	CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());

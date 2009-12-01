@@ -36,7 +36,8 @@
 
 namespace Gfx {
 
-Sandpit::Sandpit() :
+Sandpit::Sandpit(const Race::Sandpit *p_logicSandpit) :
+	m_logicSandpit(p_logicSandpit),
 	m_built(false)
 {
 }
@@ -80,15 +81,6 @@ void Sandpit::load(CL_GraphicContext &p_gc)
 
 }
 
-void Sandpit::addCircle(const CL_Point &p_center, float p_radius)
-{
-	Circle circle;
-	circle.m_center = p_center;
-	circle.m_radius = p_radius;
-
-	m_circles.push_back(circle);
-}
-
 void Sandpit::build()
 {
 	CL_Rect bounds = calculateCircleBounds();
@@ -125,13 +117,16 @@ void Sandpit::fillCircles(int p_width, int p_height, const CL_Rect& p_totalBound
 	// fill circles
 	CL_Rect circleBounds;
 
-	foreach (const Circle &circle, m_circles) {
+	const unsigned circleCount = m_logicSandpit->getCircleCount();
+
+	for (unsigned i = 0; i < circleCount; ++i) {
+		const Race::Sandpit::Circle &circle = m_logicSandpit->circleAt(i);
 
 		// here y points to bottom
-		circleBounds.left = circle.m_center.x - circle.m_radius;
-		circleBounds.right = circle.m_center.x + circle.m_radius;
-		circleBounds.top = circle.m_center.y - circle.m_radius;
-		circleBounds.bottom = circle.m_center.y + circle.m_radius;
+		circleBounds.left = circle.getCenter().x - circle.getRadius();
+		circleBounds.right = circle.getCenter().x + circle.getRadius();
+		circleBounds.top = circle.getCenter().y - circle.getRadius();
+		circleBounds.bottom = circle.getCenter().y + circle.getRadius();
 
 
 		int index;
@@ -145,7 +140,7 @@ void Sandpit::fillCircles(int p_width, int p_height, const CL_Rect& p_totalBound
 			for (int x = circleBounds.left; x <= circleBounds.right; ++x) {
 				CL_Point point(x, y);
 
-				if (point.distance(circle.m_center) <= circle.m_radius) {
+				if (point.distance(circle.getCenter()) <= circle.getRadius()) {
 
 					index = (y + ty) * strike + (x + tx);
 					cl_log_event("debug", "index = %1", index);
@@ -164,12 +159,15 @@ CL_Rect Sandpit::calculateCircleBounds()
 	bool first = true;
 	int l, t, r, b;
 
-	foreach (const Circle &circle, m_circles) {
+	const unsigned circleCount = m_logicSandpit->getCircleCount();
 
-		l = circle.m_center.x - circle.m_radius;
-		r = circle.m_center.x + circle.m_radius;
-		t = circle.m_center.y - circle.m_radius;
-		b = circle.m_center.y + circle.m_radius;
+	for (unsigned i = 0; i < circleCount; ++i) {
+		const Race::Sandpit::Circle &circle = m_logicSandpit->circleAt(i);
+
+		l = circle.getCenter().x - circle.getRadius();
+		r = circle.getCenter().x + circle.getRadius();
+		t = circle.getCenter().y - circle.getRadius();
+		b = circle.getCenter().y + circle.getRadius();
 
 		if (first) {
 			bounds.left = l;

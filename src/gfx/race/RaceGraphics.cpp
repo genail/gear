@@ -56,6 +56,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 
 	// draw pure level
 	drawLevel(p_gc);
+	drawSandpits(p_gc);
 
 	// on level objects
 	drawTireTracks(p_gc);
@@ -82,6 +83,7 @@ void RaceGraphics::load(CL_GraphicContext &p_gc)
 	m_raceUI.load(p_gc);
 	loadGroundBlocks(p_gc);
 	loadDecorations(p_gc);
+	loadSandPits(p_gc);
 }
 
 void RaceGraphics::loadGroundBlocks(CL_GraphicContext &p_gc)
@@ -119,6 +121,29 @@ void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
 			}
 
 		}
+	}
+}
+
+void RaceGraphics::loadSandPits(CL_GraphicContext &p_gc)
+{
+	const Race::Level *level = m_logic->getLevel();
+	const unsigned sandpitCount = level->getSandpitCount();
+
+	for (unsigned i = 0; i < sandpitCount; ++i) {
+		const Race::Sandpit &logicSandpit = level->sandpitAt(i);
+		CL_SharedPtr<Gfx::Sandpit> gfxSandpit(new Gfx::Sandpit(&logicSandpit));
+
+		// load and add to list
+
+		gfxSandpit->load(p_gc);
+		m_sandpits.push_back(gfxSandpit);
+	}
+}
+
+void RaceGraphics::drawSandpits(CL_GraphicContext &p_gc)
+{
+	foreach (CL_SharedPtr<Gfx::Sandpit> &sandpit, m_sandpits) {
+		sandpit->draw(p_gc);
 	}
 }
 
@@ -252,7 +277,7 @@ void RaceGraphics::drawCars(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 {
-	carMapping_t::iterator itor = m_carMapping.find(&p_car);
+	TCarMapping::iterator itor = m_carMapping.find(&p_car);
 
 	CL_SharedPtr<Gfx::Car> gfxCar;
 
@@ -317,7 +342,7 @@ void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 {
 	// remove finished smokes and update the ongoing
-	smokeList_t::iterator itor = m_smokes.begin();
+	TSmokeList::iterator itor = m_smokes.begin();
 
 	while (itor != m_smokes.end()) {
 		if ((*itor)->isFinished()) {

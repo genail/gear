@@ -30,10 +30,12 @@
 
 #include <ClanLib/display.h>
 
+#include "common.h"
+
 namespace Gfx
 {
 
-class Drawable {
+class Drawable : public boost::noncopyable {
 
 	public:
 

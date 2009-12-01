@@ -90,6 +90,10 @@ void Level::loadFromFile(const CL_String& p_filename)
 		const CL_DomNode boundsNode = contentNode.named_item("bounds");
 		loadBoundsElement(boundsNode);
 
+		// load sand
+		const CL_DomNode sandNode = contentNode.named_item("sand");
+		loadSandElement(sandNode);
+
 		file.close();
 		m_loaded = true;
 
@@ -220,9 +224,12 @@ void Level::loadSandElement(const CL_DomNode &p_sandNode)
 				groupChildNode = groupChildren.item(j);
 
 				if (groupChildNode.get_node_name() == "circle") {
-					const float x = groupChildNode.select_float("x");
-					const float y = groupChildNode.select_float("y");
-					const float radius = groupChildNode.select_float("radius");
+
+					CL_DomNamedNodeMap attrs = groupChildNode.get_attributes();
+
+					const float x = CL_StringHelp::local8_to_float(attrs.get_named_item("x").get_node_value());
+					const float y = CL_StringHelp::local8_to_float(attrs.get_named_item("y").get_node_value());
+					const float radius = CL_StringHelp::local8_to_float(attrs.get_named_item("radius").get_node_value());
 
 					// add to sandpit
 

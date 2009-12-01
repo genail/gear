@@ -52,8 +52,6 @@ class Sandpit : public Gfx::Drawable {
 		void setPosition(const CL_Pointf &p_position);
 
 
-		void build();
-
 	private:
 
 		/** Sandpit from logic */
@@ -73,6 +71,8 @@ class Sandpit : public Gfx::Drawable {
 
 
 		// build routines
+
+		void build();
 
 		CL_Rect calculateCircleBounds();
 

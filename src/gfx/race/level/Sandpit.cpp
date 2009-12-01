@@ -78,7 +78,8 @@ void Sandpit::draw(CL_GraphicContext &p_gc)
 
 void Sandpit::load(CL_GraphicContext &p_gc)
 {
-
+	build();
+	Drawable::load(p_gc);
 }
 
 void Sandpit::build()

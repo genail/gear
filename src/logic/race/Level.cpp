@@ -212,6 +212,10 @@ void Level::loadSandElement(const CL_DomNode &p_sandNode)
 			const CL_DomNodeList groupChildren = sandChildNode.get_child_nodes();
 			const int groupChildrenCount = groupChildren.get_length();
 
+			// create new sandpit
+			m_sandpits.push_back(Sandpit());
+			Sandpit &sandpit = m_sandpits.back();
+
 			for (int j = 0; j < groupChildrenCount; ++j) {
 				groupChildNode = groupChildren.item(j);
 
@@ -219,6 +223,14 @@ void Level::loadSandElement(const CL_DomNode &p_sandNode)
 					const float x = groupChildNode.select_float("x");
 					const float y = groupChildNode.select_float("y");
 					const float radius = groupChildNode.select_float("radius");
+
+					// add to sandpit
+
+					// must save as integer
+					const CL_Pointf centerFloat = real(CL_Pointf(x, y));
+					const CL_Point centerInt = CL_Point((int) floor(centerFloat.x), (int) floor(centerFloat.y));
+
+					sandpit.addCircle(centerInt, real(radius));
 
 					// build resistance geometry
 					CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
@@ -516,6 +528,17 @@ CL_Pointf Level::real(const CL_Pointf &p_point) const
 float Level::real(float p_coord) const
 {
 	return p_coord * Block::WIDTH;
+}
+
+unsigned Level::getSandpitCount() const
+{
+	return m_sandpits.size();
+}
+
+const Sandpit &Level::sandpitAt(unsigned p_index) const
+{
+	assert(p_index < m_sandpits.size());
+	return m_sandpits[p_index];
 }
 
 } // namespace

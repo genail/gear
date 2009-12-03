@@ -113,6 +113,10 @@ class RaceGraphics {
 
 		void drawLevel(CL_GraphicContext &p_gc);
 
+		void drawBackBlocks(CL_GraphicContext &p_gc);
+
+		void drawForeBlocks(CL_GraphicContext &p_gc);
+
 		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
 
 		void drawTireTracks(CL_GraphicContext &p_gc);
@@ -129,6 +133,13 @@ class RaceGraphics {
 
 
 		void countFps();
+
+		// helpers
+
+		// FIXME: this is copy of Level helpers
+		CL_Pointf real(const CL_Pointf &p_point) const;
+
+		float real(float p_coord) const;
 };
 
 } // namespace

@@ -73,7 +73,7 @@
         <sand>
             <group>
                 <circle x="1.1" y="1.1" radius="0.1" />
-                <circle x="1.2" y="1.2" radius="0.1" />
+                <circle x="1.3" y="1.3" radius="0.2" />
             </group>
         </sand>
     </content>

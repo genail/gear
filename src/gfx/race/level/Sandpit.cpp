@@ -86,6 +86,8 @@ void Sandpit::build()
 {
 	CL_Rect bounds = calculateCircleBounds();
 
+	setPosition(CL_Pointf(bounds.left, bounds.top));
+
 	const float MAX_WIDTH = 512;
 	const float MAX_HEIGHT = 512;
 

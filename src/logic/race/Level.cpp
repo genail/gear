@@ -79,8 +79,12 @@ void Level::loadFromFile(const CL_String& p_filename)
 		const CL_DomNode metaNode = root.named_item("meta");
 		loadMetaElement(metaNode);
 
-		// load level's content
+		// gets level's content
 		const CL_DomNode contentNode = root.named_item("content");
+
+		// load sand
+		const CL_DomNode sandNode = contentNode.named_item("sand");
+		loadSandElement(sandNode);
 
 		// load track
 		const CL_DomNode trackNode = contentNode.named_item("track");
@@ -89,10 +93,6 @@ void Level::loadFromFile(const CL_String& p_filename)
 		// load track bounds
 		const CL_DomNode boundsNode = contentNode.named_item("bounds");
 		loadBoundsElement(boundsNode);
-
-		// load sand
-		const CL_DomNode sandNode = contentNode.named_item("sand");
-		loadSandElement(sandNode);
 
 		file.close();
 		m_loaded = true;
@@ -139,7 +139,22 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 	CL_SharedPtr<RaceResistance::Geometry> globalResGeom(new RaceResistance::Geometry());
 	globalResGeom->addRectangle(CL_Rectf(real(0), real(0), real(m_width), real(m_height)));
 
-	m_resistanceMap.addGeometry(globalResGeom, 1.0f);
+	m_resistanceMap.addGeometry(globalResGeom, 0.3f);
+
+	// add sand resistance
+	foreach (const Sandpit &sandpit, m_sandpits) {
+		const unsigned circleCount = sandpit.getCircleCount();
+
+		CL_SharedPtr<RaceResistance::Geometry> sandpitGeometry(new RaceResistance::Geometry());
+
+		for (unsigned i = 0; i < circleCount; ++i) {
+			// sandpit values are real
+			const Sandpit::Circle &circle = sandpit.circleAt(i);
+			sandpitGeometry->addCircle(CL_Circlef(circle.getCenter().x, circle.getCenter().y, circle.getRadius()));
+		}
+
+		m_resistanceMap.addGeometry(sandpitGeometry, 0.8f);
+	}
 
 	// read blocks
 	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
@@ -240,10 +255,10 @@ void Level::loadSandElement(const CL_DomNode &p_sandNode)
 					sandpit.addCircle(centerInt, real(radius));
 
 					// build resistance geometry
-					CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
-					geom->addCircle(CL_Circlef(real(x), real(y), real(radius)));
-
-					m_resistanceMap.addGeometry(geom, 0.8f);
+//					CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
+//					geom->addCircle(CL_Circlef(real(x), real(y), real(radius)));
+//
+//					m_resistanceMap.addGeometry(geom, 0.8f);
 				} else {
 					cl_log_event("error", "unknown element in <sand><group></group></sand>: <%1>", sandChildNode.get_node_name());
 				}

@@ -254,10 +254,6 @@ void Level::loadSandElement(const CL_DomNode &p_sandNode)
 
 					sandpit.addCircle(centerInt, real(radius));
 
-					// build resistance geometry
-//					CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
-//					geom->addCircle(CL_Circlef(real(x), real(y), real(radius)));
-//
 //					m_resistanceMap.addGeometry(geom, 0.8f);
 				} else {
 					cl_log_event("error", "unknown element in <sand><group></group></sand>: <%1>", sandChildNode.get_node_name());

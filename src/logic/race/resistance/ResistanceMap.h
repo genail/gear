@@ -51,8 +51,16 @@ class ResistanceMap {
 
 	private:
 
-		typedef std::map<CL_SharedPtr<Geometry>, float> TGeometryMap;
-		TGeometryMap m_geometries;
+		struct Resistance {
+			CL_SharedPtr<Geometry> m_geometry;
+			float m_value;
+		};
+
+//		typedef std::map<CL_SharedPtr<Geometry>, float> TGeometryMap;
+//		TGeometryMap m_geometries;
+
+		typedef std::list<Resistance> TResistanceList;
+		TResistanceList m_resistances;
 };
 
 } // namespace

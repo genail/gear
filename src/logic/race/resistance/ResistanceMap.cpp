@@ -42,20 +42,24 @@ ResistanceMap::~ResistanceMap()
 
 void ResistanceMap::addGeometry(const CL_SharedPtr<Geometry> &p_geometry, float p_resistanceValue)
 {
-	m_geometries[p_geometry] = p_resistanceValue;
+	Resistance resistance;
+
+	resistance.m_geometry = p_geometry;
+	resistance.m_value = p_resistanceValue;
+
+	m_resistances.push_back(resistance);
 }
 
 float ResistanceMap::resistance(const CL_Pointf &p_point)
 {
 	float result = 0.0f;
 
-	std::pair<CL_SharedPtr<Geometry>, float> pair;
-	foreach(pair, m_geometries) {
-		const CL_SharedPtr<Geometry> &geom = pair.first;
+	foreach(const Resistance &resistance, m_resistances) {
+		const CL_SharedPtr<Geometry> &geom = resistance.m_geometry;
 		const CL_Rectf &bounds = geom->getBounds();
 
 		if (bounds.contains(p_point) && geom->contains(p_point)) {
-			result = pair.second;
+			result = resistance.m_value;
 		}
 	}
 

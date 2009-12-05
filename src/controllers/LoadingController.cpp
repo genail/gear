@@ -31,7 +31,7 @@
 #include "common/Game.h"
 #include "gfx/scenes/LoadingScene.h"
 #include "gfx/scenes/SceneContainer.h"
-#include "network/GameState.h"
+#include "network/packets/GameState.h"
 
 LoadingController::LoadingController(LoadingScene *p_scene) :
 	m_scene(p_scene)

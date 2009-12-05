@@ -34,7 +34,7 @@
 #include "common.h"
 #include "logic/race/Bound.h"
 #include "logic/race/Checkpoint.h"
-#include "network/CarState.h"
+#include "network/packets/CarState.h"
 
 namespace Race {
 

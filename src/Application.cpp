@@ -49,7 +49,7 @@
 #include "common/Properties.h"
 #include "gfx/race/ui/RaceUI.h"
 #include "logic/race/Race.h"
-#include "network/Client.h"
+#include "network/client/Client.h"
 #include "gfx/scenes/MainMenuScene.h"
 #include "gfx/scenes/SceneContainer.h"
 

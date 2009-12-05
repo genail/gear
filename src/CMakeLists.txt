@@ -3,12 +3,12 @@ SET(COMMON_SRCS
     common/Game.cpp
     common/Player.cpp
     common/Properties.cpp
-    network/CarState.cpp
-    network/Client.cpp
-    network/ClientInfo.cpp
-    network/GameState.cpp
-    network/Goodbye.cpp
-    network/PlayerJoined.cpp
+    network/client/Client.cpp
+    network/packets/CarState.cpp
+    network/packets/ClientInfo.cpp
+    network/packets/GameState.cpp
+    network/packets/Goodbye.cpp
+    network/packets/PlayerJoined.cpp
     logic/race/Block.cpp
     logic/race/Bound.cpp
     logic/race/Car.cpp
@@ -60,7 +60,7 @@ SET(SERVER_SRCS
     ${COMMON_SRCS}
     ServerApplication.cpp
     ServerConfiguration.cpp
-    network/Server.cpp
+    network/server/Server.cpp
 )
 
 FIND_PACKAGE(ClanLib-2.1 REQUIRED)

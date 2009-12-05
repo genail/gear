@@ -31,7 +31,7 @@
 #include <assert.h>
 
 #include "Player.h"
-#include "network/Client.h"
+#include "network/client/Client.h"
 #include "logic/race/Level.h"
 
 class SceneContainer;

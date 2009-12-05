@@ -31,9 +31,9 @@
 #include <list>
 #include <ClanLib/core.h>
 
-#include "logic/race/Car.h"
-
 namespace Race {
+
+class Car;
 
 class TyreStripes {
 

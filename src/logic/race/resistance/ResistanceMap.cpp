@@ -29,6 +29,7 @@
 #include "ResistanceMap.h"
 
 #include "common.h"
+#include "Geometry.h"
 
 namespace RaceResistance {
 

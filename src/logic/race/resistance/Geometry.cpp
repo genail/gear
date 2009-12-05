@@ -32,6 +32,7 @@
 
 #include "Circle.h"
 #include "Rectangle.h"
+#include "Primitive.h"
 
 namespace RaceResistance {
 

@@ -28,6 +28,8 @@
 
 #include "Game.h"
 
+#include "gfx/scenes/SceneContainer.h"
+
 Game::Game() :
 	m_networkConnection(),
 	m_player(),

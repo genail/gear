@@ -28,6 +28,7 @@
 
 #include "Stage.h"
 
+#include "gfx/DebugLayer.h"
 #include "gfx/Scene.h"
 
 namespace Gfx {

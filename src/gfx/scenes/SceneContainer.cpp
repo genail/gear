@@ -28,6 +28,8 @@
 
 #include "SceneContainer.h"
 
+#include "gfx/GameWindow.h"
+
 SceneContainer::SceneContainer(GameWindow *p_gameWindow) :
 	m_mainMenuScene(p_gameWindow),
 	m_loadingScene(p_gameWindow),

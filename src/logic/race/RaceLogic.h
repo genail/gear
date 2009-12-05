@@ -28,10 +28,14 @@
 
 #pragma once
 
-#include "logic/race/Level.h"
-#include "common/Player.h"
+#include <list>
+#include <ClanLib/core.h>
+
+class Player;
 
 namespace Race {
+
+class Level;
 
 class RaceLogic {
 

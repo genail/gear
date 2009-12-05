@@ -30,7 +30,7 @@
 
 #include <list>
 
-#include "common/Player.h"
+class Player;
 
 class ScoreTable {
 

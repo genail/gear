@@ -27,10 +27,12 @@
  */
 
 #include "common.h"
-#include "logic/race/Car.h"
-#include "common/Properties.h"
-#include "logic/race/Level.h"
 #include "common/Game.h"
+#include "common/Properties.h"
+#include "gfx/Stage.h"
+#include "gfx/DebugLayer.h"
+#include "logic/race/Car.h"
+#include "logic/race/Level.h"
 
 #include <ClanLib/core.h>
 

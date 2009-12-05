@@ -33,6 +33,7 @@
 #include <assert.h>
 
 #include "common.h"
+#include "logic/race/Sandpit.h"
 
 namespace Gfx {
 

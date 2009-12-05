@@ -31,6 +31,7 @@
 #include "common/Game.h"
 #include "gfx/Stage.h"
 #include "gfx/scenes/MainMenuScene.h"
+#include "gfx/scenes/SceneContainer.h"
 
 MainMenuController::MainMenuController(MainMenuScene *p_scene) :
 	m_scene(p_scene)

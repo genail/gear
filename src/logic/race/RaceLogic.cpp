@@ -29,6 +29,8 @@
 #include "RaceLogic.h"
 
 #include "common/Game.h"
+#include "common/Player.h"
+#include "logic/race/Level.h"
 
 namespace Race {
 

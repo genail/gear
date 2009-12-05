@@ -28,6 +28,7 @@
 
 #include "GameWindow.h"
 
+#include "gfx/Scene.h"
 #include "gfx/Stage.h"
 #include "common/Properties.h"
 

@@ -32,8 +32,9 @@
 
 #include "Player.h"
 #include "network/Client.h"
-#include "gfx/scenes/SceneContainer.h"
 #include "logic/race/Level.h"
+
+class SceneContainer;
 
 class Game {
 

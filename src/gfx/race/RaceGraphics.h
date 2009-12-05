@@ -28,18 +28,26 @@
 
 #pragma once
 
+#include <list>
 #include <ClanLib/display.h>
 
-#include "logic/race/RaceLogic.h"
+#include "common/GroundBlockType.h"
 #include "gfx/race/ui/RaceUI.h"
 #include "gfx/Viewport.h"
-#include "gfx/race/level/Car.h"
-#include "gfx/race/level/GroundBlock.h"
-#include "gfx/race/level/Smoke.h"
-#include "gfx/race/level/Sandpit.h"
-#include "gfx/race/level/DecorationSprite.h"
+
+namespace Race {
+	class Block;
+	class Car;
+	class RaceLogic;
+}
 
 namespace Gfx {
+
+class Car;
+class DecorationSprite;
+class GroundBlock;
+class Sandpit;
+class Smoke;
 
 class RaceGraphics {
 

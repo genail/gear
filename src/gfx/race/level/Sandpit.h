@@ -31,7 +31,10 @@
 #include <list>
 
 #include "gfx/Drawable.h"
-#include "logic/race/Sandpit.h"
+
+namespace Race {
+	class Sandpit;
+}
 
 namespace Gfx {
 

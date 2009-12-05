@@ -31,10 +31,9 @@
 #include <stack>
 #include <ClanLib/core.h>
 
-#include "gfx/DebugLayer.h"
-
-class Scene;
 class Application;
+class DebugLayer;
+class Scene;
 
 namespace Gfx {
 

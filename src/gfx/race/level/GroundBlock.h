@@ -37,7 +37,7 @@
 
 namespace Gfx {
 
-class GroundBlock : public boost::noncopyable, public Gfx::Drawable {
+class GroundBlock : public Gfx::Drawable {
 
 	public:
 

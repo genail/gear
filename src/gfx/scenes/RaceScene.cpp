@@ -36,6 +36,7 @@
 #include "logic/race/Race.h"
 #include "logic/race/Block.h"
 #include "network/events.h"
+#include "network/CarState.h"
 #include "network/Client.h"
 #include "gfx/race/level/TireTrack.h"
 #include "gfx/race/level/Bound.h"

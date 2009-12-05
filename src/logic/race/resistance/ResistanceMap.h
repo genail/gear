@@ -29,11 +29,12 @@
 #pragma once
 
 #include <map>
+#include <list>
 #include <ClanLib/core.h>
 
-#include "Geometry.h"
-
 namespace RaceResistance {
+
+class Geometry;
 
 class ResistanceMap {
 
@@ -55,9 +56,6 @@ class ResistanceMap {
 			CL_SharedPtr<Geometry> m_geometry;
 			float m_value;
 		};
-
-//		typedef std::map<CL_SharedPtr<Geometry>, float> TGeometryMap;
-//		TGeometryMap m_geometries;
 
 		typedef std::list<Resistance> TResistanceList;
 		TResistanceList m_resistances;

@@ -31,6 +31,7 @@
 #include <assert.h>
 
 #include "common.h"
+#include "common/Player.h"
 
 ScoreTable::ScoreTable()
 {

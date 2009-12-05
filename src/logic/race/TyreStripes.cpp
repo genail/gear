@@ -29,6 +29,7 @@
 #include "TyreStripes.h"
 
 #include "common.h"
+#include "Car.h"
 
 namespace Race {
 

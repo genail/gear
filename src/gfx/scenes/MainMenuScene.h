@@ -30,11 +30,7 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "common/Player.h"
 #include "gfx/Scene.h"
-#include "network/Client.h"
-#include "gfx/scenes/RaceScene.h"
-#include "gfx/scenes/LoadingScene.h"
 #include "controllers/MainMenuController.h"
 
 class MainMenuScene: public Scene {

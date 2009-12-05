@@ -30,9 +30,11 @@
 
 #include <ClanLib/core.h>
 
-#include "network/GameState.h"
-
 class LoadingScene;
+
+namespace Net {
+class GameState;
+}
 
 class LoadingController {
 

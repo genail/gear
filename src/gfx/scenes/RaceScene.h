@@ -30,23 +30,16 @@
 
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
-
-#include "common/Player.h"
-#include "logic/race/Car.h"
-#include "logic/race/Level.h"
-#include "gfx/race/ui/RaceUI.h"
-#include "gfx/Viewport.h"
-#include "logic/race/ScoreTable.h"
-#include "gfx/Drawable.h"
-#include "gfx/race/level/Car.h"
-#include "gfx/race/level/GroundBlock.h"
-#include "gfx/race/level/DecorationSprite.h"
-#include "gfx/race/level/Smoke.h"
+#include <ClanLib/network.h>
 
 #include "gfx/Scene.h"
-
-#include "logic/race/RaceLogic.h"
 #include "gfx/race/RaceGraphics.h"
+#include "logic/race/RaceLogic.h"
+#include "logic/race/ScoreTable.h"
+
+namespace Net {
+	class CarState;
+}
 
 #if defined(RACE_SCENE_ONLY)
 

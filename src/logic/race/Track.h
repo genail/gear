@@ -29,10 +29,11 @@
 #pragma once
 
 #include <vector>
-
-#include "logic/race/Checkpoint.h"
+#include <ClanLib/core.h>
 
 namespace Race {
+
+class Checkpoint;
 
 class Track {
 

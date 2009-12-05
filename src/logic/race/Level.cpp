@@ -30,7 +30,11 @@
 
 #include <assert.h>
 
-#include "logic/race/Checkpoint.h"
+#include "Block.h"
+#include "Bound.h"
+#include "Checkpoint.h"
+#include "Car.h"
+#include "resistance/Geometry.h"
 
 namespace Race {
 

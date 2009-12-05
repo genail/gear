@@ -33,7 +33,7 @@
 
 #include "logic/race/Level.h"
 #include "gfx/scenes/RaceScene.h" // FIXME: remove this include
-#include "logic/race//ScoreTable.h"
+#include "logic/race/ScoreTable.h"
 
 namespace Race {
 

@@ -147,7 +147,6 @@ void Sandpit::fillCircles(int p_width, int p_height, const CL_Rect& p_totalBound
 				if (point.distance(circle.getCenter()) <= circle.getRadius()) {
 
 					index = (y + ty) * strike + (x + tx);
-					cl_log_event("debug", "index = %1", index);
 
 					assert(index < p_width * p_height && index >= 0);
 					data[index] = 0xFFFF00FF; // yellow

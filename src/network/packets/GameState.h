@@ -29,68 +29,47 @@
 #pragma once
 
 #include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
-#include "network/Packet.h"
+#include "Packet.h"
+#include "CarState.h"
 
 namespace Net {
 
-class CarState : public Net::Packet {
+class GameState : public Packet {
 
 	public:
 
-		CarState() {}
+		GameState() {}
 
-		virtual ~CarState() {}
+		virtual ~GameState() {}
 
 
 		virtual CL_NetGameEvent buildEvent() const;
 
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-		const CL_String &getName() const { return m_name; }
 
-		const CL_Pointf &getPosition() const { return m_position; }
+		const CL_String &getLevel() const { return m_level; }
 
-		const CL_Angle &getRotation() const { return m_rotation; }
+		size_t getPlayerCount() const { return m_names.size(); }
 
-		const CL_Vec2f &getMovement() const { return m_movement; }
+		const CL_String &getPlayerName(size_t p_index) const { return m_names[p_index]; }
 
-		float getSpeed() const { return m_speed; }
-
-		float getAcceleration() const { return m_accel; }
-
-		float getTurn() const { return m_turn; }
+		const CarState &getCarState(size_t p_index) const { return m_carStates[p_index]; }
 
 
-		void setName(const CL_String &p_name) { m_name = p_name; }
+		void addPlayer(const CL_String &p_name, const CarState &p_carState);
 
-		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
-
-		void setRotation(const CL_Angle &p_rotation) { m_rotation = p_rotation; }
-
-		void setMovement(const CL_Vec2f &p_movement) { m_movement = p_movement; }
-
-		void setSpeed(float p_speed) { m_speed = p_speed; }
-
-		void setAcceleration(float p_accel) { m_accel = p_accel; }
-
-		void setTurn(float p_turn) { m_turn = p_turn; }
+		void setLevel(const CL_String &p_level) { m_level = p_level; }
 
 	private:
 
-		CL_String m_name;
+		CL_String m_level;
 
-		CL_Pointf m_position;
+		std::vector<CL_String> m_names;
 
-		CL_Angle m_rotation;
-
-		CL_Vec2f m_movement;
-
-		float m_speed;
-
-		float m_accel;
-
-		float m_turn;
+		std::vector<CarState> m_carStates;
 };
 
 }

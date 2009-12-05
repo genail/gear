@@ -32,8 +32,8 @@
 #include <ClanLib/network.h>
 
 #include "common.h"
-#include "network/CarState.h"
-#include "network/GameState.h"
+#include "../packets/CarState.h"
+#include "../packets/GameState.h"
 
 namespace Net {
 

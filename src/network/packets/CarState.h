@@ -29,47 +29,68 @@
 #pragma once
 
 #include <ClanLib/core.h>
-#include <ClanLib/network.h>
 
-#include "network/Packet.h"
-#include "network/CarState.h"
+#include "Packet.h"
 
 namespace Net {
 
-class GameState : public Packet {
+class CarState : public Net::Packet {
 
 	public:
 
-		GameState() {}
+		CarState() {}
 
-		virtual ~GameState() {}
+		virtual ~CarState() {}
 
 
 		virtual CL_NetGameEvent buildEvent() const;
 
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
+		const CL_String &getName() const { return m_name; }
 
-		const CL_String &getLevel() const { return m_level; }
+		const CL_Pointf &getPosition() const { return m_position; }
 
-		size_t getPlayerCount() const { return m_names.size(); }
+		const CL_Angle &getRotation() const { return m_rotation; }
 
-		const CL_String &getPlayerName(size_t p_index) const { return m_names[p_index]; }
+		const CL_Vec2f &getMovement() const { return m_movement; }
 
-		const CarState &getCarState(size_t p_index) const { return m_carStates[p_index]; }
+		float getSpeed() const { return m_speed; }
+
+		float getAcceleration() const { return m_accel; }
+
+		float getTurn() const { return m_turn; }
 
 
-		void addPlayer(const CL_String &p_name, const CarState &p_carState);
+		void setName(const CL_String &p_name) { m_name = p_name; }
 
-		void setLevel(const CL_String &p_level) { m_level = p_level; }
+		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
+
+		void setRotation(const CL_Angle &p_rotation) { m_rotation = p_rotation; }
+
+		void setMovement(const CL_Vec2f &p_movement) { m_movement = p_movement; }
+
+		void setSpeed(float p_speed) { m_speed = p_speed; }
+
+		void setAcceleration(float p_accel) { m_accel = p_accel; }
+
+		void setTurn(float p_turn) { m_turn = p_turn; }
 
 	private:
 
-		CL_String m_level;
+		CL_String m_name;
 
-		std::vector<CL_String> m_names;
+		CL_Pointf m_position;
 
-		std::vector<CarState> m_carStates;
+		CL_Angle m_rotation;
+
+		CL_Vec2f m_movement;
+
+		float m_speed;
+
+		float m_accel;
+
+		float m_turn;
 };
 
 }

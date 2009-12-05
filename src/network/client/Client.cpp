@@ -26,13 +26,13 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "network/Client.h"
+#include "Client.h"
 
 #include "common/Game.h"
 #include "common.h"
 #include "network/events.h"
-#include "network/Goodbye.h"
-#include "network/ClientInfo.h"
+#include "../packets/Goodbye.h"
+#include "../packets/ClientInfo.h"
 
 namespace Net {
 
@@ -83,8 +83,8 @@ void Client::onConnected()
 	// I am connected
 	// Sending player info
 	ClientInfo playerInfo;
-	playerInfo.setName(Game::getInstance().getPlayer().getName());
 
+	playerInfo.setName(Game::getInstance().getPlayer().getName());
 	cl_log_event("network", "Introducing myself as %1", playerInfo.getName());
 
 	send(playerInfo.buildEvent());

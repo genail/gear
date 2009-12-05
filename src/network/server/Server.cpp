@@ -26,17 +26,17 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "network/Server.h"
+#include "Server.h"
 
 #include <assert.h>
 
 #include "common.h"
 #include "network/events.h"
 #include "network/version.h"
-#include "network/Goodbye.h"
-#include "network/GameState.h"
-#include "network/ClientInfo.h"
-#include "network/PlayerJoined.h"
+#include "../packets/Goodbye.h"
+#include "../packets/GameState.h"
+#include "../packets/ClientInfo.h"
+#include "../packets/PlayerJoined.h"
 
 namespace Net {
 

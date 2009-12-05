@@ -35,8 +35,8 @@
 #include "common/Player.h"
 #include "logic/race/Car.h"
 #include "logic/race/Level.h"
-#include "network/CarState.h"
-#include "network/GameState.h"
+#include "../packets/CarState.h"
+#include "../packets/GameState.h"
 
 namespace Net {
 

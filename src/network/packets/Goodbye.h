@@ -28,38 +28,39 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-
-#include "network/Packet.h"
-#include "network/ProtocolVersion.h"
+#include "Packet.h"
 
 namespace Net {
 
-class ClientInfo : public Packet {
+class Goodbye : public Packet {
 
 	public:
 
-		ClientInfo();
+		enum GoodbyeReason {
+			UNSUPPORTED_PROTOCOL_VERSION,
+			NAME_ALREADY_IN_USE
+		};
 
-		virtual ~ClientInfo();
+		Goodbye() {}
+
+		virtual ~Goodbye() {}
 
 		virtual CL_NetGameEvent buildEvent() const;
 
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-		const CL_String &getName() const { return m_name; }
+		GoodbyeReason getGoodbyeReason() const { return m_reason; }
 
-		const ProtocolVersion &getProtocolVersion() const { return m_protocolVersion; }
+		/**
+		 * @return Textual representation of goodbye reason.
+		 */
+		CL_String getStringMessage() const;
 
-		void setName(const CL_String &p_name) { m_name = p_name; }
-
-		void setProtocolVersion(const ProtocolVersion &p_protocolVersion) { m_protocolVersion = p_protocolVersion; }
+		void setGoodbyeReason(GoodbyeReason p_reason) { m_reason = p_reason; }
 
 	private:
 
-		ProtocolVersion m_protocolVersion;
-
-		CL_String m_name;
+		GoodbyeReason m_reason;
 };
 
-} // namespace
+}

@@ -28,38 +28,24 @@
 
 #pragma once
 
-#include <map>
 #include <ClanLib/core.h>
+#include <ClanLib/gui.h>
+#include <ClanLib/display.h>
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+namespace Dbg {
 
+class RaceSceneKeyBindings
+{
 	public:
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+		virtual ~RaceSceneKeyBindings();
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
-
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
-
-
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
-
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
-
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
+		static void handleInput(bool p_pressed, const CL_InputEvent& p_event);
 
 	private:
 
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
+		RaceSceneKeyBindings();
 
-		Properties();
-
-		virtual ~Properties();
 };
+
+} // namespace

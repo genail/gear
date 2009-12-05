@@ -26,40 +26,49 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "RaceSceneKeyBindings.h"
 
-#include <map>
-#include <ClanLib/core.h>
+#include "common/Properties.h"
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+namespace Dbg {
 
-	public:
+RaceSceneKeyBindings::RaceSceneKeyBindings()
+{
+}
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+RaceSceneKeyBindings::~RaceSceneKeyBindings()
+{
+}
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
+void RaceSceneKeyBindings::handleInput(bool p_pressed, const CL_InputEvent& p_event)
+{
+	if (p_pressed) {
+		switch (p_event.id) {
+			case CL_KEY_F1:
+			{
+				int iterationSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
+				if (iterationSpeed > 0) {
+					--iterationSpeed;
 
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+					cl_log_event("debug", "Iteration speed decreased to %1", iterationSpeed);
+					Properties::setProperty("dbg_iterSpeed", iterationSpeed);
+				}
+				break;
+			}
 
+			case CL_KEY_F2:
+			{
+				int iterationSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
+				if (iterationSpeed < 300) {
+					++iterationSpeed;
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+					cl_log_event("debug", "Iteration speed increased to %1", iterationSpeed);
+					Properties::setProperty("dbg_iterSpeed", iterationSpeed);
+				}
+				break;
+			}
+		}
+	}
+}
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
-
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
-
-	private:
-
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
-
-		Properties();
-
-		virtual ~Properties();
-};
+} // namespace

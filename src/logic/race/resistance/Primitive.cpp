@@ -26,40 +26,22 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Primitive.h"
 
-#include <map>
-#include <ClanLib/core.h>
+namespace RaceResistance {
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+Primitive::Primitive(InsertionType p_insertionType) :
+	m_insertionType(p_insertionType)
+{
+}
 
-	public:
+Primitive::~Primitive()
+{
+}
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+Primitive::InsertionType Primitive::getInsertionType() const
+{
+	return m_insertionType;
+}
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
-
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
-
-
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
-
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
-
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
-
-	private:
-
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
-
-		Properties();
-
-		virtual ~Properties();
-};
+}

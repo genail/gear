@@ -26,40 +26,44 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "ResistanceMap.h"
 
-#include <map>
-#include <ClanLib/core.h>
+#include "common.h"
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+namespace RaceResistance {
 
-	public:
+ResistanceMap::ResistanceMap()
+{
+}
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+ResistanceMap::~ResistanceMap()
+{
+}
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
+void ResistanceMap::addGeometry(const CL_SharedPtr<Geometry> &p_geometry, float p_resistanceValue)
+{
+	Resistance resistance;
 
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+	resistance.m_geometry = p_geometry;
+	resistance.m_value = p_resistanceValue;
 
+	m_resistances.push_back(resistance);
+}
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+float ResistanceMap::resistance(const CL_Pointf &p_point)
+{
+	float result = 0.0f;
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
+	foreach(const Resistance &resistance, m_resistances) {
+		const CL_SharedPtr<Geometry> &geom = resistance.m_geometry;
+		const CL_Rectf &bounds = geom->getBounds();
 
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
+		if (bounds.contains(p_point) && geom->contains(p_point)) {
+			result = resistance.m_value;
+		}
+	}
 
-	private:
+	return result;
+}
 
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
-
-		Properties();
-
-		virtual ~Properties();
-};
+} // namespace

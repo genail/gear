@@ -15,9 +15,15 @@ SET(COMMON_SRCS
     logic/race/Checkpoint.cpp
     logic/race/Level.cpp
     logic/race/RaceLogic.cpp
+    logic/race/Sandpit.cpp
     logic/race/ScoreTable.cpp
     logic/race/Track.cpp
     logic/race/TyreStripes.cpp
+    logic/race/resistance/Circle.cpp
+    logic/race/resistance/Geometry.cpp
+    logic/race/resistance/Primitive.cpp
+    logic/race/resistance/Rectangle.cpp
+    logic/race/resistance/ResistanceMap.cpp
 )
 
 # Game client sources
@@ -26,6 +32,7 @@ SET(CLIENT_SRCS
     Application.cpp
     controllers/LoadingController.cpp
     controllers/MainMenuController.cpp
+    debug/RaceSceneKeyBindings.cpp
     gfx/DebugLayer.cpp
     gfx/GameWindow.cpp
     gfx/Stage.cpp
@@ -35,6 +42,7 @@ SET(CLIENT_SRCS
     gfx/race/level/Car.cpp
     gfx/race/level/DecorationSprite.cpp
     gfx/race/level/GroundBlock.cpp
+    gfx/race/level/Sandpit.cpp
     gfx/race/level/Smoke.cpp
     gfx/race/level/TireTrack.cpp
     gfx/race/ui/RaceUI.cpp
@@ -45,7 +53,6 @@ SET(CLIENT_SRCS
     gfx/scenes/SceneContainer.cpp
     math/Easing.cpp
     math/Float.cpp
-    network/Client.cpp
 )
 
 # Server sources

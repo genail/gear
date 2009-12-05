@@ -28,38 +28,58 @@
 
 #pragma once
 
-#include <map>
 #include <ClanLib/core.h>
+#include <list>
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+#include "common.h"
+#include "Primitive.h"
+
+namespace RaceResistance {
+
+class Geometry : public boost::noncopyable {
 
 	public:
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+		Geometry();
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
-
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+		virtual ~Geometry();
 
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+		const CL_Rectf &getBounds() const;
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
 
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
+		void addCircle(const CL_Circlef &p_circle);
+
+		void addRectangle(const CL_Rectf &p_rectangle);
+
+		void andCircle(const CL_Circlef &p_circle);
+
+		void andRect(const CL_Rectf &p_rectangle);
+
+		bool contains(const CL_Pointf &p_point) const;
+
+		void subtractCircle(const CL_Circlef &p_circle);
+
+		void subtractRect(const CL_Rectf &p_rectangle);
 
 	private:
 
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
+		CL_Rectf m_bounds;
 
-		Properties();
+		/** False from the beggining. Set to true if bounds are first time set to real value. */
+		bool m_boundsSet;
 
-		virtual ~Properties();
+		typedef std::list<const Primitive*> TPrimitivesList;
+		TPrimitivesList m_primitives;
+
+
+		void updateBounds(const CL_Circlef &p_circle);
+
+		void updateBounds(const CL_Rectf &p_rect);
+
+		void updateBounds(float p_l, float p_t, float p_r, float p_b);
+
 };
+
+} // namespace
+

@@ -26,40 +26,23 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Rectangle.h"
 
-#include <map>
-#include <ClanLib/core.h>
+namespace RaceResistance {
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+Rectangle::Rectangle(const CL_Rectf &p_rectangle, Primitive::InsertionType p_insertionType) :
+	Primitive(p_insertionType),
+	m_rectangle(p_rectangle)
+{
+}
 
-	public:
+Rectangle::~Rectangle()
+{
+}
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+bool Rectangle::contains(const CL_Pointf &p_point) const
+{
+	return m_rectangle.contains(p_point);
+}
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
-
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
-
-
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
-
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
-
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
-
-	private:
-
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
-
-		Properties();
-
-		virtual ~Properties();
-};
+}

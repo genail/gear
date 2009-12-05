@@ -28,38 +28,36 @@
 
 #pragma once
 
-#include <map>
 #include <ClanLib/core.h>
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+#include "common.h"
+
+namespace RaceResistance {
+
+class Primitive : public boost::noncopyable {
 
 	public:
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+		enum InsertionType {
+			IT_ADD,
+			IT_SUB,
+			IT_AND
+		};
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
+		Primitive(InsertionType p_insertionType);
 
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+		virtual ~Primitive();
 
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+		InsertionType getInsertionType() const;
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
 
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
+		virtual bool contains(const CL_Pointf &p_point) const = 0;
 
 	private:
 
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
-
-		Properties();
-
-		virtual ~Properties();
+		InsertionType m_insertionType;
 };
+
+}
+

@@ -28,38 +28,56 @@
 
 #pragma once
 
-#include <map>
-#include <ClanLib/core.h>
+#include <list>
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+#include "gfx/Drawable.h"
+#include "logic/race/Sandpit.h"
+
+namespace Gfx {
+
+class Sandpit : public Gfx::Drawable {
 
 	public:
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+		Sandpit(const Race::Sandpit *p_logicSandpit);
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
-
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+		virtual ~Sandpit();
 
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+		virtual void draw(CL_GraphicContext &p_gc);
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
+		virtual void load(CL_GraphicContext &p_gc);
 
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
+
+		void setPosition(const CL_Pointf &p_position);
+
 
 	private:
 
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
+		/** Sandpit from logic */
+		const Race::Sandpit *m_logicSandpit;
 
-		Properties();
+		/** Draw position */
+		CL_Pointf m_position;
 
-		virtual ~Properties();
+		/** Build state */
+		bool m_built;
+
+		/** Pixel data */
+		CL_SharedPtr<CL_PixelBuffer> m_pixelData;
+
+		/** The texture */
+		CL_SharedPtr<CL_Texture> m_texture;
+
+
+		// build routines
+
+		void build();
+
+		CL_Rect calculateCircleBounds();
+
+		void fillCircles(int p_width, int p_height, const CL_Rect& p_totalBounds);
 };
+
+}
+

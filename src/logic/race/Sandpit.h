@@ -28,38 +28,43 @@
 
 #pragma once
 
-#include <map>
 #include <ClanLib/core.h>
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+namespace Race {
+
+class Sandpit {
 
 	public:
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+		struct Circle {
+			public:
+				const CL_Point &getCenter() const { return m_center; }
+				int getRadius() const { return m_radius; }
+			private:
+				CL_Point m_center;
+				int m_radius;
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
+				friend class Sandpit;
+		};
 
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+		Sandpit();
+
+		virtual ~Sandpit();
 
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+		void addCircle(const CL_Point &p_center, float p_radius);
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
+		unsigned getCircleCount() const;
 
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
+		const Circle &circleAt(unsigned p_index) const;
+
 
 	private:
 
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
-
-		Properties();
-
-		virtual ~Properties();
+		/** Defined circles */
+		typedef std::vector<Circle> TCircleList;
+		TCircleList m_circles;
 };
+
+}
+

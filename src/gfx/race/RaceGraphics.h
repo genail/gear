@@ -36,6 +36,7 @@
 #include "gfx/race/level/Car.h"
 #include "gfx/race/level/GroundBlock.h"
 #include "gfx/race/level/Smoke.h"
+#include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/DecorationSprite.h"
 
 namespace Gfx {
@@ -72,20 +73,24 @@ class RaceGraphics {
 		unsigned m_lastFpsRegisterTime;
 
 		/** Logic car to gfx car mapping */
-		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > carMapping_t;
-		carMapping_t m_carMapping;
+		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMapping;
+		TCarMapping m_carMapping;
 
 		/** Block types to gfx ground blocks */
-		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > blockMapping_t;
-		blockMapping_t m_blockMapping;
+		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > TBlockMapping;
+		TBlockMapping m_blockMapping;
 
 		/** Car smoke clouds */
-		typedef std::list< CL_SharedPtr<Gfx::Smoke> > smokeList_t;
-		smokeList_t m_smokes;
+		typedef std::list< CL_SharedPtr<Gfx::Smoke> > TSmokeList;
+		TSmokeList m_smokes;
 
 		/** Decorations */
-		typedef std::list< CL_SharedPtr<Gfx::DecorationSprite> > decorationList_t;
-		decorationList_t m_decorations;
+		typedef std::list< CL_SharedPtr<Gfx::DecorationSprite> > TDecorationList;
+		TDecorationList m_decorations;
+
+		/** Sandpits */
+		typedef std::list< CL_SharedPtr<Gfx::Sandpit> > TSandpitList;
+		TSandpitList m_sandpits;
 
 
 		// initialize routines
@@ -93,6 +98,8 @@ class RaceGraphics {
 		void loadGroundBlocks(CL_GraphicContext &p_gc);
 
 		void loadDecorations(CL_GraphicContext &p_gc);
+
+		void loadSandPits(CL_GraphicContext &p_gc);
 
 
 		// update routines
@@ -106,6 +113,10 @@ class RaceGraphics {
 
 		void drawLevel(CL_GraphicContext &p_gc);
 
+		void drawBackBlocks(CL_GraphicContext &p_gc);
+
+		void drawForeBlocks(CL_GraphicContext &p_gc);
+
 		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
 
 		void drawTireTracks(CL_GraphicContext &p_gc);
@@ -118,8 +129,17 @@ class RaceGraphics {
 
 		void drawSmokes(CL_GraphicContext &p_gc);
 
+		void drawSandpits(CL_GraphicContext &p_gc);
+
 
 		void countFps();
+
+		// helpers
+
+		// FIXME: this is copy of Level helpers
+		CL_Pointf real(const CL_Pointf &p_point) const;
+
+		float real(float p_coord) const;
 };
 
 } // namespace

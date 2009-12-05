@@ -26,40 +26,41 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Sandpit.h"
 
-#include <map>
-#include <ClanLib/core.h>
+#include <assert.h>
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+namespace Race {
 
-	public:
+Sandpit::Sandpit()
+{
+	// TODO Auto-generated constructor stub
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+}
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
+Sandpit::~Sandpit()
+{
+	// TODO Auto-generated destructor stub
+}
 
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+void Sandpit::addCircle(const CL_Point &p_center, float p_radius)
+{
+	Circle circle;
+	circle.m_center = p_center;
+	circle.m_radius = p_radius;
 
+	m_circles.push_back(circle);
+}
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+unsigned Sandpit::getCircleCount() const
+{
+	return m_circles.size();
+}
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
+const Sandpit::Circle &Sandpit::circleAt(unsigned p_index) const
+{
+	assert(p_index < m_circles.size());
+	return m_circles[p_index];
+}
 
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
-
-	private:
-
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
-
-		Properties();
-
-		virtual ~Properties();
-};
+}

@@ -31,11 +31,13 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "logic/race/Car.h"
-#include "logic/race/Block.h"
-#include "logic/race/Bound.h"
-#include "logic/race/Track.h"
-#include "logic/race/TyreStripes.h"
+#include "Car.h"
+#include "Block.h"
+#include "Bound.h"
+#include "Track.h"
+#include "TyreStripes.h"
+#include "Sandpit.h"
+#include "resistance/ResistanceMap.h"
 
 namespace Race {
 
@@ -56,7 +58,7 @@ class Level
 
 		const Bound& getBound(int p_index) const { return *m_bounds[p_index].get(); }
 
-		size_t getBoundCount() const { return m_bounds.size(); }
+		unsigned getBoundCount() const { return m_bounds.size(); }
 
 		float getResistance(float p_x, float p_y);
 
@@ -66,7 +68,7 @@ class Level
 		CL_Pointf getStartPosition(int p_num) const;
 
 
-		size_t getCarCount() const { return m_cars.size(); }
+		unsigned getCarCount() const { return m_cars.size(); }
 
 		const Car &getCar(size_t p_index) const { return *m_cars[p_index]; }
 
@@ -78,9 +80,14 @@ class Level
 
 		const Block& getBlock(int x, int y) const { return *m_blocks[y * m_width + x].get(); }
 
+		unsigned getSandpitCount() const;
+
 		const Track &getTrack() const { return m_track; }
 
 		const TyreStripes &getTyreStripes() const { return m_tyreStripes; }
+
+
+		const Sandpit &sandpitAt(unsigned p_index) const;
 
 
 		void removeCar(Car *p_car);
@@ -98,6 +105,13 @@ class Level
 
 		/** Level bounds */
 		std::vector< CL_SharedPtr<Bound> > m_bounds;
+
+		/** Sandpits */
+		typedef std::vector<Sandpit> TSandpitList;
+		TSandpitList m_sandpits;
+
+		/** Resistance mapping */
+		RaceResistance::ResistanceMap m_resistanceMap;
 
 		/** All cars */
 		std::vector<Car*> m_cars;
@@ -138,6 +152,17 @@ class Level
 		void loadTrackElement(const CL_DomNode &p_trackNode);
 
 		void loadBoundsElement(const CL_DomNode &p_boundsNode);
+
+		void loadSandElement(const CL_DomNode &p_sandNode);
+
+		CL_SharedPtr<RaceResistance::Geometry> buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const;
+
+
+		// helpers
+
+		CL_Pointf real(const CL_Pointf &p_point) const;
+
+		float real(float p_coord) const;
 
 };
 

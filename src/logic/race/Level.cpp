@@ -79,8 +79,12 @@ void Level::loadFromFile(const CL_String& p_filename)
 		const CL_DomNode metaNode = root.named_item("meta");
 		loadMetaElement(metaNode);
 
-		// load level's content
+		// gets level's content
 		const CL_DomNode contentNode = root.named_item("content");
+
+		// load sand
+		const CL_DomNode sandNode = contentNode.named_item("sand");
+		loadSandElement(sandNode);
 
 		// load track
 		const CL_DomNode trackNode = contentNode.named_item("track");
@@ -131,6 +135,27 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 		m_blocks.push_back(CL_SharedPtr<Block>(new Block(Common::BT_GRASS)));
 	}
 
+	// create global resistance geometry
+	CL_SharedPtr<RaceResistance::Geometry> globalResGeom(new RaceResistance::Geometry());
+	globalResGeom->addRectangle(CL_Rectf(real(0), real(0), real(m_width), real(m_height)));
+
+	m_resistanceMap.addGeometry(globalResGeom, 0.3f);
+
+	// add sand resistance
+	foreach (const Sandpit &sandpit, m_sandpits) {
+		const unsigned circleCount = sandpit.getCircleCount();
+
+		CL_SharedPtr<RaceResistance::Geometry> sandpitGeometry(new RaceResistance::Geometry());
+
+		for (unsigned i = 0; i < circleCount; ++i) {
+			// sandpit values are real
+			const Sandpit::Circle &circle = sandpit.circleAt(i);
+			sandpitGeometry->addCircle(CL_Circlef(circle.getCenter().x, circle.getCenter().y, circle.getRadius()));
+		}
+
+		m_resistanceMap.addGeometry(sandpitGeometry, 0.8f);
+	}
+
 	// read blocks
 	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
 	const int blockListSize = blockList.get_length();
@@ -158,11 +183,11 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 			if (blockMapItor != blockMap.end()) {
 
-				m_blocks[m_width * y + x]->setType(blockMapItor->second);
+				const Common::GroundBlockType blockType = blockMapItor->second;
+				m_blocks[m_width * y + x]->setType(blockType);
 
 				// add checkpoint to track
-
-				if (blockMapItor->second == Common::BT_START_LINE_UP) {
+				if (blockType == Common::BT_START_LINE_UP) {
 					lastCP = CL_Pointf((x + 0.5f) * Block::WIDTH, (y + 0.2f) * Block::WIDTH);
 					const CL_Pointf firstCP((x + 0.5f) * Block::WIDTH, (y + 0.2 - 0.01f) * Block::WIDTH);
 
@@ -172,6 +197,11 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 					m_track.addCheckpointAtPosition(checkPosition);
 				}
+
+				// add resistance geometry based on block
+				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(x, y, blockType);
+				m_resistanceMap.addGeometry(resGeom, 0.0f);
+
 			} else {
 				cl_log_event("race", "Unknown block type: %1", typeStr);
 			}
@@ -185,6 +215,124 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 	m_track.addCheckpointAtPosition(lastCP);
 	m_track.close();
 
+}
+
+void Level::loadSandElement(const CL_DomNode &p_sandNode)
+{
+	const CL_DomNodeList sandChildren = p_sandNode.get_child_nodes();
+	const int sandChildrenCount = sandChildren.get_length();
+
+	CL_DomNode sandChildNode, groupChildNode;
+
+	for (int i = 0; i < sandChildrenCount; ++i) {
+		sandChildNode = sandChildren.item(i);
+
+		if (sandChildNode.get_node_name() == "group") {
+			const CL_DomNodeList groupChildren = sandChildNode.get_child_nodes();
+			const int groupChildrenCount = groupChildren.get_length();
+
+			// create new sandpit
+			m_sandpits.push_back(Sandpit());
+			Sandpit &sandpit = m_sandpits.back();
+
+			for (int j = 0; j < groupChildrenCount; ++j) {
+				groupChildNode = groupChildren.item(j);
+
+				if (groupChildNode.get_node_name() == "circle") {
+
+					CL_DomNamedNodeMap attrs = groupChildNode.get_attributes();
+
+					const float x = CL_StringHelp::local8_to_float(attrs.get_named_item("x").get_node_value());
+					const float y = CL_StringHelp::local8_to_float(attrs.get_named_item("y").get_node_value());
+					const float radius = CL_StringHelp::local8_to_float(attrs.get_named_item("radius").get_node_value());
+
+					// add to sandpit
+
+					// must save as integer
+					const CL_Pointf centerFloat = real(CL_Pointf(x, y));
+					const CL_Point centerInt = CL_Point((int) floor(centerFloat.x), (int) floor(centerFloat.y));
+
+					sandpit.addCircle(centerInt, real(radius));
+
+//					m_resistanceMap.addGeometry(geom, 0.8f);
+				} else {
+					cl_log_event("error", "unknown element in <sand><group></group></sand>: <%1>", sandChildNode.get_node_name());
+				}
+			}
+		} else {
+			cl_log_event("error", "unknown element in <sand></sand>: <%1>", sandChildNode.get_node_name());
+		}
+	}
+}
+
+CL_SharedPtr<RaceResistance::Geometry> Level::buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const
+{
+	CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
+
+	CL_Pointf p, q;
+	CL_Pointf topLeft = real(CL_Pointf(p_x, p_y));
+	CL_Pointf bottomRight = real(CL_Pointf(p_x + 1, p_y + 1));
+
+	switch (p_blockType) {
+		case Common::BT_GRASS:
+			break;
+		case Common::BT_STREET_HORIZ:
+			p = real(CL_Pointf(p_x, p_y + 0.1f));
+			q = real(CL_Pointf(p_x + 1, p_y + 0.9f));
+
+			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
+			break;
+		case Common::BT_STREET_VERT:
+			p = real(CL_Pointf(p_x + 0.1f, p_y));
+			q = real(CL_Pointf(p_x + 0.9f, p_y + 1));
+
+			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
+			break;
+		case Common::BT_TURN_BOTTOM_RIGHT:
+			p = real(CL_Pointf(p_x + 1, p_y + 1));
+
+			geom->addCircle(CL_Circlef(p, real(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+
+			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
+
+			break;
+		case Common::BT_TURN_BOTTOM_LEFT:
+			p = real(CL_Pointf(p_x, p_y + 1));
+
+			geom->addCircle(CL_Circlef(p, real(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+
+			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
+
+			break;
+		case Common::BT_TURN_TOP_RIGHT:
+			p = real(CL_Pointf(p_x + 1, p_y));
+
+			geom->addCircle(CL_Circlef(p, real(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+
+			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
+			break;
+		case Common::BT_TURN_TOP_LEFT:
+			p = real(CL_Pointf(p_x, p_y));
+
+			geom->addCircle(CL_Circlef(p, real(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+
+			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
+			break;
+		case Common::BT_START_LINE_UP:
+			p = real(CL_Pointf(p_x + 0.1f, p_y));
+			q = real(CL_Pointf(p_x + 0.9f, p_y + 1));
+
+			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
+			break;
+		default:
+			assert(0 && "unknown block type");
+	}
+
+	return geom;
 }
 
 void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)
@@ -218,18 +366,9 @@ void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)
 	}
 }
 
-float Level::getResistance(float p_x, float p_y) {
-	if (p_x < 0 || p_y < 0 || p_x >= Block::WIDTH * m_width || p_y >= Block::WIDTH * m_height) {
-		return 0.0f;
-	}
-
-	int blockX = (int) floor(p_x / Block::WIDTH);
-	int blockY = (int) floor(p_y / Block::WIDTH);
-
-	int localX = (int) (p_x - blockX * Block::WIDTH);
-	int localY = (int) (p_y - blockY * Block::WIDTH);
-
-	return m_blocks[blockY * m_width + blockX]->getResistance(localX, localY);
+float Level::getResistance(float p_realX, float p_realY)
+{
+	return m_resistanceMap.resistance(CL_Pointf(p_realX, p_realY));
 }
 
 void Level::addCar(Car *p_car) {
@@ -398,5 +537,26 @@ void Level::checkCollistions()
 
 }
 #endif // CLIENT
+
+CL_Pointf Level::real(const CL_Pointf &p_point) const
+{
+	return CL_Pointf(real(p_point.x), real(p_point.y));
+}
+
+float Level::real(float p_coord) const
+{
+	return p_coord * Block::WIDTH;
+}
+
+unsigned Level::getSandpitCount() const
+{
+	return m_sandpits.size();
+}
+
+const Sandpit &Level::sandpitAt(unsigned p_index) const
+{
+	assert(p_index < m_sandpits.size());
+	return m_sandpits[p_index];
+}
 
 } // namespace

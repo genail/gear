@@ -36,3 +36,37 @@ Properties::Properties() {
 
 Properties::~Properties() {
 }
+
+void Properties::setProperty(const CL_String8 &p_key, bool p_value)
+{
+	setProperty(p_key, CL_StringHelp::bool_to_local8(p_value));
+}
+
+void Properties::setProperty(const CL_String8 &p_key, int p_value)
+{
+	setProperty(p_key, CL_StringHelp::int_to_local8(p_value));
+}
+
+void Properties::setProperty(const CL_String8 &p_key, const CL_String8 &p_value)
+{
+	m_keyValueMap[p_key] = p_value;
+}
+
+bool Properties::getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue)
+{
+	return CL_StringHelp::local8_to_bool(getPropertyAsString(p_key, CL_StringHelp::bool_to_local8(p_defaultValue)));
+}
+
+int Properties::getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue)
+{
+	return CL_StringHelp::local8_to_int(getPropertyAsString(p_key, CL_StringHelp::int_to_local8(p_defaultValue)));
+}
+
+CL_String8 Properties::getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue)
+{
+	if (m_keyValueMap.find(p_key) != m_keyValueMap.end()) {
+		return m_keyValueMap[p_key];
+	} else {
+		return defaultValue;
+	}
+}

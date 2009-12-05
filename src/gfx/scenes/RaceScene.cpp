@@ -39,6 +39,7 @@
 #include "network/Client.h"
 #include "gfx/race/level/TireTrack.h"
 #include "gfx/race/level/Bound.h"
+#include "debug/RaceSceneKeyBindings.h"
 
 #if defined(RACE_SCENE_ONLY)
 
@@ -215,6 +216,11 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 	}
 
 	updateCarTurn();
+
+#if !defined(NDEBUG)
+	// debug key bindings
+	Dbg::RaceSceneKeyBindings::handleInput(state, p_event);
+#endif // !NDEBUG
 }
 
 void RaceScene::updateCarTurn()

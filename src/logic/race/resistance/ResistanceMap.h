@@ -31,35 +31,37 @@
 #include <map>
 #include <ClanLib/core.h>
 
-/**
- * Runtime properties. There are several groups:
- * <ul>
- * <li>dbg_* - Debug properties. Available only in debug build</li>
- * <li>cg_* - User configuration properties.</li>
- * </ul>
- */
-class Properties {
+#include "Geometry.h"
+
+namespace RaceResistance {
+
+class ResistanceMap {
 
 	public:
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+		ResistanceMap();
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
-
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+		virtual ~ResistanceMap();
 
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+		void addGeometry(const CL_SharedPtr<Geometry> &p_geometry, float p_resistanceValue);
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
 
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
+		float resistance(const CL_Pointf &p_point);
 
 	private:
 
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
+		struct Resistance {
+			CL_SharedPtr<Geometry> m_geometry;
+			float m_value;
+		};
 
-		Properties();
+//		typedef std::map<CL_SharedPtr<Geometry>, float> TGeometryMap;
+//		TGeometryMap m_geometries;
 
-		virtual ~Properties();
+		typedef std::list<Resistance> TResistanceList;
+		TResistanceList m_resistances;
 };
+
+} // namespace
+

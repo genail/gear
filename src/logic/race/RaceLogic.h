@@ -44,7 +44,7 @@ class RaceLogic {
 		virtual ~RaceLogic();
 
 
-		const Race::Level *getLevel() { return m_level; }
+		const Race::Level *getLevel() const { return m_level; }
 
 		const TPlayerList &getPlayerList() const { return m_players; }
 

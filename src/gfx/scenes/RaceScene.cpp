@@ -217,10 +217,10 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 	updateCarTurn();
 
-#ifndef NDEBUG
+#if !defined(NDEBUG)
 	// debug key bindings
 	Dbg::RaceSceneKeyBindings::handleInput(state, p_event);
-#endif // NDEBUG
+#endif // !NDEBUG
 }
 
 void RaceScene::updateCarTurn()

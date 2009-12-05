@@ -29,6 +29,7 @@
 #include "GameWindow.h"
 
 #include "gfx/Stage.h"
+#include "common/Properties.h"
 
 GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc) :
 	CL_Window(p_manager, p_desc),
@@ -86,7 +87,23 @@ void GameWindow::updateLogic(Scene *p_scene)
 			p_scene->update(0);
 		} else {
 			const unsigned timeChange = now - m_lastLogicUpdateTime;
+
+#if !defined(NDEBUG)
+			// apply iteration time change
+			static float timeChangeF = 0.0f;
+			const int iterSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
+
+			timeChangeF += timeChange * (iterSpeed / 100.0f);
+
+			if (timeChangeF >= 1.0f) {
+				const float total = floor(timeChangeF);
+				p_scene->update((unsigned) total);
+
+				timeChangeF -= total;
+			}
+#else // !NDEBUG
 			p_scene->update(timeChange);
+#endif // NDEBUG
 		}
 
 		m_lastLogicUpdateTime = now;

@@ -229,17 +229,33 @@ int Application::main(const std::vector<CL_String> &args)
 		while(!quit) {
 			CL_KeepAlive::process();
 
-			const unsigned delta = CL_System::get_time() - lastTime;
-			lastTime += delta;
+			const unsigned timeChange = CL_System::get_time() - lastTime;
+			lastTime += timeChange;
 
-			raceScene.update(delta);
+#if !defined(NDEBUG)
+			// apply iteration time change
+			static float timeChangeF = 0.0f;
+			const int iterSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
+
+			timeChangeF += timeChange * (iterSpeed / 100.0f);
+
+			if (timeChangeF >= 1.0f) {
+				const float total = floor(timeChangeF);
+				raceScene.update((unsigned) total);
+
+				timeChangeF -= total;
+			}
+#else // !NDEBUG
+			raceScene.update(timeChange);
+#endif // NDEBUG
+
 			raceScene.draw(gc);
 
 			displayWindow.flip();
 
 			// Avoid using 100% CPU in the loop:
 			static const int MS_60 = 1000 / 60;
-			const int sleepTime = MS_60 - delta;
+			const int sleepTime = MS_60 - timeChange;
 
 			if (sleepTime > 0) {
 				CL_System::sleep(sleepTime);

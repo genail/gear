@@ -201,7 +201,7 @@ GameState Server::prepareGameState()
 		}
 	}
 
-	gamestate.setLevel("resources/level.txt"); // FIXME: How to choose level?
+	gamestate.setLevel("resources/level.xml"); // FIXME: How to choose level?
 
 	return gamestate;
 }

@@ -165,6 +165,13 @@ void Car::update1_60() {
 	
 	// Bouncing from bounds
 	if (m_boundHitTest) {
+		
+		// przeniesienie autka tak, by już się nie stykał z bandą
+		m_position.x -= m_moveVector.x * delta;
+		m_position.y -= m_moveVector.y * delta;
+		//m_position.x += boundNormal.x * 10;
+		//m_position.y += boundNormal.y * 10;
+		
 		CL_Vec2f inormal = m_boundNormal * -1; // wektor odwrotny do normalnej
 		CL_Vec2f boundNormal; // ostateczna forma wektora wzgledem ktorego obraca sie movingVector
 		
@@ -188,11 +195,7 @@ void Car::update1_60() {
 		
 		boundNormal.normalize();
 		
-		// przeniesienie autka tak, by już się nie stykał z bandą
-		m_position.x -= m_moveVector.x * delta;
-		m_position.y -= m_moveVector.y * delta;
-		m_position.x += boundNormal.x * 10;
-		m_position.y += boundNormal.y * 10;
+		
 		
 		
 		
@@ -219,8 +222,6 @@ void Car::update1_60() {
 		changeVector *= tan(turnAngle) * fabs(m_speed) / 7.0f;
 	}
 	
-	// wektor przyspieszenia
-	//if (m_acceleration) {
 		accelerationVector.x = cos(rad);
 		accelerationVector.y = sin(rad);
 		
@@ -232,13 +233,6 @@ void Car::update1_60() {
 			accelerationVector *= m_speed;
 			accelerationVector = changeVector + accelerationVector;
 		}
-	//}
-	/* else { // jeżeli auto nie przyspiesza
-		accelerationVector = m_moveVector;
-		accelerationVector.normalize();
-		if(turnAngle != 0.0f) // zmiana wektora przyspieszenia w wypadku kiedy auto skreca
-			accelerationVector = changeVector + (accelerationVector * m_speed);
-	}*/
 	
 	// calculates current tenacity
 	const float max_tratio = MAX_TENACITY / MIN_TENACITY;
@@ -256,6 +250,10 @@ void Car::update1_60() {
 	m_moveVector = realVector;
 	
 	// nowa metoda oblicznia moveVectora
+	//CL_Vec2f realVec2;
+	//realVec2 = m_moveVector.
+	
+	
 	
 	// update position
 	m_position.x += m_moveVector.x * delta;

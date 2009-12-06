@@ -180,11 +180,21 @@ void Car::update1_60() {
 		// sprawdza czy uzyc normalnej czy odwrotnosci normalnej do obracania movingVector
 		if (angle < iangle) {
 			boundNormal = inormal;
-			finalAngle = iangle;
+			if (iangle.to_degrees() > 90)
+				finalAngle.set_radians(2 * ((1 / 2) - iangle.to_radians()));
+			else
+				finalAngle.set_radians(2 * iangle.to_radians());
+			//finalAngle = iangle;
 		} else {
 			boundNormal = m_boundNormal;
-			finalAngle = angle;
+			if (angle.to_degrees() > 90)
+				finalAngle.set_radians(2 * ((1 / 2) - angle.to_radians()));
+			else
+				finalAngle.set_radians(2 * angle.to_radians());
+			//finalAngle = angle;
 		}
+		
+		
 		
 		boundNormal.normalize();
 		
@@ -196,10 +206,12 @@ void Car::update1_60() {
 		
 		
 		
-		m_moveVector.rotate(boundNormal, finalAngle);
+		m_moveVector.rotate(CL_Vec2f(0, 0), finalAngle);
 	//	m_speed /= 2;
 		m_boundHitTest = false;
 	}
+	
+	//cl_log_event("debug", "%1", m_moveVector.angle(CL_Vec2f(1, 0)).to_degrees());
 	
 	
 	// wektor zmiany kierunku

@@ -88,19 +88,30 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 	const CL_String &levelName = p_gameState.getLevel();
 	m_level.initialize(levelName);
 
-	// first car is player car
+	// add current player to the list
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 
-	m_level.addCar(&player.getCar());
+	m_playerMap[player.getName()] = &player;
 
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();
 
 	for (unsigned i = 0; i < playerCount; ++i) {
 		const CL_String &playerName = p_gameState.getPlayerName(i);
-		m_playerMap[playerName] = new Player(playerName);
+
+		Player *player = new Player(playerName);
+		player->getCar().applyCarState(p_gameState.getCarState(i));
+
+		m_playerMap[playerName] = player;
 	}
+
+	// add the cars
+	std::pair<CL_String, Player*> entry;
+	foreach (entry, m_playerMap) {
+		m_level.addCar(&entry.second->getCar());
+	}
+
 }
 
 } // namespace

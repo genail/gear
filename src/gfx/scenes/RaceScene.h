@@ -62,7 +62,7 @@ class RaceScene: public Scene
 
 		virtual ~RaceScene();
 
-		void initialize(bool online);
+		void initialize(const CL_String &p_hostname="", int p_port=0);
 
 		void destroy();
 

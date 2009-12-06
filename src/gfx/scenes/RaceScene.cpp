@@ -35,6 +35,7 @@
 #include "common.h"
 #include "logic/race/Block.h"
 #include "logic/race/OfflineRaceLogic.h"
+#include "logic/race/OnlineRaceLogic.h"
 #include "network/events.h"
 #include "network/packets/CarState.h"
 #include "network/client/Client.h"
@@ -102,13 +103,13 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 RaceScene::~RaceScene() {
 }
 
-void RaceScene::initialize(bool online)
+void RaceScene::initialize(const CL_String &p_hostname, int p_port)
 {
 	if (!m_initialized) {
-		if (!online) {
+		if (p_hostname == "") {
 			m_logic = new Race::OfflineRaceLogic("resources/level.xml");
 		} else {
-			assert(0 && "online not supported yet");
+			m_logic = new Race::OnlineRaceLogic(p_hostname, p_port);
 		}
 
 		m_logic->initialize();

@@ -60,6 +60,9 @@ void MainMenuController::onRaceStartClicked()
 
 	game.getPlayer().setName(m_scene->getPlayerName());
 
+	// create race scene
+	m_raceScene->destroy();
+
 	if (!m_scene->getServerAddr().empty()) {
 		// separate server addr from port if possible
 		std::vector<CL_TempString> parts = CL_StringHelp::split_text(m_scene->getServerAddr(), ":");
@@ -67,28 +70,14 @@ void MainMenuController::onRaceStartClicked()
 		const CL_String serverAddr = parts[0];
 		const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
 
-		game.getNetworkConnection().setServerAddr(serverAddr);
-		game.getNetworkConnection().setServerPort(serverPort);
-
-
+		// online initialization
+		m_raceScene->initialize(serverAddr, serverPort);
+	} else {
+		// offline initialization
+		m_raceScene->initialize();
 	}
 
-	// load offline race
-
-	m_raceScene->destroy();
-	m_raceScene->initialize(false);
-
 	Gfx::Stage::pushScene(m_raceScene);
-
-
-//	LoadingScene &loadingScene = game.getSceneContainer().getLoadingScene();
-//
-//	loadingScene.destroy();
-//	loadingScene.initialize();
-//
-//	Gfx::Stage::pushScene(&loadingScene);
-//
-//	loadingScene.getController().loadRace();
 }
 
 void MainMenuController::onQuitClicked()

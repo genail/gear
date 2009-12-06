@@ -185,6 +185,8 @@ void Server::onClientInfo(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p
 	// send the gamestate
 	const GameState gamestate = prepareGameState();
 	send(p_conn, gamestate.buildEvent());
+
+	m_connections[p_conn].m_gameStateSent = true;
 }
 
 GameState Server::prepareGameState()

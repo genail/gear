@@ -41,10 +41,6 @@ Game::Game() :
 
 Game::~Game()
 {
-	m_slots.connect(m_networkConnection.sig_gameStateReceived(), this, &Game::onGameState);
-	m_slots.connect(m_networkConnection.sig_playerJoined(), this, &Game::onPlayerJoined);
-	m_slots.connect(m_networkConnection.sig_playerLeaved(), this, &Game::onPlayerLeaved);
-	m_slots.connect(m_networkConnection.sig_disconnected(), this, &Game::onDisconnected);
 }
 
 Game &Game::getInstance()

@@ -82,10 +82,6 @@ class Game {
 		void setSceneContainer(SceneContainer *p_sceneContainer) { m_sceneContainer = p_sceneContainer; }
 
 
-		// signal handlers
-
-		void onGameState(const Net::GameState &p_gameState);
-
 		friend class Application;
 };
 

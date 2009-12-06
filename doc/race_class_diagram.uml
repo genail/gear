@@ -88,7 +88,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Dec 06 15:15:03 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Dec 06 15:16:53 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -5802,7 +5802,7 @@
               isRoot = 'false' isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
             <UML:Class xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CE'
               name = 'Race' visibility = 'public' isSpecification = 'false' isRoot = 'false'
-              isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+              isLeaf = 'false' isAbstract = 'true' isActive = 'false'>
               <UML:Classifier.feature>
                 <UML:Attribute xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013D1'
                   name = 'm_level' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
@@ -5843,6 +5843,15 @@
                     <UML:Class xmi.idref = '127-0-1-1--c22cd78:1248731786f:-8000:0000000000000F11'/>
                   </UML:StructuralFeature.type>
                 </UML:Attribute>
+                <UML:Operation xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013DB'
+                  name = 'destroy' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'true'>
+                  <UML:BehavioralFeature.parameter>
+                    <UML:Parameter xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013DC'
+                      name = 'return' isSpecification = 'false' kind = 'return'/>
+                  </UML:BehavioralFeature.parameter>
+                </UML:Operation>
               </UML:Classifier.feature>
             </UML:Class>
             <UML:Generalization xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CF'
@@ -20550,7 +20559,7 @@ getters and setters.</text>
     />
   </group>
   <group name="Fig2"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[472, 168, 115, 85]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[472, 168, 115, 99]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CE"
        fill="1"
        fillcolor="white"
@@ -20564,7 +20573,7 @@ getters and setters.</text>
       x="472"
       y="168"
       width="115"
-      height="85"
+      height="99"
       fill="1"
       fillcolor="white"
       stroke="0"
@@ -20603,13 +20612,13 @@ getters and setters.</text>
       strokecolor="black"
       textcolor="black"
       font="Arial"
-      italic="false"
+      italic="true"
       bold="false"
       textsize="11"
       justification="Center"
     >Race</text>
     <group name="Fig2.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[472, 226, 115, 26]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[472, 226, 115, 40]"
          href="127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CE"
          fill="1"
          fillcolor="white"
@@ -20623,7 +20632,7 @@ getters and setters.</text>
         x="472"
         y="226"
         width="115"
-        height="26"
+        height="40"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -20645,7 +20654,7 @@ getters and setters.</text>
         x="472"
         y="227"
         width="56"
-        height="20"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -20657,6 +20666,22 @@ getters and setters.</text>
         textsize="11"
         justification="Left"
       >initialize()</text>
+      <text name="Fig2.3.3"
+        x="472"
+        y="241"
+        width="50"
+        height="20"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="true"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >destroy()</text>
     </group>
     <group name="Fig2.4"
          description="org.argouml.uml.diagram.ui.FigAttributesCompartment[472, 189, 115, 37]"
@@ -20728,7 +20753,7 @@ getters and setters.</text>
       x="472"
       y="168"
       width="115"
-      height="85"
+      height="99"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -20764,7 +20789,7 @@ getters and setters.</text>
       <moveto x="425"
               y="296" />
       <lineto x="472"
-              y="253" />
+              y="267" />
     </path>
   </group>
   <group name="Fig4"
@@ -20796,7 +20821,7 @@ getters and setters.</text>
       <moveto x="656"
               y="320" />
       <lineto x="587"
-              y="253" />
+              y="267" />
     </path>
   </group>
 </pgml>

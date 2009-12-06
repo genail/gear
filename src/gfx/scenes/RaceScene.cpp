@@ -33,8 +33,8 @@
 
 #include "common/Game.h"
 #include "common.h"
-#include "logic/race/Race.h"
 #include "logic/race/Block.h"
+#include "logic/race/OfflineRaceLogic.h"
 #include "network/events.h"
 #include "network/packets/CarState.h"
 #include "network/client/Client.h"
@@ -52,7 +52,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	Scene(p_guiParent),
 
 #endif // !RACE_SCENE_ONLY
-	m_logic(&Game::getInstance().getLevel()),
+	m_logic(NULL),
 	m_graphics(&m_logic),
 	m_lapsTotal(3),
 	m_initialized(false),
@@ -101,8 +101,16 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 RaceScene::~RaceScene() {
 }
 
-void RaceScene::initialize()
+void RaceScene::initialize(bool online)
 {
+	if (m_logic == NULL) {
+		if (!online) {
+			m_logic = new OfflineRaceLogic("resources/level.xml");
+		} else {
+			assert(0 && "online not supported yet");
+		}
+	}
+
 	// add player's car to level
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
@@ -113,6 +121,11 @@ void RaceScene::initialize()
 
 void RaceScene::destroy()
 {
+	if (m_logic != NULL) {
+		delete m_logic;
+		m_logic = NULL;
+	}
+
 	// remove player's car from level
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();

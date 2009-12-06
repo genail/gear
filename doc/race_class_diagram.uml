@@ -88,7 +88,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Dec 06 15:16:53 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Dec 06 15:28:52 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -5647,8 +5647,8 @@
               </UML:Association.connection>
             </UML:Association>
             <UML:Class xmi.id = '127-0-1-1-39fb2e4c:1255f7032ab:-8000:00000000000013AF'
-              name = 'OnlineRace' visibility = 'public' isSpecification = 'false' isRoot = 'false'
-              isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+              name = 'OnlineRaceLogic' visibility = 'public' isSpecification = 'false'
+              isRoot = 'false' isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
               <UML:GeneralizableElement.generalization>
                 <UML:Generalization xmi.idref = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CF'/>
               </UML:GeneralizableElement.generalization>
@@ -5686,8 +5686,8 @@
               </UML:Classifier.feature>
             </UML:Class>
             <UML:Class xmi.id = '127-0-1-1-39fb2e4c:1255f7032ab:-8000:00000000000013B0'
-              name = 'OfflineRace' visibility = 'public' isSpecification = 'false' isRoot = 'false'
-              isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+              name = 'OfflineRaceLogic' visibility = 'public' isSpecification = 'false'
+              isRoot = 'false' isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
               <UML:GeneralizableElement.generalization>
                 <UML:Generalization xmi.idref = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013D0'/>
               </UML:GeneralizableElement.generalization>
@@ -5801,7 +5801,7 @@
               name = 'CL_Signal1&lt;State&gt;' visibility = 'public' isSpecification = 'false'
               isRoot = 'false' isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
             <UML:Class xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CE'
-              name = 'Race' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+              name = 'RaceLogic' visibility = 'public' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'true' isActive = 'false'>
               <UML:Classifier.feature>
                 <UML:Attribute xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013D1'
@@ -5829,7 +5829,7 @@
                   </UML:BehavioralFeature.parameter>
                 </UML:Operation>
                 <UML:Attribute xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013D8'
-                  name = 'm_localPlayer' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                  name = 'm_playerList' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
                   changeability = 'changeable' targetScope = 'instance'>
                   <UML:StructuralFeature.multiplicity>
                     <UML:Multiplicity xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013D9'>
@@ -5840,7 +5840,7 @@
                     </UML:Multiplicity>
                   </UML:StructuralFeature.multiplicity>
                   <UML:StructuralFeature.type>
-                    <UML:Class xmi.idref = '127-0-1-1--c22cd78:1248731786f:-8000:0000000000000F11'/>
+                    <UML:Class xmi.idref = '127-0-1-1-39fb2e4c:1255f7032ab:-8000:000000000000139D'/>
                   </UML:StructuralFeature.type>
                 </UML:Attribute>
                 <UML:Operation xmi.id = '127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013DB'
@@ -20308,7 +20308,7 @@ getters and setters.</text>
       bold="false"
       textsize="11"
       justification="Center"
-    >OnlineRace</text>
+    >OnlineRaceLogic</text>
     <group name="Fig0.3"
          description="org.argouml.uml.diagram.ui.FigOperationsCompartment[224, 362, 201, 32]"
          href="127-0-1-1-39fb2e4c:1255f7032ab:-8000:00000000000013AF"
@@ -20395,8 +20395,8 @@ getters and setters.</text>
       <text name="Fig0.4.3"
         x="224"
         y="332"
-        width="178"
-        height="20"
+        width="180"
+        height="23"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -20421,7 +20421,7 @@ getters and setters.</text>
     />
   </group>
   <group name="Fig1"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[656, 320, 70, 67]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[656, 320, 92, 67]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1-39fb2e4c:1255f7032ab:-8000:00000000000013B0"
        fill="1"
        fillcolor="white"
@@ -20434,7 +20434,7 @@ getters and setters.</text>
     <rectangle name="Fig1.0"
       x="656"
       y="320"
-      width="70"
+      width="92"
       height="67"
       fill="1"
       fillcolor="white"
@@ -20442,7 +20442,7 @@ getters and setters.</text>
       strokecolor="black"
     />
     <group name="Fig1.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[656, 320, 70, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[656, 320, 92, 0]"
          href="127-0-1-1-39fb2e4c:1255f7032ab:-8000:00000000000013B0"
          fill="1"
          fillcolor="white"
@@ -20455,7 +20455,7 @@ getters and setters.</text>
       <rectangle name="Fig1.1.0"
         x="656"
         y="320"
-        width="70"
+        width="92"
         height="0"
         fill="1"
         fillcolor="white"
@@ -20466,7 +20466,7 @@ getters and setters.</text>
     <text name="Fig1.2"
       x="656"
       y="320"
-      width="70"
+      width="92"
       height="21"
       fill="1"
       fillcolor="white"
@@ -20478,9 +20478,9 @@ getters and setters.</text>
       bold="false"
       textsize="11"
       justification="Center"
-    >OfflineRace</text>
+    >OfflineRaceLogic</text>
     <group name="Fig1.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[656, 362, 70, 24]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[656, 362, 92, 24]"
          href="127-0-1-1-39fb2e4c:1255f7032ab:-8000:00000000000013B0"
          fill="1"
          fillcolor="white"
@@ -20493,7 +20493,7 @@ getters and setters.</text>
       <rectangle name="Fig1.3.0"
         x="656"
         y="362"
-        width="70"
+        width="92"
         height="24"
         fill="1"
         fillcolor="white"
@@ -20509,12 +20509,12 @@ getters and setters.</text>
       >
         <moveto x="656"
                 y="362" />
-        <lineto x="725"
+        <lineto x="747"
                 y="362" />
       </path>
     </group>
     <group name="Fig1.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[656, 341, 70, 21]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[656, 341, 92, 21]"
          href="127-0-1-1-39fb2e4c:1255f7032ab:-8000:00000000000013B0"
          fill="1"
          fillcolor="white"
@@ -20527,7 +20527,7 @@ getters and setters.</text>
       <rectangle name="Fig1.4.0"
         x="656"
         y="341"
-        width="70"
+        width="92"
         height="21"
         fill="1"
         fillcolor="white"
@@ -20543,14 +20543,14 @@ getters and setters.</text>
       >
         <moveto x="656"
                 y="341" />
-        <lineto x="725"
+        <lineto x="747"
                 y="341" />
       </path>
     </group>
     <rectangle name="Fig1.5"
       x="656"
       y="320"
-      width="70"
+      width="92"
       height="67"
       fill="0"
       fillcolor="white"
@@ -20559,7 +20559,7 @@ getters and setters.</text>
     />
   </group>
   <group name="Fig2"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[472, 168, 115, 99]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[456, 136, 152, 99]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CE"
        fill="1"
        fillcolor="white"
@@ -20570,9 +20570,9 @@ getters and setters.</text>
     </private>
     
     <rectangle name="Fig2.0"
-      x="472"
-      y="168"
-      width="115"
+      x="456"
+      y="136"
+      width="152"
       height="99"
       fill="1"
       fillcolor="white"
@@ -20580,7 +20580,7 @@ getters and setters.</text>
       strokecolor="0 255 255"
     />
     <group name="Fig2.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[472, 168, 115, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[456, 136, 152, 0]"
          href="127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CE"
          fill="1"
          fillcolor="white"
@@ -20591,9 +20591,9 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig2.1.0"
-        x="472"
-        y="168"
-        width="115"
+        x="456"
+        y="136"
+        width="152"
         height="0"
         fill="1"
         fillcolor="white"
@@ -20602,9 +20602,9 @@ getters and setters.</text>
       />
     </group>
     <text name="Fig2.2"
-      x="472"
-      y="168"
-      width="115"
+      x="456"
+      y="136"
+      width="152"
       height="21"
       fill="1"
       fillcolor="white"
@@ -20616,9 +20616,9 @@ getters and setters.</text>
       bold="false"
       textsize="11"
       justification="Center"
-    >Race</text>
+    >RaceLogic</text>
     <group name="Fig2.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[472, 226, 115, 40]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[456, 194, 152, 40]"
          href="127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CE"
          fill="1"
          fillcolor="white"
@@ -20629,9 +20629,9 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig2.3.0"
-        x="472"
-        y="226"
-        width="115"
+        x="456"
+        y="194"
+        width="152"
         height="40"
         fill="1"
         fillcolor="white"
@@ -20645,14 +20645,14 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="472"
-                y="226" />
-        <lineto x="586"
-                y="226" />
+        <moveto x="456"
+                y="194" />
+        <lineto x="607"
+                y="194" />
       </path>
       <text name="Fig2.3.2"
-        x="472"
-        y="227"
+        x="456"
+        y="195"
         width="56"
         height="14"
         fill="0"
@@ -20667,8 +20667,8 @@ getters and setters.</text>
         justification="Left"
       >initialize()</text>
       <text name="Fig2.3.3"
-        x="472"
-        y="241"
+        x="456"
+        y="209"
         width="50"
         height="20"
         fill="0"
@@ -20684,7 +20684,7 @@ getters and setters.</text>
       >destroy()</text>
     </group>
     <group name="Fig2.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[472, 189, 115, 37]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[456, 157, 152, 37]"
          href="127-0-1-1--15fa6b5c:1256300bf33:-8000:00000000000013CE"
          fill="1"
          fillcolor="white"
@@ -20695,9 +20695,9 @@ getters and setters.</text>
       </private>
       
       <rectangle name="Fig2.4.0"
-        x="472"
-        y="189"
-        width="115"
+        x="456"
+        y="157"
+        width="152"
         height="37"
         fill="1"
         fillcolor="white"
@@ -20711,14 +20711,14 @@ getters and setters.</text>
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="472"
-                y="189" />
-        <lineto x="586"
-                y="189" />
+        <moveto x="456"
+                y="157" />
+        <lineto x="607"
+                y="157" />
       </path>
       <text name="Fig2.4.2"
-        x="472"
-        y="190"
+        x="456"
+        y="158"
         width="77"
         height="14"
         fill="0"
@@ -20733,9 +20733,9 @@ getters and setters.</text>
         justification="Left"
       >m_level : Level</text>
       <text name="Fig2.4.3"
-        x="472"
-        y="204"
-        width="111"
+        x="456"
+        y="172"
+        width="149"
         height="20"
         fill="0"
         fillcolor="white"
@@ -20747,12 +20747,12 @@ getters and setters.</text>
         bold="false"
         textsize="11"
         justification="Left"
-      >m_localPlayer : Player</text>
+      >m_playerList : vector&lt;Player&gt;</text>
     </group>
     <rectangle name="Fig2.5"
-      x="472"
-      y="168"
-      width="115"
+      x="456"
+      y="136"
+      width="152"
       height="99"
       fill="0"
       fillcolor="white"
@@ -20788,8 +20788,8 @@ getters and setters.</text>
     >
       <moveto x="425"
               y="296" />
-      <lineto x="472"
-              y="267" />
+      <lineto x="456"
+              y="235" />
     </path>
   </group>
   <group name="Fig4"
@@ -20820,8 +20820,8 @@ getters and setters.</text>
     >
       <moveto x="656"
               y="320" />
-      <lineto x="587"
-              y="267" />
+      <lineto x="608"
+              y="235" />
     </path>
   </group>
 </pgml>

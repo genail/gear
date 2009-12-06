@@ -46,8 +46,6 @@ class Game {
 
 		static Game &getInstance();
 
-		Race::Level &getLevel();
-
 		Net::Client &getNetworkConnection();
 
 		unsigned getNetworkPlayerCount() const;
@@ -68,8 +66,6 @@ class Game {
 		/** All network players */
 		typedef std::vector<Player*> TPlayersList;
 		TPlayersList m_playersList;
-
-		Race::Level m_level;
 
 		SceneContainer *m_sceneContainer;
 

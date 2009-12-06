@@ -30,10 +30,13 @@
 
 #include <boost/foreach.hpp>
 
+// foreach macro
 #define foreach BOOST_FOREACH
 
+// default connect port
 #define DEFAULT_PORT 2500
 
+// signal and slots
 #define SIGNAL_0(name) \
 	public: \
 		CL_Signal_v0 &sig_##name() { return m_sig_##name; } \
@@ -53,6 +56,7 @@
 #define INVOKE_1(name, arg1) \
 		m_sig_##name.invoke(arg1)
 
+// deprecated macro
 #ifdef __GNUC__
 #define DEPRECATED(func) func __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
@@ -61,3 +65,9 @@
 #pragma message("WARNING: You need to implement DEPRECATED for this compiler")
 #define DEPRECATED(func) func
 #endif
+
+// log levels
+#define LOG_DEBUG "debug"
+#define LOG_ERROR "error"
+#define LOG_RACE  "race"
+#define LOG_EVENT "event"

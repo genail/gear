@@ -31,6 +31,8 @@
 #include <list>
 #include <ClanLib/core.h>
 
+#include "common.h"
+
 class Player;
 
 namespace Race {
@@ -43,22 +45,27 @@ class RaceLogic {
 
 		typedef std::list<Player*> TPlayerList;
 
-		RaceLogic(Race::Level *p_level);
+		RaceLogic();
 
 		virtual ~RaceLogic();
 
 
-		const Race::Level *getLevel() const { return m_level; }
+		virtual void initialize() = 0;
+
+		virtual void destroy() = 0;
+
+
+		const Race::Level &getLevel() const { return m_level; }
 
 		const TPlayerList &getPlayerList() const { return m_players; }
 
 
 		void update(unsigned p_timeElapsed);
 
-	private:
+	protected:
 
 		/** The level */
-		Race::Level *m_level;
+		Level m_level;
 
 		/** This race players */
 		TPlayerList m_players;

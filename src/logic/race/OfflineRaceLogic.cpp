@@ -26,55 +26,24 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RaceLogic.h"
+#include "OfflineRaceLogic.h"
 
-#include "common/Game.h"
-#include "common/Player.h"
-#include "logic/race/Level.h"
+#include "common.h"
 
 namespace Race {
 
-RaceLogic::RaceLogic()
-{
-
-}
-
-RaceLogic::~RaceLogic()
+OfflineRaceLogic::OfflineRaceLogic(const CL_String &p_levelName) :
+	m_levelName(p_levelName)
 {
 }
 
-void RaceLogic::update(unsigned p_timeElapsed)
+OfflineRaceLogic::~OfflineRaceLogic()
 {
-	updateCarPhysics(p_timeElapsed);
-	updateLevel(p_timeElapsed);
 }
 
-void RaceLogic::updateCarPhysics(unsigned p_timeElapsed)
+void OfflineRaceLogic::initialize()
 {
-	const unsigned carCount = m_level->getCarCount();
-	for (unsigned i = 0; i < carCount; ++i) {
-		Race::Car &car = m_level->getCar(i);
-		car.update(p_timeElapsed);
-	}
+	m_level.loadFromFile(m_levelName);
 }
 
-void RaceLogic::updateLevel(unsigned p_timeElapsed)
-{
-	Game &game = Game::getInstance();
-	Race::Level &level = game.getLevel();
-
-	level.update(p_timeElapsed);
 }
-
-Player *RaceLogic::findPlayer(const CL_String& p_name)
-{
-	foreach(Player *player, m_players) {
-		if (player->getName() == p_name) {
-			return player;
-		}
-	}
-
-	return NULL;
-}
-
-} // namespace

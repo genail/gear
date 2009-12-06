@@ -31,6 +31,7 @@
 #include <ClanLib/core.h>
 
 class MainMenuScene;
+class RaceScene;
 
 class MainMenuController {
 
@@ -42,7 +43,11 @@ class MainMenuController {
 
 	private:
 
+		/** This scene */
 		MainMenuScene *m_scene;
+
+		/** Next scene */
+		RaceScene *m_raceScene;
 
 		/** The slot container */
 		CL_SlotContainer m_slots;

@@ -51,6 +51,7 @@ SET(CLIENT_SRCS
     gfx/scenes/LoadingScene.cpp
     gfx/scenes/RaceScene.cpp
     gfx/scenes/SceneContainer.cpp
+    logic/race/OfflineRaceLogic.cpp
     math/Easing.cpp
     math/Float.cpp
 )

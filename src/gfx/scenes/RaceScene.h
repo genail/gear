@@ -59,7 +59,7 @@ class RaceScene: public Scene
 
 		virtual ~RaceScene();
 
-		void initialize();
+		void initialize(bool online);
 
 		void destroy();
 
@@ -83,7 +83,7 @@ class RaceScene: public Scene
 
 
 		/** Logic subsystem */
-		Race::RaceLogic m_logic;
+		Race::RaceLogic *m_logic;
 
 		/** Graphics subsystem */
 		Gfx::RaceGraphics m_graphics;

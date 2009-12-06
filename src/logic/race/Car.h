@@ -36,6 +36,10 @@
 #include "logic/race/Checkpoint.h"
 #include "network/CarState.h"
 
+namespace Gfx {
+	class RaceGraphics;
+}
+
 namespace Race {
 
 class Level;
@@ -117,30 +121,43 @@ class Car
 
 		/** Invoked when collision with bound has occurred */
 		void performBoundCollision(const Bound &p_bound) {
-			CL_Vec2f reactionVector;
-			CL_Vec2f boundVector;
 			
-			boundVector.x = fabs(p_bound.getSegment().q.x - p_bound.getSegment().p.x);
-			boundVector.y = fabs(p_bound.getSegment().q.y - p_bound.getSegment().p.y);
+			m_boundNormal = p_bound.getSegment().normal();
+			m_boundHitTest = true;
 			
-			reactionVector.x = -boundVector.y;
 			
-			if (m_position.x < fabs(p_bound.getSegment().q.x))
-				reactionVector.x = -boundVector.y;
 			
-			else if (m_position.x >= fabs(p_bound.getSegment().q.x))
-				reactionVector.x = boundVector.y;
+			/*
+			CL_Vec2f inormal = normal * -1; // negation
+			CL_Vec2f boundNormal;
 			
-			if (m_position.y < fabs(p_bound.getSegment().q.y))
-				reactionVector.y = -boundVector.x;
+			normal.normalize();
+			inormal.normalize();
+			normal *= 100;
+			inormal *= 100;
 			
-			else if (m_position.y >= fabs(p_bound.getSegment().q.y))
-				reactionVector.y = boundVector.x;
+			CL_Angle angle = m_moveVector.angle(normal);
+			CL_Angle iangle = m_moveVector.angle(inormal);
+			CL_Angle finalAngle;
 			
-			reactionVector.normalize();
-			reactionVector *= m_speed / 2;
+			if (angle < iangle) {
+				boundNormal = inormal;
+				finalAngle = iangle;
+			} else {
+				boundNormal = normal;
+				finalAngle = angle;
+			}
 			
-			m_moveVector += reactionVector;
+			m_position.x -= m_moveVector.x * delta;
+			m_position.y -= m_moveVector.y * delta;
+			
+			boundNormal.normalize();
+			m_boundNormal = boundNormal;
+			
+			m_moveVector.rotate(boundNormal, finalAngle);
+			m_speed /= 2; */
+
+			
 		} // FIXME: Ryba
 		
 #endif // !SERVER
@@ -199,6 +216,12 @@ class Car
 
 		/** Current checkpoint position */
 		const Checkpoint *m_currentCheckpoint;
+		
+		// Bound collision vars
+		
+		CL_Vec2f m_boundNormal;
+		
+		bool m_boundHitTest;
 
 		int calculateInputChecksum() const;
 
@@ -215,6 +238,9 @@ class Car
 #endif // !NDEBUG
 #endif // CLIENT
 
+#if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
+friend class Gfx::RaceGraphics;
+#endif // DRAW_CAR_VECTORS && !NDEBUG
 
 };
 

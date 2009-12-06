@@ -30,6 +30,9 @@
 
 #include <assert.h>
 
+#include "common/Game.h"
+#include "network/packets/GameState.h"
+
 namespace Race {
 
 OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
@@ -44,6 +47,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 
 	// connect signals and slots
 	m_slots.connect(m_client.sig_connected(), this, &OnlineRaceLogic::onConnected);
+	m_slots.connect(m_client.sig_disconnected(), this, &OnlineRaceLogic::onDisconnected);
 	m_slots.connect(m_client.sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
 }
 
@@ -54,6 +58,8 @@ OnlineRaceLogic::~OnlineRaceLogic()
 void OnlineRaceLogic::initialize()
 {
 	if (!m_initialized) {
+
+		// connect to server
 		m_client.connect();
 
 		m_initialized = true;
@@ -64,6 +70,7 @@ void OnlineRaceLogic::destroy()
 {
 	if (m_initialized) {
 		m_client.disconnect();
+		m_level.destroy();
 	}
 }
 
@@ -71,8 +78,29 @@ void OnlineRaceLogic::onConnected()
 {
 }
 
+void OnlineRaceLogic::onDisconnected()
+{
+}
+
 void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 {
+	// load level
+	const CL_String &levelName = p_gameState.getLevel();
+	m_level.initialize(levelName);
+
+	// first car is player car
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+
+	m_level.addCar(&player.getCar());
+
+	// add rest of players
+	const unsigned playerCount = p_gameState.getPlayerCount();
+
+	for (unsigned i = 0; i < playerCount; ++i) {
+		const CL_String &playerName = p_gameState.getPlayerName(i);
+		m_playerMap[playerName] = new Player(playerName);
+	}
 }
 
 } // namespace

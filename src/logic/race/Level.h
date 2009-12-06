@@ -56,7 +56,17 @@ class Level
 
 		void destroy();
 
+
 		void addCar(Car *p_car);
+
+		void removeCar(Car *p_car);
+
+		DEPRECATED(void update(unsigned p_timeElapsed));
+
+		const Sandpit &sandpitAt(unsigned p_index) const;
+
+
+		bool isLoaded() const { return m_loaded; }
 
 		const Bound& getBound(int p_index) const { return *m_bounds[p_index].get(); }
 
@@ -89,12 +99,7 @@ class Level
 		const TyreStripes &getTyreStripes() const { return m_tyreStripes; }
 
 
-		const Sandpit &sandpitAt(unsigned p_index) const;
 
-
-		void removeCar(Car *p_car);
-
-		DEPRECATED(void update(unsigned p_timeElapsed));
 
 
 	private:

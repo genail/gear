@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <map>
 #include <ClanLib/core.h>
 
 #include "RaceLogic.h"
@@ -70,9 +71,16 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		CL_SlotContainer m_slots;
 
 
+		/** Network players map */
+		typedef std::map<CL_String, Player*> TPlayerMap;
+		TPlayerMap m_playerMap;
+
+
 		// signal handlers
 
 		void onConnected();
+
+		void onDisconnected();
 
 		void onGameState(const Net::GameState &p_gameState);
 

@@ -60,6 +60,10 @@ RaceGraphics::~RaceGraphics()
 
 void RaceGraphics::draw(CL_GraphicContext &p_gc)
 {
+	if (!m_logic->getLevel().isLoaded()) {
+		return;
+	}
+
 	// initialize player's viewport
 	m_viewport.prepareGC(p_gc);
 

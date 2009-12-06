@@ -67,4 +67,9 @@ float ResistanceMap::resistance(const CL_Pointf &p_point)
 	return result;
 }
 
+void ResistanceMap::clear()
+{
+	m_resistances.clear();
+}
+
 } // namespace

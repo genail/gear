@@ -48,6 +48,8 @@ class ResistanceMap {
 		void addGeometry(const CL_SharedPtr<Geometry> &p_geometry, float p_resistanceValue);
 
 
+		void clear();
+
 		float resistance(const CL_Pointf &p_point);
 
 	private:

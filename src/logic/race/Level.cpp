@@ -39,6 +39,7 @@
 namespace Race {
 
 Level::Level() :
+	m_initialized(false),
 	m_loaded(false),
 	m_width(0),
 	m_height(0)
@@ -47,14 +48,35 @@ Level::Level() :
 
 void Level::initialize(const CL_String &p_filename)
 {
-	loadFromFile(p_filename);
+	if (!m_initialized) {
+		loadFromFile(p_filename);
+
+		m_initialized = true;
+	}
 }
 
 void Level::destroy()
 {
-	m_blocks.clear();
-	m_track.clear();
-	m_loaded = false;
+	if (m_initialized) {
+		m_blocks.clear();
+		m_track.clear();
+		m_bounds.clear();
+		m_sandpits.clear();
+		m_resistanceMap.clear();
+		m_cars.clear();
+
+		std::pair<Car*, CL_Pointf*> entry;
+		foreach(entry, m_carsDriftPoints) {
+			delete[] entry.second;
+		}
+
+		m_carsDriftPoints.clear();
+
+		m_startPositions.clear();
+		m_tyreStripes.clear();
+
+		m_loaded = false;
+	}
 }
 
 Level::~Level() {

@@ -95,5 +95,10 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race
 
 }
 
+void TyreStripes::clear()
+{
+	m_stripes.clear();
+}
+
 } // namespace
 

@@ -99,6 +99,12 @@ class Level
 
 	private:
 
+		/** Initialized state */
+		bool m_initialized;
+
+		/** Loaded state */
+		bool m_loaded;
+
 		/** level blocks */
 		std::vector< CL_SharedPtr<Race::Block> > m_blocks;
 
@@ -120,9 +126,6 @@ class Level
 
 		/** Car's last drift points for all four tires: fr, rr, rl, fl */
 		std::map<Car*, CL_Pointf*> m_carsDriftPoints;
-
-		/** Loaded state */
-		bool m_loaded;
 
 		/** level size */
 		int m_width, m_height;

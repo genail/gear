@@ -54,11 +54,6 @@ void OfflineRaceLogic::initialize()
 
 void OfflineRaceLogic::destroy()
 {
-	// remove player's car from level
-//	Game &game = Game::getInstance();
-//	Player &player = game.getPlayer();
-//
-//	m_level.removeCar(&player.getCar());
 	m_level.destroy();
 }
 

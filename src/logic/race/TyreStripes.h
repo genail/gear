@@ -48,6 +48,7 @@ class TyreStripes {
 
 				const CL_Pointf &getToPoint() const { return m_to; }
 
+
 			private:
 
 				CL_Pointf m_from, m_to;
@@ -63,11 +64,16 @@ class TyreStripes {
 
 
 		TyreStripes();
+
 		virtual ~TyreStripes();
+
+		const stripeList_t &getStripeList() const { return m_stripes; }
+
 
 		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner);
 
-		const stripeList_t &getStripeList() const { return m_stripes; }
+		void clear();
+
 
 	private:
 

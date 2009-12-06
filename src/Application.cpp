@@ -48,10 +48,8 @@
 #include "common/Player.h"
 #include "common/Properties.h"
 #include "gfx/race/ui/RaceUI.h"
-#include "logic/race/Race.h"
 #include "network/client/Client.h"
 #include "gfx/scenes/MainMenuScene.h"
-#include "gfx/scenes/SceneContainer.h"
 
 
 #if defined(RACE_SCENE_ONLY)
@@ -179,15 +177,11 @@ int Application::main(const std::vector<CL_String> &args)
 		DebugLayer debugLayer;
 		Gfx::Stage::m_debugLayer = &debugLayer;
 
-		cl_log_event("init", "setting scene container");
-
-		SceneContainer sceneContainer(&gameWindow);
-		Game::getInstance().setSceneContainer(&sceneContainer);
-
-
 		cl_log_event("init", "launching main scene");
 
-		Gfx::Stage::pushScene(&sceneContainer.getMainMenuScene());
+		MainMenuScene mainMenuScene(&gameWindow);
+		Gfx::Stage::pushScene(&mainMenuScene);
+
 		guiManager.exec(true);
 
 #else // !RACE_SCENE_ONLY

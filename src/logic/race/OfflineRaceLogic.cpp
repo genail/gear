@@ -29,6 +29,7 @@
 #include "OfflineRaceLogic.h"
 
 #include "common.h"
+#include "common/Game.h"
 
 namespace Race {
 
@@ -43,7 +44,22 @@ OfflineRaceLogic::~OfflineRaceLogic()
 
 void OfflineRaceLogic::initialize()
 {
-	m_level.loadFromFile(m_levelName);
+	m_level.initialize(m_levelName);
+
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+
+	m_level.addCar(&player.getCar());
+}
+
+void OfflineRaceLogic::destroy()
+{
+	// remove player's car from level
+//	Game &game = Game::getInstance();
+//	Player &player = game.getPlayer();
+//
+//	m_level.removeCar(&player.getCar());
+	m_level.destroy();
 }
 
 }

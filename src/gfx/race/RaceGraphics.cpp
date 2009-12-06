@@ -110,7 +110,7 @@ void RaceGraphics::loadGroundBlocks(CL_GraphicContext &p_gc)
 void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
 {
 	// load decorations
-	Race::Level &level = Game::getInstance().getLevel();
+	const Race::Level &level = m_logic->getLevel();
 	const int w = level.getWidth();
 	const int h = level.getHeight();
 
@@ -134,11 +134,11 @@ void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
 
 void RaceGraphics::loadSandPits(CL_GraphicContext &p_gc)
 {
-	const Race::Level *level = m_logic->getLevel();
-	const unsigned sandpitCount = level->getSandpitCount();
+	const Race::Level &level = m_logic->getLevel();
+	const unsigned sandpitCount = level.getSandpitCount();
 
 	for (unsigned i = 0; i < sandpitCount; ++i) {
-		const Race::Sandpit &logicSandpit = level->sandpitAt(i);
+		const Race::Sandpit &logicSandpit = level.sandpitAt(i);
 		CL_SharedPtr<Gfx::Sandpit> gfxSandpit(new Gfx::Sandpit(&logicSandpit));
 
 		// load and add to list
@@ -176,7 +176,7 @@ void RaceGraphics::drawUI(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawTireTracks(CL_GraphicContext &p_gc)
 {
-	Race::Level &level = Game::getInstance().getLevel();
+	const Race::Level &level = m_logic->getLevel();
 	const Race::TyreStripes &tireStripes = level.getTyreStripes();
 
 	Gfx::TireTrack track;
@@ -192,7 +192,7 @@ void RaceGraphics::drawTireTracks(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 {
-	Race::Level &level = Game::getInstance().getLevel();
+	const Race::Level &level = m_logic->getLevel();
 
 	drawBackBlocks(p_gc);
 
@@ -241,7 +241,7 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawBackBlocks(CL_GraphicContext &p_gc)
 {
-	Race::Level &level = Game::getInstance().getLevel();
+	const Race::Level &level = m_logic->getLevel();
 
 	const size_t w = level.getWidth();
 	const size_t h = level.getHeight();
@@ -268,7 +268,7 @@ void RaceGraphics::drawBackBlocks(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawForeBlocks(CL_GraphicContext &p_gc)
 {
-	Race::Level &level = Game::getInstance().getLevel();
+	const Race::Level &level = m_logic->getLevel();
 
 	const size_t w = level.getWidth();
 	const size_t h = level.getHeight();
@@ -298,7 +298,7 @@ void RaceGraphics::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p
 
 void RaceGraphics::drawCars(CL_GraphicContext &p_gc)
 {
-	Race::Level &level = Game::getInstance().getLevel();
+	const Race::Level &level = m_logic->getLevel();
 	size_t carCount = level.getCarCount();
 
 	for (size_t i = 0; i < carCount; ++i) {

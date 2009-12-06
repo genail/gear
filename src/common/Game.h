@@ -35,8 +35,6 @@
 #include "network/client/Client.h"
 #include "logic/race/Level.h"
 
-class SceneContainer;
-
 class Game {
 
 	public:
@@ -54,9 +52,6 @@ class Game {
 
 		Player &getPlayer();
 
-		SceneContainer &getSceneContainer();
-
-
 	private:
 
 		Net::Client m_networkConnection;
@@ -67,16 +62,11 @@ class Game {
 		typedef std::vector<Player*> TPlayersList;
 		TPlayersList m_playersList;
 
-		SceneContainer *m_sceneContainer;
-
 		/** Slots containter */
 		CL_SlotContainer m_slots;
 
 
 		Game();
-
-		void setSceneContainer(SceneContainer *p_sceneContainer) { m_sceneContainer = p_sceneContainer; }
-
 
 		friend class Application;
 };

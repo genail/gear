@@ -38,6 +38,7 @@
 #include "network/events.h"
 #include "network/packets/CarState.h"
 #include "network/client/Client.h"
+#include "gfx/race/RaceGraphics.h"
 #include "gfx/race/level/TireTrack.h"
 #include "gfx/race/level/Bound.h"
 #include "debug/RaceSceneKeyBindings.h"
@@ -53,7 +54,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 
 #endif // !RACE_SCENE_ONLY
 	m_logic(NULL),
-	m_graphics(&m_logic),
+	m_graphics(NULL),
 	m_lapsTotal(3),
 	m_initialized(false),
 	m_inputLock(false),
@@ -103,53 +104,48 @@ RaceScene::~RaceScene() {
 
 void RaceScene::initialize(bool online)
 {
-	if (m_logic == NULL) {
+	if (!m_initialized) {
 		if (!online) {
-			m_logic = new OfflineRaceLogic("resources/level.xml");
+			m_logic = new Race::OfflineRaceLogic("resources/level.xml");
 		} else {
 			assert(0 && "online not supported yet");
 		}
+
+		m_logic->initialize();
+		m_graphics = new Gfx::RaceGraphics(m_logic);
+
+		m_initialized = true;
 	}
 
-	// add player's car to level
-	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-	Race::Level &level = game.getLevel();
-
-	level.addCar(&player.getCar());
 }
 
 void RaceScene::destroy()
 {
-	if (m_logic != NULL) {
+	if (m_initialized) {
 		delete m_logic;
 		m_logic = NULL;
+
+		delete m_graphics;
+		m_graphics = NULL;
+
+		m_initialized = false;
 	}
-
-	// remove player's car from level
-	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-	Race::Level &level = game.getLevel();
-
-	level.removeCar(&player.getCar());
-}
-
-void RaceScene::init(const CL_String &p_levelName)
-{
 }
 
 void RaceScene::draw(CL_GraphicContext &p_gc)
 {
-	m_graphics.draw(p_gc);
+	assert(m_initialized);
+
+	m_graphics->draw(p_gc);
 }
-
-
 
 void RaceScene::load(CL_GraphicContext &p_gc)
 {
+	assert(m_initialized);
+
 	cl_log_event("debug", "RaceScene::load()");
 
-	m_graphics.load(p_gc);
+	m_graphics->load(p_gc);
 
 #if !defined(RACE_SCENE_ONLY)
 	Scene::load(p_gc);
@@ -161,27 +157,34 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 
 void RaceScene::update(unsigned p_timeElapsed)
 {
-	m_logic.update(p_timeElapsed);
-	m_graphics.update(p_timeElapsed);
+	assert(m_initialized);
 
+	m_logic->update(p_timeElapsed);
+	m_graphics->update(p_timeElapsed);
 }
 
 
 
 bool RaceScene::onInputPressed(const CL_InputEvent &p_event)
 {
+	assert(m_initialized);
+
 	handleInput(Pressed, p_event);
 	return true;
 }
 
 bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
 {
+	assert(m_initialized);
+
 	handleInput(Released, p_event);
 	return true;
 }
 
 void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 {
+	assert(m_initialized);
+
 	Race::Car &car = Game::getInstance().getPlayer().getCar();
 
 	bool state;
@@ -239,18 +242,24 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 void RaceScene::updateCarTurn()
 {
+	assert(m_initialized);
+
 	Race::Car &car = Game::getInstance().getPlayer().getCar();
 	car.setTurn((int) -m_turnLeft + (int) m_turnRight);
 }
 
 void RaceScene::startRace()
 {
+	assert(m_initialized);
+
 	m_scoreTable.clear();
 //	Game::getInstance().getNetworkRaceConnection().triggerRaceStart(3);
 }
 
 void RaceScene::onCarStateReceived(const Net::CarState &p_carState)
 {
+	assert(m_initialized);
+
 //	const CL_String name = p_carState.getName();
 //
 //	if (name == Game::getInstance().getPlayer().getName()) {
@@ -275,6 +284,8 @@ void RaceScene::onCarStateReceived(const Net::CarState &p_carState)
 
 void RaceScene::onCarStateChangedLocal(Race::Car &p_car)
 {
+	assert(m_initialized);
+
 	Net::CarState carState = p_car.prepareCarState();
 	carState.setName(Game::getInstance().getPlayer().getName());
 
@@ -283,6 +294,7 @@ void RaceScene::onCarStateChangedLocal(Race::Car &p_car)
 
 void RaceScene::onPlayerJoined(const CL_String &p_name)
 {
+	assert(m_initialized);
 
 //	Player *player = new Player(p_name);
 //
@@ -292,7 +304,7 @@ void RaceScene::onPlayerJoined(const CL_String &p_name)
 
 void RaceScene::onPlayerLeaved(const CL_String &p_name)
 {
-
+	assert(m_initialized);
 //	for (
 //		std::list<Player*>::iterator itor = m_players.begin();
 //		itor != m_players.end();
@@ -311,6 +323,8 @@ void RaceScene::onPlayerLeaved(const CL_String &p_name)
 
 void RaceScene::onStartCountdown()
 {
+	assert(m_initialized);
+
 	cl_log_event("race", "starting countdown...");
 
 	static const unsigned RACE_START_COUNTDOWN_TIME = 3000;
@@ -328,32 +342,30 @@ void RaceScene::onStartCountdown()
 
 void RaceScene::onCountdownEnds()
 {
+	assert(m_initialized);
+
 	m_raceStartTime = CL_System::get_time();
 	m_inputLock = false;
 }
 
 void RaceScene::onInputLock()
 {
+	assert(m_initialized);
+
 	m_inputLock = true;
 }
 
 void RaceScene::onRaceStateChanged(int p_lapsNum)
 {
+	assert(m_initialized);
+
 	m_lapsTotal = p_lapsNum;
-//	Game::getInstance().getRacePlayer().getCar().setLap(1);
-}
-
-void RaceScene::onInitRace(const CL_String& p_levelName)
-{
-	Game::getInstance().getLevel().addCar(&Game::getInstance().getPlayer().getCar());
-
-	m_initialized = true;
-
-	cl_log_event("race", "Initialized race with level %1", p_levelName);
 }
 
 void RaceScene::onPlayerFinished(const CL_NetGameEvent &p_event)
 {
+	assert(m_initialized);
+
 	const CL_String playerName = p_event.get_argument(0);
 	const unsigned time = p_event.get_argument(1);
 
@@ -364,6 +376,7 @@ void RaceScene::onPlayerFinished(const CL_NetGameEvent &p_event)
 
 void RaceScene::markPlayerFinished(const CL_String &p_name, unsigned p_time)
 {
+	assert(m_initialized);
 //	RacePlayer *scorePlayer;
 //
 //	if (Game::getInstance().getRacePlayer().getPlayer().getName() == p_name) {
@@ -396,6 +409,7 @@ void RaceScene::markPlayerFinished(const CL_String &p_name, unsigned p_time)
 
 void RaceScene::endRace()
 {
+	assert(m_initialized);
 //	// display the score table and quit the game
 //	const int scoreEntries = m_scoreTable.getEntriesCount();
 //
@@ -416,6 +430,7 @@ void RaceScene::endRace()
 
 bool RaceScene::isRaceFinished()
 {
+	assert(m_initialized);
 //	foreach (const RacePlayer *player, m_players) {
 //		if (!player->isFinished()) {
 //			return false;

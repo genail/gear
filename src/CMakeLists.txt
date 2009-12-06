@@ -30,7 +30,6 @@ SET(COMMON_SRCS
 SET(CLIENT_SRCS
     ${COMMON_SRCS}
     Application.cpp
-    controllers/LoadingController.cpp
     controllers/MainMenuController.cpp
     debug/RaceSceneKeyBindings.cpp
     gfx/DebugLayer.cpp
@@ -48,9 +47,7 @@ SET(CLIENT_SRCS
     gfx/race/ui/RaceUI.cpp
     gfx/race/ui/SpeedMeter.cpp
     gfx/scenes/MainMenuScene.cpp
-    gfx/scenes/LoadingScene.cpp
     gfx/scenes/RaceScene.cpp
-    gfx/scenes/SceneContainer.cpp
     logic/race/OfflineRaceLogic.cpp
     math/Easing.cpp
     math/Float.cpp

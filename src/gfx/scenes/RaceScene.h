@@ -33,12 +33,15 @@
 #include <ClanLib/network.h>
 
 #include "gfx/Scene.h"
-#include "gfx/race/RaceGraphics.h"
 #include "logic/race/RaceLogic.h"
 #include "logic/race/ScoreTable.h"
 
 namespace Net {
 	class CarState;
+}
+
+namespace Gfx {
+	class RaceGraphics;
 }
 
 #if defined(RACE_SCENE_ONLY)
@@ -70,8 +73,6 @@ class RaceScene: public Scene
 
 		int getLapsTotal() const { return m_lapsTotal; }
 
-		void init(const CL_String &p_levelName);
-
 		virtual void update(unsigned p_timeElapsed);
 
 	private:
@@ -86,7 +87,7 @@ class RaceScene: public Scene
 		Race::RaceLogic *m_logic;
 
 		/** Graphics subsystem */
-		Gfx::RaceGraphics m_graphics;
+		Gfx::RaceGraphics *m_graphics;
 
 
 
@@ -170,8 +171,6 @@ class RaceScene: public Scene
 		void onInputLock();
 
 		void onRaceStateChanged(int p_lapsNum);
-
-		void onInitRace(const CL_String& p_levelName);
 
 		void onPlayerFinished(const CL_NetGameEvent &p_event);
 

@@ -32,12 +32,11 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
+#include "logic/race/Level.h"
 
 class Player;
 
 namespace Race {
-
-class Level;
 
 class RaceLogic {
 

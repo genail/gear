@@ -29,12 +29,10 @@
 #include "Game.h"
 
 #include "common.h"
-#include "gfx/scenes/SceneContainer.h"
 
 Game::Game() :
 	m_networkConnection(),
-	m_player(),
-	m_sceneContainer(NULL)
+	m_player()
 {
 
 }
@@ -49,11 +47,6 @@ Game &Game::getInstance()
 	return game;
 }
 
-Race::Level &Game::getLevel()
-{
-	return m_level;
-}
-
 Net::Client &Game::getNetworkConnection()
 {
 	return m_networkConnection;
@@ -61,11 +54,6 @@ Net::Client &Game::getNetworkConnection()
 
 Player &Game::getPlayer() {
 	return m_player;
-}
-
-SceneContainer &Game::getSceneContainer() {
-	assert(m_sceneContainer != NULL && "scene container must be set by Application");
-	return *m_sceneContainer;
 }
 
 unsigned Game::getNetworkPlayerCount() const

@@ -30,7 +30,6 @@
 
 #include "common/Game.h"
 #include "common/Player.h"
-#include "logic/race/Level.h"
 
 namespace Race {
 
@@ -51,19 +50,16 @@ void RaceLogic::update(unsigned p_timeElapsed)
 
 void RaceLogic::updateCarPhysics(unsigned p_timeElapsed)
 {
-	const unsigned carCount = m_level->getCarCount();
+	const unsigned carCount = m_level.getCarCount();
 	for (unsigned i = 0; i < carCount; ++i) {
-		Race::Car &car = m_level->getCar(i);
+		Race::Car &car = m_level.getCar(i);
 		car.update(p_timeElapsed);
 	}
 }
 
 void RaceLogic::updateLevel(unsigned p_timeElapsed)
 {
-	Game &game = Game::getInstance();
-	Race::Level &level = game.getLevel();
-
-	level.update(p_timeElapsed);
+	m_level.update(p_timeElapsed);
 }
 
 Player *RaceLogic::findPlayer(const CL_String& p_name)

@@ -26,58 +26,53 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "OnlineRaceLogic.h"
 
-#include <list>
-#include <ClanLib/core.h>
+#include <assert.h>
 
 namespace Race {
 
-class Car;
+OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
+	m_initialized(false),
+	m_host(p_host),
+	m_port(p_port)
+{
+	assert(p_port > 0 && p_port <= 0xFFFF);
 
-class TyreStripes {
+	m_client.setServerAddr(m_host);
+	m_client.setServerPort(m_port);
 
-	public:
-		class Stripe {
+	// connect signals and slots
+	m_slots.connect(m_client.sig_connected(), this, &OnlineRaceLogic::onConnected);
+	m_slots.connect(m_client.sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
+}
 
-			public:
+OnlineRaceLogic::~OnlineRaceLogic()
+{
+}
 
-				float length() const { return m_from.distance(m_to); }
+void OnlineRaceLogic::initialize()
+{
+	if (!m_initialized) {
+		m_client.connect();
 
-				const CL_Pointf &getFromPoint() const { return m_from; }
+		m_initialized = true;
+	}
+}
 
-				const CL_Pointf &getToPoint() const { return m_to; }
+void OnlineRaceLogic::destroy()
+{
+	if (m_initialized) {
+		m_client.disconnect();
+	}
+}
 
+void OnlineRaceLogic::onConnected()
+{
+}
 
-			private:
-
-				CL_Pointf m_from, m_to;
-				const Race::Car *m_owner;
-
-				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner) :
-					m_from(p_from), m_to(p_to), m_owner(p_owner) {}
-
-				friend class TyreStripes;
-		};
-
-		typedef std::list<Stripe> stripeList_t;
-
-
-		TyreStripes();
-
-		virtual ~TyreStripes();
-
-
-		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner);
-
-		void clear();
-
-
-		const stripeList_t &getStripeList() const { return m_stripes; }
-
-	private:
-
-		stripeList_t m_stripes;
-};
+void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
+{
+}
 
 } // namespace

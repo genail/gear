@@ -33,6 +33,8 @@
 #include "network/events.h"
 #include "../packets/Goodbye.h"
 #include "../packets/ClientInfo.h"
+#include "../packets/GameState.h"
+#include "../packets/CarState.h"
 
 namespace Net {
 

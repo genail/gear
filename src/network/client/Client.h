@@ -35,10 +35,11 @@
 #include "common/Player.h"
 #include "logic/race/Car.h"
 #include "logic/race/Level.h"
-#include "../packets/CarState.h"
-#include "../packets/GameState.h"
 
 namespace Net {
+
+class CarState;
+class GameState;
 
 class Client {
 
@@ -64,6 +65,7 @@ class Client {
 		SIGNAL_1(const Net::CarState&, carStateReceived);
 
 	public:
+
 		Client();
 
 		virtual ~Client();

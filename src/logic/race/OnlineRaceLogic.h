@@ -28,56 +28,55 @@
 
 #pragma once
 
-#include <list>
 #include <ClanLib/core.h>
+
+#include "RaceLogic.h"
+#include "network/client/Client.h"
+
+namespace Net {
+	class GameState;
+}
 
 namespace Race {
 
-class Car;
-
-class TyreStripes {
+class OnlineRaceLogic: public Race::RaceLogic {
 
 	public:
-		class Stripe {
 
-			public:
+		OnlineRaceLogic(const CL_String &p_host, int p_port);
 
-				float length() const { return m_from.distance(m_to); }
-
-				const CL_Pointf &getFromPoint() const { return m_from; }
-
-				const CL_Pointf &getToPoint() const { return m_to; }
+		virtual ~OnlineRaceLogic();
 
 
-			private:
+		virtual void initialize();
 
-				CL_Pointf m_from, m_to;
-				const Race::Car *m_owner;
-
-				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner) :
-					m_from(p_from), m_to(p_to), m_owner(p_owner) {}
-
-				friend class TyreStripes;
-		};
-
-		typedef std::list<Stripe> stripeList_t;
-
-
-		TyreStripes();
-
-		virtual ~TyreStripes();
-
-
-		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner);
-
-		void clear();
-
-
-		const stripeList_t &getStripeList() const { return m_stripes; }
+		virtual void destroy();
 
 	private:
 
-		stripeList_t m_stripes;
+		/** Initialized state */
+		bool m_initialized;
+
+		/** Hostname */
+		CL_String m_host;
+
+		/** Port */
+		int m_port;
+
+		/** Network client */
+		Net::Client m_client;
+
+		/** Slots container */
+		CL_SlotContainer m_slots;
+
+
+		// signal handlers
+
+		void onConnected();
+
+		void onGameState(const Net::GameState &p_gameState);
+
 };
 
-} // namespace
+}
+

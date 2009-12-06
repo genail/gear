@@ -122,7 +122,7 @@ void Car::update1_60() {
 	const int inputChecksum = calculateInputChecksum();
 	
 	if (inputChecksum != m_inputChecksum) {
-		m_statusChangeSignal.invoke(*this);
+		INVOKE_1(inputChanged, *this);
 		m_inputChecksum = inputChecksum;
 	}
 	
@@ -353,7 +353,7 @@ void Car::setStartPosition(int p_startPosition) {
 	m_lap = 1;
 
 	// send the status change to other players
-	m_statusChangeSignal.invoke(*this);
+	INVOKE_1(inputChanged, *this);
 }
 
 bool Car::isDrifting() const {

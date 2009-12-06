@@ -31,7 +31,6 @@
 #include "common.h"
 
 Game::Game() :
-	m_networkConnection(),
 	m_player()
 {
 
@@ -47,21 +46,6 @@ Game &Game::getInstance()
 	return game;
 }
 
-Net::Client &Game::getNetworkConnection()
-{
-	return m_networkConnection;
-}
-
 Player &Game::getPlayer() {
 	return m_player;
-}
-
-unsigned Game::getNetworkPlayerCount() const
-{
-	return m_playersList.size();
-}
-
-const Player& Game::getNetworkPlayer(unsigned p_index) const
-{
-	return *m_playersList[p_index];
 }

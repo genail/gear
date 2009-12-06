@@ -46,21 +46,11 @@ class Game {
 
 		Net::Client &getNetworkConnection();
 
-		unsigned getNetworkPlayerCount() const;
-
-		const Player& getNetworkPlayer(unsigned p_index) const;
-
 		Player &getPlayer();
 
 	private:
 
-		Net::Client m_networkConnection;
-
 		Player m_player;
-
-		/** All network players */
-		typedef std::vector<Player*> TPlayersList;
-		TPlayersList m_playersList;
 
 		/** Slots containter */
 		CL_SlotContainer m_slots;

@@ -154,16 +154,6 @@ class RaceScene: public Scene
 
 		// event handlers
 
-		void onCarStateChangedRemote(const CL_NetGameEvent& p_event);
-
-		void onCarStateReceived(const Net::CarState &p_carState);
-
-		void onCarStateChangedLocal(Race::Car &p_car);
-
-		void onPlayerJoined(const CL_String &p_name);
-
-		void onPlayerLeaved(const CL_String &p_name);
-
 		void onStartCountdown();
 
 		void onCountdownEnds();

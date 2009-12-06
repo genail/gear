@@ -43,8 +43,12 @@ class Level;
 class Car
 {
 
+	SIGNAL_1(const Car&, inputChanged);
+
 	public:
+
 		Car();
+
 		virtual ~Car();
 
 		const Checkpoint *getCurrentCheckpoint() const { return m_currentCheckpoint; }
@@ -108,8 +112,6 @@ class Car
 		 * If lap is reached, then lap number will increase by one.
 		 */
 		void updateCurrentCheckpoint(const Checkpoint *p_checkpoint);
-
-		CL_Signal_v1<Car &> &sigStatusChange() { return m_statusChangeSignal; }
 
 #ifndef SERVER
 		/** @return Current collision outline based on car position and rotation */
@@ -180,9 +182,6 @@ class Car
 		
 		/** angle */
 		float m_angle;
-
-		/** Input state changed signal */
-		CL_Signal_v1<Car &> m_statusChangeSignal;
 
 		/** Input checksum */
 		int m_inputChecksum;

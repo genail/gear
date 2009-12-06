@@ -30,7 +30,7 @@
 
 #include "ClanLib/network.h"
 
-#include "network/Server.h"
+#include "network/server/Server.h"
 #include "ServerConfiguration.h"
 
 CL_ClanApplication app(&ServerApplication::main);

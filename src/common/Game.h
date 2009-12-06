@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <vector>
 #include <assert.h>
 
 #include "Player.h"
@@ -42,18 +43,21 @@ class Game {
 
 		virtual ~Game();
 
+
 		static Game &getInstance();
 
-		Race::Level &getLevel() { return m_level; }
+		Race::Level &getLevel();
 
-		Net::Client &getNetworkConnection() { return m_networkConnection; }
+		Net::Client &getNetworkConnection();
 
-		Player &getPlayer() { return m_player; }
+		unsigned getNetworkPlayerCount() const;
 
-		SceneContainer &getSceneContainer() {
-			assert(m_sceneContainer != NULL && "scene container must be set by Application");
-			return *m_sceneContainer;
-		}
+		const Player& getNetworkPlayer(unsigned p_index) const;
+
+		Player &getPlayer();
+
+		SceneContainer &getSceneContainer();
+
 
 	private:
 
@@ -61,13 +65,26 @@ class Game {
 
 		Player m_player;
 
+		/** All network players */
+		typedef std::vector<Player*> TPlayersList;
+		TPlayersList m_playersList;
+
 		Race::Level m_level;
 
 		SceneContainer *m_sceneContainer;
 
+		/** Slots containter */
+		CL_SlotContainer m_slots;
+
+
 		Game();
 
 		void setSceneContainer(SceneContainer *p_sceneContainer) { m_sceneContainer = p_sceneContainer; }
+
+
+		// signal handlers
+
+		void onGameState(const Net::GameState &p_gameState);
 
 		friend class Application;
 };

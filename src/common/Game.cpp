@@ -28,6 +28,7 @@
 
 #include "Game.h"
 
+#include "common.h"
 #include "gfx/scenes/SceneContainer.h"
 
 Game::Game() :
@@ -35,14 +36,48 @@ Game::Game() :
 	m_player(),
 	m_sceneContainer(NULL)
 {
+
 }
 
 Game::~Game()
 {
+	m_slots.connect(m_networkConnection.sig_gameStateReceived(), this, &Game::onGameState);
+	m_slots.connect(m_networkConnection.sig_playerJoined(), this, &Game::onPlayerJoined);
+	m_slots.connect(m_networkConnection.sig_playerLeaved(), this, &Game::onPlayerLeaved);
+	m_slots.connect(m_networkConnection.sig_disconnected(), this, &Game::onDisconnected);
 }
 
 Game &Game::getInstance()
 {
 	static Game game;
 	return game;
+}
+
+Race::Level &Game::getLevel()
+{
+	return m_level;
+}
+
+Net::Client &Game::getNetworkConnection()
+{
+	return m_networkConnection;
+}
+
+Player &Game::getPlayer() {
+	return m_player;
+}
+
+SceneContainer &Game::getSceneContainer() {
+	assert(m_sceneContainer != NULL && "scene container must be set by Application");
+	return *m_sceneContainer;
+}
+
+unsigned Game::getNetworkPlayerCount() const
+{
+	return m_playersList.size();
+}
+
+const Player& Game::getNetworkPlayer(unsigned p_index) const
+{
+	return *m_playersList[p_index];
 }

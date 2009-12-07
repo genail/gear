@@ -57,12 +57,24 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	// connect signals and slots from client
 	m_slots.connect(m_client.sig_connected(), this, &OnlineRaceLogic::onConnected);
 	m_slots.connect(m_client.sig_disconnected(), this, &OnlineRaceLogic::onDisconnected);
+	m_slots.connect(m_client.sig_playerJoined(), this, &OnlineRaceLogic::onPlayerJoined);
+	m_slots.connect(m_client.sig_playerLeaved(), this, &OnlineRaceLogic::onPlayerLeaved);
 	m_slots.connect(m_client.sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
 	m_slots.connect(m_client.sig_carStateReceived(), this, &OnlineRaceLogic::onCarState);
 }
 
 OnlineRaceLogic::~OnlineRaceLogic()
 {
+	TPlayerMapPair pair;
+	foreach (pair, m_playerMap) {
+		Player *player = pair.second;
+
+		// remove car from level
+		m_level.removeCar(&player->getCar());
+
+		// remove player
+		delete player;
+	}
 }
 
 void OnlineRaceLogic::initialize()
@@ -90,6 +102,42 @@ void OnlineRaceLogic::onConnected()
 
 void OnlineRaceLogic::onDisconnected()
 {
+}
+
+void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
+{
+	// check player existence
+	TPlayerMap::iterator itor = m_playerMap.find(p_name);
+
+	if (itor == m_playerMap.end()) {
+		// create new player
+		Player *player = new Player(p_name);
+		m_playerMap[p_name] = player;
+
+		// add his car to level
+		m_level.addCar(&player->getCar());
+	} else {
+		cl_log_event(LOG_ERROR, "Player named '%1' already in list", p_name);
+	}
+
+}
+
+void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
+{
+	// get the player
+	TPlayerMap::iterator itor = m_playerMap.find(p_name);
+
+	if (itor != m_playerMap.end()) {
+		Player *player = itor->second;
+
+		// remove car from level
+		m_level.removeCar(&player->getCar());
+
+		// remove player
+		delete player;
+	} else {
+		cl_log_event(LOG_ERROR, "No player named '%1' in list", p_name);
+	}
 }
 
 void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)

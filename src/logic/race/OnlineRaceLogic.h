@@ -76,6 +76,8 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		/** All players map (with local player too) */
 		typedef std::map<CL_String, Player*> TPlayerMap;
+		typedef std::pair<CL_String, Player*> TPlayerMapPair;
+
 		TPlayerMap m_playerMap;
 
 		/** Local player */
@@ -87,6 +89,10 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		void onConnected();
 
 		void onDisconnected();
+
+		void onPlayerJoined(const CL_String &p_name);
+
+		void onPlayerLeaved(const CL_String &p_name);
 
 		void onGameState(const Net::GameState &p_gameState);
 

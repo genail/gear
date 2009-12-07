@@ -44,7 +44,7 @@ PlayerJoined::~PlayerJoined()
 
 CL_NetGameEvent PlayerJoined::buildEvent() const
 {
-	CL_NetGameEvent event(EVENT_PLAYER_INFO);
+	CL_NetGameEvent event(EVENT_PLAYER_JOINED);
 	event.add_argument(m_name);
 
 	return event;
@@ -52,7 +52,7 @@ CL_NetGameEvent PlayerJoined::buildEvent() const
 
 void PlayerJoined::parseEvent(const CL_NetGameEvent &p_event)
 {
-	assert(p_event.get_name() == EVENT_PLAYER_INFO);
+	assert(p_event.get_name() == EVENT_PLAYER_JOINED);
 	m_name = p_event.get_argument(0);
 }
 

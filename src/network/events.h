@@ -45,8 +45,6 @@
 
 #define EVENT_PLAYER_LEAVED "player_leaved"
 
-#define EVENT_PLAYER_INFO	"player_info"
-
 // race events
 
 #define EVENT_CAR_STATE		"car_state"

@@ -66,7 +66,7 @@ void CarState::parseEvent(const CL_NetGameEvent &p_event)
 	m_position.x = p_event.get_argument(arg++);
 	m_position.y = p_event.get_argument(arg++);
 
-	m_rotation.from_radians(p_event.get_argument(arg++));
+	m_rotation = CL_Angle::from_radians(p_event.get_argument(arg++));
 
 	m_movement.x = p_event.get_argument(arg++);
 	m_movement.y = p_event.get_argument(arg++);

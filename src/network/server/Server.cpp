@@ -125,6 +125,18 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 
 		if (eventName == EVENT_CLIENT_INFO) {
 			onClientInfo(p_connection, p_event);
+		} else
+
+		// race events
+
+		if (eventName == EVENT_CAR_STATE) {
+			onCarState(p_connection, p_event);
+		} else
+
+		// unknown events remains unhandled
+
+		{
+			unhandled = true;
 		}
 
 
@@ -135,6 +147,19 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 		cl_log_event("exception", e.message);
 	}
 
+}
+
+void Server::onCarState(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
+	// register last car state
+	Player &player = m_connections[p_connection];
+	player.m_lastCarState.parseEvent(p_event);
+
+	// set players name (client may not set it to his nickname)
+	player.m_lastCarState.setName(player.m_name);
+
+	// send it all over
+	sendToAll(player.m_lastCarState.buildEvent(), p_connection);
 }
 
 void Server::onClientInfo(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)

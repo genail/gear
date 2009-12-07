@@ -105,6 +105,8 @@ class Server {
 		//
 
 		void onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+
+		void onCarState(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 };
 
 } // namespace

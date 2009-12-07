@@ -127,6 +127,12 @@ void Client::onEventReceived(const CL_NetGameEvent &p_event)
 			onPlayerLeaved(p_event);
 		} else
 
+		// race events
+
+		if (eventName == EVENT_CAR_STATE) {
+			onCarState(p_event);
+		}
+
 		// unknown events remain unhandled
 
 		{

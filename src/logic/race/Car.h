@@ -70,7 +70,7 @@ class Car
 
 		DEPRECATED(int prepareStatusEvent(CL_NetGameEvent &p_event));
 
-		Net::CarState prepareCarState();
+		Net::CarState prepareCarState() const;
 
 		DEPRECATED(int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0));
 

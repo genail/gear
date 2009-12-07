@@ -85,6 +85,9 @@ void Server::onClientConnected(CL_NetGameConnection *p_conn)
 	cl_log_event("network", "Player %1 is connected", (unsigned) p_conn);
 
 	Player player;
+
+	player.m_lastCarState.setPosition(CL_Pointf(200, 220));
+
 	m_connections[p_conn] = player;
 
 	// no signal invoke yet
@@ -197,10 +200,7 @@ GameState Server::prepareGameState()
 
 	foreach (pair, m_connections) {
 		const Server::Player &player = pair.second;
-
-		if (player.m_gameStateSent) {
-			gamestate.addPlayer(player.m_name, player.m_lastCarState);
-		}
+		gamestate.addPlayer(player.m_name, player.m_lastCarState);
 	}
 
 	gamestate.setLevel("resources/level.xml"); // FIXME: How to choose level?

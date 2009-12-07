@@ -35,10 +35,13 @@
 #include "network/client/Client.h"
 
 namespace Net {
+	class CarState;
 	class GameState;
 }
 
 namespace Race {
+
+class Car;
 
 class OnlineRaceLogic: public Race::RaceLogic {
 
@@ -71,9 +74,12 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		CL_SlotContainer m_slots;
 
 
-		/** Network players map */
+		/** All players map (with local player too) */
 		typedef std::map<CL_String, Player*> TPlayerMap;
 		TPlayerMap m_playerMap;
+
+		/** Local player */
+		Player *m_localPlayer;
 
 
 		// signal handlers
@@ -83,6 +89,10 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		void onDisconnected();
 
 		void onGameState(const Net::GameState &p_gameState);
+
+		void onCarState(const Net::CarState &p_carState);
+
+		void onInputChange(const Car &p_car);
 
 };
 

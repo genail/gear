@@ -30,8 +30,10 @@
 
 #include <assert.h>
 
+#include "Car.h"
 #include "common/Game.h"
 #include "network/packets/GameState.h"
+#include "network/packets/CarState.h"
 
 namespace Race {
 
@@ -45,10 +47,18 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_client.setServerAddr(m_host);
 	m_client.setServerPort(m_port);
 
-	// connect signals and slots
+	// connect signal and slots from player's car
+	Game &game = Game::getInstance();
+	m_localPlayer = &game.getPlayer();
+	Car &car = m_localPlayer->getCar();
+
+	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogic::onInputChange);
+
+	// connect signals and slots from client
 	m_slots.connect(m_client.sig_connected(), this, &OnlineRaceLogic::onConnected);
 	m_slots.connect(m_client.sig_disconnected(), this, &OnlineRaceLogic::onDisconnected);
 	m_slots.connect(m_client.sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
+	m_slots.connect(m_client.sig_carStateReceived(), this, &OnlineRaceLogic::onCarState);
 }
 
 OnlineRaceLogic::~OnlineRaceLogic()
@@ -88,30 +98,51 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 	const CL_String &levelName = p_gameState.getLevel();
 	m_level.initialize(levelName);
 
-	// add current player to the list
-	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-
-	m_playerMap[player.getName()] = &player;
-
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();
+
+	Player *player;
+	Car *car;
 
 	for (unsigned i = 0; i < playerCount; ++i) {
 		const CL_String &playerName = p_gameState.getPlayerName(i);
 
-		Player *player = new Player(playerName);
-		player->getCar().applyCarState(p_gameState.getCarState(i));
+		if (playerName == m_localPlayer->getName()) {
+			// this is local player, so it exists now
+			player = m_localPlayer;
+		} else {
+			// this is remote player
+			player = new Player(playerName);
+		}
 
+		// put player to player list
 		m_playerMap[playerName] = player;
+
+		// prepare car and put it to level
+		car = &player->getCar();
+		car->applyCarState(p_gameState.getCarState(i));
+
+		m_level.addCar(car);
 	}
 
-	// add the cars
-	std::pair<CL_String, Player*> entry;
-	foreach (entry, m_playerMap) {
-		m_level.addCar(&entry.second->getCar());
-	}
+}
 
+void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
+{
+	const CL_String &playerName = p_carState.getName();
+	TPlayerMap::iterator itor = m_playerMap.find(playerName);
+
+	if (itor != m_playerMap.end()) {
+		itor->second->getCar().applyCarState(p_carState);
+	} else {
+		cl_log_event(LOG_ERROR, "Player %1 do not exists", playerName);
+	}
+}
+
+void OnlineRaceLogic::onInputChange(const Car &p_car)
+{
+	const Net::CarState carState = p_car.prepareCarState();
+	m_client.sendCarState(carState);
 }
 
 } // namespace

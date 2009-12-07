@@ -275,7 +275,7 @@ int Car::prepareStatusEvent(CL_NetGameEvent &p_event) {
 	return c;
 }
 
-Net::CarState Car::prepareCarState()
+Net::CarState Car::prepareCarState() const
 {
 	Net::CarState state;
 

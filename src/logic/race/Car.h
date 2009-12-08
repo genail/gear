@@ -36,6 +36,10 @@
 #include "logic/race/Checkpoint.h"
 #include "network/packets/CarState.h"
 
+namespace Gfx {
+	class RaceGraphics;
+}
+
 namespace Race {
 
 class Level;
@@ -119,31 +123,9 @@ class Car
 
 		/** Invoked when collision with bound has occurred */
 		void performBoundCollision(const Bound &p_bound) {
-			CL_Vec2f reactionVector;
-			CL_Vec2f boundVector;
-			
-			boundVector.x = fabs(p_bound.getSegment().q.x - p_bound.getSegment().p.x);
-			boundVector.y = fabs(p_bound.getSegment().q.y - p_bound.getSegment().p.y);
-			
-			reactionVector.x = -boundVector.y;
-			
-			if (m_position.x < fabs(p_bound.getSegment().q.x))
-				reactionVector.x = -boundVector.y;
-			
-			else if (m_position.x >= fabs(p_bound.getSegment().q.x))
-				reactionVector.x = boundVector.y;
-			
-			if (m_position.y < fabs(p_bound.getSegment().q.y))
-				reactionVector.y = -boundVector.x;
-			
-			else if (m_position.y >= fabs(p_bound.getSegment().q.y))
-				reactionVector.y = boundVector.x;
-			
-			reactionVector.normalize();
-			reactionVector *= m_speed / 2;
-			
-			m_moveVector += reactionVector;
-		} // FIXME: Ryba
+			m_boundSegment = p_bound.getSegment();
+			m_boundHitTest = true;
+		}
 		
 #endif // !SERVER
 
@@ -198,6 +180,10 @@ class Car
 
 		/** Current checkpoint position */
 		const Checkpoint *m_currentCheckpoint;
+		
+		// Bound collision vars
+		CL_LineSegment2f m_boundSegment;
+		bool m_boundHitTest;
 
 		int calculateInputChecksum() const;
 
@@ -214,6 +200,9 @@ class Car
 #endif // !NDEBUG
 #endif // CLIENT
 
+#if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
+friend class Gfx::RaceGraphics;
+#endif // DRAW_CAR_VECTORS && !NDEBUG
 
 };
 

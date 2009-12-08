@@ -330,6 +330,16 @@ void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	gfxCar->setRotation(CL_Angle(p_car.getRotationRad(), cl_radians));
 
 	gfxCar->draw(p_gc);
+	
+	#if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
+		const CL_Pointf &pos = p_car.getPosition();
+		p_gc.push_translate(pos.x, pos.y);
+		
+		CL_Draw::line(p_gc, 0, 0, p_car.m_moveVector.x/10, p_car.m_moveVector.y/10, CL_Colorf::red);
+		
+		p_gc.pop_modelview();
+	#endif // DRAW_CAR_VECTORS && !NDEBUG
+	
 }
 
 void RaceGraphics::countFps()

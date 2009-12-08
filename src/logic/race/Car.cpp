@@ -59,7 +59,8 @@ Car::Car() :
 	m_handbrake(false),
 	m_timeFromLastUpdate(0),
 	m_greatestCheckpointId(0),
-	m_currentCheckpoint(NULL)
+	m_currentCheckpoint(NULL),
+	m_boundHitTest(false)
 {
 #ifndef SERVER
 	// build car contour for collision check
@@ -127,7 +128,7 @@ void Car::update1_60() {
 	}
 	
 	//turning
-	const float angle = MAX_ANGLE * m_turn;
+	const float turnAngle = MAX_ANGLE * m_turn;
 	
 	// acceleration speed
 	if (m_acceleration) {
@@ -163,32 +164,63 @@ void Car::update1_60() {
 	// rotation
 	const float rad = m_rotation.to_radians(); // kąt autka w radianach
 	
+	// Bouncing from bounds
+	if (m_boundHitTest) {
+		
+		// przeniesienie autka tak, by już się nie stykał z bandą
+		m_position.x -= m_moveVector.x * 2 *delta;
+		m_position.y -= m_moveVector.y * 2 *delta;
+		
+		float x2, y2;
+		if (m_boundSegment.p.x == m_boundSegment.q.x) {
+			x2 = -m_moveVector.x;
+			y2 = m_moveVector.y;
+		}
+		else {
+			float a, xp, yp, xq, yq, x, y;
+			xp = m_boundSegment.p.x;
+			yp = m_boundSegment.p.y;
+			xq = m_boundSegment.q.x;
+			yq = m_boundSegment.q.y;
+			x = m_moveVector.x;
+			y = m_moveVector.y;
+			
+			a = (yq - yp) / (xq - xp);
+			
+			x2 = (((1 - (a * a)) / (1 + (a * a))) * x) + (((2 * a) / (1 + (a * a))) * y);
+			y2 = (((2 * a) / (1 + (a * a))) * x) + ((((a * a) - 1) / ((a * a) + 1)) * y);
+		}
+		m_moveVector.x = x2;
+		m_moveVector.y = y2;
+		m_boundHitTest = false;
+	}
+	
 	// wektor zmiany kierunku
 	CL_Vec2f changeVector;
 	
-	if( angle < 0.0f ) { // skręt w jedną stronę
+	if(turnAngle < 0.0f) { // skręt w jedną stronę
 		// przygotowanie wektora skrętu (zmiany kierunku jazdy)
  		changeVector.x = sin(rad);
 		changeVector.y = -cos(rad);
 		changeVector.normalize();
-		changeVector *= tan( -angle ) * fabs(m_speed) / 7.0f; // modyfikacja siły skrętu
+		changeVector *= tan(-turnAngle) * fabs(m_speed) / 7.0f; // modyfikacja siły skrętu
 	}
-	else if( angle > 0.0f ){ // skręt w drugą stronę, wszystko analogicznie
+	else if(turnAngle > 0.0f){ // skręt w drugą stronę, wszystko analogicznie
 		changeVector.x = -sin(rad);
 		changeVector.y = cos(rad);
 		changeVector.normalize();
-		changeVector *= tan( angle ) * fabs(m_speed) / 7.0f;
+		changeVector *= tan(turnAngle) * fabs(m_speed) / 7.0f;
 	}
 	
-	// wektor przyspieszenia bez uwzględnionej zmiany kierunku
 		accelerationVector.x = cos(rad);
 		accelerationVector.y = sin(rad);
 		
 		accelerationVector.normalize();
 		accelerationVector *= m_speed;
-		// wektor prędkości, zgodnie z którym pojechałoby autko bez poślizgu
-		if( angle != 0.0f ) // sumowanie wektorow: skrętu i prostej jazdy
+		
+		if(turnAngle != 0.0f) { // zmiana wektora przyspieszenia w wypadku kiedy auto skreca
 			accelerationVector = changeVector + accelerationVector;
+		}
 	
 	// calculates current tenacity
 	const float max_tratio = MAX_TENACITY / MIN_TENACITY;
@@ -205,9 +237,15 @@ void Car::update1_60() {
 	realVector *= fabs(m_speed);
 	m_moveVector = realVector;
 	
+	// nowa metoda oblicznia moveVectora
+	
+	
+	
 	// update position
 	m_position.x += m_moveVector.x * delta;
 	m_position.y += m_moveVector.y * delta;
+	
+	
 	
 	// update rotation of car when changing direction
 	if( m_turn != 0.0f ) { // wykonywany jest skręt

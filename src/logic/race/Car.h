@@ -121,44 +121,9 @@ class Car
 
 		/** Invoked when collision with bound has occurred */
 		void performBoundCollision(const Bound &p_bound) {
-			
-			m_boundNormal = p_bound.getSegment().normal();
+			m_boundSegment = p_bound.getSegment();
 			m_boundHitTest = true;
-			
-			
-			
-			/*
-			CL_Vec2f inormal = normal * -1; // negation
-			CL_Vec2f boundNormal;
-			
-			normal.normalize();
-			inormal.normalize();
-			normal *= 100;
-			inormal *= 100;
-			
-			CL_Angle angle = m_moveVector.angle(normal);
-			CL_Angle iangle = m_moveVector.angle(inormal);
-			CL_Angle finalAngle;
-			
-			if (angle < iangle) {
-				boundNormal = inormal;
-				finalAngle = iangle;
-			} else {
-				boundNormal = normal;
-				finalAngle = angle;
-			}
-			
-			m_position.x -= m_moveVector.x * delta;
-			m_position.y -= m_moveVector.y * delta;
-			
-			boundNormal.normalize();
-			m_boundNormal = boundNormal;
-			
-			m_moveVector.rotate(boundNormal, finalAngle);
-			m_speed /= 2; */
-
-			
-		} // FIXME: Ryba
+		}
 		
 #endif // !SERVER
 
@@ -218,9 +183,7 @@ class Car
 		const Checkpoint *m_currentCheckpoint;
 		
 		// Bound collision vars
-		
-		CL_Vec2f m_boundNormal;
-		
+		CL_LineSegment2f m_boundSegment;
 		bool m_boundHitTest;
 
 		int calculateInputChecksum() const;

@@ -162,60 +162,36 @@ void Car::update1_60() {
 	// rotation
 	const float rad = m_rotation.to_radians(); // kąt autka w radianach
 	
-	
 	// Bouncing from bounds
 	if (m_boundHitTest) {
 		
 		// przeniesienie autka tak, by już się nie stykał z bandą
-		m_position.x -= m_moveVector.x * delta;
-		m_position.y -= m_moveVector.y * delta;
-		//m_position.x += boundNormal.x * 10;
-		//m_position.y += boundNormal.y * 10;
+		m_position.x -= m_moveVector.x * 2 *delta;
+		m_position.y -= m_moveVector.y * 2 *delta;
 		
-		CL_Vec2f inormal = m_boundNormal * -1; // wektor odwrotny do normalnej
-		CL_Vec2f boundNormal; // ostateczna forma wektora wzgledem ktorego obraca sie movingVector
-		
-		m_boundNormal.normalize();
-		inormal.normalize();
-		m_boundNormal *= 100;
-		inormal *= 100;
-		
-		CL_Angle angle = m_moveVector.angle(m_boundNormal); // kąt pomiędzy movingVector a normalna
-		CL_Angle iangle = m_moveVector.angle(inormal); // kąt pomiędzy movingVector a odwrotnoscia normalnej
-		CL_Angle finalAngle; // ostateczny kąt o który zostanie obrocony movingVector
-		
-		// sprawdza czy uzyc normalnej czy odwrotnosci normalnej do obracania movingVector
-		if (angle < iangle) {
-			boundNormal = inormal;
-			if (iangle.to_degrees() > 90)
-				finalAngle.set_radians(2 * ((1 / 2) - iangle.to_radians()));
-			else
-				finalAngle.set_radians(2 * iangle.to_radians());
-			//finalAngle = iangle;
-		} else {
-			boundNormal = m_boundNormal;
-			if (angle.to_degrees() > 90)
-				finalAngle.set_radians(2 * ((1 / 2) - angle.to_radians()));
-			else
-				finalAngle.set_radians(2 * angle.to_radians());
-			//finalAngle = angle;
+		float x2, y2;
+		if (m_boundSegment.p.x == m_boundSegment.q.x) {
+			x2 = -m_moveVector.x;
+			y2 = m_moveVector.y;
 		}
-		
-		
-		
-		boundNormal.normalize();
-		
-		
-		
-		
-		
-		m_moveVector.rotate(CL_Vec2f(0, 0), finalAngle);
-	//	m_speed /= 2;
+		else {
+			float a, xp, yp, xq, yq, x, y;
+			xp = m_boundSegment.p.x;
+			yp = m_boundSegment.p.y;
+			xq = m_boundSegment.q.x;
+			yq = m_boundSegment.q.y;
+			x = m_moveVector.x;
+			y = m_moveVector.y;
+			
+			a = (yq - yp) / (xq - xp);
+			
+			x2 = (((1 - (a * a)) / (1 + (a * a))) * x) + (((2 * a) / (1 + (a * a))) * y);
+			y2 = (((2 * a) / (1 + (a * a))) * x) + ((((a * a) - 1) / ((a * a) + 1)) * y);
+		}
+		m_moveVector.x = x2;
+		m_moveVector.y = y2;
 		m_boundHitTest = false;
 	}
-	
-	//cl_log_event("debug", "%1", m_moveVector.angle(CL_Vec2f(1, 0)).to_degrees());
-	
 	
 	// wektor zmiany kierunku
 	CL_Vec2f changeVector;
@@ -238,11 +214,9 @@ void Car::update1_60() {
 		accelerationVector.y = sin(rad);
 		
 		accelerationVector.normalize();
-		if (m_acceleration)
-			accelerationVector *= m_speed;
+		accelerationVector *= m_speed;
+		
 		if(turnAngle != 0.0f) { // zmiana wektora przyspieszenia w wypadku kiedy auto skreca
-			accelerationVector.normalize();
-			accelerationVector *= m_speed;
 			accelerationVector = changeVector + accelerationVector;
 		}
 	
@@ -262,8 +236,6 @@ void Car::update1_60() {
 	m_moveVector = realVector;
 	
 	// nowa metoda oblicznia moveVectora
-	//CL_Vec2f realVec2;
-	//realVec2 = m_moveVector.
 	
 	
 	

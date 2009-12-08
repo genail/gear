@@ -218,10 +218,11 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 #if !defined(NDEBUG) && defined(DRAW_CHECKPOINTS)
 
 	// draw car -> checkpoint links
-	const Race::RaceLogic::TPlayerList &players = m_logic->getPlayerList();
+	std::vector<CL_String> names = m_logic->getPlayerNames();
 
-	foreach (const Player *player, players) {
-		const Race::Car &car = player->getCar();
+	foreach (const CL_String &name, names) {
+		const Player &player = m_logic->getPlayer(name);
+		const Race::Car &car = player.getCar();
 
 		const Race::Checkpoint *cp = car.getCurrentCheckpoint();
 

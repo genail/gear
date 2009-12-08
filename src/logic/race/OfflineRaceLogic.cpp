@@ -49,6 +49,7 @@ void OfflineRaceLogic::initialize()
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 
+	m_playerMap[player.getName()] = &player;
 	m_level.addCar(&player.getCar());
 }
 

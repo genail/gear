@@ -62,15 +62,24 @@ void RaceLogic::updateLevel(unsigned p_timeElapsed)
 	m_level.update(p_timeElapsed);
 }
 
-Player *RaceLogic::findPlayer(const CL_String& p_name)
+std::vector<CL_String> RaceLogic::getPlayerNames() const
 {
-	foreach(Player *player, m_players) {
-		if (player->getName() == p_name) {
-			return player;
-		}
+	std::vector<CL_String> names;
+	TPlayerMapPair pair;
+
+	names.reserve(m_playerMap.size());
+
+	foreach(pair, m_playerMap) {
+		names.push_back(pair.first);
 	}
 
-	return NULL;
+	return names;
+}
+
+const Player &RaceLogic::getPlayer(const CL_String& p_name) const
+{
+	assert(m_playerMap.find(p_name) != m_playerMap.end());
+	return *m_playerMap.at(p_name);
 }
 
 } // namespace

@@ -28,7 +28,8 @@
 
 #pragma once
 
-#include <list>
+#include <vector>
+#include <map>
 #include <ClanLib/core.h>
 
 #include "common.h"
@@ -56,7 +57,9 @@ class RaceLogic {
 
 		const Race::Level &getLevel() const { return m_level; }
 
-		const TPlayerList &getPlayerList() const { return m_players; }
+		std::vector<CL_String> getPlayerNames() const;
+
+		const Player &getPlayer(const CL_String& p_name) const;
 
 
 		void update(unsigned p_timeElapsed);
@@ -66,8 +69,11 @@ class RaceLogic {
 		/** The level */
 		Level m_level;
 
-		/** This race players */
-		TPlayerList m_players;
+		/** All players map (with local player too) */
+		typedef std::map<CL_String, Player*> TPlayerMap;
+		typedef std::pair<CL_String, Player*> TPlayerMapPair;
+
+		TPlayerMap m_playerMap;
 
 
 		// update routines
@@ -75,11 +81,6 @@ class RaceLogic {
 		void updateCarPhysics(unsigned p_timeElapsed);
 
 		void updateLevel(unsigned p_timeElapsed);
-
-
-		// helper routines
-
-		Player *findPlayer(const CL_String& p_name);
 
 };
 

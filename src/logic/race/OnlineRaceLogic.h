@@ -73,13 +73,6 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		/** Slots container */
 		CL_SlotContainer m_slots;
 
-
-		/** All players map (with local player too) */
-		typedef std::map<CL_String, Player*> TPlayerMap;
-		typedef std::pair<CL_String, Player*> TPlayerMapPair;
-
-		TPlayerMap m_playerMap;
-
 		/** Local player */
 		Player *m_localPlayer;
 

@@ -61,6 +61,7 @@ class Level
 
 		void removeCar(Car *p_car);
 
+		// FIXME: Move all update routines to RaceLogic
 		DEPRECATED(void update(unsigned p_timeElapsed));
 
 		const Sandpit &sandpitAt(unsigned p_index) const;

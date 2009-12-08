@@ -37,6 +37,7 @@
 #include "../packets/GameState.h"
 #include "../packets/ClientInfo.h"
 #include "../packets/PlayerJoined.h"
+#include "../packets/PlayerLeaved.h"
 
 namespace Net {
 
@@ -86,7 +87,7 @@ void Server::onClientConnected(CL_NetGameConnection *p_conn)
 
 	Player player;
 
-	player.m_lastCarState.setPosition(CL_Pointf(200, 220));
+	player.m_lastCarState.setPosition(CL_Pointf(250, 250));
 
 	m_connections[p_conn] = player;
 
@@ -107,6 +108,12 @@ void Server::onClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 		if (player.m_gameStateSent) {
 			INVOKE_1(playerLeaved, player.m_name);
 		}
+
+		// send event to rest of players
+		PlayerLeaved playerLeaved;
+		playerLeaved.setName(player.m_name);;
+
+		sendToAll(playerLeaved.buildEvent(), itor->first);
 
 		// cleanup
 		m_connections.erase(itor);

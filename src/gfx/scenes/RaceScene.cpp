@@ -72,23 +72,8 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 #endif
 
 	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-
-	// wait for race init
-//	m_slots.connect(client.signalInitRace(), this, &RaceScene::onInitRace);
-	// listen for local car status change
-	// and for remote car status change
-//	m_slots.connect(raceClient.signalCarStateReceived(), this, &RaceScene::onCarStateChangedRemote);
-	// race start countdown
-//	m_slots.connect(raceClient.signalStartCountdown(), this, &RaceScene::onStartCountdown);
 	// countdown ends
 	m_raceStartTimer.func_expired().set(this, &RaceScene::onCountdownEnds);
-	// car lock
-//	m_slots.connect(raceClient.signalLockCar(), this, &RaceScene::onInputLock);
-	// race state
-//	m_slots.connect(raceClient.signalRaceStateChanged(), this, &RaceScene::onRaceStateChanged);
-	// player finished
-//	m_slots.connect(raceClient.signalPlayerFinished(), this, &RaceScene::onPlayerFinished);
 
 }
 

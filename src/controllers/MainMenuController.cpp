@@ -77,7 +77,9 @@ void MainMenuController::onRaceStartClicked()
 		m_raceScene->initialize();
 	}
 
+#if !defined(RACE_SCENE_ONLY)
 	Gfx::Stage::pushScene(m_raceScene);
+#endif // !RACE_SCENE_ONLY
 }
 
 void MainMenuController::onQuitClicked()

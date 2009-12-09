@@ -50,6 +50,7 @@
 #include "gfx/race/ui/RaceUI.h"
 #include "network/client/Client.h"
 #include "gfx/scenes/MainMenuScene.h"
+#include "logic/race/Level.h"
 
 
 #if defined(RACE_SCENE_ONLY)
@@ -196,7 +197,7 @@ int Application::main(const std::vector<CL_String> &args)
 		DebugLayer debugLayer;
 		Gfx::Stage::m_debugLayer = &debugLayer;
 
-		Race::Level &level = game.getLevel();
+		Race::Level level;
 
 		level.destroy();
 		level.initialize("resources/level.xml");

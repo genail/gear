@@ -45,6 +45,7 @@ SET(CLIENT_SRCS
     gfx/race/level/Sandpit.cpp
     gfx/race/level/Smoke.cpp
     gfx/race/level/TireTrack.cpp
+    gfx/race/ui/Label.cpp
     gfx/race/ui/RaceUI.cpp
     gfx/race/ui/SpeedMeter.cpp
     gfx/scenes/MainMenuScene.cpp

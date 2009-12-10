@@ -9,6 +9,7 @@ SET(COMMON_SRCS
     network/packets/GameState.cpp
     network/packets/Goodbye.cpp
     network/packets/PlayerJoined.cpp
+    network/packets/PlayerLeaved.cpp
     logic/race/Block.cpp
     logic/race/Bound.cpp
     logic/race/Car.cpp

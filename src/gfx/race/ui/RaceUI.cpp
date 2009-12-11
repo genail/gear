@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -35,7 +35,8 @@
 
 namespace Gfx {
 
-RaceUI::RaceUI()
+RaceUI::RaceUI() :
+	m_label(CL_Pointf(100, 20), "", Label::F_BOLD, 20)
 {
 }
 
@@ -48,12 +49,22 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 
 	// draw speed control
 	m_speedMeter.draw(p_gc);
+
+	m_label.setPosition(CL_Pointf(10, m_label.height()));
+	m_label.setText("VOTE: Restart race? yes: 0 no: 0");
+	m_label.draw(p_gc);
+
+	m_label.setPosition(CL_Pointf(10, m_label.height() * 2));
+	m_label.setText("To vote press F1 (YES) or F2 (NO)");
+	m_label.draw(p_gc);
 }
 
 void RaceUI::load(CL_GraphicContext &p_gc)
 {
 	// load speed meter
 	m_speedMeter.load(p_gc);
+
+	m_label.load(p_gc);
 
 }
 

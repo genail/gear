@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -29,6 +29,7 @@
 #pragma once
 
 #include "gfx/Drawable.h"
+#include "Label.h"
 #include "gfx/race/ui/SpeedMeter.h"
 
 namespace Gfx {
@@ -51,6 +52,9 @@ class RaceUI: public Gfx::Drawable {
 
 		/** Speed control widget */
 		SpeedMeter m_speedMeter;
+
+		// test label
+		Label m_label;
 };
 
 } // namespace

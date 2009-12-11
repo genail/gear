@@ -31,6 +31,8 @@
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
 
+#include "controllers/GameMenuController.h"
+
 namespace Gfx {
 
 class GameMenu : public CL_Window {
@@ -41,11 +43,18 @@ class GameMenu : public CL_Window {
 
 		virtual ~GameMenu();
 
+		// callbacks
+
+		CL_Callback_v0 &func_exitClicked();
+
 	private:
 
 		CL_PushButton m_callVoteButton;
 
 		CL_PushButton m_exitButton;
+
+		/** The controller */
+		GameMenuController m_controller;
 };
 
 }

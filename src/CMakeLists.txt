@@ -31,6 +31,7 @@ SET(COMMON_SRCS
 SET(CLIENT_SRCS
     ${COMMON_SRCS}
     Application.cpp
+    controllers/GameMenuController.cpp
     controllers/MainMenuController.cpp
     debug/RaceSceneKeyBindings.cpp
     gfx/DebugLayer.cpp

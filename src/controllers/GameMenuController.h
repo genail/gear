@@ -28,60 +28,23 @@
 
 #pragma once
 
-#include <libintl.h>
-#include <boost/foreach.hpp>
+namespace Gfx {
+	class GameMenu;
+}
 
-// i18n
-#define _(text) gettext(text)
+class GameMenuController {
 
-// foreach macro
-#define foreach BOOST_FOREACH
+	public:
 
-// default connect port
-#define DEFAULT_PORT 2500
+		GameMenuController(Gfx::GameMenu *p_gameMenu);
 
-// signal and slots
-#define SIGNAL_0(name) \
-	public: \
-		CL_Signal_v0 &sig_##name() { return m_sig_##name; } \
-	private: \
-		CL_Signal_v0 m_sig_##name;
-
-#define SIGNAL_1(T1, name) \
-	public: \
-		CL_Signal_v1<T1> &sig_##name() { return m_sig_##name; } \
-	private: \
-		CL_Signal_v1<T1> m_sig_##name;
+		virtual ~GameMenuController();
 
 
-#define INVOKE_0(name) \
-		m_sig_##name.invoke()
+	private:
 
-#define INVOKE_1(name, arg1) \
-		m_sig_##name.invoke(arg1)
+		Gfx::GameMenu *m_gameMenu;
 
-// callbacks
-#define CALLBACK_0(name) \
-	public: \
-		CL_Callback_v0 &func_##name() { return m_func_##name; } \
-	private: \
-		CL_Callback_v0 m_func_##name;
+		void onExitClicked();
+};
 
-#define C_INVOKE_0(name) \
-	m_func_##name.invoke()
-
-// deprecated macro
-#ifdef __GNUC__
-#define DEPRECATED(func) func __attribute__ ((deprecated))
-#elif defined(_MSC_VER)
-#define DEPRECATED(func) __declspec(deprecated) func
-#else
-#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
-#define DEPRECATED(func) func
-#endif
-
-// log levels
-#define LOG_DEBUG "debug"
-#define LOG_ERROR "error"
-#define LOG_RACE  "race"
-#define LOG_EVENT "event"

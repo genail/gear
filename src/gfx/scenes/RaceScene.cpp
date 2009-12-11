@@ -208,7 +208,8 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 	// handle quit request
 	if (p_state == Pressed && p_event.id == CL_KEY_ESCAPE) {
-		Gfx::Stage::popScene();
+		m_gameMenu.set_visible(true);
+		m_gameMenu.set_focus(true);
 	}
 
 	updateCarTurn();

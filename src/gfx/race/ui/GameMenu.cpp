@@ -54,7 +54,8 @@ GameMenu::GameMenu(CL_GUIComponent *p_parent) :
 					true)
 			),
 	m_callVoteButton(this),
-	m_exitButton(this)
+	m_exitButton(this),
+	m_controller(this)
 {
 	set_focus(false);
 	set_visible(false);
@@ -72,6 +73,10 @@ GameMenu::GameMenu(CL_GUIComponent *p_parent) :
 
 GameMenu::~GameMenu()
 {
+}
+
+CL_Callback_v0 &GameMenu::func_exitClicked() {
+	return m_exitButton.func_clicked();
 }
 
 }

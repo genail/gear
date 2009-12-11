@@ -121,7 +121,7 @@ class RaceScene: public Scene
 		CL_Pointf m_lastDriftPoint;
 
 		/** Game menu */
-		const Gfx::GameMenu m_gameMenu;
+		Gfx::GameMenu m_gameMenu;
 
 
 		// other

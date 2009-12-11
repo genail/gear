@@ -35,6 +35,7 @@
 #include "gfx/Scene.h"
 #include "logic/race/RaceLogic.h"
 #include "logic/race/ScoreTable.h"
+#include "gfx/race/ui/GameMenu.h"
 
 namespace Net {
 	class CarState;
@@ -118,6 +119,9 @@ class RaceScene: public Scene
 
 		/** Last drift car position. If null, then no drift was doing last time. */
 		CL_Pointf m_lastDriftPoint;
+
+		/** Game menu */
+		const Gfx::GameMenu m_gameMenu;
 
 
 		// other

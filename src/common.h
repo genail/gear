@@ -28,7 +28,11 @@
 
 #pragma once
 
+#include <libintl.h>
 #include <boost/foreach.hpp>
+
+// i18n
+#define _(text) gettext(text)
 
 // foreach macro
 #define foreach BOOST_FOREACH

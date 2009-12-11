@@ -28,17 +28,50 @@
 
 #include "GameMenu.h"
 
+#include "common.h"
+#include "gfx/Stage.h"
+
 namespace Gfx {
 
-GameMenu::GameMenu(CL_GUIComponent *p_parent) :
-	CL_Window(p_parent, CL_DisplayWindowDescription("menu", CL_Rect(100, 100, 200, 200), true))
-{
+const int WINDOW_WIDTH = 200;
+const int WINDOW_HEIGHT = 200;
+const int TOP_MARGIN = 40;
+const int SIDE_MARGIN = 20;
+const int BUTTON_HEIGHT = 30;
+const int BUTTON_SPACE = 15;
 
+GameMenu::GameMenu(CL_GUIComponent *p_parent) :
+	CL_Window(
+			p_parent,
+			CL_DisplayWindowDescription(
+					"menu",
+					CL_Rect(
+							(Stage::getWidth()  / 2) - (WINDOW_WIDTH  / 2),
+							(Stage::getHeight() / 2) - (WINDOW_HEIGHT / 2),
+							(Stage::getWidth()  / 2) + (WINDOW_WIDTH  / 2),
+							(Stage::getHeight() / 2) + (WINDOW_HEIGHT / 2)
+							),
+					true)
+			),
+	m_callVoteButton(this),
+	m_exitButton(this)
+{
+	set_focus(false);
+	set_visible(false);
+
+	int y = TOP_MARGIN;
+
+	m_callVoteButton.set_geometry(CL_Rect(SIDE_MARGIN, y, WINDOW_WIDTH - SIDE_MARGIN, y + BUTTON_HEIGHT));
+	m_callVoteButton.set_text(_("Call a vote"));
+
+	y += BUTTON_HEIGHT + BUTTON_SPACE;
+
+	m_exitButton.set_geometry(CL_Rect(SIDE_MARGIN, y, WINDOW_WIDTH - SIDE_MARGIN, y + BUTTON_HEIGHT));
+	m_exitButton.set_text(_("Exit race"));
 }
 
 GameMenu::~GameMenu()
 {
-	// TODO Auto-generated destructor stub
 }
 
 }

@@ -28,6 +28,9 @@
 
 #pragma once
 
+#include <ClanLib/core.h>
+#include <ClanLib/gui.h>
+
 namespace Gfx {
 
 class GameMenu : public CL_Window {
@@ -37,6 +40,12 @@ class GameMenu : public CL_Window {
 		GameMenu(CL_GUIComponent *p_parent);
 
 		virtual ~GameMenu();
+
+	private:
+
+		CL_PushButton m_callVoteButton;
+
+		CL_PushButton m_exitButton;
 };
 
 }

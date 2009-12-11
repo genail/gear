@@ -60,7 +60,8 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	m_initialized(false),
 	m_inputLock(false),
 	m_turnLeft(false),
-	m_turnRight(false)
+	m_turnRight(false),
+	m_gameMenu(this)
 {
 #if !defined(RACE_SCENE_ONLY)
 	set_class_name("RaceScene");

@@ -45,7 +45,7 @@ class GameMenu : public CL_Window {
 
 		// callbacks
 
-		CL_Callback_v0 &func_exitClicked();
+		CL_Callback_v0 &func_exit_clicked();
 
 	private:
 

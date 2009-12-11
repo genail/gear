@@ -57,7 +57,6 @@ GameMenu::GameMenu(CL_GUIComponent *p_parent) :
 	m_exitButton(this),
 	m_controller(this)
 {
-	set_focus(false);
 	set_visible(false);
 
 	int y = TOP_MARGIN;
@@ -75,7 +74,7 @@ GameMenu::~GameMenu()
 {
 }
 
-CL_Callback_v0 &GameMenu::func_exitClicked() {
+CL_Callback_v0 &GameMenu::func_exit_clicked() {
 	return m_exitButton.func_clicked();
 }
 

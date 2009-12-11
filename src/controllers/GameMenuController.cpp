@@ -34,7 +34,8 @@
 GameMenuController::GameMenuController(Gfx::GameMenu *p_gameMenu) :
 	m_gameMenu(p_gameMenu)
 {
-	m_gameMenu->func_exitClicked().set(this, &GameMenuController::onExitClicked);
+	m_gameMenu->func_exit_clicked().set(this, &GameMenuController::onExitClicked);
+	m_gameMenu->func_input_pressed().set(this, &GameMenuController::onInputPressed);
 }
 
 GameMenuController::~GameMenuController()
@@ -45,4 +46,12 @@ void GameMenuController::onExitClicked()
 {
 	m_gameMenu->set_visible(false);
 	Gfx::Stage::popScene();
+}
+
+bool GameMenuController::onInputPressed(const CL_InputEvent &p_event)
+{
+	if (p_event.id == CL_KEY_ESCAPE) {
+		m_gameMenu->set_visible(false);
+		return true;
+	}
 }

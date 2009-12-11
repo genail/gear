@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <ClanLib/display.h>
+
 namespace Gfx {
 	class GameMenu;
 }
@@ -46,5 +48,7 @@ class GameMenuController {
 		Gfx::GameMenu *m_gameMenu;
 
 		void onExitClicked();
+
+		bool onInputPressed(const CL_InputEvent &p_event);
 };
 

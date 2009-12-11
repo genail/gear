@@ -50,8 +50,13 @@ void GameMenuController::onExitClicked()
 
 bool GameMenuController::onInputPressed(const CL_InputEvent &p_event)
 {
-	if (p_event.id == CL_KEY_ESCAPE) {
-		m_gameMenu->set_visible(false);
-		return true;
+
+	if (m_gameMenu->is_visible()) {
+		if (p_event.id == CL_KEY_ESCAPE) {
+			m_gameMenu->set_visible(false);
+			return true;
+		}
 	}
+
+	return false;
 }

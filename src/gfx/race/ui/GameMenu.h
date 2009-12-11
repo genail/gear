@@ -35,7 +35,7 @@
 
 namespace Gfx {
 
-class GameMenu : public CL_Window {
+class GameMenu : public CL_GUIComponent {
 
 	public:
 
@@ -49,12 +49,17 @@ class GameMenu : public CL_Window {
 
 	private:
 
+		/** Background */
+		CL_RoundedRect m_bg;
+
 		CL_PushButton m_callVoteButton;
 
 		CL_PushButton m_exitButton;
 
 		/** The controller */
 		GameMenuController m_controller;
+
+		void render(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
 };
 
 }

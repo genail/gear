@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,6 +27,8 @@
  */
 
 #include "Label.h"
+
+#include <assert.h>
 
 namespace Gfx {
 
@@ -52,13 +54,53 @@ Label::~Label()
 
 void Label::draw(CL_GraphicContext &p_gc)
 {
+	assert(isLoaded());
 	m_clFont.draw_text(p_gc, m_pos.x, m_pos.y, m_text, m_color);
 }
 
 void Label::load(CL_GraphicContext &p_gc)
 {
 	Drawable::load(p_gc);
-	m_clFont = CL_Font(p_gc, "Tahoma", m_size);
+
+	CL_FontDescription desc;
+	desc.set_typeface_name("tahoma");
+	desc.set_height(m_size);
+
+	if (m_font == F_BOLD) {
+		desc.set_weight(100000);
+	}
+
+	m_clFont = CL_Font_System(p_gc, desc);
+
+	// remember metrics
+	m_fontMetrics = m_clFont.get_font_metrics(p_gc);
+}
+
+void Label::setColor(const CL_Colorf &p_color)
+{
+	m_color = p_color;
+}
+
+void Label::setPosition(const CL_Pointf &p_pos)
+{
+	m_pos = p_pos;
+}
+
+void Label::setText(const CL_String &p_text)
+{
+	m_text = p_text;
+}
+
+float Label::height()
+{
+	assert(isLoaded());
+	return m_fontMetrics.get_height();
+}
+
+float Label::width()
+{
+	assert(isLoaded());
+	return m_fontMetrics.get_average_character_width() * m_text.length();
 }
 
 } // namespace

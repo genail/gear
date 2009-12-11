@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -39,14 +39,15 @@ class Label: public Gfx::Drawable {
 	public:
 
 		enum Font {
-			F_REGULAR
+			F_REGULAR,
+			F_BOLD
 		};
 
 		Label(
 				const CL_Pointf &p_pos,
 				const CL_String &p_text,
 				Font p_font = F_REGULAR,
-				int p_size = 10,
+				int p_size = 14,
 				const CL_Colorf &p_color = CL_Colorf::white
 				);
 
@@ -57,19 +58,35 @@ class Label: public Gfx::Drawable {
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+
+		/** Calculates height of this label in pixels */
+		float height();
+
+		/** Calculates width of this label in pixels */
+		float width();
+
+
+		void setColor(const CL_Colorf &p_color);
+
+		void setPosition(const CL_Pointf &p_pos);
+
+		void setText(const CL_String &p_text);
+
 	private:
 
 		CL_Pointf m_pos;
 
-		const CL_String m_text;
+		CL_String m_text;
 
-		Font m_font;
+		const Font m_font;
 
-		int m_size;
+		const int m_size;
 
 		CL_Colorf m_color;
 
-		CL_Font m_clFont;
+		CL_Font_System m_clFont;
+
+		CL_FontMetrics m_fontMetrics;
 };
 
 }

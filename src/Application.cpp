@@ -62,6 +62,8 @@ class Application
 	public:
 		static int main(const std::vector<CL_String> &args);
 
+		static void onWindowClose();
+
 #if defined(RACE_SCENE_ONLY)
 		static void onInputPressed(const CL_InputEvent &p_event, const CL_InputState &p_state) {
 			m_raceScene->onInputPressed(p_event);
@@ -102,7 +104,9 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_Console::write_line("initializing");
 
 		CL_SetupCore 	setup_core;
+
 		CL_ConsoleLogger logger;
+		CL_SlotContainer slots;
 
 		cl_log_event("init", "initializing display");
 		CL_SetupDisplay setup_display;
@@ -135,6 +139,9 @@ int Application::main(const std::vector<CL_String> &args)
 
 		CL_DisplayWindow displayWindow(displayWindowDescription);
 #endif // GL1 || GL2
+
+		// window close action
+		slots.connect_functor(displayWindow.sig_window_close(), &Application::onWindowClose);
 
 #if !defined(RACE_SCENE_ONLY)
 
@@ -215,7 +222,6 @@ int Application::main(const std::vector<CL_String> &args)
 
 		CL_InputDevice &keyboard = displayWindow.get_ic().get_keyboard();
 
-		CL_SlotContainer slots;
 		slots.connect_functor(keyboard.sig_key_down(), &Application::onInputPressed);
 		slots.connect_functor(keyboard.sig_key_up(), &Application::onInputReleased);
 
@@ -269,4 +275,9 @@ int Application::main(const std::vector<CL_String> &args)
 	CL_Console::write_line("Thanks for playing :-)");
 
 	return 0;
+}
+
+void Application::onWindowClose()
+{
+	exit(0);
 }

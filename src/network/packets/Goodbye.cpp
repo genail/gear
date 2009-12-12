@@ -45,7 +45,7 @@ CL_NetGameEvent Goodbye::buildEvent() const
 void Goodbye::parseEvent(const CL_NetGameEvent &p_event)
 {
 	assert(p_event.get_name() == EVENT_GOODBYE);
-	m_reason = (GoodbyeReason) (int) p_event.get_argument(0);
+	m_reason = (Reason) (int) p_event.get_argument(0);
 }
 
 CL_String Goodbye::getStringMessage() const

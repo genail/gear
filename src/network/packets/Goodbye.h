@@ -36,7 +36,7 @@ class Goodbye : public Packet {
 
 	public:
 
-		enum GoodbyeReason {
+		enum Reason {
 			UNSUPPORTED_PROTOCOL_VERSION,
 			NAME_ALREADY_IN_USE
 		};
@@ -49,18 +49,18 @@ class Goodbye : public Packet {
 
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-		GoodbyeReason getGoodbyeReason() const { return m_reason; }
+		Reason getGoodbyeReason() const { return m_reason; }
 
 		/**
-		 * @return Textual representation of goodbye reason.
+		 * @return Literal representation of goodbye reason.
 		 */
 		CL_String getStringMessage() const;
 
-		void setGoodbyeReason(GoodbyeReason p_reason) { m_reason = p_reason; }
+		void setGoodbyeReason(Reason p_reason) { m_reason = p_reason; }
 
 	private:
 
-		GoodbyeReason m_reason;
+		Reason m_reason;
 };
 
 }

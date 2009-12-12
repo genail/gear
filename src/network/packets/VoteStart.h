@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <ClanLib/core.h>
+
 #include "Packet.h"
 
 namespace Net {
@@ -50,8 +52,12 @@ class VoteStart: public Net::Packet {
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
 
+		const CL_String &getSubject() const;
+
 		Type getType() const;
 
+
+		void setSubject(const CL_String &p_subject);
 
 		void setType(Type p_type);
 
@@ -59,6 +65,8 @@ class VoteStart: public Net::Packet {
 	private:
 
 		Type m_type;
+
+		CL_String m_subject;
 };
 
 } // namespace

@@ -46,6 +46,7 @@ CL_NetGameEvent VoteStart::buildEvent() const
 {
 	CL_NetGameEvent event(EVENT_VOTE_START);
 	event.add_argument(m_type);
+	event.add_argument(m_subject);
 
 	return event;
 }
@@ -53,7 +54,16 @@ CL_NetGameEvent VoteStart::buildEvent() const
 void VoteStart::parseEvent(const CL_NetGameEvent &p_event)
 {
 	assert(p_event.get_name() == EVENT_VOTE_START);
-	m_type = (Type) (int) p_event.get_argument(0);
+
+	int i = 0;
+
+	m_type = (Type) (int) p_event.get_argument(i++);
+	m_subject = p_event.get_argument(i++);
+}
+
+const CL_String &VoteStart::getSubject() const
+{
+	return m_subject;
 }
 
 VoteStart::Type VoteStart::getType() const
@@ -61,6 +71,10 @@ VoteStart::Type VoteStart::getType() const
 	return m_type;
 }
 
+void VoteStart::setSubject(const CL_String &p_subject)
+{
+	m_subject = p_subject;
+}
 
 void VoteStart::setType(Type p_type)
 {

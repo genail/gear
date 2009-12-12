@@ -56,12 +56,12 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 #endif // !RACE_SCENE_ONLY
 	m_logic(NULL),
 	m_graphics(NULL),
-	m_lapsTotal(3),
 	m_initialized(false),
 	m_inputLock(false),
 	m_turnLeft(false),
 	m_turnRight(false),
-	m_gameMenu(this)
+	m_gameMenu(this),
+	m_gameMenuController(&m_gameMenu)
 {
 #if !defined(RACE_SCENE_ONLY)
 	set_class_name("RaceScene");
@@ -72,7 +72,6 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 
 #endif
 
-	Game &game = Game::getInstance();
 	// countdown ends
 	m_raceStartTimer.func_expired().set(this, &RaceScene::onCountdownEnds);
 

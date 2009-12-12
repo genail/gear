@@ -36,6 +36,7 @@
 #include "logic/race/RaceLogic.h"
 #include "logic/race/ScoreTable.h"
 #include "gfx/race/ui/GameMenu.h"
+#include "controllers/GameMenuController.h"
 
 namespace Net {
 	class CarState;
@@ -72,8 +73,6 @@ class RaceScene: public Scene
 		virtual void load(CL_GraphicContext &p_gc);
 
 
-		int getLapsTotal() const { return m_lapsTotal; }
-
 		virtual void update(unsigned p_timeElapsed);
 
 	private:
@@ -91,9 +90,6 @@ class RaceScene: public Scene
 		Gfx::RaceGraphics *m_graphics;
 
 
-
-		/** Total number of laps */
-		int m_lapsTotal;
 
 		/** The score table */
 		ScoreTable m_scoreTable;
@@ -120,8 +116,14 @@ class RaceScene: public Scene
 		/** Last drift car position. If null, then no drift was doing last time. */
 		CL_Pointf m_lastDriftPoint;
 
+		// The game menu
+
 		/** Game menu */
 		Gfx::GameMenu m_gameMenu;
+
+		/** Game menu controller */
+		/** The controller */
+		GameMenuController m_gameMenuController;
 
 
 		// other

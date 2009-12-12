@@ -30,8 +30,7 @@
 
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
-
-#include "controllers/GameMenuController.h"
+#include <ClanLib/display.h>
 
 namespace Gfx {
 
@@ -56,8 +55,6 @@ class GameMenu : public CL_GUIComponent {
 
 		CL_PushButton m_exitButton;
 
-		/** The controller */
-		GameMenuController m_controller;
 
 		void render(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
 };

@@ -44,8 +44,7 @@ GameMenu::GameMenu(CL_GUIComponent *p_parent) :
 	CL_GUIComponent(p_parent),
 	m_bg(CL_Sizef(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_ROUNDNESS),
 	m_callVoteButton(this),
-	m_exitButton(this),
-	m_controller(this)
+	m_exitButton(this)
 {
 	set_geometry(
 			CL_Rect(

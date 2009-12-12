@@ -38,6 +38,9 @@
 #include "../packets/ClientInfo.h"
 #include "../packets/PlayerJoined.h"
 #include "../packets/PlayerLeaved.h"
+#include "../packets/VoteStart.h"
+#include "../packets/VoteEnd.h"
+#include "../packets/VoteTick.h"
 
 namespace Net {
 
@@ -138,7 +141,13 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 
 		if (eventName == EVENT_CAR_STATE) {
 			onCarState(p_connection, p_event);
-		} else
+		} else if (eventName == EVENT_VOTE_START) {
+			onVoteStart(p_connection, p_event);
+		} else if (eventName == EVENT_VOTE_END) {
+			onVoteEnd(p_connection, p_event);
+		} else if (eventName == EVENT_VOTE_TICK) {
+			onVoteTick(p_connection, p_event);
+		}
 
 		// unknown events remains unhandled
 
@@ -153,6 +162,22 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 	} catch (CL_Exception e) {
 		cl_log_event("exception", e.message);
 	}
+
+}
+
+void Server::onVoteStart(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
+	VoteStart voteStart;
+	voteStart.parseEvent(p_event);
+}
+
+void Server::onVoteEnd(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
+
+}
+
+void Server::onVoteTick(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+{
 
 }
 

@@ -12,6 +12,7 @@ SET(COMMON_SRCS
     network/packets/PlayerLeaved.cpp
     network/packets/VoteEnd.cpp
     network/packets/VoteStart.cpp
+    network/packets/VoteTick.cpp
     logic/race/Block.cpp
     logic/race/Bound.cpp
     logic/race/Car.cpp

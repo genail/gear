@@ -28,31 +28,37 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include "Packet.h"
+
+namespace Net {
+
+class VoteStart: public Net::Packet {
+
+	public:
+
+		enum Type {
+			T_RESTART_RACE
+		};
+
+		VoteStart();
+
+		virtual ~VoteStart();
 
 
-// connect / disconnect procedure
+		virtual CL_NetGameEvent buildEvent() const;
 
-#define EVENT_CLIENT_INFO 	"client_info"
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-#define EVENT_GAME_STATE 	"game_state"
 
-#define EVENT_GOODBYE		"goodbye"
+		Type getType() const;
 
-// player events
 
-#define EVENT_PLAYER_JOINED "player_joined"
+		void setType(Type p_type);
 
-#define EVENT_PLAYER_LEAVED "player_leaved"
 
-// race events
+	private:
 
-#define EVENT_CAR_STATE		"car_state"
+		Type m_type;
+};
 
-// voting event
-
-#define EVENT_VOTE_START	"vote_start"
-
-#define EVENT_VOTE_END		"vote_end"
-
-#define EVENT_VOTE_TICK		"vote_tick"
+} // namespace

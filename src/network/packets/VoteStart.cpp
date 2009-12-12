@@ -26,33 +26,45 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "VoteStart.h"
 
-#include <ClanLib/core.h>
+#include <assert.h>
+
+#include "network/events.h"
+
+namespace Net {
+
+VoteStart::VoteStart()
+{
+}
+
+VoteStart::~VoteStart()
+{
+}
+
+CL_NetGameEvent VoteStart::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_VOTE_START);
+	event.add_argument(m_type);
+
+	return event;
+}
+
+void VoteStart::parseEvent(const CL_NetGameEvent &p_event)
+{
+	assert(p_event.get_name() == EVENT_VOTE_START);
+	m_type = (Type) (int) p_event.get_argument(0);
+}
+
+VoteStart::Type VoteStart::getType() const
+{
+	return m_type;
+}
 
 
-// connect / disconnect procedure
+void VoteStart::setType(Type p_type)
+{
+	m_type = p_type;
+}
 
-#define EVENT_CLIENT_INFO 	"client_info"
-
-#define EVENT_GAME_STATE 	"game_state"
-
-#define EVENT_GOODBYE		"goodbye"
-
-// player events
-
-#define EVENT_PLAYER_JOINED "player_joined"
-
-#define EVENT_PLAYER_LEAVED "player_leaved"
-
-// race events
-
-#define EVENT_CAR_STATE		"car_state"
-
-// voting event
-
-#define EVENT_VOTE_START	"vote_start"
-
-#define EVENT_VOTE_END		"vote_end"
-
-#define EVENT_VOTE_TICK		"vote_tick"
+} // namespace

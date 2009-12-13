@@ -31,10 +31,11 @@
 #include "common/Game.h"
 #include "common.h"
 #include "network/events.h"
-#include "../packets/Goodbye.h"
-#include "../packets/ClientInfo.h"
-#include "../packets/GameState.h"
-#include "../packets/CarState.h"
+#include "network/packets/Goodbye.h"
+#include "network/packets/ClientInfo.h"
+#include "network/packets/GameState.h"
+#include "network/packets/CarState.h"
+#include "network/packets/VoteStart.h"
 
 namespace Net {
 
@@ -117,25 +118,27 @@ void Client::onEventReceived(const CL_NetGameEvent &p_event)
 			onGoodbye(p_event);
 		} else if (eventName == EVENT_GAME_STATE) {
 			onGameState(p_event);
-		} else
+		}
 
 		// player events
 
-		if (eventName == EVENT_PLAYER_JOINED) {
+		else if (eventName == EVENT_PLAYER_JOINED) {
 			onPlayerJoined(p_event);
 		} else if (eventName == EVENT_PLAYER_LEAVED) {
 			onPlayerLeaved(p_event);
-		} else
+		}
 
 		// race events
 
-		if (eventName == EVENT_CAR_STATE) {
+		else if (eventName == EVENT_CAR_STATE) {
 			onCarState(p_event);
+		} else if (eventName == EVENT_VOTE_START) {
+			onVoteStart(p_event);
 		}
 
 		// unknown events remain unhandled
 
-		{
+		else {
 			unhandled = true;
 		}
 
@@ -201,6 +204,24 @@ void Client::send(const CL_NetGameEvent &p_event)
 void Client::sendCarState(const Net::CarState &p_state)
 {
 	send(p_state.buildEvent());
+}
+
+void Client::onVoteStart(const CL_NetGameEvent &p_event)
+{
+	VoteStart voteStart;
+	voteStart.parseEvent(p_event);
+
+	INVOKE_3(voteStarted, voteStart.getType(), voteStart.getSubject(), voteStart.getTimeLimit());
+}
+
+void Client::callAVote(VoteType p_type, const CL_String& subject)
+{
+	VoteStart voteStart;
+
+	voteStart.setType(p_type);
+	voteStart.setSubject(subject);
+
+	send(voteStart.buildEvent());
 }
 
 } // namespace

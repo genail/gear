@@ -84,8 +84,14 @@ void GameMenu::render(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 //	m_exitButton.render(p_gc, p_clipRect);
 }
 
-CL_Callback_v0 &GameMenu::func_exit_clicked() {
+CL_Callback_v0 &GameMenu::func_exit_clicked()
+{
 	return m_exitButton.func_clicked();
+}
+
+CL_Callback_v0 &GameMenu::func_vote_clicked()
+{
+	return m_callVoteButton.func_clicked();
 }
 
 }

@@ -32,6 +32,7 @@
 #include "ClanLib/network.h"
 
 #include "common.h"
+#include "common/votetypes.h"
 #include "common/Player.h"
 #include "logic/race/Car.h"
 #include "logic/race/Level.h"
@@ -64,18 +65,14 @@ class Client {
 		/** Got new car state */
 		SIGNAL_1(const Net::CarState&, carStateReceived);
 
+		/** New vote is started. args: type, subject, time limit */
+		SIGNAL_3(VoteType, const CL_String&, unsigned, voteStarted);
+
 	public:
 
 		Client();
 
 		virtual ~Client();
-
-		void connect();
-
-		void disconnect();
-
-
-		void sendCarState(const Net::CarState &p_state);
 
 
 		const CL_String& getServerAddr() const { return m_addr; }
@@ -86,6 +83,15 @@ class Client {
 		void setServerAddr(const CL_String& p_addr) { m_addr = p_addr; }
 
 		void setServerPort(int p_port) { m_port = p_port; }
+
+
+		void callAVote(VoteType p_type, const CL_String& subject="");
+
+		void connect();
+
+		void disconnect();
+
+		void sendCarState(const Net::CarState &p_state);
 
 
 	private:
@@ -134,6 +140,8 @@ class Client {
 		void onPlayerLeaved(const CL_NetGameEvent &p_event);
 
 		void onCarState(const CL_NetGameEvent &p_event);
+
+		void onVoteStart(const CL_NetGameEvent &p_event);
 
 };
 

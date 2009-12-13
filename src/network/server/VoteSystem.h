@@ -49,10 +49,12 @@ class VoteSystem {
 
 		bool isFinished() const;
 
+		bool isRunning() const;
 
-		void addVote(VoteOption p_option, int p_voterId);
 
-		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimit);
+		bool addVote(VoteOption p_option, int p_voterId);
+
+		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs);
 
 
 		CALLBACK_0(finished);

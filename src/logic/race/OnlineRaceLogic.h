@@ -56,6 +56,9 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		virtual void destroy();
 
+
+		virtual void callAVote(VoteType p_type, const CL_String &p_subject);
+
 	private:
 
 		/** Initialized state */

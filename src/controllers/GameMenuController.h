@@ -34,20 +34,29 @@ namespace Gfx {
 	class GameMenu;
 }
 
+namespace Race {
+	class RaceLogic;
+}
+
 class GameMenuController {
 
 	public:
 
-		GameMenuController(Gfx::GameMenu *p_gameMenu);
+		GameMenuController(Race::RaceLogic **p_raceLogic, Gfx::GameMenu *p_gameMenu);
 
 		virtual ~GameMenuController();
 
 
 	private:
 
+		Race::RaceLogic **m_raceLogic;
+
 		Gfx::GameMenu *m_gameMenu;
 
+
 		void onExitClicked();
+
+		void onVoteClicked();
 
 		bool onInputPressed(const CL_InputEvent &p_event);
 };

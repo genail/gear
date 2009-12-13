@@ -53,12 +53,29 @@
 	private: \
 		CL_Signal_v1<T1> m_sig_##name;
 
+#define SIGNAL_2(T1, T2, name) \
+	public: \
+		CL_Signal_v2<T1, T2> &sig_##name() { return m_sig_##name; } \
+	private: \
+		CL_Signal_v2<T1, T2> m_sig_##name;
+
+#define SIGNAL_3(T1, T2, T3, name) \
+	public: \
+		CL_Signal_v3<T1, T2, T3> &sig_##name() { return m_sig_##name; } \
+	private: \
+		CL_Signal_v3<T1, T2, T3> m_sig_##name;
 
 #define INVOKE_0(name) \
 		m_sig_##name.invoke()
 
 #define INVOKE_1(name, arg1) \
 		m_sig_##name.invoke(arg1)
+
+#define INVOKE_2(name, arg1, arg2) \
+		m_sig_##name.invoke(arg1, arg2)
+
+#define INVOKE_3(name, arg1, arg2, arg3) \
+		m_sig_##name.invoke(arg1, arg2, arg3)
 
 // callbacks
 #define CALLBACK_0(name) \
@@ -83,6 +100,7 @@
 
 // log levels
 #define LOG_DEBUG "debug"
+#define LOG_WARN "warning"
 #define LOG_ERROR "error"
 #define LOG_RACE  "race"
 #define LOG_EVENT "event"

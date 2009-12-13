@@ -44,7 +44,7 @@
 
 namespace Net {
 
-const int VOTE_TIME_LIMIT = 30;
+const int VOTE_TIME_LIMIT_SEC = 30;
 
 Server::Server() :
 	m_bindPort(DEFAULT_PORT),
@@ -139,23 +139,21 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 
 		if (eventName == EVENT_CLIENT_INFO) {
 			onClientInfo(p_connection, p_event);
-		} else
+		}
 
 		// race events
 
-		if (eventName == EVENT_CAR_STATE) {
+		else if (eventName == EVENT_CAR_STATE) {
 			onCarState(p_connection, p_event);
 		} else if (eventName == EVENT_VOTE_START) {
 			onVoteStart(p_connection, p_event);
-		} else if (eventName == EVENT_VOTE_END) {
-			onVoteEnd(p_connection, p_event);
 		} else if (eventName == EVENT_VOTE_TICK) {
 			onVoteTick(p_connection, p_event);
 		}
 
 		// unknown events remains unhandled
 
-		{
+		else {
 			unhandled = true;
 		}
 
@@ -174,16 +172,16 @@ void Server::onVoteStart(CL_NetGameConnection *p_connection, const CL_NetGameEve
 	VoteStart voteStart;
 	voteStart.parseEvent(p_event);
 
-	if (m_voteSystem.isFinished()) {
-		m_voteSystem.start(voteStart.getType(), m_connections.size(), VOTE_TIME_LIMIT);
+	if (!m_voteSystem.isRunning()) {
+		cl_log_event(LOG_EVENT, "Starting new vote");
+		m_voteSystem.start(voteStart.getType(), m_connections.size(), VOTE_TIME_LIMIT_SEC * 1000);
 
-		sendToAll(p_event);
+		// set the time limit
+		voteStart.setTimeLimit(VOTE_TIME_LIMIT_SEC);
+
+		// send new event
+		sendToAll(voteStart.buildEvent());
 	}
-}
-
-void Server::onVoteEnd(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
-{
-
 }
 
 void Server::onVoteTick(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
@@ -192,7 +190,12 @@ void Server::onVoteTick(CL_NetGameConnection *p_connection, const CL_NetGameEven
 	voteTick.parseEvent(p_event);
 
 	if (!m_voteSystem.isFinished()) {
-		m_voteSystem.addVote(voteTick.getOption(), (int) p_connection);
+		const bool accepted = m_voteSystem.addVote(voteTick.getOption(), (int) p_connection);
+
+		if (accepted && !m_voteSystem.isFinished()) {
+			// send this vote over network
+			sendToAll(p_event);
+		}
 	}
 }
 

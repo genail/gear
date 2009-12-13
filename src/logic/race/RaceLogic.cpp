@@ -82,4 +82,8 @@ const Player &RaceLogic::getPlayer(const CL_String& p_name) const
 	return *m_playerMap.at(p_name);
 }
 
+void RaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)
+{
+}
+
 } // namespace

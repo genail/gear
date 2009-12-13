@@ -61,7 +61,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	m_turnLeft(false),
 	m_turnRight(false),
 	m_gameMenu(this),
-	m_gameMenuController(&m_gameMenu)
+	m_gameMenuController(&m_logic, &m_gameMenu)
 {
 #if !defined(RACE_SCENE_ONLY)
 	set_class_name("RaceScene");
@@ -346,3 +346,4 @@ bool RaceScene::isRaceFinished()
 //	return true;
 	return false;
 }
+

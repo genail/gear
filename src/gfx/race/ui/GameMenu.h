@@ -46,6 +46,8 @@ class GameMenu : public CL_GUIComponent {
 
 		CL_Callback_v0 &func_exit_clicked();
 
+		CL_Callback_v0 &func_vote_clicked();
+
 	private:
 
 		/** Background */

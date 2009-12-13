@@ -30,11 +30,15 @@
 
 #include "gfx/Stage.h"
 #include "gfx/race/ui/GameMenu.h"
+#include "logic/race/RaceLogic.h"
 
-GameMenuController::GameMenuController(Gfx::GameMenu *p_gameMenu) :
+
+GameMenuController::GameMenuController(Race::RaceLogic **p_raceLogic, Gfx::GameMenu *p_gameMenu) :
+	m_raceLogic(p_raceLogic),
 	m_gameMenu(p_gameMenu)
 {
 	m_gameMenu->func_exit_clicked().set(this, &GameMenuController::onExitClicked);
+	m_gameMenu->func_vote_clicked().set(this, &GameMenuController::onVoteClicked);
 	m_gameMenu->func_input_pressed().set(this, &GameMenuController::onInputPressed);
 }
 
@@ -46,6 +50,12 @@ void GameMenuController::onExitClicked()
 {
 	m_gameMenu->set_visible(false);
 	Gfx::Stage::popScene();
+}
+
+void GameMenuController::onVoteClicked()
+{
+	m_gameMenu->set_visible(false);
+	(*m_raceLogic)->callAVote(VOTE_RESTART_RACE);
 }
 
 bool GameMenuController::onInputPressed(const CL_InputEvent &p_event)

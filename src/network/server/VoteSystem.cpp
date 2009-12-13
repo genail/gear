@@ -61,33 +61,45 @@ bool VoteSystem::isFinished() const
 	return m_state == S_FINISHED;
 }
 
-
-void VoteSystem::addVote(VoteOption p_option, int p_voterId)
+bool VoteSystem::isRunning() const
 {
-	assert(!hasVoter(p_voterId));
+	return m_state == S_RUNNING;
+}
 
-	switch (p_option) {
-		case VOTE_YES:
-			++m_yesCount;
-			break;
-		case VOTE_NO:
-			++m_noCount;
-			break;
-		default:
-			assert(0 && "unknown vote option");
-	}
 
-	m_voters.push_back(p_voterId);
+bool VoteSystem::addVote(VoteOption p_option, int p_voterId)
+{
+	if(!hasVoter(p_voterId)) {
 
-	// calculate result
-	m_result = calculateResult();
+		switch (p_option) {
+			case VOTE_YES:
+				++m_yesCount;
+				break;
+			case VOTE_NO:
+				++m_noCount;
+				break;
+			default:
+				assert(0 && "unknown vote option");
+		}
 
-	if (m_result != -1) {
-		// finished, set state and call functor
-		m_state = S_FINISHED;
-		m_timer.stop();
+		m_voters.push_back(p_voterId);
 
-		C_INVOKE_0(finished);
+		// calculate result
+		m_result = calculateResult();
+
+		if (m_result != -1) {
+			// finished, set state and call functor
+			m_state = S_FINISHED;
+			m_timer.stop();
+
+			C_INVOKE_0(finished);
+		}
+
+		return true;
+
+	} else {
+		cl_log_event(LOG_WARN, "multiple vote attempt from %1", p_voterId);
+		return false;
 	}
 }
 

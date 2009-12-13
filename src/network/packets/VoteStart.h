@@ -51,10 +51,19 @@ class VoteStart: public Net::Packet {
 
 		const CL_String &getSubject() const;
 
+		unsigned getTimeLimit() const;
+
 		VoteType getType() const;
 
 
 		void setSubject(const CL_String &p_subject);
+
+		/**
+		 * Note: time limit value is set by server.
+		 * Any value set by client when sending this packet
+		 * to server will be ignored.
+		 */
+		void setTimeLimit(unsigned p_timeLimit);
 
 		void setType(VoteType p_type);
 
@@ -64,6 +73,8 @@ class VoteStart: public Net::Packet {
 		VoteType m_type;
 
 		CL_String m_subject;
+
+		unsigned m_timeLimit;
 };
 
 } // namespace

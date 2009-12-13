@@ -33,6 +33,7 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
+#include "common/votetypes.h"
 #include "logic/race/Level.h"
 
 class Player;
@@ -53,6 +54,9 @@ class RaceLogic {
 		virtual void initialize() = 0;
 
 		virtual void destroy() = 0;
+
+
+		virtual void callAVote(VoteType p_type, const CL_String &p_subject="");
 
 
 		const Race::Level &getLevel() const { return m_level; }

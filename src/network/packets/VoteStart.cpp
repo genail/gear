@@ -47,6 +47,7 @@ CL_NetGameEvent VoteStart::buildEvent() const
 	CL_NetGameEvent event(EVENT_VOTE_START);
 	event.add_argument(m_type);
 	event.add_argument(m_subject);
+	event.add_argument(m_timeLimit);
 
 	return event;
 }
@@ -59,11 +60,17 @@ void VoteStart::parseEvent(const CL_NetGameEvent &p_event)
 
 	m_type = (VoteType) (int) p_event.get_argument(i++);
 	m_subject = p_event.get_argument(i++);
+	m_timeLimit = p_event.get_argument(i++);
 }
 
 const CL_String &VoteStart::getSubject() const
 {
 	return m_subject;
+}
+
+unsigned VoteStart::getTimeLimit() const
+{
+	return m_timeLimit;
 }
 
 VoteType VoteStart::getType() const
@@ -74,6 +81,11 @@ VoteType VoteStart::getType() const
 void VoteStart::setSubject(const CL_String &p_subject)
 {
 	m_subject = p_subject;
+}
+
+void VoteStart::setTimeLimit(unsigned p_timeLimit)
+{
+	m_timeLimit = p_timeLimit;
 }
 
 void VoteStart::setType(VoteType p_type)

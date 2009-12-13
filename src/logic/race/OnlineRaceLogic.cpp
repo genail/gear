@@ -173,6 +173,7 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 		m_level.addCar(car);
 	}
 
+
 }
 
 void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
@@ -191,6 +192,11 @@ void OnlineRaceLogic::onInputChange(const Car &p_car)
 {
 	const Net::CarState carState = p_car.prepareCarState();
 	m_client.sendCarState(carState);
+}
+
+void OnlineRaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)
+{
+	m_client.callAVote(p_type, p_subject);
 }
 
 } // namespace

@@ -86,14 +86,23 @@ BOOST_AUTO_TEST_CASE(undecidedVote)
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 }
 
+bool finished = false;
+void onFinished() {
+	finished = true;
+}
+
 BOOST_AUTO_TEST_CASE(timeLimit)
 {
 	Net::VoteSystem voteSystem;
+	voteSystem.func_finished().set(&onFinished);
+
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.start(VOTE_RESTART_RACE, 6, 50);
 	usleep(1000 * 100);
+	CL_KeepAlive::process();
 
+	BOOST_CHECK_EQUAL(finished, true);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
 	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
 }

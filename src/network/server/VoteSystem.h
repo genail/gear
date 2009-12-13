@@ -29,7 +29,9 @@
 #pragma once
 
 #include <vector>
+#include <ClanLib/core.h>
 
+#include "common.h"
 #include "common/votetypes.h"
 
 namespace Net {
@@ -53,27 +55,38 @@ class VoteSystem {
 		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimit);
 
 
+		CALLBACK_0(finished);
+
 	private:
+
+		enum State {
+			S_HOLD,
+			S_RUNNING,
+			S_FINISHED
+		};
 
 		unsigned m_voterCount;
 
 		unsigned m_yesCount, m_noCount;
 
-		unsigned m_endTime;
-
-		/** Set to false until firts start */
-		bool m_started;
+		/** Voting state */
+		State m_state;
 
 		/** Set to -1 if result is now known yet */
-		mutable int m_result;
+		int m_result;
 
 		/** Voters that already gave thier vote */
 		std::vector<int> m_voters;
+
+		/** The timer */
+		CL_Timer m_timer;
 
 
 		int calculateResult() const;
 
 		bool hasVoter(int p_id) const;
+
+		void onTimerExpired();
 
 
 };

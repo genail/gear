@@ -68,7 +68,8 @@
 		CL_Callback_v0 m_func_##name;
 
 #define C_INVOKE_0(name) \
-	m_func_##name.invoke()
+	if (!m_func_##name.is_null()) \
+		m_func_##name.invoke()
 
 // deprecated macro
 #ifdef __GNUC__

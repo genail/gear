@@ -34,6 +34,7 @@
 #include "common.h"
 #include "../packets/CarState.h"
 #include "../packets/GameState.h"
+#include "VoteSystem.h"
 
 namespace Net {
 
@@ -79,6 +80,9 @@ class Server {
 
 		/** List of active connections */
 		std::map<CL_NetGameConnection*, Server::Player> m_connections;
+
+		/** Voting system */
+		VoteSystem m_voteSystem;
 
 		/** ClanLib game server */
 		CL_NetGameServer m_gameServer;

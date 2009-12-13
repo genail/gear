@@ -41,8 +41,9 @@ const float FAIL_RATIO = 1.0f * (1.0f / 3.0f) - 0.001f;
 namespace Net {
 
 VoteSystem::VoteSystem() :
-	m_started(false)
+	m_state(S_HOLD)
 {
+	m_timer.func_expired().set(this, &VoteSystem::onTimerExpired);
 }
 
 VoteSystem::~VoteSystem()
@@ -57,31 +58,7 @@ VoteResult VoteSystem::getResult() const
 
 bool VoteSystem::isFinished() const
 {
-	// not finished if no started at least once
-	if (!m_started) {
-		return false;
-	}
-
-	// finished when result is known
-	if (m_result != -1) {
-		return true;
-	}
-
-	// finished when time has passed
-	const unsigned now = CL_System::get_time();
-
-	if (m_endTime <= now) {
-		return true;
-	}
-
-	// finished when result calculation will succeed
-	m_result = calculateResult();
-
-	if (m_result != -1) {
-		return true;
-	}
-
-	return false;
+	return m_state == S_FINISHED;
 }
 
 
@@ -101,18 +78,29 @@ void VoteSystem::addVote(VoteOption p_option, int p_voterId)
 	}
 
 	m_voters.push_back(p_voterId);
+
+	// calculate result
+	m_result = calculateResult();
+
+	if (m_result != -1) {
+		// finished, set state and call functor
+		m_state = S_FINISHED;
+		m_timer.stop();
+
+		C_INVOKE_0(finished);
+	}
 }
 
 void VoteSystem::start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimit)
 {
 	m_voterCount = p_voterCount;
-	m_endTime = CL_System::get_time() + p_timeLimit;
 
 	m_yesCount = m_noCount = 0;
 	m_result = -1;
+	m_state = S_RUNNING;
 
 	m_voters.clear();
-	m_started = true;
+	m_timer.start(p_timeLimit, false);
 }
 
 int VoteSystem::calculateResult() const
@@ -145,6 +133,15 @@ bool VoteSystem::hasVoter(int p_id) const
 	}
 
 	return false;
+}
+
+void VoteSystem::onTimerExpired()
+{
+	if (m_state == S_RUNNING) {
+
+		m_state = S_FINISHED;
+		C_INVOKE_0(finished);
+	}
 }
 
 } // namespace

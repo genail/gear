@@ -44,6 +44,8 @@
 
 namespace Net {
 
+const int VOTE_TIME_LIMIT = 30;
+
 Server::Server() :
 	m_bindPort(DEFAULT_PORT),
 	m_running(false)
@@ -169,6 +171,12 @@ void Server::onVoteStart(CL_NetGameConnection *p_connection, const CL_NetGameEve
 {
 	VoteStart voteStart;
 	voteStart.parseEvent(p_event);
+
+	if (m_voteSystem.isFinished()) {
+		m_voteSystem.start(voteStart.getType(), m_connections.size(), VOTE_TIME_LIMIT);
+
+		sendToAll(p_event);
+	}
 }
 
 void Server::onVoteEnd(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
@@ -178,7 +186,12 @@ void Server::onVoteEnd(CL_NetGameConnection *p_connection, const CL_NetGameEvent
 
 void Server::onVoteTick(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
 {
+	VoteTick voteTick;
+	voteTick.parseEvent(p_event);
 
+	if (!m_voteSystem.isFinished()) {
+		m_voteSystem.addVote(voteTick.getOption(), (int) p_connection);
+	}
 }
 
 void Server::onCarState(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)

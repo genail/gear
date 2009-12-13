@@ -28,23 +28,52 @@
 
 #pragma once
 
-//
-// Vote enums
-//
+#include <vector>
 
-enum VoteOption
-{
-	VOTE_YES,
-	VOTE_NO
+#include "common/votetypes.h"
+
+namespace Net {
+
+class VoteSystem {
+
+	public:
+
+		VoteSystem();
+
+		virtual ~VoteSystem();
+
+
+		VoteResult getResult() const;
+
+		bool isFinished() const;
+
+
+		void addVote(VoteOption p_option, int p_voterId);
+
+		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimit);
+
+
+	private:
+
+		unsigned m_voterCount;
+
+		unsigned m_yesCount, m_noCount;
+
+		unsigned m_endTime;
+
+		/** Set to -1 if result is now known yet */
+		mutable int m_result;
+
+		/** Voters that already gave thier vote */
+		std::vector<int> m_voters;
+
+
+		int calculateResult() const;
+
+		bool hasVoter(int p_id) const;
+
+
 };
 
-enum VoteType
-{
-	VOTE_RESTART_RACE
-};
+}
 
-enum VoteResult
-{
-	VOTE_PASSED,
-	VOTE_FAILED
-};

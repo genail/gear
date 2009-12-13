@@ -67,6 +67,7 @@ SET(SERVER_SRCS
     ServerApplication.cpp
     ServerConfiguration.cpp
     network/server/Server.cpp
+    network/server/VoteSystem.cpp
 )
 
 FIND_PACKAGE(ClanLib-2.1 REQUIRED)

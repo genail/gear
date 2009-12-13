@@ -40,7 +40,8 @@ const float FAIL_RATIO = 1.0f - PASS_RATIO;
 
 namespace Net {
 
-VoteSystem::VoteSystem()
+VoteSystem::VoteSystem() :
+	m_started(false)
 {
 }
 
@@ -56,6 +57,11 @@ VoteResult VoteSystem::getResult() const
 
 bool VoteSystem::isFinished() const
 {
+	// not finished if no started at least once
+	if (!m_started) {
+		return false;
+	}
+
 	// finished when result is known
 	if (m_result != -1) {
 		return true;
@@ -81,7 +87,7 @@ bool VoteSystem::isFinished() const
 
 void VoteSystem::addVote(VoteOption p_option, int p_voterId)
 {
-	assert(hasVoter(p_voterId));
+	assert(!hasVoter(p_voterId));
 
 	switch (p_option) {
 		case VOTE_YES:
@@ -106,6 +112,7 @@ void VoteSystem::start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLi
 	m_result = -1;
 
 	m_voters.clear();
+	m_started = true;
 }
 
 int VoteSystem::calculateResult() const

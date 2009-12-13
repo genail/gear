@@ -26,57 +26,33 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE Suites
+#include <boost/test/unit_test.hpp>
 
-#include <vector>
-
-#include "common/votetypes.h"
-
-namespace Net {
-
-class VoteSystem {
-
-	public:
-
-		VoteSystem();
-
-		virtual ~VoteSystem();
-
-
-		VoteResult getResult() const;
-
-		bool isFinished() const;
-
-
-		void addVote(VoteOption p_option, int p_voterId);
-
-		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimit);
-
-
-	private:
-
-		unsigned m_voterCount;
-
-		unsigned m_yesCount, m_noCount;
-
-		unsigned m_endTime;
-
-		/** Set to false until firts start */
-		bool m_started;
-
-		/** Set to -1 if result is now known yet */
-		mutable int m_result;
-
-		/** Voters that already gave thier vote */
-		std::vector<int> m_voters;
-
-
-		int calculateResult() const;
-
-		bool hasVoter(int p_id) const;
-
-
-};
-
+int add(int i, int j)
+{
+    return i + j;
 }
 
+BOOST_AUTO_TEST_SUITE(Maths)
+
+BOOST_AUTO_TEST_CASE(universeInOrder)
+{
+    BOOST_CHECK(add(2, 2) == 4);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Physics)
+
+BOOST_AUTO_TEST_CASE(specialTheory)
+{
+    int e = 32;
+    int m = 2;
+    int c = 4;
+
+    BOOST_CHECK(e == m * c * c);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

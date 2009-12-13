@@ -70,6 +70,15 @@ SET(SERVER_SRCS
     network/server/VoteSystem.cpp
 )
 
+SET(TEST_SRCS
+    # tested classes
+    network/server/VoteSystem.cpp
+    
+    # test code
+    tests/suite.cpp
+    tests/network/server/VoteSystemTest.cpp
+)
+
 FIND_PACKAGE(ClanLib-2.1 REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
 FIND_PACKAGE(JPEG REQUIRED)
@@ -166,3 +175,19 @@ SET_TARGET_PROPERTIES(
     "-Wall -DSERVER $ENV{CXXFLAGS}"
 )
 
+# Test configuration
+
+ADD_EXECUTABLE(test_suite ${TEST_SRCS})
+TARGET_LINK_LIBRARIES(test_suite ${CLIENT_LIBS} ${SERVER_LIBS})
+
+SET_TARGET_PROPERTIES(
+    test_suite PROPERTIES
+    LINK_FLAGS
+    "-lfontconfig -lXxf86vm -lboost_unit_test_framework-mt"
+)
+
+SET_TARGET_PROPERTIES(
+    test_suite PROPERTIES
+    COMPILE_FLAGS
+    "-Wall -DCLIENT $ENV{CXXFLAGS}"
+)

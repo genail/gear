@@ -29,17 +29,13 @@
 #pragma once
 
 #include "Packet.h"
+#include "common/votetypes.h"
 
 namespace Net {
 
 class VoteEnd: public Net::Packet {
 
 	public:
-
-		enum Result {
-			R_PASSED,
-			R_FAILED
-		};
 
 		VoteEnd();
 
@@ -51,15 +47,15 @@ class VoteEnd: public Net::Packet {
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
 
-		Result getResult() const;
+		VoteResult getResult() const;
 
 
-		void setResult(Result p_result);
+		void setResult(VoteResult p_result);
 
 
 	private:
 
-		Result m_result;
+		VoteResult m_result;
 };
 
 } // namespace

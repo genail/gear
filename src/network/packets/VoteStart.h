@@ -31,16 +31,13 @@
 #include <ClanLib/core.h>
 
 #include "Packet.h"
+#include "common/votetypes.h"
 
 namespace Net {
 
 class VoteStart: public Net::Packet {
 
 	public:
-
-		enum Type {
-			T_RESTART_RACE
-		};
 
 		VoteStart();
 
@@ -54,17 +51,17 @@ class VoteStart: public Net::Packet {
 
 		const CL_String &getSubject() const;
 
-		Type getType() const;
+		VoteType getType() const;
 
 
 		void setSubject(const CL_String &p_subject);
 
-		void setType(Type p_type);
+		void setType(VoteType p_type);
 
 
 	private:
 
-		Type m_type;
+		VoteType m_type;
 
 		CL_String m_subject;
 };

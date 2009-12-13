@@ -29,18 +29,13 @@
 #pragma once
 
 #include "Packet.h"
+#include "common/votetypes.h"
 
 namespace Net {
 
 class VoteTick: public Net::Packet {
 
 	public:
-
-		enum Option {
-			O_YES,
-			O_NO,
-			O_SKIP
-		};
 
 
 		VoteTick();
@@ -53,15 +48,15 @@ class VoteTick: public Net::Packet {
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
 
-		Option getOption() const;
+		VoteOption getOption() const;
 
 
-		void setOption(Option p_option);
+		void setOption(VoteOption p_option);
 
 
 	private:
 
-		Option m_option;
+		VoteOption m_option;
 };
 
 } // namespace

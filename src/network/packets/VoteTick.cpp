@@ -53,17 +53,17 @@ CL_NetGameEvent VoteTick::buildEvent() const
 void VoteTick::parseEvent(const CL_NetGameEvent &p_event)
 {
 	assert(p_event.get_name() == EVENT_VOTE_TICK);
-	m_option = (Option) (int) p_event.get_argument(0);
+	m_option = (VoteOption) (int) p_event.get_argument(0);
 }
 
 
-VoteTick::Option VoteTick::getOption() const
+VoteOption VoteTick::getOption() const
 {
 	return m_option;
 }
 
 
-void VoteTick::setOption(Option p_option)
+void VoteTick::setOption(VoteOption p_option)
 {
 	m_option = p_option;
 }

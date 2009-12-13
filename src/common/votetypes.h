@@ -26,46 +26,26 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "VoteEnd.h"
+#pragma once
 
-#include <assert.h>
+//
+// Vote enums
+//
 
-#include "network/events.h"
-
-namespace Net {
-
-VoteEnd::VoteEnd()
+enum VoteOption
 {
+	VOTE_YES,
+	VOTE_NO,
+	VOTE_SKIP
+};
 
-}
-
-VoteEnd::~VoteEnd()
+enum VoteType
 {
-}
+	VOTE_RESTART_RACE
+};
 
-CL_NetGameEvent VoteEnd::buildEvent() const
+enum VoteResult
 {
-	CL_NetGameEvent event(EVENT_VOTE_END);
-	event.add_argument(m_result);
-
-	return event;
-}
-
-void VoteEnd::parseEvent(const CL_NetGameEvent &p_event)
-{
-	assert(p_event.get_name() == EVENT_VOTE_END);
-	m_result = (VoteResult) (int) p_event.get_argument(0);
-}
-
-VoteResult VoteEnd::getResult() const
-{
-	return m_result;
-}
-
-
-void VoteEnd::setResult(VoteResult p_result)
-{
-	m_result = p_result;
-}
-
-} // namespace
+	VOTE_PASSED,
+	VOTE_FAILED
+};

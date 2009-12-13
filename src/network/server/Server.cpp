@@ -53,6 +53,8 @@ Server::Server() :
 	m_slots.connect(m_gameServer.sig_client_connected(), this, &Server::onClientConnected);
 	m_slots.connect(m_gameServer.sig_client_disconnected(), this, &Server::onClientDisconnected);
 	m_slots.connect(m_gameServer.sig_event_received(), this, &Server::onEventArrived);
+
+	m_voteSystem.func_finished().set(this, &Server::onVoteSystemFinished);
 }
 
 Server::~Server()
@@ -302,20 +304,13 @@ void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnectio
 	}
 }
 
-//CL_NetGameConnection* Server::getConnectionForPlayer(const Player* player)
-//{
-//	CL_MutexSection lockSection(&m_lockMutex);
-//
-//	std::pair<CL_NetGameConnection*, Player*> pair;
-//
-//	foreach (pair, m_connections) {
-//		if (pair.second == player) {
-//			return pair.first;
-//		}
-//	}
-//
-//	return NULL;
-//}
+void Server::onVoteSystemFinished()
+{
+	VoteEnd voteEnd;
+	voteEnd.setResult(m_voteSystem.getResult());
+
+	sendToAll(voteEnd.buildEvent());
+}
 
 } // namespace
 

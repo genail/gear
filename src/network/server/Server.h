@@ -117,6 +117,12 @@ class Server {
 		void onVoteEnd(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 		void onVoteTick(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+
+		//
+		// other events
+		//
+
+		void onVoteSystemFinished();
 };
 
 } // namespace

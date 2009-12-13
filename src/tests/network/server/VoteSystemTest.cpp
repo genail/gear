@@ -34,20 +34,33 @@
 
 #include "network/server/VoteSystem.h"
 
+bool finished;
+
+void onFinished() {
+	finished = true;
+}
+
 BOOST_AUTO_TEST_CASE(passingVote)
 {
 	Net::VoteSystem voteSystem;
 
+	finished = false;
+	voteSystem.func_finished().set(&onFinished);
+
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.start(VOTE_RESTART_RACE, 3, 1000);
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 
 	voteSystem.addVote(VOTE_YES, 1);
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.addVote(VOTE_YES, 2);
+	BOOST_CHECK_EQUAL(finished, true);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
 
 	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_PASSED);
@@ -56,15 +69,23 @@ BOOST_AUTO_TEST_CASE(passingVote)
 BOOST_AUTO_TEST_CASE(failingVote)
 {
 	Net::VoteSystem voteSystem;
+
+	finished = false;
+	voteSystem.func_finished().set(&onFinished);
+
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.addVote(VOTE_NO, 1);
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.addVote(VOTE_NO, 2);
+	BOOST_CHECK_EQUAL(finished, true);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
 
 	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
@@ -73,6 +94,11 @@ BOOST_AUTO_TEST_CASE(failingVote)
 BOOST_AUTO_TEST_CASE(undecidedVote)
 {
 	Net::VoteSystem voteSystem;
+
+	finished = false;
+	voteSystem.func_finished().set(&onFinished);
+
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
@@ -80,22 +106,23 @@ BOOST_AUTO_TEST_CASE(undecidedVote)
 	voteSystem.addVote(VOTE_YES, 1);
 	voteSystem.addVote(VOTE_YES, 2);
 	voteSystem.addVote(VOTE_YES, 3);
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.addVote(VOTE_NO, 4);
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 }
 
-bool finished = false;
-void onFinished() {
-	finished = true;
-}
 
 BOOST_AUTO_TEST_CASE(timeLimit)
 {
 	Net::VoteSystem voteSystem;
+
+	finished = false;
 	voteSystem.func_finished().set(&onFinished);
 
+	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
 
 	voteSystem.start(VOTE_RESTART_RACE, 6, 50);

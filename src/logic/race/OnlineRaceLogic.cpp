@@ -40,7 +40,8 @@ namespace Race {
 OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_initialized(false),
 	m_host(p_host),
-	m_port(p_port)
+	m_port(p_port),
+	m_voteRunning(false)
 {
 	assert(p_port > 0 && p_port <= 0xFFFF);
 
@@ -61,6 +62,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_slots.connect(m_client.sig_playerLeaved(), this, &OnlineRaceLogic::onPlayerLeaved);
 	m_slots.connect(m_client.sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
 	m_slots.connect(m_client.sig_carStateReceived(), this, &OnlineRaceLogic::onCarState);
+	m_slots.connect(m_client.sig_voteStarted(), this, &OnlineRaceLogic::onVoteStarted);
 }
 
 OnlineRaceLogic::~OnlineRaceLogic()
@@ -197,6 +199,49 @@ void OnlineRaceLogic::onInputChange(const Car &p_car)
 void OnlineRaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)
 {
 	m_client.callAVote(p_type, p_subject);
+}
+
+const CL_String &OnlineRaceLogic::getVoteMessage() const
+{
+	return m_voteMessage;
+}
+
+bool OnlineRaceLogic::isVoteRunning() const
+{
+	return m_voteRunning;
+}
+
+int OnlineRaceLogic::getVoteNoCount() const
+{
+	return m_voteNoCount;
+}
+
+int OnlineRaceLogic::getVoteYesCount() const
+{
+	return m_voteYesCount;
+}
+
+unsigned OnlineRaceLogic::getVoteTimeout() const
+{
+	return m_voteTimeout;
+}
+
+void OnlineRaceLogic::onVoteStarted(VoteType p_voteType, const CL_String& subject, unsigned p_timeLimitSec)
+{
+	switch (p_voteType) {
+		case VOTE_RESTART_RACE:
+			m_voteMessage = _("Restart Level?");
+			break;
+
+		default:
+			assert(0 && "unknown VoteType");
+	}
+
+	m_voteRunning = true;
+	m_voteYesCount = 0;
+	m_voteNoCount = 0;
+	m_voteTimeout = CL_System::get_time() + (p_timeLimitSec * 1000);
+
 }
 
 } // namespace

@@ -65,7 +65,7 @@ class Client {
 		/** Got new car state */
 		SIGNAL_1(const Net::CarState&, carStateReceived);
 
-		/** New vote is started. args: type, subject, time limit */
+		/** New vote is started. args: type, subject, time limit in seconds */
 		SIGNAL_3(VoteType, const CL_String&, unsigned, voteStarted);
 
 	public:

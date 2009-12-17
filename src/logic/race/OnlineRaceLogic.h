@@ -56,8 +56,20 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		virtual void destroy();
 
+		// vote system
 
 		virtual void callAVote(VoteType p_type, const CL_String &p_subject);
+
+
+		virtual const CL_String &getVoteMessage() const;
+
+		virtual int getVoteNoCount() const;
+
+		virtual int getVoteYesCount() const;
+
+		virtual unsigned getVoteTimeout() const;
+
+		virtual bool isVoteRunning() const;
 
 	private:
 
@@ -80,6 +92,19 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		Player *m_localPlayer;
 
 
+		// vote system
+
+		bool m_voteRunning;
+
+		CL_String m_voteMessage;
+
+		int m_voteYesCount;
+
+		int m_voteNoCount;
+
+		unsigned m_voteTimeout;
+
+
 		// signal handlers
 
 		void onConnected();
@@ -95,6 +120,8 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		void onCarState(const Net::CarState &p_carState);
 
 		void onInputChange(const Car &p_car);
+
+		void onVoteStarted(VoteType p_voteType, const CL_String& subject, unsigned p_timeLimitSec);
 
 };
 

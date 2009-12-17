@@ -86,4 +86,30 @@ void RaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)
 {
 }
 
+const CL_String &RaceLogic::getVoteMessage() const
+{
+	static CL_String def;
+	return def;
+}
+
+bool RaceLogic::isVoteRunning() const
+{
+	return false;
+}
+
+int RaceLogic::getVoteNoCount() const
+{
+	return 0;
+}
+
+int RaceLogic::getVoteYesCount() const
+{
+	return 0;
+}
+
+unsigned RaceLogic::getVoteTimeout() const
+{
+	return 0;
+}
+
 } // namespace

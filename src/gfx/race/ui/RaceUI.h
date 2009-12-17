@@ -28,9 +28,13 @@
 
 #pragma once
 
-#include "gfx/Drawable.h"
 #include "Label.h"
+#include "gfx/Drawable.h"
 #include "gfx/race/ui/SpeedMeter.h"
+
+namespace Race {
+	class RaceLogic;
+}
 
 namespace Gfx {
 
@@ -38,7 +42,7 @@ class RaceUI: public Gfx::Drawable {
 
 	public:
 
-		RaceUI();
+		RaceUI(const Race::RaceLogic* p_logic);
 
 		virtual ~RaceUI();
 
@@ -55,6 +59,9 @@ class RaceUI: public Gfx::Drawable {
 
 		// test label
 		Label m_label;
+
+		// Race logic pointer
+		const Race::RaceLogic *m_logic;
 };
 
 } // namespace

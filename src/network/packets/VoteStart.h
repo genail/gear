@@ -51,6 +51,7 @@ class VoteStart: public Net::Packet {
 
 		const CL_String &getSubject() const;
 
+		/** @return vote time limit in seconds */
 		unsigned getTimeLimit() const;
 
 		VoteType getType() const;

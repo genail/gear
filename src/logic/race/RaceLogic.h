@@ -55,8 +55,21 @@ class RaceLogic {
 
 		virtual void destroy() = 0;
 
+		// voting system
 
 		virtual void callAVote(VoteType p_type, const CL_String &p_subject="");
+
+		/** @return Message that will be displayed on screen when vote is running. */
+		virtual const CL_String &getVoteMessage() const;
+
+		virtual int getVoteNoCount() const;
+
+		virtual int getVoteYesCount() const;
+
+		/** @return Time in milliseconds that is deadline to this vote */
+		virtual unsigned getVoteTimeout() const;
+
+		virtual bool isVoteRunning() const;
 
 
 		const Race::Level &getLevel() const { return m_level; }

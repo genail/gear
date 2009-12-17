@@ -32,11 +32,13 @@
 #include "logic/race/Car.h"
 #include "gfx/scenes/RaceScene.h"
 #include "gfx/Stage.h"
+#include "logic/race/RaceLogic.h"
 
 namespace Gfx {
 
-RaceUI::RaceUI() :
-	m_label(CL_Pointf(100, 20), "", Label::F_BOLD, 20)
+RaceUI::RaceUI(const Race::RaceLogic* p_logic) :
+	m_label(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
+	m_logic(p_logic)
 {
 }
 
@@ -50,13 +52,28 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 	// draw speed control
 	m_speedMeter.draw(p_gc);
 
-	m_label.setPosition(CL_Pointf(10, m_label.height()));
-	m_label.setText("VOTE: Restart race? yes: 0 no: 0");
-	m_label.draw(p_gc);
+	if (m_logic->isVoteRunning()) {
 
-	m_label.setPosition(CL_Pointf(10, m_label.height() * 2));
-	m_label.setText("To vote press F1 (YES) or F2 (NO)");
-	m_label.draw(p_gc);
+		// calculate time left in seconds
+		const unsigned now = CL_System::get_time();
+		const unsigned deadline = m_logic->getVoteTimeout();
+
+		const unsigned timeLeftSec = deadline >= now ? (deadline - now) / 1000 : 0;
+
+		m_label.setPosition(CL_Pointf(10, m_label.height()));
+		m_label.setText(
+				CL_String(_("VOTE")) + " (" + CL_StringHelp::uint_to_local8(timeLeftSec) + "): "
+				+ m_logic->getVoteMessage()
+				+ " " + _("yes") + ": " + CL_StringHelp::int_to_local8(m_logic->getVoteYesCount())
+				+ " " + _("no") + ": " + CL_StringHelp::int_to_local8(m_logic->getVoteNoCount())
+		);
+
+		m_label.draw(p_gc);
+
+		m_label.setPosition(CL_Pointf(10, m_label.height() * 2));
+		m_label.setText(_("To vote press F1 (YES) or F2 (NO)"));
+		m_label.draw(p_gc);
+	}
 }
 
 void RaceUI::load(CL_GraphicContext &p_gc)

@@ -36,6 +36,7 @@
 #include "network/packets/GameState.h"
 #include "network/packets/CarState.h"
 #include "network/packets/VoteStart.h"
+#include "network/packets/VoteEnd.h"
 
 namespace Net {
 
@@ -134,6 +135,8 @@ void Client::onEventReceived(const CL_NetGameEvent &p_event)
 			onCarState(p_event);
 		} else if (eventName == EVENT_VOTE_START) {
 			onVoteStart(p_event);
+		} else if (eventName == EVENT_VOTE_END) {
+			onVoteEnd(p_event);
 		}
 
 		// unknown events remain unhandled
@@ -212,6 +215,14 @@ void Client::onVoteStart(const CL_NetGameEvent &p_event)
 	voteStart.parseEvent(p_event);
 
 	INVOKE_3(voteStarted, voteStart.getType(), voteStart.getSubject(), voteStart.getTimeLimit());
+}
+
+void Client::onVoteEnd(const CL_NetGameEvent &p_event)
+{
+	VoteEnd voteEnd;
+	voteEnd.parseEvent(p_event);
+
+	INVOKE_1(voteEnded, voteEnd.getResult());
 }
 
 void Client::callAVote(VoteType p_type, const CL_String& subject)

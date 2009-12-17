@@ -123,6 +123,8 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		void onVoteStarted(VoteType p_voteType, const CL_String& subject, unsigned p_timeLimitSec);
 
+		void onVoteEnded(VoteResult p_voteResult);
+
 };
 
 }

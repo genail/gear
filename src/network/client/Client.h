@@ -68,6 +68,9 @@ class Client {
 		/** New vote is started. args: type, subject, time limit in seconds */
 		SIGNAL_3(VoteType, const CL_String&, unsigned, voteStarted);
 
+		/** Vote has ended. */
+		SIGNAL_1(VoteResult, voteEnded);
+
 	public:
 
 		Client();
@@ -142,6 +145,8 @@ class Client {
 		void onCarState(const CL_NetGameEvent &p_event);
 
 		void onVoteStart(const CL_NetGameEvent &p_event);
+
+		void onVoteEnd(const CL_NetGameEvent &p_event);
 
 };
 

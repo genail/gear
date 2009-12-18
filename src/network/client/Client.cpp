@@ -138,6 +138,8 @@ void Client::onEventReceived(const CL_NetGameEvent &p_event)
 			onVoteStart(p_event);
 		} else if (eventName == EVENT_VOTE_END) {
 			onVoteEnd(p_event);
+		} else if (eventName == EVENT_VOTE_TICK) {
+			onVoteTick(p_event);
 		}
 
 		// unknown events remain unhandled
@@ -224,6 +226,14 @@ void Client::onVoteEnd(const CL_NetGameEvent &p_event)
 	voteEnd.parseEvent(p_event);
 
 	INVOKE_1(voteEnded, voteEnd.getResult());
+}
+
+void Client::onVoteTick(const CL_NetGameEvent &p_event)
+{
+	VoteTick voteTick;
+	voteTick.parseEvent(p_event);
+
+	INVOKE_1(voteTickReceived, voteTick.getOption());
 }
 
 void Client::callAVote(VoteType p_type, const CL_String& subject)

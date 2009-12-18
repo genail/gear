@@ -130,6 +130,8 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		void onVoteEnded(VoteResult p_voteResult);
 
+		void onVoteTick(VoteOption p_voteOption);
+
 };
 
 }

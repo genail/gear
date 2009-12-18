@@ -64,6 +64,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_slots.connect(m_client.sig_carStateReceived(), this, &OnlineRaceLogic::onCarState);
 	m_slots.connect(m_client.sig_voteStarted(), this, &OnlineRaceLogic::onVoteStarted);
 	m_slots.connect(m_client.sig_voteEnded(), this, &OnlineRaceLogic::onVoteEnded);
+	m_slots.connect(m_client.sig_voteTickReceived(), this, &OnlineRaceLogic::onVoteTick);
 }
 
 OnlineRaceLogic::~OnlineRaceLogic()
@@ -269,6 +270,20 @@ void OnlineRaceLogic::voteNo()
 void OnlineRaceLogic::voteYes()
 {
 	m_client.voteYes();
+}
+
+void OnlineRaceLogic::onVoteTick(VoteOption p_voteOption)
+{
+	switch (p_voteOption) {
+		case VOTE_YES:
+			++m_voteYesCount;
+			break;
+		case VOTE_NO:
+			++m_voteNoCount;
+			break;
+		default:
+			assert(0 && "unknown VoteOption");
+	}
 }
 
 } // namespace

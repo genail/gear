@@ -68,6 +68,9 @@ class Client {
 		/** New vote is started. args: type, subject, time limit in seconds */
 		SIGNAL_3(VoteType, const CL_String&, unsigned, voteStarted);
 
+		/** Got vote tick */
+		SIGNAL_1(VoteOption, voteTickReceived);
+
 		/** Vote has ended. */
 		SIGNAL_1(VoteResult, voteEnded);
 
@@ -157,6 +160,8 @@ class Client {
 		void onVoteStart(const CL_NetGameEvent &p_event);
 
 		void onVoteEnd(const CL_NetGameEvent &p_event);
+
+		void onVoteTick(const CL_NetGameEvent &p_event);
 
 };
 

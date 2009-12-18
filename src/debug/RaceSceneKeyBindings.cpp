@@ -44,7 +44,7 @@ void RaceSceneKeyBindings::handleInput(bool p_pressed, const CL_InputEvent& p_ev
 {
 	if (p_pressed) {
 		switch (p_event.id) {
-			case CL_KEY_F1:
+			case CL_KEY_F9:
 			{
 				int iterationSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
 				if (iterationSpeed > 0) {
@@ -56,7 +56,7 @@ void RaceSceneKeyBindings::handleInput(bool p_pressed, const CL_InputEvent& p_ev
 				break;
 			}
 
-			case CL_KEY_F2:
+			case CL_KEY_F10:
 			{
 				int iterationSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
 				if (iterationSpeed < 300) {

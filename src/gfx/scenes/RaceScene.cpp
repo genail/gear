@@ -194,15 +194,16 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 		case CL_KEY_SPACE:
 			car.setHandbrake(state);
 			break;
-#ifndef NDEBUG
-		case CL_KEY_BACKSPACE:
-		{
-			if (p_state == Released) {
-				startRace();
+		case CL_KEY_F1:
+			if (m_logic->isVoteRunning()) {
+				m_logic->voteYes();
 			}
-		}
-		break;
-#endif // NDEBUG
+			break;
+		case CL_KEY_F2:
+			if (m_logic->isVoteRunning()) {
+				m_logic->voteNo();
+			}
+			break;
 	}
 
 	// handle quit request

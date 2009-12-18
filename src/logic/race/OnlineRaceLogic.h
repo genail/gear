@@ -71,6 +71,11 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		virtual bool isVoteRunning() const;
 
+		virtual void voteNo();
+
+		virtual void voteYes();
+
+
 	private:
 
 		/** Initialized state */

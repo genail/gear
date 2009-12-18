@@ -55,6 +55,7 @@ class RaceLogic {
 
 		virtual void destroy() = 0;
 
+
 		// voting system
 
 		virtual void callAVote(VoteType p_type, const CL_String &p_subject="");
@@ -70,6 +71,10 @@ class RaceLogic {
 		virtual unsigned getVoteTimeout() const;
 
 		virtual bool isVoteRunning() const;
+
+		virtual void voteNo();
+
+		virtual void voteYes();
 
 
 		const Race::Level &getLevel() const { return m_level; }

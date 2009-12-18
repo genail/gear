@@ -261,4 +261,14 @@ void OnlineRaceLogic::onVoteEnded(VoteResult p_voteResult)
 	m_voteRunning = false;
 }
 
+void OnlineRaceLogic::voteNo()
+{
+	m_client.voteNo();
+}
+
+void OnlineRaceLogic::voteYes()
+{
+	m_client.voteYes();
+}
+
 } // namespace

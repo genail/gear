@@ -37,6 +37,7 @@
 #include "network/packets/CarState.h"
 #include "network/packets/VoteStart.h"
 #include "network/packets/VoteEnd.h"
+#include "network/packets/VoteTick.h"
 
 namespace Net {
 
@@ -233,6 +234,25 @@ void Client::callAVote(VoteType p_type, const CL_String& subject)
 	voteStart.setSubject(subject);
 
 	send(voteStart.buildEvent());
+}
+
+
+void Client::voteNo()
+{
+	vote(false);
+}
+
+void Client::voteYes()
+{
+	vote(true);
+}
+
+void Client::vote(bool p_yes)
+{
+	VoteTick tick;
+	tick.setOption(p_yes ? VOTE_YES : VOTE_NO);
+
+	send(tick.buildEvent());
 }
 
 } // namespace

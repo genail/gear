@@ -96,6 +96,10 @@ class Client {
 
 		void sendCarState(const Net::CarState &p_state);
 
+		void voteNo();
+
+		void voteYes();
+
 
 	private:
 
@@ -115,7 +119,13 @@ class Client {
 		CL_SlotContainer m_slots;
 
 
+		//
+		// helpers
+		//
+
 		void send(const CL_NetGameEvent &p_event);
+
+		void vote(bool p_yes);
 
 		//
 		// connection events

@@ -84,6 +84,7 @@ const Player &RaceLogic::getPlayer(const CL_String& p_name) const
 
 void RaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)
 {
+	// nothing
 }
 
 const CL_String &RaceLogic::getVoteMessage() const
@@ -110,6 +111,16 @@ int RaceLogic::getVoteYesCount() const
 unsigned RaceLogic::getVoteTimeout() const
 {
 	return 0;
+}
+
+void RaceLogic::voteNo()
+{
+	// empty
+}
+
+void RaceLogic::voteYes()
+{
+	// empty
 }
 
 } // namespace

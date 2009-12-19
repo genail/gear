@@ -121,8 +121,41 @@ SET(SERVER_LIBS ${LIBS}
     ${Threads_LIBRARY}
 )
 
-# Game client configuration
+#-Wuninitialized
+#-Wunreachable-code
+# Common configuration
+# -Weffc++
+SET(COMMON_COMPILE_FLAGS
+    "-isystem/usr/local/include/ClanLib-2.1 \
+    -Woverloaded-virtual \
+    -Wsign-promo \
+    -Wextra \
+    -Wunused \
+    -Wchar-subscripts \
+    -Wcomment \
+    -Wformat \
+    -Wformat-security \
+    -Winit-self \
+    -Wmain \
+    -Wmissing-include-dirs \
+    -Wparentheses \
+    -Wsequence-point \
+    -Wreturn-type \
+    -Wswitch \
+    -Wswitch-default \
+    -Wswitch-enum \
+    -Wtrigraphs \
+    -Wunused \
+    -Wunknown-pragmas \
+    -Warray-bounds \
+    -Wshadow \
+    -Wlarger-than=1024 \
+    -Wenum-compare \
+    -Winline \
+    -Wvolatile-register-var"
+)
 
+# Game client configuration
 IF (USE_GL2)
     SET(CLIENT_FLAGS "${CLIENT_FLAGS} -DGL2")
     SET(CLIENT_LIBS ${CLIENT_LIBS} ${ClanLib_GL_LIBRARY})
@@ -155,7 +188,7 @@ SET_TARGET_PROPERTIES(
 SET_TARGET_PROPERTIES(
     game PROPERTIES
     COMPILE_FLAGS
-    "-Wall -DCLIENT ${CLIENT_FLAGS} $ENV{CXXFLAGS}"
+    "-DCLIENT ${CLIENT_FLAGS} $ENV{CXXFLAGS} ${COMMON_COMPILE_FLAGS}"
 )
 
 
@@ -172,7 +205,7 @@ SET_TARGET_PROPERTIES(
 SET_TARGET_PROPERTIES(
     server PROPERTIES
     COMPILE_FLAGS
-    "-Wall -DSERVER $ENV{CXXFLAGS}"
+    "-DSERVER $ENV{CXXFLAGS} ${COMMON_COMPILE_FLAGS}"
 )
 
 # Test configuration

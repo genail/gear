@@ -28,6 +28,10 @@
 
 #include "RaceStart.h"
 
+#include <assert.h>
+
+#include "network/events.h"
+
 namespace Net {
 
 RaceStart::RaceStart()
@@ -40,12 +44,46 @@ RaceStart::~RaceStart()
 
 CL_NetGameEvent RaceStart::buildEvent() const
 {
+	CL_NetGameEvent event(EVENT_RACE_START);
 
+	event.add_argument(m_carPosition.x);
+	event.add_argument(m_carPosition.y);
+
+	event.add_argument(m_carRotation.to_radians());
+
+	return event;
 }
 
 void RaceStart::parseEvent(const CL_NetGameEvent &p_event)
 {
+	assert(p_event.get_name() == EVENT_RACE_START);
 
+	int i = 0;
+
+	m_carPosition.x = static_cast<float> (p_event.get_argument(i++));
+	m_carPosition.y = static_cast<float> (p_event.get_argument(i++));
+
+	m_carRotation.from_radians(static_cast<float> (p_event.get_argument(i++)));
+}
+
+const CL_Pointf &RaceStart::getCarPosition() const
+{
+	return m_carPosition;
+}
+
+const CL_Angle &RaceStart::getCarRotation() const
+{
+	return m_carRotation;
+}
+
+void RaceStart::setCarPosition(const CL_Pointf &p_position)
+{
+	m_carPosition = p_position;
+}
+
+void RaceStart::setCarRotation(const CL_Angle &p_rotation)
+{
+	m_carRotation = p_rotation;
 }
 
 }

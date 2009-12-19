@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <ClanLib/core.h>
+
 #include "Packet.h"
 
 namespace Net {
@@ -44,6 +46,22 @@ class RaceStart: public Net::Packet {
 		virtual CL_NetGameEvent buildEvent() const;
 
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
+
+
+		const CL_Pointf &getCarPosition() const;
+
+		const CL_Angle &getCarRotation() const;
+
+
+		void setCarPosition(const CL_Pointf &p_position);
+
+		void setCarRotation(const CL_Angle &p_rotation);
+
+	private:
+
+		CL_Pointf m_carPosition;
+
+		CL_Angle m_carRotation;
 };
 
 }

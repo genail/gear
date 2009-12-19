@@ -228,7 +228,7 @@ unsigned OnlineRaceLogic::getVoteTimeout() const
 	return m_voteTimeout;
 }
 
-void OnlineRaceLogic::onVoteStarted(VoteType p_voteType, const CL_String& subject, unsigned p_timeLimitSec)
+void OnlineRaceLogic::onVoteStarted(VoteType p_voteType, const CL_String& p_subject, unsigned p_timeLimitSec)
 {
 	switch (p_voteType) {
 		case VOTE_RESTART_RACE:

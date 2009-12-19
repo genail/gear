@@ -121,10 +121,11 @@ SET(SERVER_LIBS ${LIBS}
     ${Threads_LIBRARY}
 )
 
-#-Wuninitialized
-#-Wunreachable-code
-# Common configuration
+# -Wuninitialized
+# -Wunreachable-code
+# -Winline
 # -Weffc++
+# Common configuration
 SET(COMMON_COMPILE_FLAGS
     "-isystem/usr/local/include/ClanLib-2.1 \
     -Woverloaded-virtual \
@@ -151,7 +152,6 @@ SET(COMMON_COMPILE_FLAGS
     -Wshadow \
     -Wlarger-than=1024 \
     -Wenum-compare \
-    -Winline \
     -Wvolatile-register-var"
 )
 

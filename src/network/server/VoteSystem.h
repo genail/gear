@@ -47,6 +47,8 @@ class VoteSystem {
 
 		VoteResult getResult() const;
 
+		VoteType getType() const;
+
 		bool isFinished() const;
 
 		bool isRunning() const;
@@ -66,6 +68,9 @@ class VoteSystem {
 			S_RUNNING,
 			S_FINISHED
 		};
+
+		/** Type of this vote */
+		VoteType m_type;
 
 		unsigned m_voterCount;
 

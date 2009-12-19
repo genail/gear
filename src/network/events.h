@@ -49,6 +49,8 @@
 
 #define EVENT_CAR_STATE		"car_state"
 
+#define EVENT_RACE_START	"race_start"
+
 // voting event
 
 #define EVENT_VOTE_START	"vote_start"

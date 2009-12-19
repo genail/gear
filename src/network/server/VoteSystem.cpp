@@ -105,6 +105,7 @@ bool VoteSystem::addVote(VoteOption p_option, int p_voterId)
 
 void VoteSystem::start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimit)
 {
+	m_type = p_type;
 	m_voterCount = p_voterCount;
 
 	m_yesCount = m_noCount = 0;
@@ -154,6 +155,11 @@ void VoteSystem::onTimerExpired()
 		m_state = S_FINISHED;
 		C_INVOKE_0(finished);
 	}
+}
+
+VoteType VoteSystem::getType() const
+{
+	return m_type;
 }
 
 } // namespace

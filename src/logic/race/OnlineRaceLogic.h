@@ -126,7 +126,7 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		void onInputChange(const Car &p_car);
 
-		void onVoteStarted(VoteType p_voteType, const CL_String& subject, unsigned p_timeLimitSec);
+		void onVoteStarted(VoteType p_voteType, const CL_String& p_subject, unsigned p_timeLimitSec);
 
 		void onVoteEnded(VoteResult p_voteResult);
 

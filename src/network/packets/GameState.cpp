@@ -34,6 +34,16 @@
 
 namespace Net {
 
+GameState::GameState()
+{
+	// nothing
+}
+
+GameState::~GameState()
+{
+	// nothing
+}
+
 CL_NetGameEvent GameState::buildEvent() const
 {
 	CL_NetGameEvent event(EVENT_GAME_STATE);

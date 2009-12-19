@@ -309,10 +309,28 @@ void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnectio
 
 void Server::onVoteSystemFinished()
 {
+	// voting finished, send event
 	VoteEnd voteEnd;
 	voteEnd.setResult(m_voteSystem.getResult());
 
 	sendToAll(voteEnd.buildEvent());
+
+	// check if I should take action
+	if (m_voteSystem.getResult() == VOTE_PASSED) {
+		switch (m_voteSystem.getType()) {
+			case VOTE_RESTART_RACE:
+				startRace();
+				break;
+
+			default:
+				assert(0 && "unknown VoteType");
+		}
+	}
+}
+
+void Server::startRace()
+{
+
 }
 
 } // namespace

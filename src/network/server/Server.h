@@ -91,12 +91,18 @@ class Server {
 		CL_SlotContainer m_slots;
 
 
+		// helpers
+
 		void send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
 
 		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL, bool p_ignoreNotFullyConnected = true);
 
 		GameState prepareGameState();
 
+		void startRace();
+
+
+		// network events
 
 		void onClientConnected(CL_NetGameConnection *p_connection);
 

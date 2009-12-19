@@ -65,6 +65,9 @@ class Client {
 		/** Got new car state */
 		SIGNAL_1(const Net::CarState&, carStateReceived);
 
+		/** Should start the race */
+		SIGNAL_2(const CL_Pointf&, const CL_Angle&, raceStartReceived);
+
 		/** New vote is started. args: type, subject, time limit in seconds */
 		SIGNAL_3(VoteType, const CL_String&, unsigned, voteStarted);
 
@@ -156,6 +159,8 @@ class Client {
 		void onPlayerLeaved(const CL_NetGameEvent &p_event);
 
 		void onCarState(const CL_NetGameEvent &p_event);
+
+		void onRaceStart(const CL_NetGameEvent &p_event);
 
 		void onVoteStart(const CL_NetGameEvent &p_event);
 

@@ -192,6 +192,18 @@ void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
 	}
 }
 
+void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle &p_carRotation)
+{
+	cl_log_event(LOG_RACE, "Race is starting");
+
+	Car &car = Game::getInstance().getPlayer().getCar();
+
+	car.setPosition(p_carPosition);
+	car.setRotation(p_carRotation.to_degrees());
+	car.setLap(1);
+	car.setLocked(true);
+}
+
 void OnlineRaceLogic::onInputChange(const Car &p_car)
 {
 	const Net::CarState carState = p_car.prepareCarState();

@@ -38,6 +38,7 @@
 #include "network/packets/VoteStart.h"
 #include "network/packets/VoteEnd.h"
 #include "network/packets/VoteTick.h"
+#include "network/packets/RaceStart.h"
 
 namespace Net {
 
@@ -78,6 +79,16 @@ Client::~Client() {
 	if (m_connected) {
 		m_gameClient.disconnect();
 	}
+}
+
+void Client::send(const CL_NetGameEvent &p_event)
+{
+	m_gameClient.send_event(p_event);
+}
+
+void Client::sendCarState(const Net::CarState &p_state)
+{
+	send(p_state.buildEvent());
 }
 
 void Client::onConnected()
@@ -134,6 +145,8 @@ void Client::onEventReceived(const CL_NetGameEvent &p_event)
 
 		else if (eventName == EVENT_CAR_STATE) {
 			onCarState(p_event);
+		} else if (eventName == EVENT_RACE_START) {
+			onRaceStart(p_event);
 		} else if (eventName == EVENT_VOTE_START) {
 			onVoteStart(p_event);
 		} else if (eventName == EVENT_VOTE_END) {
@@ -202,14 +215,12 @@ void Client::onCarState(const CL_NetGameEvent &p_event)
 	INVOKE_1(carStateReceived, state);
 }
 
-void Client::send(const CL_NetGameEvent &p_event)
+void Client::onRaceStart(const CL_NetGameEvent &p_event)
 {
-	m_gameClient.send_event(p_event);
-}
+	RaceStart raceStart;
+	raceStart.parseEvent(p_event);
 
-void Client::sendCarState(const Net::CarState &p_state)
-{
-	send(p_state.buildEvent());
+	INVOKE_2(raceStartReceived, raceStart.getCarPosition(), raceStart.getCarRotation());
 }
 
 void Client::onVoteStart(const CL_NetGameEvent &p_event)

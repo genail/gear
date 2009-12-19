@@ -124,6 +124,8 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		void onCarState(const Net::CarState &p_carState);
 
+		void onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle &p_carRotation);
+
 		void onInputChange(const Car &p_car);
 
 		void onVoteStarted(VoteType p_voteType, const CL_String& p_subject, unsigned p_timeLimitSec);

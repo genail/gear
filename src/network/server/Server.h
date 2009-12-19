@@ -79,7 +79,10 @@ class Server {
 		bool m_running;
 
 		/** List of active connections */
-		std::map<CL_NetGameConnection*, Server::Player> m_connections;
+		typedef std::map<CL_NetGameConnection*, Server::Player> TConnectionPlayerMap;
+		typedef std::pair<CL_NetGameConnection*, Server::Player> TConnectionPlayerPair;
+
+		TConnectionPlayerMap m_connections;
 
 		/** Voting system */
 		VoteSystem m_voteSystem;

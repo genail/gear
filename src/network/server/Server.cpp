@@ -41,6 +41,7 @@
 #include "../packets/VoteStart.h"
 #include "../packets/VoteEnd.h"
 #include "../packets/VoteTick.h"
+#include "../packets/RaceStart.h"
 
 namespace Net {
 
@@ -330,7 +331,12 @@ void Server::onVoteSystemFinished()
 
 void Server::startRace()
 {
+	RaceStart raceStart;
 
+	raceStart.setCarPosition(CL_Pointf(300, 500));
+	raceStart.setCarRotation(CL_Angle(90, cl_degrees));
+
+	sendToAll(raceStart.buildEvent());
 }
 
 } // namespace

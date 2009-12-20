@@ -28,6 +28,7 @@ SET(COMMON_SRCS
     logic/race/Car.cpp
     logic/race/Checkpoint.cpp
     logic/race/Level.cpp
+    logic/race/MessageBoard.cpp
     logic/race/RaceLogic.cpp
     logic/race/Sandpit.cpp
     logic/race/ScoreTable.cpp

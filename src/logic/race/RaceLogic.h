@@ -77,14 +77,30 @@ class RaceLogic {
 		virtual void voteYes();
 
 
+		bool isRaceFinished() const;
+
+		bool isRacePending() const;
+
+		bool isRaceStarted() const;
+
 		const Race::Level &getLevel() const { return m_level; }
 
 		std::vector<CL_String> getPlayerNames() const;
 
 		const Player &getPlayer(const CL_String& p_name) const;
 
+		unsigned getRaceStartTime() const;
 
-		void update(unsigned p_timeElapsed);
+		unsigned getRaceFinishTime() const;
+
+		/**
+		 * Begins the race at <code>p_startTimeMs</code>.
+		 *
+		 * @p_startTimeMs Race start time in ms from system boot.
+		 */
+		void startRace(unsigned p_startTimeMs);
+
+		virtual void update(unsigned p_timeElapsed);
 
 	protected:
 
@@ -96,6 +112,12 @@ class RaceLogic {
 		typedef std::pair<CL_String, Player*> TPlayerMapPair;
 
 		TPlayerMap m_playerMap;
+
+		/** Race beginning time. If 0 then race not started yet */
+		unsigned m_raceStartTimeMs;
+
+		/** Race end time. If 0 then race not finished yet */
+		unsigned m_raceFinishTimeMs;
 
 
 		// update routines

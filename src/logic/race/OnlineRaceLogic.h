@@ -76,6 +76,9 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		virtual void voteYes();
 
 
+		virtual void update(unsigned p_timeElapsed);
+
+
 	private:
 
 		/** Initialized state */

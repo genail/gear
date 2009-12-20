@@ -37,6 +37,8 @@
 
 namespace Race {
 
+const unsigned RACE_START_DELAY = 3000;
+
 OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_initialized(false),
 	m_host(p_host),
@@ -62,6 +64,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_slots.connect(m_client.sig_playerLeaved(), this, &OnlineRaceLogic::onPlayerLeaved);
 	m_slots.connect(m_client.sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
 	m_slots.connect(m_client.sig_carStateReceived(), this, &OnlineRaceLogic::onCarState);
+	m_slots.connect(m_client.sig_raceStartReceived(), this, &OnlineRaceLogic::onRaceStart);
 	m_slots.connect(m_client.sig_voteStarted(), this, &OnlineRaceLogic::onVoteStarted);
 	m_slots.connect(m_client.sig_voteEnded(), this, &OnlineRaceLogic::onVoteEnded);
 	m_slots.connect(m_client.sig_voteTickReceived(), this, &OnlineRaceLogic::onVoteTick);
@@ -98,6 +101,18 @@ void OnlineRaceLogic::destroy()
 		m_client.disconnect();
 		m_level.destroy();
 	}
+}
+
+void OnlineRaceLogic::update(unsigned p_timeElapsed)
+{
+	RaceLogic::update(p_timeElapsed);
+
+	// make sure that car is not locked when race is started
+	Race::Car &car = m_localPlayer->getCar();
+	if (isRaceStarted() && car.isLocked()) {
+		car.setLocked(false);
+	}
+
 }
 
 void OnlineRaceLogic::onConnected()
@@ -199,9 +214,11 @@ void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle
 	Car &car = Game::getInstance().getPlayer().getCar();
 
 	car.setPosition(p_carPosition);
-	car.setRotation(p_carRotation.to_degrees());
+	car.setRotation(p_carRotation.to_degrees() - 90); // FIXME: Remove -90 when #16 is resolved
 	car.setLap(1);
 	car.setLocked(true);
+
+	startRace(CL_System::get_time() + RACE_START_DELAY);
 }
 
 void OnlineRaceLogic::onInputChange(const Car &p_car)

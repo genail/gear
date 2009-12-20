@@ -55,6 +55,8 @@ class Car
 
 		virtual ~Car();
 
+		bool isLocked() const;
+
 		const Checkpoint *getCurrentCheckpoint() const { return m_currentCheckpoint; }
 
 		int getLap() const { return m_lap; }

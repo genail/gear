@@ -33,7 +33,9 @@
 
 namespace Race {
 
-RaceLogic::RaceLogic()
+RaceLogic::RaceLogic() :
+	m_raceStartTimeMs(0),
+	m_raceFinishTimeMs(0)
 {
 
 }
@@ -121,6 +123,37 @@ void RaceLogic::voteNo()
 void RaceLogic::voteYes()
 {
 	// empty
+}
+
+void RaceLogic::startRace(unsigned p_startTimeMs)
+{
+	m_raceStartTimeMs = p_startTimeMs;
+	m_raceFinishTimeMs = 0;
+}
+
+bool RaceLogic::isRaceFinished() const
+{
+	return m_raceFinishTimeMs != 0;
+}
+
+bool RaceLogic::isRacePending() const
+{
+	return m_raceStartTimeMs > CL_System::get_time();
+}
+
+bool RaceLogic::isRaceStarted() const
+{
+	return m_raceStartTimeMs <= CL_System::get_time();
+}
+
+unsigned RaceLogic::getRaceStartTime() const
+{
+	return m_raceStartTimeMs;
+}
+
+unsigned RaceLogic::getRaceFinishTime() const
+{
+	return m_raceFinishTimeMs;
 }
 
 } // namespace

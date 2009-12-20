@@ -451,4 +451,9 @@ void Car::setLocked(bool p_locked)
 	m_locked = p_locked;
 }
 
+bool Car::isLocked() const
+{
+	return m_locked;
+}
+
 } // namespace

@@ -57,11 +57,23 @@ class RaceUI: public Gfx::Drawable {
 		/** Speed control widget */
 		SpeedMeter m_speedMeter;
 
-		// test label
-		Label m_label;
+		/** Vote label */
+		Label m_voteLabel;
+
+		/** Message board label */
+		Label m_messageBoardLabel;
 
 		// Race logic pointer
 		const Race::RaceLogic *m_logic;
+
+
+		// draw routines
+
+		void drawMeters(CL_GraphicContext &p_gc);
+
+		void drawVote(CL_GraphicContext &p_gc);
+
+		void drawMessageBoard(CL_GraphicContext &p_gc);
 };
 
 } // namespace

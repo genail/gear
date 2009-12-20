@@ -43,11 +43,11 @@ class MessageBoard {
 		virtual ~MessageBoard();
 
 
-		const CL_String &getMessageString(int p_id);
+		const CL_String &getMessageString(int p_id) const;
 
-		unsigned getMessageCreationTime(int p_id);
+		unsigned getMessageCreationTime(int p_id) const;
 
-		std::vector<int> getMessageIdsYoungerThat(unsigned p_ageMs, unsigned p_limit = 0xFFFFFFFF);
+		std::vector<int> getMessageIdsYoungerThat(unsigned p_ageMs, unsigned p_limit = 0xFFFFFFFF) const;
 
 
 		int addMessage(const CL_String &p_message);

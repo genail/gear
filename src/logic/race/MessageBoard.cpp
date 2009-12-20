@@ -57,19 +57,19 @@ MessageBoard::~MessageBoard()
 {
 }
 
-const CL_String &MessageBoard::getMessageString(int p_id)
+const CL_String &MessageBoard::getMessageString(int p_id) const
 {
 	assert(m_messageMap.find(p_id) != m_messageMap.end());
-	return m_messageMap[p_id].m_msg;
+	return m_messageMap.find(p_id)->second.m_msg;
 }
 
-unsigned MessageBoard::getMessageCreationTime(int p_id)
+unsigned MessageBoard::getMessageCreationTime(int p_id) const
 {
 	assert(m_messageMap.find(p_id) != m_messageMap.end());
-	return m_messageMap[p_id].m_creationTime;
+	return m_messageMap.find(p_id)->second.m_creationTime;
 }
 
-std::vector<int> MessageBoard::getMessageIdsYoungerThat(unsigned p_ageMs, unsigned p_limit)
+std::vector<int> MessageBoard::getMessageIdsYoungerThat(unsigned p_ageMs, unsigned p_limit) const
 {
 	std::vector<int> result;
 
@@ -110,17 +110,17 @@ int MessageBoard::nextId()
 	do {
 		if (m_id != std::numeric_limits<int>::max()) {
 			++m_id;
+		} else {
+			m_id = 1;
 
 			if (!overflow) {
 				overflow = true;
 			} else {
 				assert(0 && "Lack of id's");
 			}
-		} else {
-			m_id = 1;
 		}
 
-	} while (m_messageMap.find(m_id) == m_messageMap.end());
+	} while (m_messageMap.find(m_id) != m_messageMap.end());
 
 	return m_id;
 }

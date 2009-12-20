@@ -37,7 +37,8 @@
 namespace Gfx {
 
 RaceUI::RaceUI(const Race::RaceLogic* p_logic) :
-	m_label(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
+	m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
+	m_messageBoardLabel(CL_Pointf(), "", Label::F_BOLD, 14),
 	m_logic(p_logic)
 {
 }
@@ -49,9 +50,19 @@ RaceUI::~RaceUI()
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
 
+	drawMeters(p_gc);
+	drawVote(p_gc);
+	drawMessageBoard(p_gc);
+}
+
+void RaceUI::drawMeters(CL_GraphicContext &p_gc)
+{
 	// draw speed control
 	m_speedMeter.draw(p_gc);
+}
 
+void RaceUI::drawVote(CL_GraphicContext &p_gc)
+{
 	if (m_logic->isVoteRunning()) {
 
 		// calculate time left in seconds
@@ -60,28 +71,49 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 
 		const unsigned timeLeftSec = deadline >= now ? (deadline - now) / 1000 : 0;
 
-		m_label.setPosition(CL_Pointf(10, m_label.height()));
-		m_label.setText(
+		m_voteLabel.setPosition(CL_Pointf(10, m_voteLabel.height()));
+		m_voteLabel.setText(
 				CL_String(_("VOTE")) + " (" + CL_StringHelp::uint_to_local8(timeLeftSec) + "): "
 				+ m_logic->getVoteMessage()
 				+ " " + _("yes") + ": " + CL_StringHelp::int_to_local8(m_logic->getVoteYesCount())
 				+ " " + _("no") + ": " + CL_StringHelp::int_to_local8(m_logic->getVoteNoCount())
 		);
 
-		m_label.draw(p_gc);
+		m_voteLabel.draw(p_gc);
 
-		m_label.setPosition(CL_Pointf(10, m_label.height() * 2));
-		m_label.setText(_("To vote press F1 (YES) or F2 (NO)"));
-		m_label.draw(p_gc);
+		m_voteLabel.setPosition(CL_Pointf(10, m_voteLabel.height() * 2));
+		m_voteLabel.setText(_("To vote press F1 (YES) or F2 (NO)"));
+		m_voteLabel.draw(p_gc);
+	}
+}
+
+void RaceUI::drawMessageBoard(CL_GraphicContext &p_gc)
+{
+	static const float START_POSITION_X = 0.3f;
+	static const float START_POSITION_Y = 0.95f;
+
+	static const int CHANGE_Y = -20;
+	static const int LIMIT = 10;
+
+	const Race::MessageBoard &board = m_logic->getMessageBoard();
+	std::vector<int> messages = board.getMessageIdsYoungerThat(10000, LIMIT);
+
+	CL_Pointf position(Stage::getWidth() * START_POSITION_X, Stage::getHeight() * START_POSITION_Y);
+
+	foreach(int id, messages) {
+		m_messageBoardLabel.setPosition(position);
+		m_messageBoardLabel.setText(board.getMessageString(id));
+
+		m_messageBoardLabel.draw(p_gc);
+		position.y += CHANGE_Y;
 	}
 }
 
 void RaceUI::load(CL_GraphicContext &p_gc)
 {
-	// load speed meter
 	m_speedMeter.load(p_gc);
-
-	m_label.load(p_gc);
+	m_voteLabel.load(p_gc);
+	m_messageBoardLabel.load(p_gc);
 
 }
 

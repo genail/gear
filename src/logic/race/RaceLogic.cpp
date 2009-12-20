@@ -177,6 +177,11 @@ bool RaceLogic::isRaceStarted() const
 	return m_raceStartTimeMs <= CL_System::get_time();
 }
 
+int RaceLogic::getRaceLapCount() const
+{
+	return m_lapCount;
+}
+
 unsigned RaceLogic::getRaceStartTime() const
 {
 	return m_raceStartTimeMs;

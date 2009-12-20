@@ -48,6 +48,7 @@ struct Comparator {
 RaceUI::RaceUI(const Race::RaceLogic* p_logic) :
 	m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
 	m_messageBoardLabel(CL_Pointf(), "", Label::F_BOLD, 14),
+	m_lapLabel(CL_Pointf(Stage::getWidth() - 60, 30), "", Label::F_BOLD, 25),
 	m_logic(p_logic)
 {
 }
@@ -62,6 +63,7 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 	drawMeters(p_gc);
 	drawVote(p_gc);
 	drawMessageBoard(p_gc);
+	drawLapLabel(p_gc);
 }
 
 void RaceUI::drawMeters(CL_GraphicContext &p_gc)
@@ -82,10 +84,13 @@ void RaceUI::drawVote(CL_GraphicContext &p_gc)
 
 		m_voteLabel.setPosition(CL_Pointf(10, m_voteLabel.height()));
 		m_voteLabel.setText(
-				CL_String(_("VOTE")) + " (" + CL_StringHelp::uint_to_local8(timeLeftSec) + "): "
-				+ m_logic->getVoteMessage()
-				+ " " + _("yes") + ": " + CL_StringHelp::int_to_local8(m_logic->getVoteYesCount())
-				+ " " + _("no") + ": " + CL_StringHelp::int_to_local8(m_logic->getVoteNoCount())
+				cl_format(
+						_("VOTE (%1): %2 yes: %3 no: %4"),
+						timeLeftSec,
+						m_logic->getVoteMessage(),
+						m_logic->getVoteYesCount(),
+						m_logic->getVoteNoCount()
+				)
 		);
 
 		m_voteLabel.draw(p_gc);
@@ -150,11 +155,25 @@ void RaceUI::drawMessageBoard(CL_GraphicContext &p_gc)
 
 }
 
+void RaceUI::drawLapLabel(CL_GraphicContext &p_gc)
+{
+	const int lapsTotal = m_logic->getRaceLapCount();
+	int lapsCurrent = Game::getInstance().getPlayer().getCar().getLap();
+
+	if (lapsCurrent > lapsTotal) {
+		lapsCurrent = lapsTotal;
+	}
+
+	m_lapLabel.setText(cl_format("%1 / %2", lapsCurrent, lapsTotal));
+	m_lapLabel.draw(p_gc);
+}
+
 void RaceUI::load(CL_GraphicContext &p_gc)
 {
 	m_speedMeter.load(p_gc);
 	m_voteLabel.load(p_gc);
 	m_messageBoardLabel.load(p_gc);
+	m_lapLabel.load(p_gc);
 
 }
 

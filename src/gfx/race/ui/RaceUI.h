@@ -63,6 +63,9 @@ class RaceUI: public Gfx::Drawable {
 		/** Message board label */
 		Label m_messageBoardLabel;
 
+		/** Lap count label */
+		Label m_lapLabel;
+
 		// Race logic pointer
 		const Race::RaceLogic *m_logic;
 
@@ -74,6 +77,7 @@ class RaceUI: public Gfx::Drawable {
 		void drawVote(CL_GraphicContext &p_gc);
 
 		void drawMessageBoard(CL_GraphicContext &p_gc);
+		void drawLapLabel(CL_GraphicContext &p_gc);
 };
 
 } // namespace

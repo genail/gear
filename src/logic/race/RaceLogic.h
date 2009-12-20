@@ -92,6 +92,8 @@ class RaceLogic {
 
 		const Player &getPlayer(const CL_String& p_name) const;
 
+		int getRaceLapCount() const;
+
 		unsigned getRaceStartTime() const;
 
 		unsigned getRaceFinishTime() const;

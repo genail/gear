@@ -98,7 +98,7 @@ class RaceLogic {
 		 *
 		 * @p_startTimeMs Race start time in ms from system boot.
 		 */
-		void startRace(unsigned p_startTimeMs);
+		void startRace(int p_lapCount, unsigned p_startTimeMs);
 
 		virtual void update(unsigned p_timeElapsed);
 
@@ -119,12 +119,26 @@ class RaceLogic {
 		/** Race end time. If 0 then race not finished yet */
 		unsigned m_raceFinishTimeMs;
 
+		/** Laps total */
+		int m_lapCount;
+
+		/** Players that finished this race */
+		typedef std::vector<const Player*> TConstPlayerList;
+
+		TConstPlayerList m_playersFinished;
+
 
 		// update routines
 
 		void updateCarPhysics(unsigned p_timeElapsed);
 
 		void updateLevel(unsigned p_timeElapsed);
+
+		void updatePlayersProgress();
+
+
+		// helpers
+		bool hasPlayerFinished(const Player *p_player) const;
 
 };
 

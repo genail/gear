@@ -35,7 +35,8 @@ namespace Race {
 
 RaceLogic::RaceLogic() :
 	m_raceStartTimeMs(0),
-	m_raceFinishTimeMs(0)
+	m_raceFinishTimeMs(0),
+	m_lapCount(0)
 {
 
 }
@@ -48,6 +49,7 @@ void RaceLogic::update(unsigned p_timeElapsed)
 {
 	updateCarPhysics(p_timeElapsed);
 	updateLevel(p_timeElapsed);
+	updatePlayersProgress();
 }
 
 void RaceLogic::updateCarPhysics(unsigned p_timeElapsed)
@@ -62,6 +64,22 @@ void RaceLogic::updateCarPhysics(unsigned p_timeElapsed)
 void RaceLogic::updateLevel(unsigned p_timeElapsed)
 {
 	m_level.update(p_timeElapsed);
+}
+
+void RaceLogic::updatePlayersProgress()
+{
+	Player *player;
+
+	TPlayerMapPair pair;
+	foreach (pair, m_playerMap) {
+		player = pair.second;
+
+		if (player->getCar().getLap() > m_lapCount && !hasPlayerFinished(player)) {
+			cl_log_event(LOG_RACE, "Player '%1' has finished the race", player->getName());
+
+			m_playersFinished.push_back(player);
+		}
+	}
 }
 
 std::vector<CL_String> RaceLogic::getPlayerNames() const
@@ -125,10 +143,13 @@ void RaceLogic::voteYes()
 	// empty
 }
 
-void RaceLogic::startRace(unsigned p_startTimeMs)
+void RaceLogic::startRace(int p_lapCount, unsigned p_startTimeMs)
 {
+	m_lapCount = p_lapCount;
 	m_raceStartTimeMs = p_startTimeMs;
+
 	m_raceFinishTimeMs = 0;
+	m_playersFinished.clear();
 }
 
 bool RaceLogic::isRaceFinished() const
@@ -154,6 +175,17 @@ unsigned RaceLogic::getRaceStartTime() const
 unsigned RaceLogic::getRaceFinishTime() const
 {
 	return m_raceFinishTimeMs;
+}
+
+bool RaceLogic::hasPlayerFinished(const Player *p_player) const
+{
+	foreach (const Player *p, m_playersFinished) {
+		if (p_player == p) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 } // namespace

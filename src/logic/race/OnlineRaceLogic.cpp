@@ -218,7 +218,7 @@ void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle
 	car.setLap(1);
 	car.setLocked(true);
 
-	startRace(CL_System::get_time() + RACE_START_DELAY);
+	startRace(3, CL_System::get_time() + RACE_START_DELAY);
 }
 
 void OnlineRaceLogic::onInputChange(const Car &p_car)

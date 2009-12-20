@@ -102,10 +102,13 @@ void RaceUI::drawMessageBoard(CL_GraphicContext &p_gc)
 	static const float START_POSITION_Y = 0.95f;
 
 	static const int CHANGE_Y = -20;
-	static const int LIMIT = 10;
+	static const int ITEM_LIMIT = 10;
+
+	static const unsigned VISIBLE_TIME_MS = 20000;
+	static const unsigned FADE_TIME_MS = 5000;
 
 	const Race::MessageBoard &board = m_logic->getMessageBoard();
-	std::vector<int> messages = board.getMessageIdsYoungerThat(10000, LIMIT);
+	std::vector<int> messages = board.getMessageIdsYoungerThat(VISIBLE_TIME_MS, ITEM_LIMIT);
 
 	// sort results in multimap by age
 	typedef std::multimap<unsigned, CL_String, Comparator> TMessageMap;
@@ -124,11 +127,22 @@ void RaceUI::drawMessageBoard(CL_GraphicContext &p_gc)
 
 	// display in sorted order
 	CL_Pointf position(Stage::getWidth() * START_POSITION_X, Stage::getHeight() * START_POSITION_Y);
+	const unsigned now = CL_System::get_time();
 
 	TMessagePair pair;
 	foreach (pair, messageMap) {
 		m_messageBoardLabel.setPosition(position);
 		m_messageBoardLabel.setText(pair.second);
+
+		// calculate color
+		age = now - pair.first;
+
+		if (age < VISIBLE_TIME_MS - FADE_TIME_MS) {
+			m_messageBoardLabel.setColor(CL_Colorf::white);
+		} else {
+			const float alpha = 1.0f - ((age - (VISIBLE_TIME_MS - FADE_TIME_MS)) / (float) FADE_TIME_MS);
+			m_messageBoardLabel.setColor(CL_Colorf(1.0f, 1.0f, 1.0f, alpha));
+		}
 
 		m_messageBoardLabel.draw(p_gc);
 		position.y += CHANGE_Y;

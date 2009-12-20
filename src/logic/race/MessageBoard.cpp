@@ -72,12 +72,19 @@ unsigned MessageBoard::getMessageCreationTime(int p_id)
 std::vector<int> MessageBoard::getMessageIdsYoungerThat(unsigned p_ageMs, unsigned p_limit)
 {
 	std::vector<int> result;
-	const unsigned now = CL_System::get_time();
 
-	TMessageMapPair pair;
-	foreach (pair, m_messageMap) {
-		if (now - pair.second.m_creationTime < p_ageMs) {
-			result.push_back(pair.first);
+	if (p_limit != 0) {
+		const unsigned now = CL_System::get_time();
+
+		TMessageMapPair pair;
+		foreach (pair, m_messageMap) {
+			if (now - pair.second.m_creationTime < p_ageMs) {
+				result.push_back(pair.first);
+
+				if (result.size() == p_limit) {
+					break;
+				}
+			}
 		}
 	}
 

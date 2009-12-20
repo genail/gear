@@ -446,4 +446,9 @@ void Car::updateCurrentCheckpoint(const Checkpoint *p_checkpoint)
 	}
 }
 
+void Car::setLocked(bool p_locked)
+{
+	m_locked = p_locked;
+}
+
 } // namespace

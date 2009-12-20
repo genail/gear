@@ -1,3 +1,12 @@
+MACRO(JOIN_LIST p_list)
+    SET(JOIN_LIST_RESULT "")
+    
+    FOREACH(element ${ARGN})
+        SET(JOIN_LIST_RESULT "${JOIN_LIST_RESULT} ${element}")
+    ENDFOREACH()
+    
+ENDMACRO(JOIN_LIST)
+
 # Common source files
 SET(COMMON_SRCS
     common/Game.cpp
@@ -128,33 +137,36 @@ SET(SERVER_LIBS ${LIBS}
 # -Weffc++
 # Common configuration
 SET(COMMON_COMPILE_FLAGS
-    "-isystem/usr/local/include/ClanLib-2.1 \
-    -Woverloaded-virtual \
-    -Wsign-promo \
-    -Wextra \
-    -Wunused \
-    -Wchar-subscripts \
-    -Wcomment \
-    -Wformat \
-    -Wformat-security \
-    -Winit-self \
-    -Wmain \
-    -Wmissing-include-dirs \
-    -Wparentheses \
-    -Wsequence-point \
-    -Wreturn-type \
-    -Wswitch \
-    -Wswitch-default \
-    -Wswitch-enum \
-    -Wtrigraphs \
-    -Wunused \
-    -Wunknown-pragmas \
-    -Warray-bounds \
-    -Wshadow \
-    -Wlarger-than=1024 \
-    -Wenum-compare \
-    -Wvolatile-register-var"
+    "-isystem/usr/local/include/ClanLib-2.1"
+    "-Woverloaded-virtual"
+    "-Wsign-promo"
+    "-Wextra"
+    "-Wunused"
+    "-Wchar-subscripts"
+    "-Wcomment"
+    "-Wformat"
+    "-Wformat-security"
+    "-Winit-self"
+    "-Wmain"
+    "-Wmissing-include-dirs"
+    "-Wparentheses"
+    "-Wsequence-point"
+    "-Wreturn-type"
+    "-Wswitch"
+    "-Wswitch-default"
+    "-Wswitch-enum"
+    "-Wtrigraphs"
+    "-Wunused"
+    "-Wunknown-pragmas"
+    "-Warray-bounds"
+    "-Wshadow"
+    "-Wlarger-than=1024"
+    "-Wenum-compare"
+    "-Wvolatile-register-var"
 )
+
+JOIN_LIST("" ${COMMON_COMPILE_FLAGS})
+SET(COMMON_COMPILE_FLAGS "${JOIN_LIST_RESULT}")
 
 # Game client configuration
 IF (USE_GL2)
@@ -225,3 +237,6 @@ SET_TARGET_PROPERTIES(
     COMPILE_FLAGS
     "-Wall -DCLIENT $ENV{CXXFLAGS}"
 )
+
+ENABLE_TESTING()
+ADD_TEST(suite test_suite)

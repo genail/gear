@@ -333,7 +333,7 @@ void Server::startRace()
 {
 	RaceStart raceStart;
 
-	raceStart.setCarPosition(CL_Pointf(300, 500));
+	raceStart.setCarPosition(CL_Pointf(300, 1100));
 	raceStart.setCarRotation(CL_Angle(90, cl_degrees));
 
 	sendToAll(raceStart.buildEvent());

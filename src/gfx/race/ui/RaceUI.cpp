@@ -164,7 +164,7 @@ void RaceUI::drawLapLabel(CL_GraphicContext &p_gc)
 		lapsCurrent = lapsTotal;
 	}
 
-	m_lapLabel.setText(cl_format("%1 / %2", lapsCurrent, lapsTotal));
+	m_lapLabel.setText(cl_format(_("Lap %1 / %2"), lapsCurrent, lapsTotal));
 	m_lapLabel.draw(p_gc);
 }
 

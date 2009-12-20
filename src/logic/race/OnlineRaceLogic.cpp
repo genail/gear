@@ -135,6 +135,8 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 
 		// add his car to level
 		m_level.addCar(&player->getCar());
+
+		m_messageBoard.addMessage(cl_format("Player %1 joined", p_name));
 	} else {
 		cl_log_event(LOG_ERROR, "Player named '%1' already in list", p_name);
 	}
@@ -154,6 +156,8 @@ void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 
 		// remove player
 		delete player;
+
+		m_messageBoard.addMessage(cl_format("Player %1 leaved", p_name));
 	} else {
 		cl_log_event(LOG_ERROR, "No player named '%1' in list", p_name);
 	}
@@ -281,10 +285,10 @@ void OnlineRaceLogic::onVoteEnded(VoteResult p_voteResult)
 {
 	switch (p_voteResult) {
 		case VOTE_PASSED:
-			cl_log_event(LOG_RACE, "Vote passed");
+			m_messageBoard.addMessage("Vote passed");
 			break;
 		case VOTE_FAILED:
-			cl_log_event(LOG_RACE, "Vote failed");
+			m_messageBoard.addMessage("Vote failed");
 			break;
 		default:
 			assert(0 && "unknown VoteResult");

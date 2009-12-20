@@ -36,7 +36,8 @@ namespace Race {
 RaceLogic::RaceLogic() :
 	m_raceStartTimeMs(0),
 	m_raceFinishTimeMs(0),
-	m_lapCount(0)
+	m_lapCount(0),
+	m_nextPlace(1)
 {
 	m_messageBoard.addMessage(_("Game loaded"));
 }
@@ -68,14 +69,42 @@ void RaceLogic::updateLevel(unsigned p_timeElapsed)
 
 void RaceLogic::updatePlayersProgress()
 {
+	static const unsigned MILLISECOND = 1;
+	static const unsigned CENTISECOND = MILLISECOND * 10;
+	static const unsigned SECOND = CENTISECOND * 100;
+	static const unsigned MINUTE = SECOND * 60;
+
 	Player *player;
+	unsigned now = 0, min = 0, sec = 0, centi = 0;
 
 	TPlayerMapPair pair;
 	foreach (pair, m_playerMap) {
 		player = pair.second;
 
 		if (player->getCar().getLap() > m_lapCount && !hasPlayerFinished(player)) {
-			cl_log_event(LOG_RACE, "Player '%1' has finished the race", player->getName());
+
+			// calculate timing
+			if (now == 0) {
+				now = CL_System::get_time();
+				unsigned diff = now - m_raceStartTimeMs;
+
+				min = diff / MINUTE;
+				diff -= min * MINUTE;
+
+				sec = diff / SECOND;
+				diff -= sec * SECOND;
+
+				centi = diff / CENTISECOND;
+			}
+
+			m_messageBoard.addMessage(
+					cl_format(
+							"Player '%1' has finished at %2 place (%3:%4:%5)",
+							player->getName(),
+							m_nextPlace++,
+							min, sec, centi
+					)
+			);
 
 			m_playersFinished.push_back(player);
 		}
@@ -158,6 +187,7 @@ void RaceLogic::startRace(int p_lapCount, unsigned p_startTimeMs)
 	m_lapCount = p_lapCount;
 	m_raceStartTimeMs = p_startTimeMs;
 
+	m_nextPlace = 1;
 	m_raceFinishTimeMs = 0;
 	m_playersFinished.clear();
 }

@@ -98,6 +98,8 @@ int MessageBoard::addMessage(const CL_String &p_message)
 	Message msg = { p_message, CL_System::get_time() };
 	m_messageMap[id] = msg;
 
+	cl_log_event(LOG_RACE, p_message);
+
 	checkLimits();
 
 	return id;

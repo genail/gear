@@ -127,6 +127,9 @@ class RaceLogic {
 		/** Laps total */
 		int m_lapCount;
 
+		/** Next place to get on finish */
+		int m_nextPlace;
+
 		/** Players that finished this race */
 		typedef std::vector<const Player*> TConstPlayerList;
 

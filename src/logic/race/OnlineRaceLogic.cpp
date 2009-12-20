@@ -273,6 +273,8 @@ void OnlineRaceLogic::onVoteStarted(VoteType p_voteType, const CL_String& p_subj
 	m_voteNoCount = 0;
 	m_voteTimeout = CL_System::get_time() + (p_timeLimitSec * 1000);
 
+	m_messageBoard.addMessage(_("New vote called"));
+
 }
 
 void OnlineRaceLogic::onVoteEnded(VoteResult p_voteResult)

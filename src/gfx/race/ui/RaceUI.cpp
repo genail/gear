@@ -28,6 +28,8 @@
 
 #include "RaceUI.h"
 
+#include <map>
+
 #include "common/Game.h"
 #include "logic/race/Car.h"
 #include "gfx/scenes/RaceScene.h"
@@ -35,6 +37,13 @@
 #include "logic/race/RaceLogic.h"
 
 namespace Gfx {
+
+struct Comparator {
+	bool operator() (unsigned s1, unsigned s2) const
+	{
+		return s1 > s2; // reverse order
+	}
+};
 
 RaceUI::RaceUI(const Race::RaceLogic* p_logic) :
 	m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
@@ -98,15 +107,33 @@ void RaceUI::drawMessageBoard(CL_GraphicContext &p_gc)
 	const Race::MessageBoard &board = m_logic->getMessageBoard();
 	std::vector<int> messages = board.getMessageIdsYoungerThat(10000, LIMIT);
 
-	CL_Pointf position(Stage::getWidth() * START_POSITION_X, Stage::getHeight() * START_POSITION_Y);
+	// sort results in multimap by age
+	typedef std::multimap<unsigned, CL_String, Comparator> TMessageMap;
+	typedef std::pair<unsigned, CL_String> TMessagePair;
+
+	TMessageMap messageMap;
+
+	unsigned age;
 
 	foreach(int id, messages) {
+		age = board.getMessageCreationTime(id);
+		const CL_String &msg = board.getMessageString(id);
+
+		messageMap.insert(TMessagePair(age, msg));
+	}
+
+	// display in sorted order
+	CL_Pointf position(Stage::getWidth() * START_POSITION_X, Stage::getHeight() * START_POSITION_Y);
+
+	TMessagePair pair;
+	foreach (pair, messageMap) {
 		m_messageBoardLabel.setPosition(position);
-		m_messageBoardLabel.setText(board.getMessageString(id));
+		m_messageBoardLabel.setText(pair.second);
 
 		m_messageBoardLabel.draw(p_gc);
 		position.y += CHANGE_Y;
 	}
+
 }
 
 void RaceUI::load(CL_GraphicContext &p_gc)

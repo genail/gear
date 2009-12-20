@@ -42,7 +42,7 @@ class RaceUI: public Gfx::Drawable {
 
 	public:
 
-		RaceUI(const Race::RaceLogic* p_logic);
+		explicit RaceUI(const Race::RaceLogic* p_logic);
 
 		virtual ~RaceUI();
 

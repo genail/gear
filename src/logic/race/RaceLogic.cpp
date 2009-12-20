@@ -38,7 +38,7 @@ RaceLogic::RaceLogic() :
 	m_raceFinishTimeMs(0),
 	m_lapCount(0)
 {
-
+	m_messageBoard.addMessage(_("Game loaded"));
 }
 
 RaceLogic::~RaceLogic()
@@ -80,6 +80,16 @@ void RaceLogic::updatePlayersProgress()
 			m_playersFinished.push_back(player);
 		}
 	}
+}
+
+const Race::Level &RaceLogic::getLevel() const
+{
+	return m_level;
+}
+
+const MessageBoard &RaceLogic::getMessageBoard() const
+{
+	return m_messageBoard;
 }
 
 std::vector<CL_String> RaceLogic::getPlayerNames() const

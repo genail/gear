@@ -35,6 +35,7 @@
 #include "common.h"
 #include "common/votetypes.h"
 #include "logic/race/Level.h"
+#include "logic/race/MessageBoard.h"
 
 class Player;
 
@@ -83,7 +84,9 @@ class RaceLogic {
 
 		bool isRaceStarted() const;
 
-		const Race::Level &getLevel() const { return m_level; }
+		const Race::Level &getLevel() const;
+
+		const MessageBoard &getMessageBoard() const;
 
 		std::vector<CL_String> getPlayerNames() const;
 
@@ -126,6 +129,9 @@ class RaceLogic {
 		typedef std::vector<const Player*> TConstPlayerList;
 
 		TConstPlayerList m_playersFinished;
+
+		/** Message board to display game messages */
+		MessageBoard m_messageBoard;
 
 
 		// update routines

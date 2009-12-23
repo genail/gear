@@ -67,7 +67,9 @@ void Label::draw(CL_GraphicContext &p_gc)
 	assert(isLoaded());
 
 	float ax, ay;
-	calculateAttachPoint(width(), height(), ax, ay);
+	const CL_Size s = size(p_gc);
+
+	calculateAttachPoint(s.width, s.height, ax, ay);
 
 	m_clFont.draw_text(p_gc, m_pos.x - ax, m_pos.y - ay, m_text, m_color);
 }
@@ -116,8 +118,13 @@ float Label::width()
 	assert(isLoaded());
 
 	//cl_log_event(LOG_DEBUG, "%1", m_fontMetrics.get_average_character_width());
-
 	return m_fontMetrics.get_average_character_width() * m_text.length() / 3;
+}
+
+CL_Size Label::size(CL_GraphicContext &p_gc)
+{
+	assert(isLoaded());
+	return m_clFont.get_text_size(p_gc, m_text);
 }
 
 void Label::setAttachPoint(int p_attachPoint)

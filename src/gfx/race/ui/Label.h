@@ -30,6 +30,7 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
 #include "gfx/Drawable.h"
 
 namespace Gfx {
@@ -66,10 +67,12 @@ class Label: public Gfx::Drawable {
 
 
 		/** Calculates height of this label in pixels */
-		float height();
+		DEPRECATED(float height());
 
 		/** Calculates width of this label in pixels */
 		float width();
+
+		CL_Size size(CL_GraphicContext &p_gc);
 
 
 		void setAttachPoint(int p_attachPoint);

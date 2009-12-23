@@ -90,7 +90,6 @@ void RaceUI::drawVote(CL_GraphicContext &p_gc)
 
 		const unsigned timeLeftSec = deadline >= now ? (deadline - now) / 1000 : 0;
 
-		m_voteLabel.setPosition(CL_Pointf(10, m_voteLabel.height()));
 		m_voteLabel.setText(
 				cl_format(
 						_("VOTE (%1): %2 yes: %3 no: %4"),
@@ -101,9 +100,10 @@ void RaceUI::drawVote(CL_GraphicContext &p_gc)
 				)
 		);
 
+		m_voteLabel.setPosition(CL_Pointf(10, m_voteLabel.size(p_gc).height));
 		m_voteLabel.draw(p_gc);
 
-		m_voteLabel.setPosition(CL_Pointf(10, m_voteLabel.height() * 2));
+		m_voteLabel.setPosition(CL_Pointf(10, m_voteLabel.size(p_gc).height * 2));
 		m_voteLabel.setText(_("To vote press F1 (YES) or F2 (NO)"));
 		m_voteLabel.draw(p_gc);
 	}

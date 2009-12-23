@@ -35,7 +35,7 @@ class Player {
 
 	public:
 
-		Player() {}
+		Player();
 
 		Player(const CL_String8 &p_name);
 

@@ -32,9 +32,10 @@
 
 #include "common/Game.h"
 #include "logic/race/Car.h"
+#include "logic/race/RaceLogic.h"
 #include "gfx/scenes/RaceScene.h"
 #include "gfx/Stage.h"
-#include "logic/race/RaceLogic.h"
+#include "gfx/Viewport.h"
 
 namespace Gfx {
 
@@ -45,12 +46,16 @@ struct Comparator {
 	}
 };
 
-RaceUI::RaceUI(const Race::RaceLogic* p_logic) :
+RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
 	m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
 	m_messageBoardLabel(CL_Pointf(), "", Label::F_BOLD, 14),
-	m_lapLabel(CL_Pointf(Stage::getWidth() - 60, 30), "", Label::F_BOLD, 25),
-	m_logic(p_logic)
+	m_lapLabel(CL_Pointf(Stage::getWidth() - 20, 5), "", Label::F_BOLD, 25),
+	m_carLabel(CL_Pointf(), "", Label::F_BOLD, 14),
+	m_logic(p_logic),
+	m_viewport(p_viewport)
 {
+	m_lapLabel.setAttachPoint(Label::AP_RIGHT | Label::AP_TOP);
+	m_carLabel.setAttachPoint(Label::AP_CENTER | Label::AP_TOP);
 }
 
 RaceUI::~RaceUI()
@@ -64,6 +69,7 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 	drawVote(p_gc);
 	drawMessageBoard(p_gc);
 	drawLapLabel(p_gc);
+	drawCarLabels(p_gc);
 }
 
 void RaceUI::drawMeters(CL_GraphicContext &p_gc)
@@ -173,8 +179,20 @@ void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
 	const Race::Level &level = m_logic->getLevel();
 	const int carCount = level.getCarCount();
 
+	CL_Pointf pos;
+
 	for (int i = 0; i < carCount; ++i) {
 
+		const Race::Car &car = level.getCar(i);
+		pos = m_viewport->onScreen(car.getPosition());
+
+		pos.y += 20;
+
+		m_carLabel.setPosition(pos);
+		m_carLabel.setText(car.getOwner()->getName());
+
+		m_carLabel.draw(p_gc);
+		m_carLabel.width();
 	}
 }
 
@@ -184,6 +202,7 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 	m_voteLabel.load(p_gc);
 	m_messageBoardLabel.load(p_gc);
 	m_lapLabel.load(p_gc);
+	m_carLabel.load(p_gc);
 
 }
 

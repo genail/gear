@@ -34,20 +34,28 @@ namespace Gfx
 {
 
 class Viewport {
+
 	public:
+
 		Viewport();
+
 		virtual ~Viewport();
 
-		void prepareGC(CL_GraphicContext &p_gc);
+
+		float getScale() const;
+
+
+		void attachTo(const CL_Pointf* p_point);
+
+		void detach();
+
 		void finalizeGC(CL_GraphicContext &p_gc);
 
-		void attachTo(const CL_Pointf* p_point) { m_attachPoint = p_point; }
+		CL_Pointf onScreen(const CL_Pointf &p_point) const;
 
-		void detach() { m_attachPoint = NULL; }
+		void prepareGC(CL_GraphicContext &p_gc);
 
-		float getScale() const { return m_scale; }
-
-		void setScale(float p_scale) { m_scale = p_scale; }
+		void setScale(float p_scale);
 
 		void update(unsigned int p_elapsedTime);
 

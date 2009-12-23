@@ -29,8 +29,15 @@
 #include "Player.h"
 #include "logic/race/Car.h"
 
+Player::Player() :
+	m_car(this)
+{
+
+}
+
 Player::Player(const CL_String8& p_name) :
-	m_name(p_name)
+	m_name(p_name),
+	m_car(this)
 {
 
 }

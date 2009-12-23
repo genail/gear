@@ -36,6 +36,8 @@
 #include "logic/race/Checkpoint.h"
 #include "network/packets/CarState.h"
 
+class Player;
+
 namespace Gfx {
 	class RaceGraphics;
 }
@@ -51,7 +53,7 @@ class Car
 
 	public:
 
-		Car();
+		Car(const Player *p_owner);
 
 		virtual ~Car();
 
@@ -60,6 +62,8 @@ class Car
 		const Checkpoint *getCurrentCheckpoint() const { return m_currentCheckpoint; }
 
 		int getLap() const { return m_lap; }
+
+		const Player *getOwner() const;
 
 		const CL_Pointf& getPosition() const { return m_position; }
 
@@ -133,8 +137,11 @@ class Car
 
 	private:
 		
+		/** This car owner */
+		const Player *m_owner;
+
 		/** Parent level */
-		Race::Level* m_level;
+		Race::Level *m_level;
 
 		/** Locked state. If true then car shoudn't move. */
 		bool m_locked;

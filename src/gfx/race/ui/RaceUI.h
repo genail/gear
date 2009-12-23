@@ -38,11 +38,13 @@ namespace Race {
 
 namespace Gfx {
 
+class Viewport;
+
 class RaceUI: public Gfx::Drawable {
 
 	public:
 
-		explicit RaceUI(const Race::RaceLogic* p_logic);
+		explicit RaceUI(const Race::RaceLogic* p_logic, const Gfx::Viewport *p_viewport);
 
 		virtual ~RaceUI();
 
@@ -66,8 +68,14 @@ class RaceUI: public Gfx::Drawable {
 		/** Lap count label */
 		Label m_lapLabel;
 
+		/** Player names under cars label */
+		Label m_carLabel;
+
 		// Race logic pointer
 		const Race::RaceLogic *m_logic;
+
+		// Viewport pointer
+		const Gfx::Viewport *m_viewport;
 
 
 		// draw routines

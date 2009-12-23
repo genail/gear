@@ -73,4 +73,33 @@ void Viewport::finalizeGC(CL_GraphicContext &p_gc) {
 	p_gc.pop_modelview();
 }
 
+CL_Pointf Viewport::onScreen(const CL_Pointf &p_point) const
+{
+	CL_Pointf result;
+	result.x = ((p_point.x - m_x) / m_width) * Stage::getWidth();
+	result.y = ((p_point.y - m_y) / m_height) * Stage::getHeight();
+
+	return result;
+}
+
+void Viewport::attachTo(const CL_Pointf* p_point)
+{
+	m_attachPoint = p_point;
+}
+
+void Viewport::detach()
+{
+	m_attachPoint = NULL;
+}
+
+float Viewport::getScale() const
+{
+	return m_scale;
+}
+
+void Viewport::setScale(float p_scale)
+{
+	m_scale = p_scale;
+}
+
 } // namespace

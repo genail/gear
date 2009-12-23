@@ -28,6 +28,7 @@
 
 #include "common.h"
 #include "common/Game.h"
+#include "common/Player.h"
 #include "common/Properties.h"
 #include "gfx/Stage.h"
 #include "gfx/DebugLayer.h"
@@ -44,7 +45,8 @@ const int CAR_WIDTH = 18;
 /* Car height in pixels */
 const int CAR_HEIGHT = 24;
 
-Car::Car() :
+Car::Car(const Player *p_owner) :
+	m_owner(p_owner),
 	m_level(NULL),
 	m_locked(false),
 	m_position(300.0f, 300.0f),
@@ -454,6 +456,11 @@ void Car::setLocked(bool p_locked)
 bool Car::isLocked() const
 {
 	return m_locked;
+}
+
+const Player *Car::getOwner() const
+{
+	return m_owner;
 }
 
 } // namespace

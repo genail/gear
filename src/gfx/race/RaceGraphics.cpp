@@ -46,7 +46,8 @@ namespace Gfx {
 
 RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
 	m_logic(p_logic),
-	m_raceUI(p_logic)
+	m_viewport(),
+	m_raceUI(p_logic, &m_viewport)
 {
 	// attach viewport to player's car
 	Game &game = Game::getInstance();

@@ -32,6 +32,15 @@
 
 namespace Gfx {
 
+const int Label::AP_LEFT   = 1;
+const int Label::AP_TOP    = 2;
+const int Label::AP_RIGHT  = 4;
+const int Label::AP_BOTTOM = 8;
+const int Label::AP_CENTER = 16;
+
+const int AP_SIDES = Label::AP_LEFT | Label::AP_RIGHT;
+const int AP_TOPS = Label::AP_TOP | Label::AP_BOTTOM;
+
 Label::Label(
 		const CL_Pointf &p_pos,
 		const CL_String &p_text,
@@ -40,6 +49,7 @@ Label::Label(
 		const CL_Colorf &p_color
 		) :
 		m_pos(p_pos),
+		m_attachPoint(AP_LEFT | AP_BOTTOM),
 		m_text(p_text),
 		m_font(p_font),
 		m_size(p_size),
@@ -55,7 +65,11 @@ Label::~Label()
 void Label::draw(CL_GraphicContext &p_gc)
 {
 	assert(isLoaded());
-	m_clFont.draw_text(p_gc, m_pos.x, m_pos.y, m_text, m_color);
+
+	float ax, ay;
+	calculateAttachPoint(width(), height(), ax, ay);
+
+	m_clFont.draw_text(p_gc, m_pos.x - ax, m_pos.y - ay, m_text, m_color);
 }
 
 void Label::load(CL_GraphicContext &p_gc)
@@ -100,7 +114,47 @@ float Label::height()
 float Label::width()
 {
 	assert(isLoaded());
-	return m_fontMetrics.get_average_character_width() * m_text.length();
+
+	//cl_log_event(LOG_DEBUG, "%1", m_fontMetrics.get_average_character_width());
+
+	return m_fontMetrics.get_average_character_width() * m_text.length() / 3;
+}
+
+void Label::setAttachPoint(int p_attachPoint)
+{
+	G_ASSERT(!((p_attachPoint & AP_LEFT) && (p_attachPoint & AP_RIGHT)) && "bad value");
+	G_ASSERT(!((p_attachPoint & AP_TOP) && (p_attachPoint & AP_BOTTOM)) && "bad value");
+
+	m_attachPoint = p_attachPoint;
+}
+
+void Label::calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y)
+{
+	if (m_attachPoint & AP_SIDES) {
+		if (m_attachPoint & AP_LEFT) {
+			p_x = 0.0f;
+		} else {
+			p_x = p_w;
+		}
+	}
+
+	if (m_attachPoint & AP_TOPS) {
+		if (m_attachPoint & AP_BOTTOM) {
+			p_y = 0.0f;
+		} else {
+			p_y = -p_h;
+		}
+	}
+
+	if (m_attachPoint & AP_CENTER) {
+		if (!(m_attachPoint & AP_TOPS)) {
+			p_y = -p_h / 2.0f;
+		}
+
+		if (!(m_attachPoint & AP_SIDES)) {
+			p_x = p_w / 2.0f;
+		}
+	}
 }
 
 } // namespace

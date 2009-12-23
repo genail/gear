@@ -38,6 +38,12 @@ class Label: public Gfx::Drawable {
 
 	public:
 
+		static const int AP_LEFT;
+		static const int AP_TOP;
+		static const int AP_RIGHT;
+		static const int AP_BOTTOM;
+		static const int AP_CENTER;
+
 		enum Font {
 			F_REGULAR,
 			F_BOLD
@@ -66,6 +72,8 @@ class Label: public Gfx::Drawable {
 		float width();
 
 
+		void setAttachPoint(int p_attachPoint);
+
 		void setColor(const CL_Colorf &p_color);
 
 		void setPosition(const CL_Pointf &p_pos);
@@ -75,6 +83,8 @@ class Label: public Gfx::Drawable {
 	private:
 
 		CL_Pointf m_pos;
+
+		int m_attachPoint;
 
 		CL_String m_text;
 
@@ -87,6 +97,8 @@ class Label: public Gfx::Drawable {
 		CL_Font_System m_clFont;
 
 		CL_FontMetrics m_fontMetrics;
+
+		void calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y);
 };
 
 }

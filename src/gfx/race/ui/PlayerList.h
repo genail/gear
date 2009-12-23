@@ -31,6 +31,7 @@
 #include <ClanLib/core.h>
 
 #include "gfx/Drawable.h"
+#include "gfx/race/ui/Label.h"
 
 namespace Race {
 	class RaceLogic;
@@ -60,6 +61,8 @@ class PlayerList : public Gfx::Drawable {
 		const Race::RaceLogic *m_logic;
 
 		CL_Pointf m_position;
+
+		Label m_label;
 };
 
 }

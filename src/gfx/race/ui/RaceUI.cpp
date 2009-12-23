@@ -47,6 +47,7 @@ struct Comparator {
 };
 
 RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
+	m_playerList(p_logic),
 	m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
 	m_messageBoardLabel(CL_Pointf(), "", Label::F_BOLD, 14),
 	m_lapLabel(CL_Pointf(Stage::getWidth() - 20, 5), "", Label::F_BOLD, 25),
@@ -54,6 +55,7 @@ RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) 
 	m_logic(p_logic),
 	m_viewport(p_viewport)
 {
+	m_playerList.setPosition(CL_Pointf(Stage::getWidth() - 150, 100));
 	m_lapLabel.setAttachPoint(Label::AP_RIGHT | Label::AP_TOP);
 	m_carLabel.setAttachPoint(Label::AP_CENTER | Label::AP_TOP);
 }
@@ -64,12 +66,12 @@ RaceUI::~RaceUI()
 
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
-
 	drawMeters(p_gc);
 	drawVote(p_gc);
 	drawMessageBoard(p_gc);
 	drawLapLabel(p_gc);
 	drawCarLabels(p_gc);
+	drawPlayerList(p_gc);
 }
 
 void RaceUI::drawMeters(CL_GraphicContext &p_gc)
@@ -196,9 +198,15 @@ void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
 	}
 }
 
+void RaceUI::drawPlayerList(CL_GraphicContext &p_gc)
+{
+	m_playerList.draw(p_gc);
+}
+
 void RaceUI::load(CL_GraphicContext &p_gc)
 {
 	m_speedMeter.load(p_gc);
+	m_playerList.load(p_gc);
 	m_voteLabel.load(p_gc);
 	m_messageBoardLabel.load(p_gc);
 	m_lapLabel.load(p_gc);

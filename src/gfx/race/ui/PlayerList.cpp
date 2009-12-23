@@ -28,12 +28,15 @@
 
 #include "PlayerList.h"
 
+#include "common/Player.h"
+#include "logic/race/Car.h"
 #include "logic/race/RaceLogic.h"
 
 namespace Gfx {
 
 PlayerList::PlayerList(const Race::RaceLogic *p_logic) :
-	m_logic(p_logic)
+	m_logic(p_logic),
+	m_label(CL_Pointf(), "", Label::F_BOLD, 16)
 {
 }
 
@@ -49,11 +52,32 @@ void PlayerList::setPosition(const CL_Pointf &p_pos)
 
 void PlayerList::draw(CL_GraphicContext &p_gc)
 {
+	const Race::Level &level = m_logic->getLevel();
+	const int carCount = level.getCarCount();
 
+	const float labelHeight = m_label.height();
+	float h = 0.0f;
+
+	p_gc.mult_translate(m_position.x, m_position.y);
+
+	for (int i = 0; i < carCount; ++i) {
+		const Race::Car &car = level.getCar(i);
+
+		m_label.setPosition(CL_Pointf(0, h));
+		m_label.setText(cl_format("%1. %2", i + 1, car.getOwner()->getName()));
+
+		m_label.draw(p_gc);
+
+		h += labelHeight;
+	}
+
+	p_gc.pop_modelview();
 }
 
 void PlayerList::load(CL_GraphicContext &p_gc)
 {
+	m_label.load(p_gc);
+
 	Drawable::load(p_gc);
 }
 

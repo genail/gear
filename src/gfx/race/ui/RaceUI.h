@@ -31,6 +31,7 @@
 #include "Label.h"
 #include "gfx/Drawable.h"
 #include "gfx/race/ui/SpeedMeter.h"
+#include "gfx/race/ui/PlayerList.h"
 
 namespace Race {
 	class RaceLogic;
@@ -58,6 +59,9 @@ class RaceUI: public Gfx::Drawable {
 
 		/** Speed control widget */
 		SpeedMeter m_speedMeter;
+
+		/** Player list widget */
+		PlayerList m_playerList;
 
 		/** Vote label */
 		Label m_voteLabel;
@@ -89,6 +93,8 @@ class RaceUI: public Gfx::Drawable {
 		void drawLapLabel(CL_GraphicContext &p_gc);
 
 		void drawCarLabels(CL_GraphicContext &p_gc);
+
+		void drawPlayerList(CL_GraphicContext &p_gc);
 };
 
 } // namespace

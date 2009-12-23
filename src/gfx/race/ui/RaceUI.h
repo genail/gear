@@ -77,7 +77,10 @@ class RaceUI: public Gfx::Drawable {
 		void drawVote(CL_GraphicContext &p_gc);
 
 		void drawMessageBoard(CL_GraphicContext &p_gc);
+
 		void drawLapLabel(CL_GraphicContext &p_gc);
+
+		void drawCarLabels(CL_GraphicContext &p_gc);
 };
 
 } // namespace

@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <assert.h>
 #include <libintl.h>
 #include <boost/foreach.hpp>
 
@@ -88,7 +89,9 @@
 	if (!m_func_##name.is_null()) \
 		m_func_##name.invoke()
 
+
 // deprecated macro
+
 #ifdef __GNUC__
 #define DEPRECATED(func) func __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
@@ -97,6 +100,23 @@
 #pragma message("WARNING: You need to implement DEPRECATED for this compiler")
 #define DEPRECATED(func) func
 #endif
+
+
+// assert macro
+
+#if defined(G_ASSERT)
+#error G_ASSERT already defined
+#endif // G_ASSERT
+
+#define G_ASSERT(expr) \
+	assert(expr)
+
+#if defined(G_ASSERT_PERROR)
+#error G_ASSERT_PERROR already defined
+#endif // G_ASSERT_PERROR
+
+#define G_ASSERT_PERROR(expr) \
+	assert_perror(expr)
 
 // log levels
 #define LOG_DEBUG "debug"

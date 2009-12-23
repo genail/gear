@@ -168,6 +168,16 @@ void RaceUI::drawLapLabel(CL_GraphicContext &p_gc)
 	m_lapLabel.draw(p_gc);
 }
 
+void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
+{
+	const Race::Level &level = m_logic->getLevel();
+	const int carCount = level.getCarCount();
+
+	for (int i = 0; i < carCount; ++i) {
+
+	}
+}
+
 void RaceUI::load(CL_GraphicContext &p_gc)
 {
 	m_speedMeter.load(p_gc);

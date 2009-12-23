@@ -585,4 +585,21 @@ const Sandpit &Level::sandpitAt(unsigned p_index) const
 	return m_sandpits[p_index];
 }
 
+int Level::getCarCount() const
+{
+	return static_cast<int>(m_cars.size());
+}
+
+const Car &Level::getCar(int p_index) const
+{
+	G_ASSERT(p_index >= 0 && p_index < getCarCount());
+	return *m_cars[static_cast<unsigned>(p_index)];
+}
+
+Car &Level::getCar(int p_index)
+{
+	G_ASSERT(p_index >= 0 && p_index < getCarCount());
+	return *m_cars[static_cast<unsigned>(p_index)];
+}
+
 } // namespace

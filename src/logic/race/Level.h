@@ -81,11 +81,11 @@ class Level
 		CL_Pointf getStartPosition(int p_num) const;
 
 
-		unsigned getCarCount() const { return m_cars.size(); }
+		int getCarCount() const;
 
-		const Car &getCar(size_t p_index) const { return *m_cars[p_index]; }
+		const Car &getCar(int p_index) const;
 
-		Car &getCar(size_t p_index) { return *m_cars[p_index]; }
+		Car &getCar(int p_index);
 
 		int getWidth() const { return m_width; }
 

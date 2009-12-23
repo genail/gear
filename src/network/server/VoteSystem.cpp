@@ -33,10 +33,10 @@
 
 #include "common.h"
 
-/** Yes to No ratio that will result in succeeded voting */
-const float PASS_RATIO = 1.0f * (2.0f / 3.0f) - 0.001f;
-/** No to Yes ratio that will result in failed voting */
-const float FAIL_RATIO = 1.0f * (1.0f / 3.0f) - 0.001f;
+/** Yes to all ratio that will result in succeeded voting */
+const float PASS_RATIO = 1.0f / 2.0f - 0.001f;
+/** No to all ratio that will result in failed voting */
+const float FAIL_RATIO = PASS_RATIO;
 
 namespace Net {
 

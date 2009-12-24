@@ -38,7 +38,7 @@ class CarState : public Net::Packet {
 
 	public:
 
-		CarState() {}
+		CarState();
 
 		virtual ~CarState() {}
 

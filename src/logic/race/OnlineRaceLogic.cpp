@@ -58,16 +58,17 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogic::onInputChange);
 
 	// connect signals and slots from client
-	m_slots.connect(m_client.sig_connected(), this, &OnlineRaceLogic::onConnected);
-	m_slots.connect(m_client.sig_disconnected(), this, &OnlineRaceLogic::onDisconnected);
-	m_slots.connect(m_client.sig_playerJoined(), this, &OnlineRaceLogic::onPlayerJoined);
-	m_slots.connect(m_client.sig_playerLeaved(), this, &OnlineRaceLogic::onPlayerLeaved);
+	m_slots.connect(m_client.sig_connected(),         this, &OnlineRaceLogic::onConnected);
+	m_slots.connect(m_client.sig_disconnected(),      this, &OnlineRaceLogic::onDisconnected);
+	m_slots.connect(m_client.sig_goodbyeReceived(),   this, &OnlineRaceLogic::onGoodbye);
+	m_slots.connect(m_client.sig_playerJoined(),      this, &OnlineRaceLogic::onPlayerJoined);
+	m_slots.connect(m_client.sig_playerLeaved(),      this, &OnlineRaceLogic::onPlayerLeaved);
 	m_slots.connect(m_client.sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
-	m_slots.connect(m_client.sig_carStateReceived(), this, &OnlineRaceLogic::onCarState);
+	m_slots.connect(m_client.sig_carStateReceived(),  this, &OnlineRaceLogic::onCarState);
 	m_slots.connect(m_client.sig_raceStartReceived(), this, &OnlineRaceLogic::onRaceStart);
-	m_slots.connect(m_client.sig_voteStarted(), this, &OnlineRaceLogic::onVoteStarted);
-	m_slots.connect(m_client.sig_voteEnded(), this, &OnlineRaceLogic::onVoteEnded);
-	m_slots.connect(m_client.sig_voteTickReceived(), this, &OnlineRaceLogic::onVoteTick);
+	m_slots.connect(m_client.sig_voteStarted(),       this, &OnlineRaceLogic::onVoteStarted);
+	m_slots.connect(m_client.sig_voteEnded(),         this, &OnlineRaceLogic::onVoteEnded);
+	m_slots.connect(m_client.sig_voteTickReceived(),  this, &OnlineRaceLogic::onVoteTick);
 }
 
 OnlineRaceLogic::~OnlineRaceLogic()
@@ -123,6 +124,11 @@ void OnlineRaceLogic::onConnected()
 
 void OnlineRaceLogic::onDisconnected()
 {
+}
+
+void OnlineRaceLogic::onGoodbye(GoodbyeReason p_reason, const CL_String &p_message)
+{
+	display(cl_format(_("Disconnected from server. Reason: %1"), p_message));
 }
 
 void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)

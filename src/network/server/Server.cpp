@@ -224,7 +224,7 @@ void Server::onClientInfo(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p
 
 		// send goodbye
 		Net::Goodbye goodbye;
-		goodbye.setGoodbyeReason(Goodbye::UNSUPPORTED_PROTOCOL_VERSION);
+		goodbye.setGoodbyeReason(GR_UNSUPPORTED_PROTOCOL_VERSION);
 
 		send(p_conn, goodbye.buildEvent());
 		return;
@@ -245,7 +245,7 @@ void Server::onClientInfo(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p
 
 		// send goodbye
 		Goodbye goodbye;
-		goodbye.setGoodbyeReason(Goodbye::NAME_ALREADY_IN_USE);
+		goodbye.setGoodbyeReason(GR_NAME_ALREADY_IN_USE);
 
 		send(p_conn, goodbye.buildEvent());
 		return;

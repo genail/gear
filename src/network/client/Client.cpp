@@ -178,6 +178,8 @@ void Client::onGoodbye(const CL_NetGameEvent &p_event)
 
 	cl_log_event("event", "Server says goodbye: %1", goodbye.getStringMessage());
 	disconnect();
+
+	INVOKE_2(goodbyeReceived, goodbye.getGoodbyeReason(), goodbye.getStringMessage());
 }
 
 void Client::onGameState(const CL_NetGameEvent &p_gameState)

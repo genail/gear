@@ -34,6 +34,14 @@
 
 namespace Net {
 
+CarState::CarState() :
+		m_speed(0.0f),
+		m_accel(0.0f),
+		m_turn(0.0f)
+{
+
+}
+
 CL_NetGameEvent CarState::buildEvent() const
 {
 	CL_NetGameEvent event(EVENT_CAR_STATE);

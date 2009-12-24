@@ -32,6 +32,7 @@
 #include "ClanLib/network.h"
 
 #include "common.h"
+#include "common/types.h"
 #include "common/votetypes.h"
 #include "common/Player.h"
 #include "logic/race/Car.h"
@@ -49,6 +50,9 @@ class Client {
 
 		/** Client is disconnected */
 		SIGNAL_0(disconnected);
+
+		/** Server sends goodbye: reason, reason text */
+		SIGNAL_2(GoodbyeReason, const CL_String&, goodbyeReceived);
 
 		/** Player info accepted */
 		SIGNAL_0(accepted);

@@ -30,6 +30,7 @@
 
 #include <assert.h>
 
+#include "common.h"
 #include "network/events.h"
 
 namespace Net {
@@ -45,16 +46,16 @@ CL_NetGameEvent Goodbye::buildEvent() const
 void Goodbye::parseEvent(const CL_NetGameEvent &p_event)
 {
 	assert(p_event.get_name() == EVENT_GOODBYE);
-	m_reason = (Reason) (int) p_event.get_argument(0);
+	m_reason = static_cast<GoodbyeReason>(static_cast<int>(p_event.get_argument(0)));
 }
 
 CL_String Goodbye::getStringMessage() const
 {
 	switch (m_reason) {
-		case UNSUPPORTED_PROTOCOL_VERSION:
-			return "Unsupported protocol version";
-		case NAME_ALREADY_IN_USE:
-			return "Name already in use";
+		case GR_UNSUPPORTED_PROTOCOL_VERSION:
+			return _("Unsupported protocol version");
+		case GR_NAME_ALREADY_IN_USE:
+			return _("Name already in use");
 		default:
 			assert(0 && "unknown goodbye reason");
 	}

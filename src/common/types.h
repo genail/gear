@@ -28,35 +28,7 @@
 
 #pragma once
 
-#include "common/types.h"
-#include "Packet.h"
-
-namespace Net {
-
-class Goodbye : public Packet {
-
-	public:
-
-		Goodbye() {}
-
-		virtual ~Goodbye() {}
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		GoodbyeReason getGoodbyeReason() const { return m_reason; }
-
-		/**
-		 * @return Literal representation of goodbye reason.
-		 */
-		CL_String getStringMessage() const;
-
-		void setGoodbyeReason(GoodbyeReason p_reason) { m_reason = p_reason; }
-
-	private:
-
-		GoodbyeReason m_reason;
+enum GoodbyeReason {
+	GR_UNSUPPORTED_PROTOCOL_VERSION,
+	GR_NAME_ALREADY_IN_USE
 };
-
-}

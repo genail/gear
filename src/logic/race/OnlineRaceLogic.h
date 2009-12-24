@@ -119,6 +119,8 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		void onDisconnected();
 
+		void onGoodbye(GoodbyeReason p_reason, const CL_String &p_message);
+
 		void onPlayerJoined(const CL_String &p_name);
 
 		void onPlayerLeaved(const CL_String &p_name);

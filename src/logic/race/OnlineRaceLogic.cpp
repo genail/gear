@@ -220,15 +220,23 @@ void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle
 	car.setPosition(p_carPosition);
 	car.setRotation(p_carRotation.to_degrees() - 90); // FIXME: Remove -90 when #16 is resolved
 	car.setLap(1);
+
 	car.setLocked(true);
+
+	// send current state
+	const Net::CarState carState = car.prepareCarState();
+	m_client.sendCarState(carState);
+
 
 	startRace(3, CL_System::get_time() + RACE_START_DELAY);
 }
 
 void OnlineRaceLogic::onInputChange(const Car &p_car)
 {
-	const Net::CarState carState = p_car.prepareCarState();
-	m_client.sendCarState(carState);
+	if (!p_car.isLocked()) { // ignore when should be locked
+		const Net::CarState carState = p_car.prepareCarState();
+		m_client.sendCarState(carState);
+	}
 }
 
 void OnlineRaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)

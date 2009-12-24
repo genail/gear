@@ -451,6 +451,13 @@ void Car::updateCurrentCheckpoint(const Checkpoint *p_checkpoint)
 void Car::setLocked(bool p_locked)
 {
 	m_locked = p_locked;
+
+	if (p_locked) {
+		m_acceleration = false;
+		m_brake = false;
+		m_handbrake = false;
+		m_moveVector = CL_Vec2f();
+	}
 }
 
 bool Car::isLocked() const

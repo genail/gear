@@ -52,6 +52,8 @@ class Game {
 
 		Player m_player;
 
+		Net::Client m_client;
+
 		/** Slots containter */
 		CL_SlotContainer m_slots;
 

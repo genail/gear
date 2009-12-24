@@ -49,3 +49,8 @@ Game &Game::getInstance()
 Player &Game::getPlayer() {
 	return m_player;
 }
+
+Net::Client &Game::getNetworkConnection()
+{
+	return m_client;
+}

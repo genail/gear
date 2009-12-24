@@ -91,13 +91,13 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		int m_port;
 
 		/** Network client */
-		Net::Client m_client;
-
-		/** Slots container */
-		CL_SlotContainer m_slots;
+		Net::Client *m_client;
 
 		/** Local player */
 		Player *m_localPlayer;
+
+		/** Slots container */
+		CL_SlotContainer m_slots;
 
 
 		// vote system

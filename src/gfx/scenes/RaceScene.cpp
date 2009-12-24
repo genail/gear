@@ -108,6 +108,11 @@ void RaceScene::destroy()
 	}
 }
 
+void RaceScene::poped()
+{
+	destroy();
+}
+
 void RaceScene::draw(CL_GraphicContext &p_gc)
 {
 	G_ASSERT(m_initialized);
@@ -135,6 +140,7 @@ void RaceScene::update(unsigned p_timeElapsed)
 {
 	G_ASSERT(m_initialized);
 
+	if (m_logic)
 	m_logic->update(p_timeElapsed);
 	m_graphics->update(p_timeElapsed);
 }

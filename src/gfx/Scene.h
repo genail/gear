@@ -45,11 +45,17 @@ class Scene : public CL_GUIComponent {
 
 		virtual ~Scene() {}
 
-		virtual void draw(CL_GraphicContext &p_gc) {};
 
 		bool isLoaded() const { return m_loaded; }
 
+
+		virtual void draw(CL_GraphicContext &p_gc) {};
+
 		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
+
+		virtual void pushed() {}
+
+		virtual void poped() {}
 
 		virtual void update(unsigned p_timeElapsed) {}
 

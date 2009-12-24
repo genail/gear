@@ -43,12 +43,13 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_initialized(false),
 	m_host(p_host),
 	m_port(p_port),
+	m_client(&Game::getInstance().getNetworkConnection()),
 	m_voteRunning(false)
 {
-	assert(p_port > 0 && p_port <= 0xFFFF);
+	G_ASSERT(p_port > 0 && p_port <= 0xFFFF);
 
-	m_client.setServerAddr(m_host);
-	m_client.setServerPort(m_port);
+	m_client->setServerAddr(m_host);
+	m_client->setServerPort(m_port);
 
 	// connect signal and slots from player's car
 	Game &game = Game::getInstance();
@@ -58,17 +59,17 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogic::onInputChange);
 
 	// connect signals and slots from client
-	m_slots.connect(m_client.sig_connected(),         this, &OnlineRaceLogic::onConnected);
-	m_slots.connect(m_client.sig_disconnected(),      this, &OnlineRaceLogic::onDisconnected);
-	m_slots.connect(m_client.sig_goodbyeReceived(),   this, &OnlineRaceLogic::onGoodbye);
-	m_slots.connect(m_client.sig_playerJoined(),      this, &OnlineRaceLogic::onPlayerJoined);
-	m_slots.connect(m_client.sig_playerLeaved(),      this, &OnlineRaceLogic::onPlayerLeaved);
-	m_slots.connect(m_client.sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
-	m_slots.connect(m_client.sig_carStateReceived(),  this, &OnlineRaceLogic::onCarState);
-	m_slots.connect(m_client.sig_raceStartReceived(), this, &OnlineRaceLogic::onRaceStart);
-	m_slots.connect(m_client.sig_voteStarted(),       this, &OnlineRaceLogic::onVoteStarted);
-	m_slots.connect(m_client.sig_voteEnded(),         this, &OnlineRaceLogic::onVoteEnded);
-	m_slots.connect(m_client.sig_voteTickReceived(),  this, &OnlineRaceLogic::onVoteTick);
+	m_slots.connect(m_client->sig_connected(),         this, &OnlineRaceLogic::onConnected);
+	m_slots.connect(m_client->sig_disconnected(),      this, &OnlineRaceLogic::onDisconnected);
+	m_slots.connect(m_client->sig_goodbyeReceived(),   this, &OnlineRaceLogic::onGoodbye);
+	m_slots.connect(m_client->sig_playerJoined(),      this, &OnlineRaceLogic::onPlayerJoined);
+	m_slots.connect(m_client->sig_playerLeaved(),      this, &OnlineRaceLogic::onPlayerLeaved);
+	m_slots.connect(m_client->sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
+	m_slots.connect(m_client->sig_carStateReceived(),  this, &OnlineRaceLogic::onCarState);
+	m_slots.connect(m_client->sig_raceStartReceived(), this, &OnlineRaceLogic::onRaceStart);
+	m_slots.connect(m_client->sig_voteStarted(),       this, &OnlineRaceLogic::onVoteStarted);
+	m_slots.connect(m_client->sig_voteEnded(),         this, &OnlineRaceLogic::onVoteEnded);
+	m_slots.connect(m_client->sig_voteTickReceived(),  this, &OnlineRaceLogic::onVoteTick);
 }
 
 OnlineRaceLogic::~OnlineRaceLogic()
@@ -81,7 +82,7 @@ void OnlineRaceLogic::initialize()
 	if (!m_initialized) {
 
 		// connect to server
-		if (!m_client.connect()) {
+		if (!m_client->connect()) {
 			display(_("Cannot connect to game server"));
 		}
 
@@ -92,7 +93,7 @@ void OnlineRaceLogic::initialize()
 void OnlineRaceLogic::destroy()
 {
 	if (m_initialized) {
-		m_client.disconnect();
+		m_client->disconnect();
 
 		// remove players
 		TPlayerMapPair pair;
@@ -114,6 +115,8 @@ void OnlineRaceLogic::destroy()
 
 void OnlineRaceLogic::update(unsigned p_timeElapsed)
 {
+	G_ASSERT(m_initialized);
+
 	RaceLogic::update(p_timeElapsed);
 
 	// make sure that car is not locked when race is started
@@ -241,7 +244,7 @@ void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle
 
 	// send current state
 	const Net::CarState carState = car.prepareCarState();
-	m_client.sendCarState(carState);
+	m_client->sendCarState(carState);
 
 
 	startRace(3, CL_System::get_time() + RACE_START_DELAY);
@@ -251,13 +254,13 @@ void OnlineRaceLogic::onInputChange(const Car &p_car)
 {
 	if (!p_car.isLocked()) { // ignore when should be locked
 		const Net::CarState carState = p_car.prepareCarState();
-		m_client.sendCarState(carState);
+		m_client->sendCarState(carState);
 	}
 }
 
 void OnlineRaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)
 {
-	m_client.callAVote(p_type, p_subject);
+	m_client->callAVote(p_type, p_subject);
 }
 
 const CL_String &OnlineRaceLogic::getVoteMessage() const
@@ -323,12 +326,12 @@ void OnlineRaceLogic::onVoteEnded(VoteResult p_voteResult)
 
 void OnlineRaceLogic::voteNo()
 {
-	m_client.voteNo();
+	m_client->voteNo();
 }
 
 void OnlineRaceLogic::voteYes()
 {
-	m_client.voteYes();
+	m_client->voteYes();
 }
 
 void OnlineRaceLogic::onVoteTick(VoteOption p_voteOption)

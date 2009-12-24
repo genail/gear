@@ -74,6 +74,8 @@ class RaceScene: public Scene
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+		virtual void poped();
+
 		virtual void update(unsigned p_timeElapsed);
 
 

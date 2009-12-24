@@ -52,6 +52,13 @@ Client::Client() :
 	m_slots.connect(m_gameClient.sig_event_received(), this, &Client::onEventReceived);
 }
 
+Client::~Client() {
+
+	if (m_connected) {
+		m_gameClient.disconnect();
+	}
+}
+
 bool Client::connect() {
 
 	assert(!m_addr.empty() && m_port > 0 && m_port < 0xFFFF);
@@ -72,13 +79,6 @@ bool Client::connect() {
 
 void Client::disconnect()
 {
-	if (m_connected) {
-		m_gameClient.disconnect();
-	}
-}
-
-Client::~Client() {
-
 	if (m_connected) {
 		m_gameClient.disconnect();
 	}

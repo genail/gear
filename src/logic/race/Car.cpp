@@ -446,6 +446,8 @@ void Car::updateCurrentCheckpoint(const Checkpoint *p_checkpoint)
 		if (id == m_greatestCheckpointId + 1) {
 			++m_greatestCheckpointId;
 		}
+	} else {
+		m_greatestCheckpointId = 0;
 	}
 
 	m_currentCheckpoint = p_checkpoint;

@@ -48,19 +48,19 @@
 	private: \
 		CL_Signal_v0 m_sig_##name;
 
-#define SIGNAL_1(T1, name) \
+#define SIGNAL_1(name, T1) \
 	public: \
 		CL_Signal_v1<T1> &sig_##name() { return m_sig_##name; } \
 	private: \
 		CL_Signal_v1<T1> m_sig_##name;
 
-#define SIGNAL_2(T1, T2, name) \
+#define SIGNAL_2(name, T1, T2) \
 	public: \
 		CL_Signal_v2<T1, T2> &sig_##name() { return m_sig_##name; } \
 	private: \
 		CL_Signal_v2<T1, T2> m_sig_##name;
 
-#define SIGNAL_3(T1, T2, T3, name) \
+#define SIGNAL_3(name, T1, T2, T3) \
 	public: \
 		CL_Signal_v3<T1, T2, T3> &sig_##name() { return m_sig_##name; } \
 	private: \

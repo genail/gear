@@ -49,7 +49,7 @@ class Level;
 class Car
 {
 
-	SIGNAL_1(const Car&, inputChanged);
+	SIGNAL_1(inputChanged, const Car&);
 
 	public:
 

@@ -52,34 +52,34 @@ class Client {
 		SIGNAL_0(disconnected);
 
 		/** Server sends goodbye: reason, reason text */
-		SIGNAL_2(GoodbyeReason, const CL_String&, goodbyeReceived);
+		SIGNAL_2(goodbyeReceived, GoodbyeReason, const CL_String&);
 
 		/** Player info accepted */
 		SIGNAL_0(accepted);
 
 		/** Received game state */
-		SIGNAL_1(const Net::GameState&, gameStateReceived);
+		SIGNAL_1(gameStateReceived, const Net::GameState&);
 
 		/** New player joined */
-		SIGNAL_1(const CL_String&, playerJoined);
+		SIGNAL_1(playerJoined, const CL_String&);
 
 		/** Player leaved */
-		SIGNAL_1(const CL_String&, playerLeaved);
+		SIGNAL_1(playerLeaved, const CL_String&);
 
 		/** Got new car state */
-		SIGNAL_1(const Net::CarState&, carStateReceived);
+		SIGNAL_1(carStateReceived, const Net::CarState&);
 
 		/** Should start the race */
-		SIGNAL_2(const CL_Pointf&, const CL_Angle&, raceStartReceived);
+		SIGNAL_2(raceStartReceived, const CL_Pointf&, const CL_Angle&);
 
 		/** New vote is started. args: type, subject, time limit in seconds */
-		SIGNAL_3(VoteType, const CL_String&, unsigned, voteStarted);
+		SIGNAL_3(voteStarted, VoteType, const CL_String&, unsigned);
 
 		/** Got vote tick */
-		SIGNAL_1(VoteOption, voteTickReceived);
+		SIGNAL_1(voteTickReceived, VoteOption);
 
 		/** Vote has ended. */
-		SIGNAL_1(VoteResult, voteEnded);
+		SIGNAL_1(voteEnded, VoteResult);
 
 	public:
 

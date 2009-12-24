@@ -40,9 +40,9 @@ namespace Net {
 
 class Server {
 
-	SIGNAL_1(const CL_String&, playerJoined);
+	SIGNAL_1(playerJoined, const CL_String&);
 
-	SIGNAL_1(const CL_String&, playerLeaved);
+	SIGNAL_1(playerLeaved, const CL_String&);
 
 		struct Player {
 

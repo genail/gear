@@ -95,9 +95,6 @@ class RaceScene: public Scene
 		/** The score table */
 		ScoreTable m_scoreTable;
 
-		/** Race start timer */
-		CL_Timer m_raceStartTimer;
-
 		/** Race start time */
 		unsigned m_raceStartTime;
 
@@ -149,27 +146,12 @@ class RaceScene: public Scene
 
 		void updateCarTurn();
 
-		// flow control
-
-		void startRace();
-
-		void endRace();
-
-		bool isRaceFinished();
-
-		void markPlayerFinished(const CL_String &p_name, unsigned p_time);
 
 		// event handlers
-
-		void onStartCountdown();
-
-		void onCountdownEnds();
 
 		void onInputLock();
 
 		void onRaceStateChanged(int p_lapsNum);
-
-		void onPlayerFinished(const CL_NetGameEvent &p_event);
 
 #if defined(RACE_SCENE_ONLY)
 		friend class Application;

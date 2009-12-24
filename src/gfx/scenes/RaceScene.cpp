@@ -72,9 +72,6 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 
 #endif
 
-	// countdown ends
-	m_raceStartTimer.func_expired().set(this, &RaceScene::onCountdownEnds);
-
 }
 
 RaceScene::~RaceScene() {
@@ -112,14 +109,14 @@ void RaceScene::destroy()
 
 void RaceScene::draw(CL_GraphicContext &p_gc)
 {
-	assert(m_initialized);
+	G_ASSERT(m_initialized);
 
 	m_graphics->draw(p_gc);
 }
 
 void RaceScene::load(CL_GraphicContext &p_gc)
 {
-	assert(m_initialized);
+	G_ASSERT(m_initialized);
 
 	cl_log_event("debug", "RaceScene::load()");
 
@@ -135,7 +132,7 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 
 void RaceScene::update(unsigned p_timeElapsed)
 {
-	assert(m_initialized);
+	G_ASSERT(m_initialized);
 
 	m_logic->update(p_timeElapsed);
 	m_graphics->update(p_timeElapsed);
@@ -145,7 +142,7 @@ void RaceScene::update(unsigned p_timeElapsed)
 
 bool RaceScene::onInputPressed(const CL_InputEvent &p_event)
 {
-	assert(m_initialized);
+	G_ASSERT(m_initialized);
 
 	handleInput(Pressed, p_event);
 	return true;
@@ -153,7 +150,7 @@ bool RaceScene::onInputPressed(const CL_InputEvent &p_event)
 
 bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
 {
-	assert(m_initialized);
+	G_ASSERT(m_initialized);
 
 	handleInput(Released, p_event);
 	return true;
@@ -161,7 +158,7 @@ bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
 
 void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 {
-	assert(m_initialized);
+	G_ASSERT(m_initialized);
 
 	Race::Car &car = Game::getInstance().getPlayer().getCar();
 
@@ -222,129 +219,16 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 void RaceScene::updateCarTurn()
 {
-	assert(m_initialized);
+	G_ASSERT(m_initialized);
 
 	Race::Car &car = Game::getInstance().getPlayer().getCar();
 	car.setTurn((int) -m_turnLeft + (int) m_turnRight);
 }
 
-void RaceScene::startRace()
-{
-	assert(m_initialized);
-
-	m_scoreTable.clear();
-//	Game::getInstance().getNetworkRaceConnection().triggerRaceStart(3);
-}
-
-void RaceScene::onStartCountdown()
-{
-	assert(m_initialized);
-
-	cl_log_event("race", "starting countdown...");
-
-	static const unsigned RACE_START_COUNTDOWN_TIME = 3000;
-
-	m_raceStartTimer.start(RACE_START_COUNTDOWN_TIME, false);
-//	m_raceUI.displayCountdown();
-
-	// mark all players state as not finished
-//	Game::getInstance().getPlayer().setFinished(false);
-
-//	foreach (Player *player, m_players) {
-////		player->setFinished(false);
-//	}
-}
-
-void RaceScene::onCountdownEnds()
-{
-	assert(m_initialized);
-
-	m_raceStartTime = CL_System::get_time();
-	m_inputLock = false;
-}
-
 void RaceScene::onInputLock()
 {
-	assert(m_initialized);
+	G_ASSERT(m_initialized);
 
 	m_inputLock = true;
-}
-void RaceScene::onPlayerFinished(const CL_NetGameEvent &p_event)
-{
-	assert(m_initialized);
-
-	const CL_String playerName = p_event.get_argument(0);
-	const unsigned time = p_event.get_argument(1);
-
-	// set this player finished state
-	markPlayerFinished(playerName, time);
-
-}
-
-void RaceScene::markPlayerFinished(const CL_String &p_name, unsigned p_time)
-{
-	assert(m_initialized);
-//	RacePlayer *scorePlayer;
-//
-//	if (Game::getInstance().getRacePlayer().getPlayer().getName() == p_name) {
-//
-//		Game::getInstance().getRacePlayer().setFinished(true);
-//		scorePlayer = &Game::getInstance().getRacePlayer();
-//
-//		// send to the server that race is finished
-//		Game::getInstance().getNetworkRaceConnection().markFinished(p_time);
-//	} else {
-//		RacePlayer *player = findPlayer(p_name);
-//
-//		if (player == NULL) {
-//			cl_log_event("error", "Cannot find player called %1", p_name);
-//			return;
-//		}
-//
-//		player->setFinished(true);
-//		scorePlayer = player;
-//	}
-//
-//	// put to score table
-//	m_scoreTable.add(scorePlayer, p_time);
-//
-//	// check if this race is finished
-//	if (isRaceFinished()) {
-//		endRace();
-//	}
-}
-
-void RaceScene::endRace()
-{
-	assert(m_initialized);
-//	// display the score table and quit the game
-//	const int scoreEntries = m_scoreTable.getEntriesCount();
-//
-//	CL_Console::write_line("-----------Score Table------------");
-//
-//	for (int i = 0; i < scoreEntries; ++i) {
-//
-//		const CL_String &playerName = m_scoreTable.getEntryPlayer(i)->getPlayer().getName();
-//		const unsigned time = m_scoreTable.getEntryTime(i);
-//
-//		CL_Console::write_line("%1) %2 (%3 ms)", i + 1, playerName, time);
-//	}
-//
-//	CL_Console::write_line("----------------------------------");
-//
-//	CL_Console::write_line("");
-}
-
-bool RaceScene::isRaceFinished()
-{
-	assert(m_initialized);
-//	foreach (const RacePlayer *player, m_players) {
-//		if (!player->isFinished()) {
-//			return false;
-//		}
-//	}
-//
-//	return true;
-	return false;
 }
 

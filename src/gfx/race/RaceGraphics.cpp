@@ -62,23 +62,26 @@ RaceGraphics::~RaceGraphics()
 
 void RaceGraphics::draw(CL_GraphicContext &p_gc)
 {
-	if (!m_logic->getLevel().isLoaded()) {
-		return;
+//	if (!m_logic->getLevel().isLoaded()) {
+//		return;
+//	}
+
+	if (m_logic->getLevel().isLoaded()) {
+
+		// initialize player's viewport
+		m_viewport.prepareGC(p_gc);
+
+		// draw pure level
+		drawLevel(p_gc);
+
+		// on level objects
+		drawTireTracks(p_gc);
+		drawCars(p_gc);
+		drawSmokes(p_gc);
+
+		// revert player's viewport
+		m_viewport.finalizeGC(p_gc);
 	}
-
-	// initialize player's viewport
-	m_viewport.prepareGC(p_gc);
-
-	// draw pure level
-	drawLevel(p_gc);
-
-	// on level objects
-	drawTireTracks(p_gc);
-	drawCars(p_gc);
-	drawSmokes(p_gc);
-
-	// revert player's viewport
-	m_viewport.finalizeGC(p_gc);
 
 	// draw the user interface
 	drawUI(p_gc);

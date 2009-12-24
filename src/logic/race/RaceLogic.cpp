@@ -190,6 +190,8 @@ void RaceLogic::startRace(int p_lapCount, unsigned p_startTimeMs)
 	m_nextPlace = 1;
 	m_raceFinishTimeMs = 0;
 	m_playersFinished.clear();
+
+	display(_("Get ready..."));
 }
 
 bool RaceLogic::isRaceFinished() const
@@ -231,6 +233,11 @@ bool RaceLogic::hasPlayerFinished(const Player *p_player) const
 	}
 
 	return false;
+}
+
+void RaceLogic::display(const CL_String &p_message)
+{
+	m_messageBoard.addMessage(p_message);
 }
 
 } // namespace

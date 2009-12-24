@@ -111,6 +111,8 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 	Race::Car &car = m_localPlayer->getCar();
 	if (isRaceStarted() && car.isLocked()) {
 		car.setLocked(false);
+
+		display(_("*** START! ***"));
 	}
 
 }
@@ -136,7 +138,7 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 		// add his car to level
 		m_level.addCar(&player->getCar());
 
-		m_messageBoard.addMessage(cl_format("Player %1 joined", p_name));
+		display(cl_format(_("Player %1 joined"), p_name));
 	} else {
 		cl_log_event(LOG_ERROR, "Player named '%1' already in list", p_name);
 	}
@@ -157,7 +159,7 @@ void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 		// remove player
 		delete player;
 
-		m_messageBoard.addMessage(cl_format("Player %1 leaved", p_name));
+		display(cl_format("Player %1 leaved", p_name));
 	} else {
 		cl_log_event(LOG_ERROR, "No player named '%1' in list", p_name);
 	}
@@ -285,7 +287,7 @@ void OnlineRaceLogic::onVoteStarted(VoteType p_voteType, const CL_String& p_subj
 	m_voteNoCount = 0;
 	m_voteTimeout = CL_System::get_time() + (p_timeLimitSec * 1000);
 
-	m_messageBoard.addMessage(_("New vote called"));
+	display(_("New vote called"));
 
 }
 
@@ -293,10 +295,10 @@ void OnlineRaceLogic::onVoteEnded(VoteResult p_voteResult)
 {
 	switch (p_voteResult) {
 		case VOTE_PASSED:
-			m_messageBoard.addMessage("Vote passed");
+			display("Vote passed");
 			break;
 		case VOTE_FAILED:
-			m_messageBoard.addMessage("Vote failed");
+			display("Vote failed");
 			break;
 		default:
 			assert(0 && "unknown VoteResult");

@@ -135,9 +135,6 @@ class RaceLogic {
 
 		TConstPlayerList m_playersFinished;
 
-		/** Message board to display game messages */
-		MessageBoard m_messageBoard;
-
 
 		// update routines
 
@@ -149,7 +146,15 @@ class RaceLogic {
 
 
 		// helpers
+
 		bool hasPlayerFinished(const Player *p_player) const;
+
+		void display(const CL_String &p_message);
+
+	private:
+
+		/** Message board to display game messages */
+		MessageBoard m_messageBoard;
 
 };
 

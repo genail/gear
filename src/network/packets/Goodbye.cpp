@@ -59,6 +59,8 @@ CL_String Goodbye::getStringMessage() const
 		default:
 			assert(0 && "unknown goodbye reason");
 	}
+
+	return "";
 }
 
 } // namespace

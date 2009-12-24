@@ -81,7 +81,9 @@ void OnlineRaceLogic::initialize()
 	if (!m_initialized) {
 
 		// connect to server
-		m_client.connect();
+		if (!m_client.connect()) {
+			display(_("Cannot connect to game server"));
+		}
 
 		m_initialized = true;
 	}

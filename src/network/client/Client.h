@@ -100,7 +100,7 @@ class Client {
 
 		void callAVote(VoteType p_type, const CL_String& subject="");
 
-		void connect();
+		bool connect();
 
 		void disconnect();
 

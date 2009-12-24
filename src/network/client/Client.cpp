@@ -52,7 +52,7 @@ Client::Client() :
 	m_slots.connect(m_gameClient.sig_event_received(), this, &Client::onEventReceived);
 }
 
-void Client::connect() {
+bool Client::connect() {
 
 	assert(!m_addr.empty() && m_port > 0 && m_port < 0xFFFF);
 
@@ -64,7 +64,10 @@ void Client::connect() {
 		m_gameClient.connect(m_addr, port);
 	} catch (CL_Exception e) {
 		cl_log_event("exception", "Cannot connect to %1:%2", m_addr, m_port);
+		return false;
 	}
+
+	return true;
 }
 
 void Client::disconnect()

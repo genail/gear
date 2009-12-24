@@ -247,6 +247,7 @@ void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle
 	const Net::CarState carState = car.prepareCarState();
 	m_client->sendCarState(carState);
 
+	car.updateCurrentCheckpoint(NULL);
 
 	startRace(3, CL_System::get_time() + RACE_START_DELAY);
 }

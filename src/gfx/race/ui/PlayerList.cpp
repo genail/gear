@@ -55,7 +55,6 @@ void PlayerList::draw(CL_GraphicContext &p_gc)
 	const Race::Level &level = m_logic->getLevel();
 	const int carCount = level.getCarCount();
 
-	const float labelHeight = m_label.height();
 	float h = 0.0f;
 
 	p_gc.mult_translate(m_position.x, m_position.y);
@@ -68,7 +67,7 @@ void PlayerList::draw(CL_GraphicContext &p_gc)
 
 		m_label.draw(p_gc);
 
-		h += labelHeight;
+		h += m_labelHeight;
 	}
 
 	p_gc.pop_modelview();
@@ -77,6 +76,9 @@ void PlayerList::draw(CL_GraphicContext &p_gc)
 void PlayerList::load(CL_GraphicContext &p_gc)
 {
 	m_label.load(p_gc);
+
+	m_label.setText("X");
+	m_labelHeight = m_label.size(p_gc).height;
 
 	Drawable::load(p_gc);
 }

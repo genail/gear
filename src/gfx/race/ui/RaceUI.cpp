@@ -194,7 +194,6 @@ void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
 		m_carLabel.setText(car.getOwner()->getName());
 
 		m_carLabel.draw(p_gc);
-		m_carLabel.width();
 	}
 }
 

@@ -63,6 +63,8 @@ class PlayerList : public Gfx::Drawable {
 		CL_Pointf m_position;
 
 		Label m_label;
+
+		int m_labelHeight;
 };
 
 }

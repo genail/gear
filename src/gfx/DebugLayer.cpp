@@ -38,11 +38,11 @@ DebugLayer::~DebugLayer() {
 
 void DebugLayer::draw(CL_GraphicContext &p_gc) {
 
-	if (!m_label.isLoaded()) {
-		m_label.load(p_gc);
+	if (!isLoaded()) {
+		load(p_gc);
 	}
 
-	const float height = m_label.height();
+	m_label.setText("X");
 
 	float x = 5;
 	float y = 15;
@@ -52,6 +52,16 @@ void DebugLayer::draw(CL_GraphicContext &p_gc) {
 		m_label.setPosition(CL_Pointf(x, y));
 
 		m_label.draw(p_gc);
-		y += height;
+		y += m_labelHeight;
 	}
+}
+
+void DebugLayer::load(CL_GraphicContext &p_gc)
+{
+	m_label.load(p_gc);
+
+	m_label.setText("X");
+	m_labelHeight = m_label.size(p_gc).height;
+
+	Drawable::load(p_gc);
 }

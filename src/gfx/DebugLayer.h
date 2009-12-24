@@ -48,6 +48,8 @@ class DebugLayer : public Gfx::Drawable {
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
+		virtual void load(CL_GraphicContext &p_gc);
+
 
 		void putMessage(const CL_String8 &p_key, const CL_String8 &p_value) { m_messages[p_key] = p_value; }
 
@@ -59,5 +61,7 @@ class DebugLayer : public Gfx::Drawable {
 		::std::map<CL_String8, CL_String8> m_messages;
 
 		Gfx::Label m_label;
+
+		int m_labelHeight;
 };
 

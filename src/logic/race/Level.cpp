@@ -402,6 +402,7 @@ void Level::addCar(Car *p_car) {
 	assert(m_loaded && "Level is not loaded");
 
 	p_car->m_level = this;
+	p_car->updateCurrentCheckpoint(NULL);
 
 
 	m_cars.push_back(p_car);

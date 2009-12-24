@@ -65,6 +65,8 @@ class RaceGraphics {
 
 	private:
 
+		bool m_loaded;
+
 		/** Logic with data for reading only */
 		const Race::RaceLogic *m_logic;
 

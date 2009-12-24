@@ -40,6 +40,7 @@ OfflineRaceLogic::OfflineRaceLogic(const CL_String &p_levelName) :
 
 OfflineRaceLogic::~OfflineRaceLogic()
 {
+	destroy();
 }
 
 void OfflineRaceLogic::initialize()

@@ -53,6 +53,10 @@ class Scene : public CL_GUIComponent {
 
 		virtual void update(unsigned p_timeElapsed) {}
 
+	protected:
+
+		void setLoaded(bool p_loaded) { m_loaded = p_loaded; }
+
 	private:
 
 		/** True when load() method was invoked */

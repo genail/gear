@@ -429,23 +429,26 @@ CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
 
 void Car::updateCurrentCheckpoint(const Checkpoint *p_checkpoint)
 {
-	// check if lap is reached
-	if (
-			p_checkpoint->getProgress() == 0.0f &&
-			m_currentCheckpoint->getProgress() == 1.0f &&
-			m_greatestCheckpointId == m_currentCheckpoint->getId()
-	) {
-		++m_lap;
-		cl_log_event("race", "Going for lap %1", m_lap);
-		m_greatestCheckpointId = 0;
+	if (p_checkpoint != NULL) {
+		// check if lap is reached
+		if (
+				p_checkpoint->getProgress() == 0.0f &&
+				m_currentCheckpoint->getProgress() == 1.0f &&
+				m_greatestCheckpointId == m_currentCheckpoint->getId()
+		) {
+			++m_lap;
+			cl_log_event("race", "Going for lap %1", m_lap);
+			m_greatestCheckpointId = 0;
+		}
+
+		const int id = p_checkpoint->getId();
+
+		if (id == m_greatestCheckpointId + 1) {
+			++m_greatestCheckpointId;
+		}
 	}
 
 	m_currentCheckpoint = p_checkpoint;
-	const int id = p_checkpoint->getId();
-
-	if (id == m_greatestCheckpointId + 1) {
-		++m_greatestCheckpointId;
-	}
 }
 
 void Car::setLocked(bool p_locked)

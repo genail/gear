@@ -103,6 +103,7 @@ void RaceScene::destroy()
 		delete m_graphics;
 		m_graphics = NULL;
 
+		setLoaded(false);
 		m_initialized = false;
 	}
 }
@@ -118,7 +119,7 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 {
 	G_ASSERT(m_initialized);
 
-	cl_log_event("debug", "RaceScene::load()");
+	cl_log_event(LOG_DEBUG, "RaceScene::load()");
 
 	m_graphics->load(p_gc);
 

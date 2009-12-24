@@ -73,16 +73,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 
 OnlineRaceLogic::~OnlineRaceLogic()
 {
-	TPlayerMapPair pair;
-	foreach (pair, m_playerMap) {
-		Player *player = pair.second;
-
-		// remove car from level
-		m_level.removeCar(&player->getCar());
-
-		// remove player
-		delete player;
-	}
+	destroy();
 }
 
 void OnlineRaceLogic::initialize()
@@ -100,6 +91,21 @@ void OnlineRaceLogic::destroy()
 {
 	if (m_initialized) {
 		m_client.disconnect();
+
+		// remove players
+		TPlayerMapPair pair;
+		foreach (pair, m_playerMap) {
+			Player *player = pair.second;
+
+			// remove car from level
+			m_level.removeCar(&player->getCar());
+
+			// delete player if belongs to me
+			if (player != &Game::getInstance().getPlayer()) {
+				delete player;
+			}
+		}
+
 		m_level.destroy();
 	}
 }

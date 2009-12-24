@@ -28,6 +28,7 @@
 
 #include "GameWindow.h"
 
+#include "common.h"
 #include "gfx/Scene.h"
 #include "gfx/Stage.h"
 #include "common/Properties.h"
@@ -38,11 +39,7 @@ GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescripti
 	m_lastScene(NULL)
 {
 	func_render().set(this, &GameWindow::onRender);
-
-	// invoke repaint 60 times per second
 	set_constant_repaint(true);
-//	m_timer.func_expired().set(this, &GameWindow::repaint);
-//	m_timer.start(1000 / 60, true);
 }
 
 GameWindow::~GameWindow()
@@ -64,55 +61,57 @@ void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 
 void GameWindow::updateLogic(Scene *p_scene)
 {
-//	CL_KeepAlive::process();
 
 	if (p_scene != NULL) {
 
-		if (p_scene != m_lastScene) {
+		if (p_scene->isLoaded()) { // update only when loaded
 
-			if (m_lastScene != NULL) {
-				m_lastScene->set_visible(false);
-				m_lastScene->set_focus(false);
+			if (p_scene != m_lastScene) {
+
+				if (m_lastScene != NULL) {
+					m_lastScene->set_visible(false);
+					m_lastScene->set_focus(false);
+				}
+
+				// set the scene visibility and focus
+				p_scene->set_visible(true);
+				p_scene->set_focus(true);
+
+				m_lastScene = p_scene;
 			}
 
-			// set the scene visibility and focus
-			p_scene->set_visible(true);
-			p_scene->set_focus(true);
+			const unsigned now = CL_System::get_time();
 
-			m_lastScene = p_scene;
-		}
-
-		const unsigned now = CL_System::get_time();
-
-		if (m_lastLogicUpdateTime == 0) {
-			p_scene->update(0);
-		} else {
-			const unsigned timeChange = now - m_lastLogicUpdateTime;
+			if (m_lastLogicUpdateTime == 0) {
+				p_scene->update(0);
+			} else {
+				const unsigned timeChange = now - m_lastLogicUpdateTime;
 
 #if !defined(NDEBUG)
-			// apply iteration time change
-			static float timeChangeF = 0.0f;
-			const int iterSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
+				// apply iteration time change
+				static float timeChangeF = 0.0f;
+				const int iterSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
 
-			timeChangeF += timeChange * (iterSpeed / 100.0f);
+				timeChangeF += timeChange * (iterSpeed / 100.0f);
 
-			if (timeChangeF >= 1.0f) {
-				const float total = floor(timeChangeF);
-				p_scene->update((unsigned) total);
+				if (timeChangeF >= 1.0f) {
+					const float total = floor(timeChangeF);
+					p_scene->update((unsigned) total);
 
-				timeChangeF -= total;
-			}
+					timeChangeF -= total;
+				}
 #else // !NDEBUG
-			p_scene->update(timeChange);
+				p_scene->update(timeChange);
 #endif // NDEBUG
-		}
+			}
 
-		m_lastLogicUpdateTime = now;
+			m_lastLogicUpdateTime = now;
+		}
 
 	} else {
 		// when there are no scenes on stack, then probably application
 		// should be ended
-		cl_log_event("debug", "Closing application because of empty scene stack");
+		cl_log_event(LOG_DEBUG, "Closing application because of empty scene stack");
 		exit_with_code(0);
 	}
 }

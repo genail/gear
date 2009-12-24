@@ -45,9 +45,10 @@
 namespace Gfx {
 
 RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
-	m_logic(p_logic),
-	m_viewport(),
-	m_raceUI(p_logic, &m_viewport)
+		m_loaded(false),
+		m_logic(p_logic),
+		m_viewport(),
+		m_raceUI(p_logic, &m_viewport)
 {
 	// attach viewport to player's car
 	Game &game = Game::getInstance();
@@ -62,9 +63,7 @@ RaceGraphics::~RaceGraphics()
 
 void RaceGraphics::draw(CL_GraphicContext &p_gc)
 {
-//	if (!m_logic->getLevel().isLoaded()) {
-//		return;
-//	}
+	G_ASSERT(m_loaded);
 
 	if (m_logic->getLevel().isLoaded()) {
 
@@ -101,6 +100,8 @@ void RaceGraphics::load(CL_GraphicContext &p_gc)
 	loadGroundBlocks(p_gc);
 	loadDecorations(p_gc);
 	loadSandPits(p_gc);
+
+	m_loaded = true;
 }
 
 void RaceGraphics::loadGroundBlocks(CL_GraphicContext &p_gc)
@@ -363,6 +364,8 @@ void RaceGraphics::countFps()
 
 void RaceGraphics::update(unsigned p_timeElapsed)
 {
+	G_ASSERT(m_loaded);
+
 	updateViewport(p_timeElapsed);
 	updateSmokes(p_timeElapsed);
 }

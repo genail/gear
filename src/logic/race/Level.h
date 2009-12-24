@@ -152,8 +152,6 @@ class Level
 		/** Collision checking */
 		void checkCollistions();
 
-		void updateCheckpoints();
-
 		// level loading
 
 		void loadFromFile(const CL_String& p_filename);

@@ -135,6 +135,7 @@ void OnlineRaceLogic::onConnected()
 
 void OnlineRaceLogic::onDisconnected()
 {
+	display(_("Disconnected from host"));
 }
 
 void OnlineRaceLogic::onGoodbye(GoodbyeReason p_reason, const CL_String &p_message)

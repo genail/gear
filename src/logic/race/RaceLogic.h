@@ -144,6 +144,8 @@ class RaceLogic {
 
 		void updatePlayersProgress();
 
+		void updateCheckpoints();
+
 
 		// helpers
 

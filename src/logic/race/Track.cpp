@@ -84,7 +84,7 @@ void Track::clear()
 	m_closed = false;
 }
 
-const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap)
+const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap) const
 {
 	assert(m_closed);
 
@@ -123,7 +123,7 @@ const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_
 	return result;
 }
 
-void Track::getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_prev, Checkpoint **p_next)
+void Track::getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_prev, Checkpoint **p_next) const
 {
 	assert(m_checkpoints.size() >= 3);
 	assert(m_closed);
@@ -133,7 +133,7 @@ void Track::getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_prev, Che
 	Checkpoint *next;
 	bool found = false;
 
-	TCheckpointVector::iterator itor = m_checkpoints.begin();
+	TCheckpointVector::const_iterator itor = m_checkpoints.begin();
 
 	for (;itor != m_checkpoints.end(); ++itor) {
 		current = *itor;

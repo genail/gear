@@ -439,36 +439,8 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 
 }
 
-void Level::updateCheckpoints()
-{
-	foreach(Car *car, m_cars) {
-
-		const Checkpoint *currentCheckpoint = car->getCurrentCheckpoint() ? car->getCurrentCheckpoint() : m_track.getFirst();
-
-		// find next checkpoint
-		bool movingForward, newLap;
-		const Checkpoint *nextCheckpoint = m_track.check(car->getPosition(), currentCheckpoint, &movingForward, &newLap);
-
-		// apply to car
-		if (nextCheckpoint != currentCheckpoint) {
-			car->updateCurrentCheckpoint(nextCheckpoint);
-
-			if (!movingForward) {
-				cl_log_event("debug", "Wrong way");
-			}
-
-			if (newLap) {
-				cl_log_event("debug", "New lap");
-			}
-		}
-
-	}
-}
-
 void Level::update(unsigned p_timeElapsed)
 {
-	updateCheckpoints();
-
 #ifdef CLIENT
 
 	checkCollistions();

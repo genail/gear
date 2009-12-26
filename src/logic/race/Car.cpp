@@ -62,6 +62,7 @@ Car::Car(const Player *p_owner) :
 	m_inputTurn(0.0f),
 	m_inputLocked(false),
 	m_inputChecksum(0),
+	m_phySpeedDelta(0.0f),
 	m_phyBoundHitTest(false),
 	m_greatestCheckpointId(0),
 	m_currentCheckpoint(NULL)
@@ -127,7 +128,8 @@ void Car::update1_60() {
 	static const float BRAKE_POWER = 0.05f;
 	static const float ACCEL_POWER = 0.07f;
 	static const float TURN_POWER  = (2 * M_PI / 360.0f) * 2.5f;
-	static const float ALIGN_POWER = TURN_POWER / 2.0f;
+	static const float MOV_ALIGN_POWER = TURN_POWER / 2.0f;
+	static const float ROT_ALIGN_POWER = TURN_POWER * 0.7f;
 	static const float AIR_RESITANCE = 0.005f; // per one speed unit
 
 	// speed limit under what physics angle reduction will be more agresive
@@ -138,6 +140,8 @@ void Car::update1_60() {
 		return;
 	}
 	
+	const float prevSpeed = m_speed; // for m_phySpeedDelta
+
 	// apply inputs to speed
 	if (m_inputBrake) {
 		m_speed -= BRAKE_POWER;
@@ -147,17 +151,23 @@ void Car::update1_60() {
 	
 	// calculate rotations
 	if (m_inputTurn != 0.0f) {
+
+		// rotate corpse and later physics movement
 		m_rotation += CL_Angle(TURN_POWER * -m_inputTurn, cl_radians);
-		alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER);
+		alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER);
+
 	} else {
-		alignRotation(m_rotation, m_phyMoveRot, ALIGN_POWER / 2.0f);
+
+		// align corpse back to physics movement
+		alignRotation(m_rotation, m_phyMoveRot, MOV_ALIGN_POWER);
 
 		// makes car stop rotating if speed is too low
 		if (m_speed > LOWER_SPEED_ANGLE_REDUCTION) {
-			alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER / 2.0f);
+			alignRotation(m_phyMoveRot, m_rotation, ROT_ALIGN_POWER);
 		} else {
-			alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER * ((LOWER_SPEED_ANGLE_REDUCTION + 1.0f) - m_speed));
+			alignRotation(m_phyMoveRot, m_rotation, ROT_ALIGN_POWER * ((LOWER_SPEED_ANGLE_REDUCTION + 1.0f) - m_speed));
 		}
+
 	}
 
 	// reduce speed
@@ -194,6 +204,10 @@ void Car::update1_60() {
 	// apply movement (invert y)
 	m_position.x += m_phyMoveVec.x;
 	m_position.y -= m_phyMoveVec.y;
+
+
+	// set speed delta
+	m_phySpeedDelta = m_speed - prevSpeed;
 
 //	static const float BRAKE_POWER = 100.0f;
 //
@@ -440,7 +454,17 @@ void Car::setStartPosition(int p_startPosition) {
 
 bool Car::isDrifting() const {
 	static const float DRIFT_LIMIT = 6.0f;
-	return fabs((m_rotation - m_phyMoveRot).to_degrees()) >= DRIFT_LIMIT;
+	static const float ACCEL_LIMIT = 0.05f;
+
+	if (fabs((m_rotation - m_phyMoveRot).to_degrees()) >= DRIFT_LIMIT) {
+		return true;
+	}
+
+	if (fabs(m_phySpeedDelta) >= ACCEL_LIMIT) {
+		return true;
+	}
+
+	return false;
 }
 
 #if defined(CLIENT)
@@ -464,8 +488,10 @@ CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
 
 void Car::performBoundCollision(const Bound &p_bound)
 {
-	m_phyCollideBound = p_bound.getSegment();
-	m_phyBoundHitTest = true;
+//	m_phyCollideBound = p_bound.getSegment();
+//	m_phyBoundHitTest = true;
+
+
 }
 #endif // CLIENT
 

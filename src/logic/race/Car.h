@@ -191,10 +191,11 @@ class Car
 		/** Move vector for next frame */
 		CL_Vec2f m_phyMoveVec;
 
+		/** Car movement rotation */
 		CL_Angle m_phyMoveRot;
 
-		/** What additional speed will be gained in period of one second (FIXME: is that true?) */
-//		CL_Vec2f m_phyAccelVec;
+		/** Speed delta (for isDrifting()) */
+		float m_phySpeedDelta;
 
 		/** Did hit test to bound occurred? (FIXME: think again if this is necessary to have this to be a field?) */
 		bool m_phyBoundHitTest;
@@ -219,7 +220,6 @@ class Car
 
 
 		void update1_60();
-
 
 		// helpers
 

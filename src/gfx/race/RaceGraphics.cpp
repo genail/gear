@@ -382,7 +382,7 @@ void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 	static const float ZOOM_SPEED = 0.005f;
 	static const float MAX_SPEED = 500.0f; // FIXME
 
-	float speed = fabs( ceil(Game::getInstance().getPlayer().getCar().getSpeed() * 10.0f ) / 10.0f);
+	float speed = fabs( ceil(Game::getInstance().getPlayer().getCar().getSpeed() * 500.0f ) / 10.0f);
 
 	float properScale = -( 1.0f / MAX_SPEED ) * speed + 2.0f;
 	properScale = ceil( properScale * 100.0f ) / 100.0f;

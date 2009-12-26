@@ -103,8 +103,9 @@ void Car::update(unsigned p_timeElapsed)
 void Car::update1_60() {
 	
 	static const float BRAKE_POWER = 0.2f;
-	static const float ACCEL_POWER = 0.15f;
+	static const float ACCEL_POWER = 0.1f;
 	static const float TURN_POWER  = (2 * M_PI / 360.0f) * 4.0f;
+	static const float ALIGN_POWER = TURN_POWER / 2.0f;
 
 	// don't do anything if car is locked
 	if (m_inputLocked) {
@@ -120,14 +121,30 @@ void Car::update1_60() {
 	
 	if (m_inputTurn != 0.0f) {
 		m_rotation += CL_Angle(TURN_POWER * -m_inputTurn, cl_radians);
+		m_phyMoveRot += CL_Angle(TURN_POWER * -m_inputTurn  / 2, cl_radians);
+	} else {
+
+		if (m_rotation != m_phyMoveRot) {
+			const float diffRad = (m_rotation - m_phyMoveRot).to_radians();
+
+			if (fabs(diffRad) > ALIGN_POWER) {
+				if (diffRad > 0.0f) {
+					m_rotation -= CL_Angle(ALIGN_POWER, cl_radians);
+				} else {
+					m_rotation += CL_Angle(ALIGN_POWER, cl_radians);
+				}
+			} else {
+				m_rotation -= CL_Angle(diffRad, cl_radians);
+			}
+		}
 	}
 
 	// calculate next move vector
-	const float m_rotationRad = m_rotation.to_radians();
+	const float m_rotationRad = m_phyMoveRot.to_radians();
 	m_phyMoveVec.x = cos(m_rotationRad);
 	m_phyMoveVec.y = sin(m_rotationRad);
 
-	cl_log_event(LOG_DEBUG, "x: %1, y: %2, angle: %3", m_phyMoveVec.x, m_phyMoveVec.y, m_rotation.to_degrees());
+//	cl_log_event(LOG_DEBUG, "x: %1, y: %2, angle: %3", m_phyMoveVec.x, m_phyMoveVec.y, m_rotation.to_degrees());
 
 	m_phyMoveVec.normalize();
 	m_phyMoveVec *= m_speed;

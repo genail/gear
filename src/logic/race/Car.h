@@ -191,6 +191,7 @@ class Car
 		/** Move vector for next frame */
 		CL_Vec2f m_phyMoveVec;
 
+		CL_Angle m_phyMoveRot;
 
 		/** What additional speed will be gained in period of one second (FIXME: is that true?) */
 //		CL_Vec2f m_phyAccelVec;

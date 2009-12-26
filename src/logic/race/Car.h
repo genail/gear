@@ -158,7 +158,7 @@ class Car
 		/** Central position on map */
 		CL_Pointf m_position;
 
-		/** CCW rotation from positive X axis */
+		/** CW rotation from positive X axis */
 		CL_Angle m_rotation;
 
 		/** Current speed in map pixels per frame */
@@ -223,11 +223,13 @@ class Car
 
 		// helpers
 
+		void alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad);
+
 		int calculateInputChecksum() const;
 
 		float normalize(float p_value) const;
 
-		void alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad);
+		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
 
 
 		friend class Race::Level;

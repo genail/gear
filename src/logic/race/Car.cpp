@@ -153,7 +153,7 @@ void Car::update1_60() {
 	if (m_inputTurn != 0.0f) {
 
 		// rotate corpse and later physics movement
-		m_rotation += CL_Angle(TURN_POWER * -m_inputTurn, cl_radians);
+		m_rotation += CL_Angle(TURN_POWER * m_inputTurn, cl_radians);
 		alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER);
 
 	} else {
@@ -203,11 +203,16 @@ void Car::update1_60() {
 
 	// apply movement (invert y)
 	m_position.x += m_phyMoveVec.x;
-	m_position.y -= m_phyMoveVec.y;
+	m_position.y += m_phyMoveVec.y;
 
 
 	// set speed delta
 	m_phySpeedDelta = m_speed - prevSpeed;
+
+
+	// delicate values must be normalized
+	m_rotation.normalize();
+	m_phyMoveRot.normalize();
 
 //	static const float BRAKE_POWER = 100.0f;
 //
@@ -389,6 +394,61 @@ void Car::update1_60() {
 #endif // CLIENT
 }
 
+#if defined(CLIENT)
+CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
+{
+	CL_CollisionOutline outline(m_phyCollisionOutline);
+
+//	outline.calculate_smallest_enclosing_discs();
+//	outline.set_inside_test(true);
+
+
+	// transform the outline
+	CL_Angle angle(90, cl_degrees);
+	angle += m_rotation;
+
+	outline.set_angle(angle);
+	outline.set_translation(m_position.x, m_position.y);
+
+	return outline;
+}
+
+void Car::performBoundCollision(const Bound &p_bound)
+{
+//	m_phyCollideBound = p_bound.getSegment();
+//	m_phyBoundHitTest = true;
+
+	const CL_LineSegment2f &seg = p_bound.getSegment();
+	const float side = -seg.point_right_of_line(m_position);
+
+	const CL_Vec2f segVec = seg.q - seg.p;
+
+	// need right side normal to throw the car away
+	CL_Vec2f normal(segVec.y, -segVec.x); // right side normal
+	normal.normalize();
+
+	if (side < 0) { // turn to left side if collision was on the left
+		normal *= -1;
+	}
+
+	// calculate collision angle to estaminate speed reduction
+	CL_Angle angleDiff(m_rotation - vecToAngle(normal));
+
+	const float colAngleDeg = fabs(angleDiff.to_degrees()) - 90.0f;
+	const float reduction = 1.0f - fabs((colAngleDeg - 90.0f) / 90.0f);
+
+	m_speed -= m_speed * reduction;
+
+//	cl_log_event(LOG_DEBUG, "collision angle = %1", colAngleDeg);
+//	cl_log_event(LOG_DEBUG, "collision reduction = %1", reduction);
+//	cl_log_event(LOG_DEBUG, "rotation = %1", m_rotation.to_degrees());
+
+	// move away
+	m_position += normal * m_speed;
+
+}
+#endif // CLIENT
+
 Net::CarState Car::prepareCarState() const
 {
 	Net::CarState state;
@@ -466,34 +526,6 @@ bool Car::isDrifting() const {
 
 	return false;
 }
-
-#if defined(CLIENT)
-CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
-{
-	CL_CollisionOutline outline(m_phyCollisionOutline);
-
-//	outline.calculate_smallest_enclosing_discs();
-//	outline.set_inside_test(true);
-
-
-	// transform the outline
-	CL_Angle angle(90, cl_degrees);
-	angle += m_rotation;
-
-	outline.set_angle(angle);
-	outline.set_translation(m_position.x, m_position.y);
-
-	return outline;
-}
-
-void Car::performBoundCollision(const Bound &p_bound)
-{
-//	m_phyCollideBound = p_bound.getSegment();
-//	m_phyBoundHitTest = true;
-
-
-}
-#endif // CLIENT
 
 void Car::updateCurrentCheckpoint(const Checkpoint *p_checkpoint)
 {
@@ -621,6 +653,19 @@ float Car::normalize(float p_value) const {
 void Car::setLocked(bool p_locked)
 {
 	m_inputLocked = p_locked;
+}
+
+CL_Angle Car::vecToAngle(const CL_Vec2f &p_vec)
+{
+	const static CL_Vec2f ANGLE_ZERO(1.0f, 0.0f);
+	CL_Angle angle = p_vec.angle(ANGLE_ZERO);
+
+	if (p_vec.y < 0) {
+		angle.set_radians(-angle.to_radians());
+	}
+
+	return angle;
+
 }
 
 } // namespace

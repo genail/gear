@@ -56,7 +56,7 @@ void Car::draw(CL_GraphicContext &p_gc)
 	p_gc.push_modelview();
 
 	p_gc.mult_translate(m_position.x, m_position.y);
-	p_gc.mult_rotate(m_rotation, 0, 0, -1);
+	p_gc.mult_rotate(m_rotation, 0, 0, 1);
 
 	m_sprite.draw(p_gc, 0, 0);
 

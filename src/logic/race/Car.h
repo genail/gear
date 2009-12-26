@@ -220,9 +220,15 @@ class Car
 
 		void update1_60();
 
+
+		// helpers
+
 		int calculateInputChecksum() const;
 
 		float normalize(float p_value) const;
+
+		void alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad);
+
 
 		friend class Race::Level;
 

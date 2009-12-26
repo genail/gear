@@ -100,12 +100,35 @@ void Car::update(unsigned p_timeElapsed)
 	}
 }
 
+void Car::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad)
+{
+	const CL_Angle diffAngle = p_what - p_to;
+	const float diffRad = diffAngle.to_radians();
+	const float diffRadAbs = fabs(diffRad);
+
+	if (diffRadAbs > 0.01f) {
+		if (diffRadAbs > p_stepRad) {
+
+			const CL_Angle stepAngle(p_stepRad, cl_radians);
+
+			if (diffRad > 0.0f) {
+				p_what -= stepAngle;
+			} else {
+				p_what += stepAngle;
+			}
+		} else {
+			p_what = p_to;
+		}
+	}
+}
+
 void Car::update1_60() {
 	
-	static const float BRAKE_POWER = 0.2f;
-	static const float ACCEL_POWER = 0.1f;
-	static const float TURN_POWER  = (2 * M_PI / 360.0f) * 4.0f;
+	static const float BRAKE_POWER = 0.05f;
+	static const float ACCEL_POWER = 0.07f;
+	static const float TURN_POWER  = (2 * M_PI / 360.0f) * 2.5f;
 	static const float ALIGN_POWER = TURN_POWER / 2.0f;
+	static const float AIR_RESITANCE = 0.005f; // per one speed unit
 
 	// don't do anything if car is locked
 	if (m_inputLocked) {
@@ -119,25 +142,42 @@ void Car::update1_60() {
 		m_speed += ACCEL_POWER;
 	}
 	
+	// calculate rotations
 	if (m_inputTurn != 0.0f) {
 		m_rotation += CL_Angle(TURN_POWER * -m_inputTurn, cl_radians);
-		m_phyMoveRot += CL_Angle(TURN_POWER * -m_inputTurn  / 2, cl_radians);
+		alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER);
 	} else {
-
-		if (m_rotation != m_phyMoveRot) {
-			const float diffRad = (m_rotation - m_phyMoveRot).to_radians();
-
-			if (fabs(diffRad) > ALIGN_POWER) {
-				if (diffRad > 0.0f) {
-					m_rotation -= CL_Angle(ALIGN_POWER, cl_radians);
-				} else {
-					m_rotation += CL_Angle(ALIGN_POWER, cl_radians);
-				}
-			} else {
-				m_rotation -= CL_Angle(diffRad, cl_radians);
-			}
-		}
+		alignRotation(m_rotation, m_phyMoveRot, ALIGN_POWER / 2.0f);
+		alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER / 2.0f);
 	}
+
+	// reduce speed
+	const CL_Angle diffAngle = m_rotation - m_phyMoveRot;
+	float diffDegAbs = fabs(diffAngle.to_degrees());
+
+	if (diffDegAbs > 0.1f) {
+
+		CL_Angle diffAngleNorm = diffAngle;
+		diffAngleNorm.normalize_180();
+
+		// 0.0 when goin straight, 1.0 when 90 deg, > 1.0 when more than 90 deg
+		const float angleRate = fabs(1.0f - (fabs(diffAngleNorm.to_degrees()) - 90.0f) / 90.0f);
+		const float speedReduction = -0.05f * angleRate;
+
+		if (m_speed > speedReduction) {
+			m_speed += speedReduction;
+		} else {
+			m_speed = 0.0f;
+		}
+
+//		float speedReduction = 1.0f - diffDegAbs / 90.0f;
+//		speedReduction /= 50.0f;
+//
+//		m_speed -= m_speed * speedReduction;
+		cl_log_event(LOG_DEBUG, "diff: %1", angleRate);
+	}
+
+	m_speed -= m_speed * AIR_RESITANCE;
 
 	// calculate next move vector
 	const float m_rotationRad = m_phyMoveRot.to_radians();
@@ -397,14 +437,8 @@ void Car::setStartPosition(int p_startPosition) {
 }
 
 bool Car::isDrifting() const {
-	
-	static const float MIN_SPEED = 320.0f;
-	static const float MIN_TURN = 0.5f;
-	
-	if (m_inputBrake && m_speed >= MIN_SPEED) return true;
-	else if (fabs(m_inputTurn) >= MIN_TURN && m_speed >= MIN_SPEED) return true;
-	else return false;
-	
+	static const float DRIFT_LIMIT = 6.0f;
+	return fabs((m_rotation - m_phyMoveRot).to_degrees()) >= DRIFT_LIMIT;
 }
 
 #if defined(CLIENT)

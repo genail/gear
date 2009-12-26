@@ -28,7 +28,7 @@
 
 #pragma once
 
-#define TIRE_TRACK_DEFAULT_ALPHA 0.5f
+#define TIRE_TRACK_DEFAULT_ALPHA 0.2f
 
 #include <ClanLib/core.h>
 

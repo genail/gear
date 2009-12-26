@@ -130,6 +130,9 @@ void Car::update1_60() {
 	static const float ALIGN_POWER = TURN_POWER / 2.0f;
 	static const float AIR_RESITANCE = 0.005f; // per one speed unit
 
+	// speed limit under what physics angle reduction will be more agresive
+	static const float LOWER_SPEED_ANGLE_REDUCTION = 3.0f;
+
 	// don't do anything if car is locked
 	if (m_inputLocked) {
 		return;
@@ -148,7 +151,13 @@ void Car::update1_60() {
 		alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER);
 	} else {
 		alignRotation(m_rotation, m_phyMoveRot, ALIGN_POWER / 2.0f);
-		alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER / 2.0f);
+
+		// makes car stop rotating if speed is too low
+		if (m_speed > LOWER_SPEED_ANGLE_REDUCTION) {
+			alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER / 2.0f);
+		} else {
+			alignRotation(m_phyMoveRot, m_rotation, ALIGN_POWER * ((LOWER_SPEED_ANGLE_REDUCTION + 1.0f) - m_speed));
+		}
 	}
 
 	// reduce speed
@@ -169,22 +178,15 @@ void Car::update1_60() {
 		} else {
 			m_speed = 0.0f;
 		}
-
-//		float speedReduction = 1.0f - diffDegAbs / 90.0f;
-//		speedReduction /= 50.0f;
-//
-//		m_speed -= m_speed * speedReduction;
-		cl_log_event(LOG_DEBUG, "diff: %1", angleRate);
 	}
 
+	// car cannot travel too quickly
 	m_speed -= m_speed * AIR_RESITANCE;
 
 	// calculate next move vector
 	const float m_rotationRad = m_phyMoveRot.to_radians();
 	m_phyMoveVec.x = cos(m_rotationRad);
 	m_phyMoveVec.y = sin(m_rotationRad);
-
-//	cl_log_event(LOG_DEBUG, "x: %1, y: %2, angle: %3", m_phyMoveVec.x, m_phyMoveVec.y, m_rotation.to_degrees());
 
 	m_phyMoveVec.normalize();
 	m_phyMoveVec *= m_speed;

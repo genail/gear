@@ -67,6 +67,9 @@ void RaceSceneKeyBindings::handleInput(bool p_pressed, const CL_InputEvent& p_ev
 				}
 				break;
 			}
+
+			default:
+				break;
 		}
 	}
 }

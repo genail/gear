@@ -369,6 +369,12 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 
 	updateViewport(p_timeElapsed);
 	updateSmokes(p_timeElapsed);
+
+#if !defined(NDEBUG)
+	const CL_Pointf &carPos = Game::getInstance().getPlayer().getCar().getPosition();
+	Gfx::Stage::getDebugLayer()->putMessage("car x",  cl_format("%1", carPos.x));
+	Gfx::Stage::getDebugLayer()->putMessage("car y",  cl_format("%1", carPos.y));
+#endif // !NDEBUG
 }
 
 void RaceGraphics::updateViewport(unsigned p_timeElapsed)
@@ -391,7 +397,7 @@ void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 
 
 #ifndef NDEBUG
-	Gfx::Stage::getDebugLayer()->putMessage(CL_String8("scale"),  CL_StringHelp::float_to_local8(scale));
+	Gfx::Stage::getDebugLayer()->putMessage("scale",  CL_StringHelp::float_to_local8(scale));
 #endif
 }
 

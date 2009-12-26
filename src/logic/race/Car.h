@@ -161,7 +161,7 @@ class Car
 		/** CCW rotation from positive X axis */
 		CL_Angle m_rotation;
 
-		/** Current speed */
+		/** Current speed in map pixels per frame */
 		float m_speed;
 
 
@@ -188,11 +188,12 @@ class Car
 
 		// physics
 
-		/** How far vehicle will go in period of one second (FIXME: is that true?) */
+		/** Move vector for next frame */
 		CL_Vec2f m_phyMoveVec;
 
+
 		/** What additional speed will be gained in period of one second (FIXME: is that true?) */
-		CL_Vec2f m_phyAccelVec;
+//		CL_Vec2f m_phyAccelVec;
 
 		/** Did hit test to bound occurred? (FIXME: think again if this is necessary to have this to be a field?) */
 		bool m_phyBoundHitTest;

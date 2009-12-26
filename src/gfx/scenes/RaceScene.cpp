@@ -208,6 +208,8 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 				m_logic->voteNo();
 			}
 			break;
+		default:
+			break;
 	}
 
 	// handle quit request

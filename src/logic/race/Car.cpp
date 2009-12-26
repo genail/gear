@@ -102,180 +102,209 @@ void Car::update(unsigned p_timeElapsed)
 
 void Car::update1_60() {
 	
+	static const float BRAKE_POWER = 0.2f;
+	static const float ACCEL_POWER = 0.15f;
+	static const float TURN_POWER  = (2 * M_PI / 360.0f) * 4.0f;
+
 	// don't do anything if car is locked
 	if (m_inputLocked) {
 		return;
 	}
 	
-	static const float BRAKE_POWER = 100.0f;
-	
-	static const float ACCEL_SPEED = 200.0f;
-	static const float MAX_SPEED = 500.0f;
-	
-	static const float AIR_RESIST = 0.2f;
-	const float GROUND_RESIST = m_level->getResistance(m_position.x, m_position.y);
-	
-	static const float MAX_ANGLE = 50.0f;
-	
-	static const float MAX_TENACITY = 0.2f;
-	static const float MIN_TENACITY = 0.05f;
-	
-	
-	
-	const static float delta = (1000.f / 60.0f) / 1000.0f;
-	
-	// calculate input checksum and if its different than last one, then
-	// invoke the signal
-	const int inputChecksum = calculateInputChecksum();
-	
-	if (inputChecksum != m_inputChecksum) {
-		INVOKE_1(inputChanged, *this);
-		m_inputChecksum = inputChecksum;
-	}
-	
-	//turning
-	const float turnAngle = MAX_ANGLE * m_inputTurn;
-	
-	// acceleration speed
-	if (m_inputAccel) {
-		const float speedChange = ACCEL_SPEED * delta;
-		
-		m_speed += speedChange;
-		
-		if (m_speed > MAX_SPEED) {
-			m_speed = MAX_SPEED;
-		}
-	}
-	
-	// brake
+	// apply inputs to speed
 	if (m_inputBrake) {
-		const float speedChange = BRAKE_POWER * delta;
-		
-		m_speed -= speedChange;
-		
-		if (m_speed < -MAX_SPEED / 2) {
-			m_speed = -MAX_SPEED / 2;
-		}
+		m_speed -= BRAKE_POWER;
+	} else if (m_inputAccel) {
+		m_speed += ACCEL_POWER;
 	}
 	
-	// Resistance
-	const float finalResist = (1.0f - GROUND_RESIST) - (AIR_RESIST * (1.0f - GROUND_RESIST));
-	cl_log_event("debug", "%1", finalResist);
-	
-	// rotation
-	const float rad = m_rotation.to_radians(); // kąt autka w radianach
-	
-	// Bouncing from bounds
-	if (m_phyBoundHitTest) {
-		
-		// przeniesienie autka tak, by już się nie stykał z bandą
-		
-		m_position.x -= m_phyMoveVec.x * 2 *delta;
-		m_position.y -= m_phyMoveVec.y * 2 *delta;
-		
-		float x2, y2;
-		if (m_phyCollideBound.p.x == m_phyCollideBound.q.x) {
-			x2 = -m_phyMoveVec.x;
-			y2 = m_phyMoveVec.y;
-		}
-		else {
-			float a, xp, yp, xq, yq, x, y;
-			xp = m_phyCollideBound.p.x;
-			yp = m_phyCollideBound.p.y;
-			xq = m_phyCollideBound.q.x;
-			yq = m_phyCollideBound.q.y;
-			x = m_phyMoveVec.x;
-			y = m_phyMoveVec.y;
-			
-			a = (yq - yp) / (xq - xp);
-			
-			x2 = (((1 - (a * a)) / (1 + (a * a))) * x) + (((2 * a) / (1 + (a * a))) * y);
-			y2 = (((2 * a) / (1 + (a * a))) * x) + ((((a * a) - 1) / ((a * a) + 1)) * y);
-		}
-		m_phyMoveVec.x = x2;
-		m_phyMoveVec.y = y2;
-		m_phyBoundHitTest = false;
+	if (m_inputTurn != 0.0f) {
+		m_rotation += CL_Angle(TURN_POWER * -m_inputTurn, cl_radians);
 	}
-	
-	// wektor zmiany kierunku
-	CL_Vec2f changeVector;
-	
-	if(turnAngle < 0.0f) { // skręt w jedną stronę
-		// przygotowanie wektora skrętu (zmiany kierunku jazdy)
- 		changeVector.x = sin(rad);
-		changeVector.y = -cos(rad);
-		changeVector.normalize();
-		changeVector *= tan(-turnAngle) * fabs(m_speed) / 7.0f; // modyfikacja siły skrętu
-	}
-	else if(turnAngle > 0.0f){ // skręt w drugą stronę, wszystko analogicznie
-		changeVector.x = -sin(rad);
-		changeVector.y = cos(rad);
-		changeVector.normalize();
-		changeVector *= tan(turnAngle) * fabs(m_speed) / 7.0f;
-	}
-	
-		m_phyAccelVec.x = cos(rad);
-		m_phyAccelVec.y = sin(rad);
-		
-		m_phyAccelVec.normalize();
-		m_phyAccelVec *= m_speed;
-		
-		if(turnAngle != 0.0f) { // zmiana wektora przyspieszenia w wypadku kiedy auto skreca
-			m_phyAccelVec = changeVector + m_phyAccelVec;
-		}
-	
-	// calculates current tenacity
-	const float max_tratio = MAX_TENACITY / MIN_TENACITY;
-	
-	float tratio = (max_tratio / MAX_SPEED) * fabs(m_speed);
-	if (fabs(m_speed) == 0)
-		tratio = 1;
-	
-	const float tenacity = MAX_TENACITY / tratio;
-	
-	// wektor o który zostanie przesunięte autko (już z poślizgiem)
-	CL_Vec2f realVector = m_phyMoveVec + ( m_phyAccelVec * tenacity );
-	realVector.normalize();
-	realVector *= finalResist * fabs(m_speed);
-	m_phyMoveVec = realVector;
-	
-	// nowa metoda oblicznia moveVectora
-	
-	
-	
-	// update position
-	m_position.x += m_phyMoveVec.x * delta;
-	m_position.y += m_phyMoveVec.y * delta;
-	
-	
-	
-	// update rotation of car when changing direction
-	if( m_inputTurn != 0.0f ) { // wykonywany jest skręt
-		
-		// tworzymy sobie osobne wektory dla rotacji
-		CL_Vec2f rotVector; // wektor rotacji
-		CL_Vec2f changeRotVector; // wektor zmiany rotacji (w danej chwili)
-		
-		rotVector.x = cos(rad);
-		rotVector.y = sin(rad);
-		rotVector.normalize();
-		
-		if( m_inputTurn < 0.0f ) { // skręt w jedną stronę
-			changeRotVector.x = sin(rad);
-			changeRotVector.y = -cos(rad);
-			changeRotVector.normalize();
-			changeRotVector *= 2.4f * delta;
-		}
-		else if ( m_inputTurn > 0.0f ) { // skręt w drugą stronę
-			changeRotVector.x = -sin(rad);
-			changeRotVector.y = cos(rad);
-			changeRotVector.normalize();
-			changeRotVector *= 2.4f * delta;
-		}
-		
-		rotVector += changeRotVector;
-		m_rotation.set_degrees( atan2( rotVector.y, rotVector.x ) * 180.0f / 3.14f );
-	}
+
+	// calculate next move vector
+	const float m_rotationRad = m_rotation.to_radians();
+	m_phyMoveVec.x = cos(m_rotationRad);
+	m_phyMoveVec.y = sin(m_rotationRad);
+
+	cl_log_event(LOG_DEBUG, "x: %1, y: %2, angle: %3", m_phyMoveVec.x, m_phyMoveVec.y, m_rotation.to_degrees());
+
+	m_phyMoveVec.normalize();
+	m_phyMoveVec *= m_speed;
+
+	// apply movement (invert y)
+	m_position.x += m_phyMoveVec.x;
+	m_position.y -= m_phyMoveVec.y;
+
+//	static const float BRAKE_POWER = 100.0f;
+//
+//	static const float ACCEL_SPEED = 200.0f;
+//	static const float MAX_SPEED = 500.0f;
+//
+//	static const float AIR_RESIST = 0.2f;
+//	const float GROUND_RESIST = m_level->getResistance(m_position.x, m_position.y);
+//
+//	static const float MAX_ANGLE = 50.0f;
+//
+//	static const float MAX_TENACITY = 0.2f;
+//	static const float MIN_TENACITY = 0.05f;
+//
+//
+//
+//	const static float delta = (1000.f / 60.0f) / 1000.0f;
+//
+//	// calculate input checksum and if its different than last one, then
+//	// invoke the signal
+//	const int inputChecksum = calculateInputChecksum();
+//
+//	if (inputChecksum != m_inputChecksum) {
+//		INVOKE_1(inputChanged, *this);
+//		m_inputChecksum = inputChecksum;
+//	}
+//
+//	//turning
+//	const float turnAngle = MAX_ANGLE * m_inputTurn;
+//
+//	// acceleration speed
+//	if (m_inputAccel) {
+//		const float speedChange = ACCEL_SPEED * delta;
+//
+//		m_speed += speedChange;
+//
+//		if (m_speed > MAX_SPEED) {
+//			m_speed = MAX_SPEED;
+//		}
+//	}
+//
+//	// brake
+//	if (m_inputBrake) {
+//		const float speedChange = BRAKE_POWER * delta;
+//
+//		m_speed -= speedChange;
+//
+//		if (m_speed < -MAX_SPEED / 2) {
+//			m_speed = -MAX_SPEED / 2;
+//		}
+//	}
+//
+//	// Resistance
+//	const float finalResist = (1.0f - GROUND_RESIST) - (AIR_RESIST * (1.0f - GROUND_RESIST));
+//	cl_log_event("debug", "%1", finalResist);
+//
+//	// rotation
+//	const float rad = m_rotation.to_radians(); // kąt autka w radianach
+//
+//	// Bouncing from bounds
+//	if (m_phyBoundHitTest) {
+//
+//		// przeniesienie autka tak, by już się nie stykał z bandą
+//
+//		m_position.x -= m_phyMoveVec.x * 2 *delta;
+//		m_position.y -= m_phyMoveVec.y * 2 *delta;
+//
+//		float x2, y2;
+//		if (m_phyCollideBound.p.x == m_phyCollideBound.q.x) {
+//			x2 = -m_phyMoveVec.x;
+//			y2 = m_phyMoveVec.y;
+//		}
+//		else {
+//			float a, xp, yp, xq, yq, x, y;
+//			xp = m_phyCollideBound.p.x;
+//			yp = m_phyCollideBound.p.y;
+//			xq = m_phyCollideBound.q.x;
+//			yq = m_phyCollideBound.q.y;
+//			x = m_phyMoveVec.x;
+//			y = m_phyMoveVec.y;
+//
+//			a = (yq - yp) / (xq - xp);
+//
+//			x2 = (((1 - (a * a)) / (1 + (a * a))) * x) + (((2 * a) / (1 + (a * a))) * y);
+//			y2 = (((2 * a) / (1 + (a * a))) * x) + ((((a * a) - 1) / ((a * a) + 1)) * y);
+//		}
+//		m_phyMoveVec.x = x2;
+//		m_phyMoveVec.y = y2;
+//		m_phyBoundHitTest = false;
+//	}
+//
+//	// wektor zmiany kierunku
+//	CL_Vec2f changeVector;
+//
+//	if(turnAngle < 0.0f) { // skręt w jedną stronę
+//		// przygotowanie wektora skrętu (zmiany kierunku jazdy)
+// 		changeVector.x = sin(rad);
+//		changeVector.y = -cos(rad);
+//		changeVector.normalize();
+//		changeVector *= tan(-turnAngle) * fabs(m_speed) / 7.0f; // modyfikacja siły skrętu
+//	}
+//	else if(turnAngle > 0.0f){ // skręt w drugą stronę, wszystko analogicznie
+//		changeVector.x = -sin(rad);
+//		changeVector.y = cos(rad);
+//		changeVector.normalize();
+//		changeVector *= tan(turnAngle) * fabs(m_speed) / 7.0f;
+//	}
+//
+//		m_phyAccelVec.x = cos(rad);
+//		m_phyAccelVec.y = sin(rad);
+//
+//		m_phyAccelVec.normalize();
+//		m_phyAccelVec *= m_speed;
+//
+//		if(turnAngle != 0.0f) { // zmiana wektora przyspieszenia w wypadku kiedy auto skreca
+//			m_phyAccelVec = changeVector + m_phyAccelVec;
+//		}
+//
+//	// calculates current tenacity
+//	const float max_tratio = MAX_TENACITY / MIN_TENACITY;
+//
+//	float tratio = (max_tratio / MAX_SPEED) * fabs(m_speed);
+//	if (fabs(m_speed) == 0)
+//		tratio = 1;
+//
+//	const float tenacity = MAX_TENACITY / tratio;
+//
+//	// wektor o który zostanie przesunięte autko (już z poślizgiem)
+//	CL_Vec2f realVector = m_phyMoveVec + ( m_phyAccelVec * tenacity );
+//	realVector.normalize();
+//	realVector *= finalResist * fabs(m_speed);
+//	m_phyMoveVec = realVector;
+//
+//	// nowa metoda oblicznia moveVectora
+//
+//
+//
+//	// update position
+//	m_position.x += m_phyMoveVec.x * delta;
+//	m_position.y += m_phyMoveVec.y * delta;
+//
+//
+//
+//	// update rotation of car when changing direction
+//	if( m_inputTurn != 0.0f ) { // wykonywany jest skręt
+//
+//		// tworzymy sobie osobne wektory dla rotacji
+//		CL_Vec2f rotVector; // wektor rotacji
+//		CL_Vec2f changeRotVector; // wektor zmiany rotacji (w danej chwili)
+//
+//		rotVector.x = cos(rad);
+//		rotVector.y = sin(rad);
+//		rotVector.normalize();
+//
+//		if( m_inputTurn < 0.0f ) { // skręt w jedną stronę
+//			changeRotVector.x = sin(rad);
+//			changeRotVector.y = -cos(rad);
+//			changeRotVector.normalize();
+//			changeRotVector *= 2.4f * delta;
+//		}
+//		else if ( m_inputTurn > 0.0f ) { // skręt w drugą stronę
+//			changeRotVector.x = -sin(rad);
+//			changeRotVector.y = cos(rad);
+//			changeRotVector.normalize();
+//			changeRotVector *= 2.4f * delta;
+//		}
+//
+//		rotVector += changeRotVector;
+//		m_rotation.set_degrees( atan2( rotVector.y, rotVector.x ) * 180.0f / 3.14f );
+//	}
 	
 #ifdef CLIENT
 #ifndef NDEBUG
@@ -342,7 +371,7 @@ void Car::setStartPosition(int p_startPosition) {
 	m_inputAccel = false;
 	m_inputBrake = false;
 	m_phyMoveVec = CL_Vec2f();
-	m_phyAccelVec = CL_Vec2f();
+//	m_phyAccelVec = CL_Vec2f();
 	m_speed = 0.0f;
 	m_lap = 1;
 
@@ -455,7 +484,14 @@ float Car::getSpeed() const
 
 float Car::getSpeedKMS() const
 {
-	return m_speed / 3.0f;
+	// m_speed - pixels per iteration
+	// 4 - length of avarage car in meters
+	// 50 - length of avarage car in pixels
+	// 60 - one second
+	// 60 * 60 - one minute
+	// 60 * 60 * 60 - one hour
+	// / 1000 - to kmh
+	return m_speed * (4 / 50.0f) * 60 * 60 * 60 / 1000;
 }
 
 void Car::setAcceleration(bool p_value)

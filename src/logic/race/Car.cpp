@@ -192,7 +192,12 @@ void Car::update1_60() {
 			turnAngle.set_radians(turnAngle.to_radians() * (absSpeed / LOWER_SPEED_TURN_REDUCTION));
 		}
 
-		m_rotation += turnAngle;
+		// make backwards turning reverse
+		if (m_speed > 0.0f) {
+			m_rotation += turnAngle;
+		} else {
+			m_rotation -= turnAngle;
+		}
 
 		// rotate corpse and physics movement
 		if (absSpeed > LOWER_SPEED_ROTATION_REDUCTION) {

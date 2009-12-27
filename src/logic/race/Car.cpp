@@ -436,9 +436,6 @@ CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
 
 void Car::performBoundCollision(const Bound &p_bound)
 {
-//	m_phyCollideBound = p_bound.getSegment();
-//	m_phyBoundHitTest = true;
-
 	const CL_LineSegment2f &seg = p_bound.getSegment();
 	const float side = -seg.point_right_of_line(m_position);
 
@@ -459,16 +456,10 @@ void Car::performBoundCollision(const Bound &p_bound)
 	CL_Angle angleDiff(m_phyMoveRot - vecToAngle(normal));
 	normalizeAngle180(angleDiff);
 
-	cl_log_event(LOG_DEBUG, "collision angle diff = %1", angleDiff.to_degrees());
-
 	const float colAngleDeg = fabs(angleDiff.to_degrees()) - 90.0f;
 	const float reduction = fabs(1.0f - fabs(colAngleDeg - 90.0f) / 90.0f);
 
 	m_speed -= m_speed * reduction;
-
-//	cl_log_event(LOG_DEBUG, "collision angle = %1", colAngleDeg);
-	cl_log_event(LOG_DEBUG, "collision reduction = %1", reduction);
-//	cl_log_event(LOG_DEBUG, "rotation = %1", m_rotation.to_degrees());
 
 }
 #endif // CLIENT

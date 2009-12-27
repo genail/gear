@@ -153,6 +153,8 @@ void Car::update1_60() {
 	static const float LOWER_SPEED_ANGLE_REDUCTION = 3.0f;
 	// speed limit under what angle difference will be lower than normal
 	static const float LOWER_SPEED_ROTATION_REDUCTION = 3.0f;
+	// speed limit under what turn power will decrease
+	static const float LOWER_SPEED_TURN_REDUCTION = 1.0f;
 
 	// don't do anything if car is locked
 	if (m_inputLocked) {
@@ -183,7 +185,14 @@ void Car::update1_60() {
 	if (m_phyWheelsTurn != 0.0f) {
 
 		// rotate corpse and later physics movement
-		m_rotation += CL_Angle(TURN_POWER * m_phyWheelsTurn, cl_radians);
+		CL_Angle turnAngle(TURN_POWER * m_phyWheelsTurn, cl_radians);
+
+		if (absSpeed <= LOWER_SPEED_TURN_REDUCTION) {
+			// reduce turn if car speed is too low
+			turnAngle.set_radians(turnAngle.to_radians() * (absSpeed / LOWER_SPEED_TURN_REDUCTION));
+		}
+
+		m_rotation += turnAngle;
 
 		// rotate corpse and physics movement
 		if (absSpeed > LOWER_SPEED_ROTATION_REDUCTION) {
@@ -250,6 +259,9 @@ void Car::update1_60() {
 	// apply movement (invert y)
 	m_position.x += m_phyMoveVec.x;
 	m_position.y += m_phyMoveVec.y;
+
+	// set speed delta
+	m_phySpeedDelta = m_speed - prevSpeed;
 
 	
 #if defined(CLIENT)

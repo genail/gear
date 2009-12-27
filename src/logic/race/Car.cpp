@@ -168,6 +168,12 @@ void Car::update1_60() {
 			alignRotation(m_phyMoveRot, m_rotation, ROT_ALIGN_POWER * ((LOWER_SPEED_ANGLE_REDUCTION + 1.0f) - m_speed));
 		}
 
+		// normalize rotations only when equal
+		if (m_rotation == m_phyMoveRot) {
+			m_rotation.normalize();
+			m_phyMoveRot.normalize();
+		}
+
 	}
 
 	// reduce speed
@@ -210,9 +216,6 @@ void Car::update1_60() {
 	m_phySpeedDelta = m_speed - prevSpeed;
 
 
-	// delicate values must be normalized
-	m_rotation.normalize();
-	m_phyMoveRot.normalize();
 
 //	static const float BRAKE_POWER = 100.0f;
 //

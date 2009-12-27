@@ -133,8 +133,10 @@ void Car::update1_60() {
 	static const float ROT_ALIGN_POWER = TURN_POWER * 0.7f;
 	static const float AIR_RESITANCE = 0.005f; // per one speed unit
 
-	// speed limit under what physics angle reduction will be more agresive
+	// speed limit under what physics angle reduction will be more aggressive
 	static const float LOWER_SPEED_ANGLE_REDUCTION = 3.0f;
+	// speed limit under what angle difference will be lower than normal
+	static const float LOWER_SPEED_ROTATION_REDUCTION = 3.0f;
 
 	// don't do anything if car is locked
 	if (m_inputLocked) {
@@ -162,13 +164,15 @@ void Car::update1_60() {
 	// calculate rotations
 	if (m_phyWheelsTurn != 0.0f) {
 
-		// turn wheel
-//		m_phyWheelsTurn += m_inputTurn * WHEEL_TURN_SPEED;
-//		m_phyWheelsTurn = limit(m_phyWheelsTurn, -1.0f, 1.0f);
-
 		// rotate corpse and later physics movement
 		m_rotation += CL_Angle(TURN_POWER * m_phyWheelsTurn, cl_radians);
-		alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER);
+
+		// rotate corpse and physics movement
+		if (m_speed > LOWER_SPEED_ROTATION_REDUCTION) {
+			alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER);
+		} else {
+			alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER * ((LOWER_SPEED_ROTATION_REDUCTION + 1.0f) - m_speed));
+		}
 
 	} else {
 

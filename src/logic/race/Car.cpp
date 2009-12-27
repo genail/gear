@@ -188,8 +188,8 @@ void Car::update1_60() {
 
 		// normalize rotations only when equal
 		if (m_rotation == m_phyMoveRot) {
-			m_rotation.normalize();
-			m_phyMoveRot.normalize();
+			normalizeAngle(m_rotation);
+			normalizeAngle(m_phyMoveRot);
 		}
 
 	}
@@ -201,7 +201,7 @@ void Car::update1_60() {
 	if (diffDegAbs > 0.1f) {
 
 		CL_Angle diffAngleNorm = diffAngle;
-		diffAngleNorm.normalize_180();
+		normalizeAngle180(diffAngleNorm);
 
 		// 0.0 when goin straight, 1.0 when 90 deg, > 1.0 when more than 90 deg
 		const float angleRate = fabs(1.0f - (fabs(diffAngleNorm.to_degrees()) - 90.0f) / 90.0f);
@@ -452,20 +452,23 @@ void Car::performBoundCollision(const Bound &p_bound)
 		normal *= -1;
 	}
 
+	// move away
+	m_position += (normal * fabs(m_speed));
+
 	// calculate collision angle to estaminate speed reduction
-	CL_Angle angleDiff(m_rotation - vecToAngle(normal));
+	CL_Angle angleDiff(m_phyMoveRot - vecToAngle(normal));
+	normalizeAngle180(angleDiff);
+
+	cl_log_event(LOG_DEBUG, "collision angle diff = %1", angleDiff.to_degrees());
 
 	const float colAngleDeg = fabs(angleDiff.to_degrees()) - 90.0f;
-	const float reduction = 1.0f - fabs((colAngleDeg - 90.0f) / 90.0f);
+	const float reduction = fabs(1.0f - fabs(colAngleDeg - 90.0f) / 90.0f);
 
 	m_speed -= m_speed * reduction;
 
 //	cl_log_event(LOG_DEBUG, "collision angle = %1", colAngleDeg);
-//	cl_log_event(LOG_DEBUG, "collision reduction = %1", reduction);
+	cl_log_event(LOG_DEBUG, "collision reduction = %1", reduction);
 //	cl_log_event(LOG_DEBUG, "rotation = %1", m_rotation.to_degrees());
-
-	// move away
-	m_position += normal * m_speed;
 
 }
 #endif // CLIENT
@@ -690,6 +693,24 @@ CL_Angle Car::vecToAngle(const CL_Vec2f &p_vec)
 
 	return angle;
 
+}
+
+void Car::normalizeAngle(CL_Angle &p_angle)
+{
+#if CL_CURRENT_VERSION <= CL_VERSION(2,1,1)
+	p_angle.normalize();
+	if (p_angle.to_radians() < 0) {
+		p_angle += CL_Angle(2 * CL_PI, cl_radians);
+	}
+#else
+	p_angle.normalize();
+#endif
+}
+
+void Car::normalizeAngle180(CL_Angle &p_angle)
+{
+	normalizeAngle(p_angle);
+	p_angle.normalize_180();
 }
 
 } // namespace

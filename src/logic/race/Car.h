@@ -229,6 +229,12 @@ class Car
 
 		float limit(float p_value, float p_from, float p_to) const;
 
+		/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
+		void normalizeAngle(CL_Angle &p_angle);
+
+		/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
+		void normalizeAngle180(CL_Angle &p_angle);
+
 		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
 
 

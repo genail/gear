@@ -177,6 +177,8 @@ void Car::update1_60() {
 		m_phyWheelsTurn = m_inputTurn;
 	}
 
+	const float absSpeed = fabs(m_speed);
+
 	// calculate rotations
 	if (m_phyWheelsTurn != 0.0f) {
 
@@ -184,10 +186,10 @@ void Car::update1_60() {
 		m_rotation += CL_Angle(TURN_POWER * m_phyWheelsTurn, cl_radians);
 
 		// rotate corpse and physics movement
-		if (m_speed > LOWER_SPEED_ROTATION_REDUCTION) {
+		if (absSpeed > LOWER_SPEED_ROTATION_REDUCTION) {
 			alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER);
 		} else {
-			alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER * ((LOWER_SPEED_ROTATION_REDUCTION + 1.0f) - m_speed));
+			alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER * ((LOWER_SPEED_ROTATION_REDUCTION + 1.0f) - absSpeed));
 		}
 
 	} else {
@@ -196,10 +198,10 @@ void Car::update1_60() {
 		alignRotation(m_rotation, m_phyMoveRot, MOV_ALIGN_POWER);
 
 		// makes car stop rotating if speed is too low
-		if (m_speed > LOWER_SPEED_ANGLE_REDUCTION) {
+		if (absSpeed > LOWER_SPEED_ANGLE_REDUCTION) {
 			alignRotation(m_phyMoveRot, m_rotation, ROT_ALIGN_POWER);
 		} else {
-			alignRotation(m_phyMoveRot, m_rotation, ROT_ALIGN_POWER * ((LOWER_SPEED_ANGLE_REDUCTION + 1.0f) - m_speed));
+			alignRotation(m_phyMoveRot, m_rotation, ROT_ALIGN_POWER * ((LOWER_SPEED_ANGLE_REDUCTION + 1.0f) - absSpeed));
 		}
 
 		// normalize rotations only when equal
@@ -227,8 +229,8 @@ void Car::update1_60() {
 		const float angleRate = fabs(1.0f - (fabs(diffAngleNorm.to_degrees()) - 90.0f) / 90.0f);
 		const float speedReduction = -0.05f * angleRate;
 
-		if (m_speed > speedReduction) {
-			m_speed += speedReduction;
+		if (absSpeed > speedReduction) {
+			m_speed += m_speed > 0.0f ? speedReduction : -speedReduction;
 		} else {
 			m_speed = 0.0f;
 		}

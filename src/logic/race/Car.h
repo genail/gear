@@ -197,8 +197,8 @@ class Car
 		/** Speed delta (for isDrifting()) */
 		float m_phySpeedDelta;
 
-		/** Did hit test to bound occurred? (FIXME: think again if this is necessary to have this to be a field?) */
-		bool m_phyBoundHitTest;
+		/** Wheels turn. -1.0 is max left, 1.0 is max right */
+		float m_phyWheelsTurn;
 
 		/** If hit test occurred, this field will keep bound segment that vehicle collided with. */
 		CL_LineSegment2f m_phyCollideBound;
@@ -227,7 +227,7 @@ class Car
 
 		int calculateInputChecksum() const;
 
-		float normalize(float p_value) const;
+		float limit(float p_value, float p_from, float p_to) const;
 
 		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
 

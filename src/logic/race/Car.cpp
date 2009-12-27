@@ -63,7 +63,7 @@ Car::Car(const Player *p_owner) :
 	m_inputLocked(false),
 	m_inputChecksum(0),
 	m_phySpeedDelta(0.0f),
-	m_phyBoundHitTest(false),
+	m_phyWheelsTurn(0.0f),
 	m_greatestCheckpointId(0),
 	m_currentCheckpoint(NULL)
 {
@@ -127,6 +127,7 @@ void Car::update1_60() {
 	
 	static const float BRAKE_POWER = 0.05f;
 	static const float ACCEL_POWER = 0.07f;
+	static const float WHEEL_TURN_SPEED = 1.0f / 10.0f;
 	static const float TURN_POWER  = (2 * M_PI / 360.0f) * 2.5f;
 	static const float MOV_ALIGN_POWER = TURN_POWER / 2.0f;
 	static const float ROT_ALIGN_POWER = TURN_POWER * 0.7f;
@@ -149,11 +150,24 @@ void Car::update1_60() {
 		m_speed += ACCEL_POWER;
 	}
 	
+	// rotate steering wheels
+	const float diff = m_inputTurn - m_phyWheelsTurn;
+
+	if (fabs(diff) > WHEEL_TURN_SPEED) {
+		m_phyWheelsTurn += diff > 0.0f ? WHEEL_TURN_SPEED : -WHEEL_TURN_SPEED;
+	} else {
+		m_phyWheelsTurn = m_inputTurn;
+	}
+
 	// calculate rotations
-	if (m_inputTurn != 0.0f) {
+	if (m_phyWheelsTurn != 0.0f) {
+
+		// turn wheel
+//		m_phyWheelsTurn += m_inputTurn * WHEEL_TURN_SPEED;
+//		m_phyWheelsTurn = limit(m_phyWheelsTurn, -1.0f, 1.0f);
 
 		// rotate corpse and later physics movement
-		m_rotation += CL_Angle(TURN_POWER * m_inputTurn, cl_radians);
+		m_rotation += CL_Angle(TURN_POWER * m_phyWheelsTurn, cl_radians);
 		alignRotation(m_phyMoveRot, m_rotation, MOV_ALIGN_POWER);
 
 	} else {
@@ -625,7 +639,7 @@ void Car::setLap(int p_lap)
 
 void Car::setTurn(float p_value)
 {
-	m_inputTurn = normalize(p_value);
+	m_inputTurn = limit(p_value, -1.0f, 1.0f);
 }
 
 void Car::setPosition(const CL_Pointf &p_position)
@@ -643,11 +657,14 @@ void Car::setHandbrake(bool p_handbrake)
 	m_inputHandbrake = p_handbrake;
 }
 
-float Car::normalize(float p_value) const {
-	if (p_value < -1.0f) {
-		p_value = 1.0f;
-	} else if (p_value > 1.0f) {
-		p_value = 1.0f;
+float Car::limit(float p_value, float p_from, float p_to) const
+{
+	if (p_value < p_from) {
+		return p_from;
+	}
+
+	if (p_value > p_to) {
+		return p_to;
 	}
 
 	return p_value;

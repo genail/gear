@@ -103,8 +103,24 @@ void Car::update(unsigned p_timeElapsed)
 
 void Car::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad)
 {
-	const CL_Angle diffAngle = p_what - p_to;
-	const float diffRad = diffAngle.to_radians();
+	// works only on normalized values
+	CL_Angle normWhat(p_what);
+	CL_Angle normTo(p_to);
+
+	normalizeAngle(normWhat);
+	normalizeAngle(normTo);
+
+	const CL_Angle diffAngle = normWhat - normTo;
+
+	float diffRad = diffAngle.to_radians();
+
+	// if difference is higher than 180, then rotate in shorten way
+	if (diffRad > CL_PI) {
+		diffRad -= CL_PI * 2;
+	} else if (diffRad < -CL_PI) {
+		diffRad += CL_PI * 2;
+	}
+
 	const float diffRadAbs = fabs(diffRad);
 
 	if (diffRadAbs > 0.01f) {
@@ -193,6 +209,10 @@ void Car::update1_60() {
 		}
 
 	}
+
+	normalizeAngle(m_phyMoveRot);
+	normalizeAngle(m_rotation);
+
 
 	// reduce speed
 	const CL_Angle diffAngle = m_rotation - m_phyMoveRot;
@@ -441,25 +461,47 @@ void Car::performBoundCollision(const Bound &p_bound)
 
 	const CL_Vec2f segVec = seg.q - seg.p;
 
-	// need right side normal to throw the car away
-	CL_Vec2f normal(segVec.y, -segVec.x); // right side normal
-	normal.normalize();
+	// need front normal (crash side)
+	CL_Vec2f fnormal(segVec.y, -segVec.x); // right side normal
+	fnormal.normalize();
 
-	if (side < 0) { // turn to left side if collision was on the left
-		normal *= -1;
+	if (side < 0) {
+		fnormal *= -1;
 	}
 
 	// move away
-	m_position += (normal * fabs(m_speed));
+	m_position += (fnormal * fabs(m_speed));
 
 	// calculate collision angle to estaminate speed reduction
-	CL_Angle angleDiff(m_phyMoveRot - vecToAngle(normal));
+	CL_Angle angleDiff(m_phyMoveRot - vecToAngle(fnormal));
 	normalizeAngle180(angleDiff);
 
 	const float colAngleDeg = fabs(angleDiff.to_degrees()) - 90.0f;
 	const float reduction = fabs(1.0f - fabs(colAngleDeg - 90.0f) / 90.0f);
 
 	m_speed -= m_speed * reduction;
+
+	// bounce movement vector and angle away
+
+	// get mirror point
+	if (m_phyMoveVec.length() > 0.01f) {
+		m_phyMoveVec.normalize();
+		cl_log_event(LOG_DEBUG, "before move vec x = %1, y = %2", m_phyMoveVec.x, m_phyMoveVec.y);
+		cl_log_event(LOG_DEBUG, "before rotation = %1", m_phyMoveRot.to_degrees());
+
+		const float lengthProj = m_phyMoveVec.length() * cos(segVec.angle(m_phyMoveVec).to_radians());
+		const CL_Vec2f mirrorPoint(segVec * (lengthProj / segVec.length()));
+
+		// invert move vector by mirror point
+		const CL_Vec2f mirrorVec = (m_phyMoveVec - mirrorPoint) * -1;
+		m_phyMoveVec = mirrorPoint + mirrorVec;
+
+		// update physics angle
+		m_phyMoveRot = vecToAngle(m_phyMoveVec);
+
+		cl_log_event(LOG_DEBUG, "after move vec x = %1, y = %2", m_phyMoveVec.x, m_phyMoveVec.y);
+		cl_log_event(LOG_DEBUG, "after rotation = %1", m_phyMoveRot.to_degrees());
+	}
 
 }
 #endif // CLIENT

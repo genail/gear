@@ -29,6 +29,7 @@
 #include "MainMenuScene.h"
 
 #include "common.h"
+#include "common/Properties.h"
 
 MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	Scene(p_parent),
@@ -63,6 +64,9 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
+
+	m_nameLineEdit.set_text(Properties::getPropertyAsString("nickname", ""));
+	m_serverLineEdit.set_text(Properties::getPropertyAsString("hostname", ""));
 }
 
 MainMenuScene::~MainMenuScene()

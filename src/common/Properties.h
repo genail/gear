@@ -42,22 +42,22 @@ class Properties {
 
 	public:
 
-		static void setProperty(const CL_String8 &p_key, bool p_value);
+		static void setProperty(const CL_String &p_key, bool p_value);
 
-		static void setProperty(const CL_String8 &p_key, int p_value);
+		static void setProperty(const CL_String &p_key, int p_value);
 
-		static void setProperty(const CL_String8 &p_key, const CL_String8 &p_value);
+		static void setProperty(const CL_String &p_key, const CL_String &p_value);
 
 
-		static bool getPropertyAsBool(const CL_String8 &p_key, bool p_defaultValue);
+		static bool getPropertyAsBool(const CL_String &p_key, bool p_defaultValue);
 
-		static int getPropertyAsInt(const CL_String8 &p_key, int p_defaultValue);
+		static int getPropertyAsInt(const CL_String &p_key, int p_defaultValue);
 
-		static CL_String8 getPropertyAsString(const CL_String8 &p_key, const CL_String8 &defaultValue);
+		static CL_String getPropertyAsString(const CL_String &p_key, const CL_String &defaultValue);
 
 	private:
 
-		static std::map<CL_String8, CL_String8> m_keyValueMap;
+		static std::map<CL_String, CL_String> m_keyValueMap;
 
 		Properties();
 

@@ -168,15 +168,14 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 	G_ASSERT(m_initialized);
 
 	Race::Car &car = Game::getInstance().getPlayer().getCar();
-
-	bool state;
+	bool pressed;
 
 	switch (p_state) {
 		case Pressed:
-			state = true;
+			pressed = true;
 			break;
 		case Released:
-			state = false;
+			pressed = false;
 			break;
 		default:
 			assert(0 && "unknown input state");
@@ -184,27 +183,27 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 	switch (p_event.id) {
 		case CL_KEY_LEFT:
-			m_turnLeft = state;
+			m_turnLeft = pressed;
 			break;
 		case CL_KEY_RIGHT:
-			m_turnRight = state;
+			m_turnRight = pressed;
 			break;
 		case CL_KEY_UP:
-			car.setAcceleration(state);
+			car.setAcceleration(pressed);
 			break;
 		case CL_KEY_DOWN:
-			car.setBrake(state);
+			car.setBrake(pressed);
 			break;
 		case CL_KEY_SPACE:
-			car.setHandbrake(state);
+			car.setHandbrake(pressed);
 			break;
 		case CL_KEY_F1:
-			if (m_logic->isVoteRunning()) {
+			if (pressed && m_logic->isVoteRunning()) {
 				m_logic->voteYes();
 			}
 			break;
 		case CL_KEY_F2:
-			if (m_logic->isVoteRunning()) {
+			if (pressed && m_logic->isVoteRunning()) {
 				m_logic->voteNo();
 			}
 			break;
@@ -213,7 +212,7 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 	}
 
 	// handle quit request
-	if (p_state == Pressed && p_event.id == CL_KEY_ESCAPE) {
+	if (pressed && p_event.id == CL_KEY_ESCAPE) {
 		m_gameMenu.set_visible(true);
 		m_gameMenu.set_focus(true);
 	}
@@ -222,7 +221,7 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 #if !defined(NDEBUG)
 	// debug key bindings
-	Dbg::RaceSceneKeyBindings::handleInput(state, p_event);
+	Dbg::RaceSceneKeyBindings::handleInput(pressed, p_event);
 #endif // !NDEBUG
 }
 

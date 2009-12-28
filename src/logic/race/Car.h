@@ -182,8 +182,8 @@ class Car
 		/** Locked state. If true then car shoudn't move. */
 		bool m_inputLocked;
 
-		/** Checksum value that will tell if input has changed */
-		int m_inputChecksum;
+		/** True if input changed from last time */
+		bool m_inputChanged;
 
 
 		// physics
@@ -221,8 +221,6 @@ class Car
 		// helpers
 
 		void alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad);
-
-		int calculateInputChecksum() const;
 
 		float limit(float p_value, float p_from, float p_to) const;
 

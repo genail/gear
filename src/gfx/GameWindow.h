@@ -41,7 +41,7 @@ class GameWindow : public CL_GUIComponent {
 
 		virtual ~GameWindow();
 
-		void r(CL_GraphicContext &p_gc);
+		void renderDirect(CL_GraphicContext &p_gc);
 
 	private:
 
@@ -63,7 +63,7 @@ class GameWindow : public CL_GUIComponent {
 		//
 
 
-		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
+		void renderGui(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
 
 		void repaint();
 

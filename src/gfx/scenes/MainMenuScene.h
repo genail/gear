@@ -33,7 +33,8 @@
 #include "gfx/Scene.h"
 #include "controllers/MainMenuController.h"
 
-class MainMenuScene: public Scene {
+class MainMenuScene : public Gfx::Scene
+{
 
 		SIGNAL_0(startRaceClicked);
 		SIGNAL_0(quitClicked);

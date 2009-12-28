@@ -30,6 +30,7 @@
 
 #include "common.h"
 #include "common/Properties.h"
+#include "gfx/Stage.h"
 
 MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	Scene(p_parent),

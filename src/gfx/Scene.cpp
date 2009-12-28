@@ -26,58 +26,73 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Scene.h"
 
-#include <stack>
-#include <ClanLib/core.h>
-
-class Application;
-class DebugLayer;
+#include "gfx/Stage.h"
 
 namespace Gfx {
 
-class Scene;
+Scene::Scene(CL_GUIComponent *p_parent, bool p_gui) :
+		CL_GUIComponent(p_parent),
+		m_loaded(false),
+		m_gui(p_gui)
+{
+	set_visible(false),
+	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
 
-class Stage {
-	public:
+	if (p_gui) {
+		func_render().set(this, &Scene::onRender);
+	}
+}
 
-		virtual ~Stage() {
-		}
+Scene::~Scene()
+{
+	// empty
+}
 
-		static DebugLayer* getDebugLayer() { return m_debugLayer; }
+bool Scene::isLoaded() const
+{
+	return m_loaded;
+}
 
-		static int getWidth() { return m_width; }
+bool Scene::isGui() const
+{
+	return m_gui;
+}
 
-		static int getHeight() { return m_height; }
+void Scene::draw(CL_GraphicContext &p_gc)
+{
+	// empty
+}
 
-		static void pushScene(Scene *p_scene);
+void Scene::load(CL_GraphicContext &p_gc)
+{
+	m_loaded = true;
+}
 
-		static void popScene();
+void Scene::pushed()
+{
+	// empty
+}
 
-		static Scene *peekScene();
+void Scene::poped()
+{
+	// empty
+}
 
-		static void replaceScene(Scene *p_scene);
+void Scene::update(unsigned p_timeElapsed)
+{
+	// empty
+}
 
-		static CL_ResourceManager* getResourceManager() { return m_resourceManager; }
+void Scene::setLoaded(bool p_loaded)
+{
+	m_loaded = p_loaded;
+}
 
-
-	private:
-
-		/** Resource Manager */
-		static CL_ResourceManager *m_resourceManager;
-
-		/** Stage size */
-		static int m_width, m_height;
-
-		/** Scene stack */
-		static std::stack<Scene*> m_sceneStack;
-
-		/** Debug layer */
-		static DebugLayer *m_debugLayer;
-
-		Stage() {}
-
-		friend class ::Application;
-};
+void Scene::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
+{
+	draw(p_gc);
+}
 
 } // namespace

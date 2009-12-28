@@ -50,6 +50,7 @@ SET(CLIENT_SRCS
     debug/RaceSceneKeyBindings.cpp
     gfx/DebugLayer.cpp
     gfx/GameWindow.cpp
+    gfx/Scene.cpp
     gfx/Stage.cpp
     gfx/Viewport.cpp
     gfx/race/RaceGraphics.cpp

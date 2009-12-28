@@ -31,19 +31,24 @@
 #include <ClanLib/core.h>
 #include <ClanLib/gui.h>
 
+namespace Gfx {
 class Scene;
 
 class GameWindow : public CL_Window {
 	public:
 
-		GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc);
+		GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc, CL_GraphicContext *p_nativeGC);
 
 		virtual ~GameWindow();
+
+		void r(CL_GraphicContext &p_gc);
 
 	private:
 
 		/** Last update logic time. When 0 then no logic update has been done before. */
 		unsigned m_lastLogicUpdateTime;
+
+		CL_GraphicContext *m_nativeGC;
 
 		/** Update timer */
 		CL_Timer m_timer;
@@ -68,3 +73,4 @@ class GameWindow : public CL_Window {
 
 };
 
+} // namespace

@@ -53,7 +53,7 @@ class RaceScene
 
 #else // RACE_SCENE_ONLY
 
-class RaceScene: public Scene
+class RaceScene: public Gfx::Scene
 {
 
 #endif // !RACE_SCENE_ONLY
@@ -63,6 +63,8 @@ class RaceScene: public Scene
 		RaceScene(CL_GUIComponent *p_guiParent);
 
 		virtual ~RaceScene();
+
+		virtual bool isNative() const { return true; }
 
 
 		void initialize(const CL_String &p_hostname="", int p_port=0);

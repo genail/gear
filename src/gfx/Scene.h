@@ -31,43 +31,44 @@
 #include <ClanLib/gui.h>
 #include <ClanLib/display.h>
 
-#include "gfx/Stage.h"
+namespace Gfx {
 
 class Scene : public CL_GUIComponent {
 
 	public:
 
-		Scene(CL_GUIComponent *p_parent) : CL_GUIComponent(p_parent), m_loaded(false) {
-			set_visible(false),
-			func_render().set(this, &Scene::onRender);
-			set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
-		}
+		Scene(CL_GUIComponent *p_parent, bool p_gui = true);
 
-		virtual ~Scene() {}
+		virtual ~Scene();
 
 
-		bool isLoaded() const { return m_loaded; }
+		bool isLoaded() const;
 
+		bool isGui() const;
 
-		virtual void draw(CL_GraphicContext &p_gc) {};
+		virtual void draw(CL_GraphicContext &p_gc);
 
-		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
+		virtual void load(CL_GraphicContext &p_gc);
 
-		virtual void pushed() {}
+		virtual void pushed();
 
-		virtual void poped() {}
+		virtual void poped();
 
-		virtual void update(unsigned p_timeElapsed) {}
+		virtual void update(unsigned p_timeElapsed);
 
 	protected:
 
-		void setLoaded(bool p_loaded) { m_loaded = p_loaded; }
+		void setLoaded(bool p_loaded);
 
 	private:
 
 		/** True when load() method was invoked */
 		bool m_loaded;
 
-		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect) { draw(p_gc); }
+		bool m_gui;
+
+		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
 
 };
+
+} // namespace

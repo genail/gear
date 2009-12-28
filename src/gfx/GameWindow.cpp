@@ -33,9 +33,12 @@
 #include "gfx/Stage.h"
 #include "common/Properties.h"
 
-GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc) :
+namespace Gfx {
+
+GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc, CL_GraphicContext *p_nativeGC) :
 	CL_Window(p_manager, p_desc),
 	m_lastLogicUpdateTime(0),
+	m_nativeGC(p_nativeGC),
 	m_lastScene(NULL)
 {
 	func_render().set(this, &GameWindow::onRender);
@@ -51,12 +54,26 @@ void GameWindow::repaint()
 	request_repaint();
 }
 
+void GameWindow::r(CL_GraphicContext &p_gc)
+{
+	Scene *scene = Gfx::Stage::peekScene();
+
+	renderScene(p_gc, scene);
+}
+
+
 void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 {
 	Scene *scene = Gfx::Stage::peekScene();
 
 	updateLogic(scene);
-	renderScene(p_gc, scene);
+
+	if (!scene->isGui()) {
+//		cl_log_event(LOG_DEBUG, "native");
+//		renderScene(*m_nativeGC, scene);
+	} else {
+//		renderScene(p_gc, scene);
+	}
 }
 
 void GameWindow::updateLogic(Scene *p_scene)
@@ -126,7 +143,9 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 			p_scene->load(p_gc);
 		}
 
-		// scene will be rendered by gui mechanics
+		p_scene->draw(p_gc);
 
 	}
 }
+
+} // namespace

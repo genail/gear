@@ -51,7 +51,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 #else // RACE_SCENE_ONLY
 
 RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
-	Scene(p_guiParent),
+	Scene(p_guiParent, false),
 
 #endif // !RACE_SCENE_ONLY
 	m_logic(NULL),

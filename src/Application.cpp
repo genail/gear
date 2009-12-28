@@ -179,7 +179,8 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_DisplayWindowDescription guiDesc("Gear");
 		guiDesc.set_position(CL_Rect(0, 0, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()), true);
 
-		GameWindow gameWindow(&guiManager, guiDesc);
+		CL_GraphicContext nativeGC = displayWindow.get_gc();
+		Gfx::GameWindow gameWindow(&guiManager, guiDesc, &nativeGC);
 
 		// load debug layer
 		DebugLayer debugLayer;
@@ -190,7 +191,13 @@ int Application::main(const std::vector<CL_String> &args)
 		MainMenuScene mainMenuScene(&gameWindow);
 		Gfx::Stage::pushScene(&mainMenuScene);
 
-		guiManager.exec(true);
+		while(true) {
+			guiManager.exec(false);
+			gameWindow.r(nativeGC);
+			windowManager.draw_windows(nativeGC);
+
+			displayWindow.flip(1);
+		}
 
 #else // !RACE_SCENE_ONLY
 

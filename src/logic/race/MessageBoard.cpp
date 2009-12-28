@@ -33,6 +33,11 @@
 
 #include "common.h"
 
+// shitty Visual C++ hack to get numeric_limits<>::max() to work
+#ifdef max
+#undef max
+#endif
+
 namespace Race {
 
 /** What is the most number of messages that can be kept */
@@ -110,6 +115,7 @@ int MessageBoard::nextId()
 	bool overflow = false;
 
 	do {
+
 		if (m_id != std::numeric_limits<int>::max()) {
 			++m_id;
 		} else {

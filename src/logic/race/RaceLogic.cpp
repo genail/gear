@@ -169,7 +169,7 @@ std::vector<CL_String> RaceLogic::getPlayerNames() const
 const Player &RaceLogic::getPlayer(const CL_String& p_name) const
 {
 	assert(m_playerMap.find(p_name) != m_playerMap.end());
-	return *m_playerMap.at(p_name);
+	return *m_playerMap.find(p_name)->second;
 }
 
 void RaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)

@@ -34,7 +34,7 @@
 namespace Gfx {
 class Scene;
 
-class GameWindow : public CL_Window {
+class GameWindow : public CL_GUIComponent {
 	public:
 
 		GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc, CL_GraphicContext *p_nativeGC);

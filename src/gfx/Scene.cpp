@@ -37,8 +37,8 @@ Scene::Scene(CL_GUIComponent *p_parent, bool p_gui) :
 		m_loaded(false),
 		m_gui(p_gui)
 {
-	set_visible(false),
-	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
+	set_visible(false);
+	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight() - 50));
 
 	if (p_gui) {
 		func_render().set(this, &Scene::onRender);

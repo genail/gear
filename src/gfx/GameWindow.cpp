@@ -36,13 +36,17 @@
 namespace Gfx {
 
 GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc, CL_GraphicContext *p_nativeGC) :
-	CL_Window(p_manager, p_desc),
+	CL_GUIComponent(p_manager, CL_GUITopLevelDescription("GameWindow", CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight() - 50), false)),
 	m_lastLogicUpdateTime(0),
 	m_nativeGC(p_nativeGC),
 	m_lastScene(NULL)
 {
 	func_render().set(this, &GameWindow::onRender);
-	set_constant_repaint(true);
+//	set_constant_repaint(true);
+
+	CL_PushButton *label = new CL_PushButton(this);
+	label->set_geometry(CL_Rect(50, 50, 180, 120));
+	label->set_text("aaa");
 }
 
 GameWindow::~GameWindow()
@@ -51,7 +55,7 @@ GameWindow::~GameWindow()
 
 void GameWindow::repaint()
 {
-	request_repaint();
+	//request_repaint();
 }
 
 void GameWindow::r(CL_GraphicContext &p_gc)
@@ -68,12 +72,12 @@ void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 
 	updateLogic(scene);
 
-	if (!scene->isGui()) {
+//	if (!scene->isGui()) {
 //		cl_log_event(LOG_DEBUG, "native");
-//		renderScene(*m_nativeGC, scene);
-	} else {
-//		renderScene(p_gc, scene);
-	}
+////		renderScene(*m_nativeGC, scene);
+//	} else {
+		renderScene(p_gc, scene);
+//	}
 }
 
 void GameWindow::updateLogic(Scene *p_scene)
@@ -143,6 +147,7 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 			p_scene->load(p_gc);
 		}
 
+//		if (!p_scene->isGui())
 		p_scene->draw(p_gc);
 
 	}

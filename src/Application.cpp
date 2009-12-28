@@ -64,6 +64,8 @@ class Application
 
 		static void onWindowClose();
 
+		static void wmRepaint() {}
+
 #if defined(RACE_SCENE_ONLY)
 		static void onInputPressed(const CL_InputEvent &p_event, const CL_InputState &p_state) {
 			m_raceScene->onInputPressed(p_event);
@@ -135,7 +137,7 @@ int Application::main(const std::vector<CL_String> &args)
 
 		displayWindowDescription.set_title("Gear");
 		displayWindowDescription.set_size(CL_Size(Gfx::Stage::m_width, Gfx::Stage::m_height), false);
-		displayWindowDescription.set_multisampling(4);
+//		displayWindowDescription.set_multisampling(4);
 
 		CL_DisplayWindow displayWindow(displayWindowDescription);
 #endif // GL1 || GL2
@@ -188,13 +190,15 @@ int Application::main(const std::vector<CL_String> &args)
 
 		cl_log_event("init", "launching main scene");
 
+		windowManager.func_repaint().set(&Application::wmRepaint);
+
 		MainMenuScene mainMenuScene(&gameWindow);
 		Gfx::Stage::pushScene(&mainMenuScene);
 
 		while(true) {
 			guiManager.exec(false);
-			gameWindow.r(nativeGC);
 			windowManager.draw_windows(nativeGC);
+			gameWindow.r(nativeGC);
 
 			displayWindow.flip(1);
 		}

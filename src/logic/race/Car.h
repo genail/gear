@@ -200,9 +200,6 @@ class Car
 		/** Wheels turn. -1.0 is max left, 1.0 is max right */
 		float m_phyWheelsTurn;
 
-		/** If hit test occurred, this field will keep bound segment that vehicle collided with. */
-		CL_LineSegment2f m_phyCollideBound;
-
 #if defined(CLIENT)
 		/** Body outline for collision check */
 		CL_CollisionOutline m_phyCollisionOutline;

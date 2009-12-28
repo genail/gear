@@ -89,6 +89,7 @@ Car::Car(const Player *p_owner) :
 
 Car::~Car() {
 }
+
 void Car::update(unsigned p_timeElapsed)
 {
 	m_timeFromLastUpdate += p_timeElapsed;
@@ -284,10 +285,6 @@ CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
 {
 	CL_CollisionOutline outline(m_phyCollisionOutline);
 
-//	outline.calculate_smallest_enclosing_discs();
-//	outline.set_inside_test(true);
-
-
 	// transform the outline
 	CL_Angle angle(90, cl_degrees);
 	angle += m_rotation;
@@ -330,8 +327,6 @@ void Car::performBoundCollision(const Bound &p_bound)
 	// get mirror point
 	if (m_phyMoveVec.length() > 0.01f) {
 		m_phyMoveVec.normalize();
-		cl_log_event(LOG_DEBUG, "before move vec x = %1, y = %2", m_phyMoveVec.x, m_phyMoveVec.y);
-		cl_log_event(LOG_DEBUG, "before rotation = %1", m_phyMoveRot.to_degrees());
 
 		const float lengthProj = m_phyMoveVec.length() * cos(segVec.angle(m_phyMoveVec).to_radians());
 		const CL_Vec2f mirrorPoint(segVec * (lengthProj / segVec.length()));
@@ -343,8 +338,6 @@ void Car::performBoundCollision(const Bound &p_bound)
 		// update physics angle
 		m_phyMoveRot = vecToAngle(m_phyMoveVec);
 
-		cl_log_event(LOG_DEBUG, "after move vec x = %1, y = %2", m_phyMoveVec.x, m_phyMoveVec.y);
-		cl_log_event(LOG_DEBUG, "after rotation = %1", m_phyMoveRot.to_degrees());
 	}
 
 }
@@ -405,7 +398,6 @@ void Car::setStartPosition(int p_startPosition) {
 	m_inputAccel = false;
 	m_inputBrake = false;
 	m_phyMoveVec = CL_Vec2f();
-//	m_phyAccelVec = CL_Vec2f();
 	m_speed = 0.0f;
 	m_lap = 1;
 

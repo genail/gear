@@ -31,12 +31,17 @@
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 
+#if defined(CLIENT)
+#include <ClanLib/display.h>
+#endif // CLIENT
+
 #include "common.h"
-#include "logic/race/Bound.h"
-#include "logic/race/Checkpoint.h"
-#include "network/packets/CarState.h"
 
 class Player;
+
+namespace Net {
+	class CarState;
+}
 
 namespace Gfx {
 	class RaceGraphics;
@@ -44,6 +49,8 @@ namespace Gfx {
 
 namespace Race {
 
+class Bound;
+class Checkpoint;
 class Level;
 
 class Car
@@ -57,53 +64,55 @@ class Car
 
 		virtual ~Car();
 
+
+		// attributes
+
+		bool isDrifting() const;
+
 		bool isLocked() const;
 
-		const Checkpoint *getCurrentCheckpoint() const { return m_currentCheckpoint; }
+		const Checkpoint *getCurrentCheckpoint() const;
 
-		int getLap() const { return m_lap; }
+		int getLap() const;
 
 		const Player *getOwner() const;
 
-		const CL_Pointf& getPosition() const { return m_position; }
+		const CL_Pointf& getPosition() const;
 
-		float getRotation() const { return m_rotation.to_degrees(); }
+		float getRotation() const;
 		
-		float getRotationRad() const { return m_rotation.to_radians(); }
+		float getRotationRad() const;
 
-		float getSpeed() const { return m_speed; }
+		float getSpeed() const;
 
 		/** @return Car speed in km/s */
-		float getSpeedKMS() const { return m_speed / 3.0f; }
+		float getSpeedKMS() const;
+
 		
-		bool isDrifting() const;
-
-		DEPRECATED(int prepareStatusEvent(CL_NetGameEvent &p_event));
-
-		Net::CarState prepareCarState() const;
-
-		DEPRECATED(int applyStatusEvent(const CL_NetGameEvent &p_event, int p_beginIndex = 0));
+		// operations
 
 		void applyCarState(const Net::CarState &p_carState);
 
-		void setAcceleration(bool p_value) { m_acceleration = p_value; }
+		Net::CarState prepareCarState() const;
 
-		void setBrake(bool p_value) { m_brake = p_value; }
+		void setAcceleration(bool p_value);
 
-		void setLap(int p_lap) { m_lap = p_lap; }
+		void setBrake(bool p_value);
+
+		void setLap(int p_lap);
 
 		/**
 		 * Sets if car movement should be locked (car won't move).
 		 */
 		void setLocked(bool p_locked);
 
-		void setTurn(float p_value) { m_turn = normalize(p_value); }
+		void setTurn(float p_value);
 
-		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
+		void setPosition(const CL_Pointf &p_position);
 
-		void setRotation(float p_rotation) { m_rotation.set_degrees(p_rotation); }
+		void setRotation(float p_rotation);
 		
-		void setHandbrake(bool p_handbrake) { m_handbrake = p_handbrake; }
+		void setHandbrake(bool p_handbrake);
 
 		/**
 		 * Sets the car position at selected <code>p_startPosition</code>
@@ -115,73 +124,88 @@ class Car
 
 		void update(unsigned int elapsedTime);
 
-		void update1_60();
-
 		/**
 		 * Sets the new checkpoint and calculates car progress on track.
 		 * If lap is reached, then lap number will increase by one.
 		 */
 		void updateCurrentCheckpoint(const Checkpoint *p_checkpoint);
 
-#ifndef SERVER
+#if defined(CLIENT)
 		/** @return Current collision outline based on car position and rotation */
 		CL_CollisionOutline calculateCurrentCollisionOutline() const;
 
 		/** Invoked when collision with bound has occurred */
-		void performBoundCollision(const Bound &p_bound) {
-			m_boundSegment = p_bound.getSegment();
-			m_boundHitTest = true;
-		}
-		
-#endif // !SERVER
+		void performBoundCollision(const Bound &p_bound);
+#endif // CLIENT
 
 	private:
-		
-		/** This car owner */
-		const Player *m_owner;
 
+		/** Parent player */
+		const Player *m_owner;
+		
 		/** Parent level */
 		Race::Level *m_level;
-
-		/** Locked state. If true then car shoudn't move. */
-		bool m_locked;
-
-		/** Central position on map */
-		CL_Pointf m_position;
-
-		/** Rotation in degrees CCW from positive X axis */
-		CL_Angle m_rotation;
-
-		/** Current turn. -1 is maximum left, 0 is center and 1 is maximum right */
-		float m_turn;
-
-		/** Acceleration switch */
-		bool m_acceleration;
-
-		/** Brake switch */
-		bool m_brake;
-		
-		/** Handbrake switch */
-		bool m_handbrake;
-
-		/** Move vector */
-		CL_Vec2f m_moveVector;
-		CL_Vec2f accelerationVector;
-
-		/** Current speed */
-		float m_speed;
-		
-		/** angle */
-		float m_angle;
-
-		/** Input checksum */
-		int m_inputChecksum;
 
 		/** Lap number */
 		int m_lap;
 
+		/** This will help to keep 1/60 iteration speed */
 		unsigned m_timeFromLastUpdate;
 
+
+		// current vehicle state
+
+		/** Central position on map */
+		CL_Pointf m_position;
+
+		/** CW rotation from positive X axis */
+		CL_Angle m_rotation;
+
+		/** Current speed in map pixels per frame */
+		float m_speed;
+
+
+		// input state
+
+		/** Acceleration switch */
+		bool m_inputAccel;
+
+		/** Brake switch */
+		bool m_inputBrake;
+		
+		/** Handbrake switch */
+		bool m_inputHandbrake;
+
+		/** Current turn. -1 is maximum left, 0 is center and 1 is maximum right */
+		float m_inputTurn;
+
+		/** Locked state. If true then car shoudn't move. */
+		bool m_inputLocked;
+
+		/** Checksum value that will tell if input has changed */
+		int m_inputChecksum;
+
+
+		// physics
+
+		/** Move vector for next frame */
+		CL_Vec2f m_phyMoveVec;
+
+		/** Car movement rotation */
+		CL_Angle m_phyMoveRot;
+
+		/** Speed delta (for isDrifting()) */
+		float m_phySpeedDelta;
+
+		/** Wheels turn. -1.0 is max left, 1.0 is max right */
+		float m_phyWheelsTurn;
+
+#if defined(CLIENT)
+		/** Body outline for collision check */
+		CL_CollisionOutline m_phyCollisionOutline;
+#endif // CLIENT
+
+		
 		// checkpoint system
 
 		/** The greatest checkpoint id met on this lap */
@@ -189,40 +213,34 @@ class Car
 
 		/** Current checkpoint position */
 		const Checkpoint *m_currentCheckpoint;
-		
-		// Bound collision vars
-		CL_LineSegment2f m_boundSegment;
-		bool m_boundHitTest;
+
+
+
+		void update1_60();
+
+		// helpers
+
+		void alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad);
 
 		int calculateInputChecksum() const;
 
-		float normalize(float p_value) const;
+		float limit(float p_value, float p_from, float p_to) const;
+
+		/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
+		void normalizeAngle(CL_Angle &p_angle);
+
+		/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
+		void normalizeAngle180(CL_Angle &p_angle);
+
+		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
+
 
 		friend class Race::Level;
-
-#ifdef CLIENT
-		/** Body outline for collision check */
-		CL_CollisionOutline m_collisionOutline;
-
-#ifndef NDEBUG
-		void debugDrawLine(CL_GraphicContext &p_gc, float x1, float y1, float x2, float y2, const CL_Color& p_color);
-#endif // !NDEBUG
-#endif // CLIENT
 
 #if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
 friend class Gfx::RaceGraphics;
 #endif // DRAW_CAR_VECTORS && !NDEBUG
 
 };
-
-inline float Car::normalize(float p_value) const {
-	if (p_value < -1.0f) {
-		p_value = 1.0f;
-	} else if (p_value > 1.0f) {
-		p_value = 1.0f;
-	}
-
-	return p_value;
-}
 
 } // namespace

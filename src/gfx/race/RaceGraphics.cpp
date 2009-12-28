@@ -40,6 +40,7 @@
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
 #include "logic/race/Block.h"
+#include "logic/race/Bound.h"
 #include "logic/race/RaceLogic.h"
 
 namespace Gfx {
@@ -76,7 +77,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 		// on level objects
 		drawTireTracks(p_gc);
 		drawCars(p_gc);
-		drawSmokes(p_gc);
+//		drawSmokes(p_gc);
 
 		// revert player's viewport
 		m_viewport.finalizeGC(p_gc);
@@ -368,6 +369,12 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 
 	updateViewport(p_timeElapsed);
 	updateSmokes(p_timeElapsed);
+
+#if !defined(NDEBUG)
+	const CL_Pointf &carPos = Game::getInstance().getPlayer().getCar().getPosition();
+	Gfx::Stage::getDebugLayer()->putMessage("car x",  cl_format("%1", carPos.x));
+	Gfx::Stage::getDebugLayer()->putMessage("car y",  cl_format("%1", carPos.y));
+#endif // !NDEBUG
 }
 
 void RaceGraphics::updateViewport(unsigned p_timeElapsed)
@@ -375,7 +382,7 @@ void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 	static const float ZOOM_SPEED = 0.005f;
 	static const float MAX_SPEED = 500.0f; // FIXME
 
-	float speed = fabs( ceil(Game::getInstance().getPlayer().getCar().getSpeed() * 10.0f ) / 10.0f);
+	float speed = fabs( ceil(Game::getInstance().getPlayer().getCar().getSpeed() * 500.0f ) / 10.0f);
 
 	float properScale = -( 1.0f / MAX_SPEED ) * speed + 2.0f;
 	properScale = ceil( properScale * 100.0f ) / 100.0f;
@@ -390,7 +397,7 @@ void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 
 
 #ifndef NDEBUG
-	Gfx::Stage::getDebugLayer()->putMessage(CL_String8("scale"),  CL_StringHelp::float_to_local8(scale));
+	Gfx::Stage::getDebugLayer()->putMessage("scale",  CL_StringHelp::float_to_local8(scale));
 #endif
 }
 

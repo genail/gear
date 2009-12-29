@@ -59,9 +59,12 @@ class GuiScene: public CL_GUIComponent, public Scene {
 
 	protected:
 
-		bool m_loaded;
-
 		void setLoaded(bool p_loaded);
+
+
+	private:
+
+		bool m_loaded;
 };
 
 }

@@ -28,17 +28,57 @@
 
 #include "DirectScene.h"
 
+#include "common.h"
+
 namespace Gfx {
 
-DirectScene::DirectScene()
+DirectScene::DirectScene() :
+		m_loaded(false)
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 DirectScene::~DirectScene()
 {
-	// TODO Auto-generated destructor stub
+}
+
+bool DirectScene::isLoaded() const
+{
+	return m_loaded;
+}
+
+SceneType DirectScene::getType() const
+{
+	return ST_DIRECT;
+}
+
+void DirectScene::setLoaded(bool p_loaded)
+{
+	m_loaded = p_loaded;
+}
+
+void DirectScene::draw(CL_GraphicContext &p_gc)
+{
+	G_ASSERT(m_loaded);
+}
+
+void DirectScene::load(CL_GraphicContext &p_gc)
+{
+	G_ASSERT(!m_loaded);
+}
+
+void DirectScene::pushed()
+{
+	// empty
+}
+
+void DirectScene::poped()
+{
+	// empty
+}
+
+void DirectScene::update(unsigned p_timeElapsed)
+{
+	G_ASSERT(!m_loaded);
 }
 
 }

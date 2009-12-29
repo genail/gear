@@ -49,6 +49,7 @@ SET(CLIENT_SRCS
     controllers/MainMenuController.cpp
     debug/RaceSceneKeyBindings.cpp
     gfx/DebugLayer.cpp
+    gfx/DirectScene.cpp
     gfx/GameWindow.cpp
     gfx/GuiScene.cpp
     gfx/Stage.cpp

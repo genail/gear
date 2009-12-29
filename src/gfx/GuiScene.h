@@ -28,37 +28,34 @@
 
 #pragma once
 
-#include <ClanLib/gui.h>
-#include <ClanLib/display.h>
-
-#include "common/types.h"
+#include "Scene.h"
 
 namespace Gfx {
 
-class Scene : public CL_GUIComponent {
+class GuiScene: public Scene {
 
 	public:
 
-		Scene();
+		GuiScene(CL_GUIComponent *p_parent);
 
-		virtual ~Scene();
-
-
-		virtual bool isLoaded() const = 0;
-
-		virtual SceneType getType() const = 0;
+		virtual ~GuiScene();
 
 
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
+		virtual bool isLoaded() const;
 
-		virtual void load(CL_GraphicContext &p_gc) = 0;
+		virtual SceneType getType() const;
 
-		virtual void pushed() = 0;
 
-		virtual void poped() = 0;
+		virtual void draw(CL_GraphicContext &p_gc);
 
-		virtual void update(unsigned p_timeElapsed) = 0;
+		virtual void load(CL_GraphicContext &p_gc);
 
+		virtual void pushed();
+
+		virtual void poped();
+
+		virtual void update(unsigned p_timeElapsed);
 };
 
-} // namespace
+}
+

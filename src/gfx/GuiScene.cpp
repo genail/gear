@@ -26,39 +26,51 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
-#include <ClanLib/gui.h>
-#include <ClanLib/display.h>
-
-#include "common/types.h"
+#include "GuiScene.h"
 
 namespace Gfx {
 
-class Scene : public CL_GUIComponent {
+GuiScene::GuiScene()
+{
+}
 
-	public:
+GuiScene::~GuiScene()
+{
+}
 
-		Scene();
+bool GuiScene::isLoaded() const
+{
+	return m_loaded;
+}
 
-		virtual ~Scene();
+SceneType GuiScene::getType() const
+{
+	return ST_GUI;
+}
 
+void GuiScene::draw(CL_GraphicContext &p_gc)
+{
+	// empty
+}
 
-		virtual bool isLoaded() const = 0;
+void GuiScene::load(CL_GraphicContext &p_gc)
+{
+	// empty
+}
 
-		virtual SceneType getType() const = 0;
+void GuiScene::pushed()
+{
+	// empty
+}
 
+void GuiScene::poped()
+{
+	// empty
+}
 
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
+void GuiScene::update(unsigned p_timeElapsed)
+{
+	// empty
+}
 
-		virtual void load(CL_GraphicContext &p_gc) = 0;
-
-		virtual void pushed() = 0;
-
-		virtual void poped() = 0;
-
-		virtual void update(unsigned p_timeElapsed) = 0;
-
-};
-
-} // namespace
+}

@@ -52,7 +52,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Dec 29 17:37:30 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Dec 29 17:40:47 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -190,7 +190,7 @@
           <UML:Stereotype.baseClass>Abstraction</UML:Stereotype.baseClass>
         </UML:Stereotype>
         <UML:Class xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:000000000000103E'
-          name = 'NativeScene' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+          name = 'DirectScene' visibility = 'public' isSpecification = 'false' isRoot = 'false'
           isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
           <UML:ModelElement.clientDependency>
             <UML:Abstraction xmi.idref = '127-0-1-1--1ef5f17f:125db43007d:-8000:000000000000103F'/>
@@ -937,7 +937,7 @@
       bold="false"
       textsize="11"
       justification="Center"
-    >+ NativeScene</text>
+    >+ DirectScene</text>
     <group name="Fig5.3"
          description="org.argouml.uml.diagram.ui.FigOperationsCompartment[840, 466, 91, 24]"
          href="127-0-1-1--1ef5f17f:125db43007d:-8000:000000000000103E"

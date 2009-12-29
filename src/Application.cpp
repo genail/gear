@@ -181,8 +181,10 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_DisplayWindowDescription guiDesc("Gear");
 		guiDesc.set_position(CL_Rect(0, 0, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()), true);
 
-		CL_GraphicContext nativeGC = displayWindow.get_gc();
-		Gfx::GameWindow gameWindow(&guiManager, &windowManager, &guiManager);
+		CL_GraphicContext &gc = displayWindow.get_gc();
+		CL_InputContext &ic = displayWindow.get_ic();
+
+		Gfx::GameWindow gameWindow(&guiManager, &windowManager, &ic);
 
 		// load debug layer
 		DebugLayer debugLayer;
@@ -201,7 +203,7 @@ int Application::main(const std::vector<CL_String> &args)
 //			gameWindow.renderDirect(nativeGC);
 
 //			windowManager.draw_windows(nativeGC);
-			gameWindow.draw(nativeGC);
+			gameWindow.draw(gc);
 
 			displayWindow.flip(1);
 		}

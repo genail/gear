@@ -35,15 +35,19 @@
 
 namespace Gfx {
 
-GameWindow::GameWindow(CL_GUIManager *p_manager, CL_GUIWindowManagerTexture *p_winMgr, CL_GUIManager *p_guiMgr) :
-	CL_GUIComponent(p_manager, CL_GUITopLevelDescription("GameWindow", CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight() - 50), false)),
+GameWindow::GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_winMgr, CL_InputContext *p_ic) :
+	CL_GUIComponent(p_guiMgr, CL_GUITopLevelDescription("GameWindow", CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight() - 50), false)),
 	m_winMgr(p_winMgr),
 	m_guiMgr(p_guiMgr),
+	m_ic(p_ic),
 	m_lastLogicUpdateTime(0),
 	m_lastScene(NULL)
 {
 //	func_render().set(this, &GameWindow::renderGui);
+	CL_InputDevice &keyboard = m_ic->get_keyboard();
 
+	m_slotContainer.connect(keyboard.sig_key_down(), this, &GameWindow::onKeyDown);
+	m_slotContainer.connect(keyboard.sig_key_up(), this, &GameWindow::onKeyUp);
 }
 
 GameWindow::~GameWindow()
@@ -159,6 +163,24 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 			p_scene->draw(p_gc);
 //		}
 
+	}
+}
+
+void GameWindow::onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state)
+{
+	Scene *scene = Gfx::Stage::peekScene();
+
+	if (scene != NULL) {
+		scene->inputPressed(p_event);
+	}
+}
+
+void GameWindow::onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state)
+{
+	Scene *scene = Gfx::Stage::peekScene();
+
+	if (scene != NULL) {
+		scene->inputReleased(p_event);
 	}
 }
 

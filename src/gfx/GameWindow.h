@@ -37,7 +37,7 @@ class Scene;
 class GameWindow : public CL_GUIComponent {
 	public:
 
-		GameWindow(CL_GUIManager *p_manager, CL_GUIWindowManagerTexture *p_winMgr, CL_GUIManager *p_guiMgr);
+		GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_winMgr, CL_InputContext *p_ic);
 
 		virtual ~GameWindow();
 
@@ -50,6 +50,8 @@ class GameWindow : public CL_GUIComponent {
 		CL_GUIWindowManagerTexture *m_winMgr;
 
 		CL_GUIManager *m_guiMgr;
+
+		CL_InputContext *m_ic;
 
 		/** Last update logic time. When 0 then no logic update has been done before. */
 		unsigned m_lastLogicUpdateTime;
@@ -64,6 +66,8 @@ class GameWindow : public CL_GUIComponent {
 		/** Last scene */
 		Scene *m_lastScene;
 
+		CL_SlotContainer m_slotContainer;
+
 		//
 		// methods
 		//
@@ -76,6 +80,13 @@ class GameWindow : public CL_GUIComponent {
 		void updateLogic(Scene *p_scene);
 
 		void renderScene(CL_GraphicContext &p_gc, Scene *p_scene);
+
+
+		// signal handlers
+
+		void onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state);
+
+		void onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state);
 
 };
 

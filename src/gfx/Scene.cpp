@@ -41,7 +41,7 @@ Scene::Scene(CL_GUIComponent *p_parent, bool p_gui) :
 	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight() - 50));
 
 	if (p_gui) {
-		func_render().set(this, &Scene::onRender);
+//		func_render().set(this, &Scene::onRender);
 	}
 }
 
@@ -92,7 +92,7 @@ void Scene::setLoaded(bool p_loaded)
 
 void Scene::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
 {
-	draw(p_gc);
+//	draw(p_gc);
 }
 
 } // namespace

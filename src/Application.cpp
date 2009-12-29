@@ -197,8 +197,10 @@ int Application::main(const std::vector<CL_String> &args)
 
 		while(true) {
 			guiManager.exec(false);
-			windowManager.draw_windows(nativeGC);
+
 			gameWindow.renderDirect(nativeGC);
+
+			windowManager.draw_windows(nativeGC);
 
 			displayWindow.flip(1);
 		}

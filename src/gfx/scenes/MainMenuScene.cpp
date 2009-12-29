@@ -76,7 +76,7 @@ MainMenuScene::~MainMenuScene()
 
 void MainMenuScene::draw(CL_GraphicContext &p_gc)
 {
-//	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
+	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
 }
 
 void MainMenuScene::onOkClicked()

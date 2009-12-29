@@ -61,11 +61,10 @@ void GameWindow::repaint()
 
 void GameWindow::draw(CL_GraphicContext &p_gc)
 {
-	Scene *scene = Gfx::Stage::peekScene();
-	updateLogic(scene);
-
 	m_guiMgr->exec(false);
 
+	Scene *scene = Gfx::Stage::peekScene();
+	updateLogic(scene);
 	renderScene(p_gc, scene);
 
 	m_winMgr->draw_windows(p_gc);

@@ -36,14 +36,13 @@
 namespace Gfx {
 
 GameWindow::GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_winMgr, CL_InputContext *p_ic) :
-	CL_GUIComponent(p_guiMgr, CL_GUITopLevelDescription("GameWindow", CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight() - 50), false)),
+	CL_GUIComponent(p_guiMgr, CL_GUITopLevelDescription("GameWindow", CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight()), false)),
 	m_winMgr(p_winMgr),
 	m_guiMgr(p_guiMgr),
 	m_ic(p_ic),
 	m_lastLogicUpdateTime(0),
 	m_lastScene(NULL)
 {
-//	func_render().set(this, &GameWindow::renderGui);
 	CL_InputDevice &keyboard = m_ic->get_keyboard();
 
 	m_slotContainer.connect(keyboard.sig_key_down(), this, &GameWindow::onKeyDown);
@@ -62,6 +61,7 @@ void GameWindow::repaint()
 void GameWindow::draw(CL_GraphicContext &p_gc)
 {
 	m_guiMgr->exec(false);
+	dispatchEvents();
 
 	Scene *scene = Gfx::Stage::peekScene();
 	updateLogic(scene);
@@ -144,20 +144,57 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 
 void GameWindow::onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state)
 {
-	Scene *scene = Gfx::Stage::peekScene();
+	m_events.push_back(p_event);
 
-	if (scene != NULL) {
-		scene->inputPressed(p_event);
-	}
+	// uncoment when repeat_count fixed
+//	Scene *scene = Gfx::Stage::peekScene();
+//
+//	if (scene != NULL) {
+//		scene->inputPressed(p_event);
+//	}
 }
 
 void GameWindow::onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state)
 {
-	Scene *scene = Gfx::Stage::peekScene();
+	m_events.push_back(p_event);
 
-	if (scene != NULL) {
-		scene->inputReleased(p_event);
+	// uncoment when repeat_count fixed
+//	Scene *scene = Gfx::Stage::peekScene();
+//
+//	if (scene != NULL) {
+//		scene->inputReleased(p_event);
+//	}
+}
+
+void GameWindow::dispatchEvents()
+{
+	Scene *scene = Gfx::Stage::peekScene();
+	std::vector<int> usedKeys;
+
+	std::list<CL_InputEvent>::reverse_iterator ritor = m_events.rbegin();
+	bool used;
+
+	for (;ritor != m_events.rend(); ++ritor) {
+		used = false;
+		foreach (int k, usedKeys) {
+			if (ritor->id == k) {
+				used = true;
+				break;
+			}
+		}
+
+		if (!used) {
+			if (ritor->type == CL_InputEvent::pressed) {
+				scene->inputPressed(*ritor);
+			} else {
+				scene->inputReleased(*ritor);
+			}
+
+			usedKeys.push_back(ritor->id);
+		}
 	}
+
+	m_events.clear();
 }
 
 } // namespace

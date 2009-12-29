@@ -35,7 +35,7 @@
 
 namespace Gfx {
 
-class Scene : public CL_GUIComponent {
+class Scene {
 
 	public:
 

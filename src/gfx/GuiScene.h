@@ -32,7 +32,7 @@
 
 namespace Gfx {
 
-class GuiScene: public Scene {
+class GuiScene: public CL_GUIComponent, public Scene {
 
 	public:
 
@@ -55,6 +55,13 @@ class GuiScene: public Scene {
 		virtual void poped();
 
 		virtual void update(unsigned p_timeElapsed);
+
+
+	protected:
+
+		bool m_loaded;
+
+		void setLoaded(bool p_loaded);
 };
 
 }

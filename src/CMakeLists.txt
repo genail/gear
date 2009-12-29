@@ -51,7 +51,6 @@ SET(CLIENT_SRCS
     gfx/DebugLayer.cpp
     gfx/GameWindow.cpp
     gfx/GuiScene.cpp
-    gfx/Scene.cpp
     gfx/Stage.cpp
     gfx/Viewport.cpp
     gfx/race/RaceGraphics.cpp

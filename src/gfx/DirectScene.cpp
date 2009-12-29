@@ -26,73 +26,19 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Scene.h"
-
-#include "gfx/Stage.h"
+#include "DirectScene.h"
 
 namespace Gfx {
 
-Scene::Scene(CL_GUIComponent *p_parent, bool p_gui) :
-		CL_GUIComponent(p_parent),
-		m_loaded(false),
-		m_gui(p_gui)
+DirectScene::DirectScene()
 {
-	set_visible(false);
-	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight() - 50));
+	// TODO Auto-generated constructor stub
 
-	if (p_gui) {
-//		func_render().set(this, &Scene::onRender);
-	}
 }
 
-Scene::~Scene()
+DirectScene::~DirectScene()
 {
-	// empty
+	// TODO Auto-generated destructor stub
 }
 
-bool Scene::isLoaded() const
-{
-	return m_loaded;
 }
-
-bool Scene::isGui() const
-{
-	return m_gui;
-}
-
-void Scene::draw(CL_GraphicContext &p_gc)
-{
-	// empty
-}
-
-void Scene::load(CL_GraphicContext &p_gc)
-{
-	m_loaded = true;
-}
-
-void Scene::pushed()
-{
-	// empty
-}
-
-void Scene::poped()
-{
-	// empty
-}
-
-void Scene::update(unsigned p_timeElapsed)
-{
-	// empty
-}
-
-void Scene::setLoaded(bool p_loaded)
-{
-	m_loaded = p_loaded;
-}
-
-void Scene::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
-{
-//	draw(p_gc);
-}
-
-} // namespace

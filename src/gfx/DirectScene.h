@@ -26,63 +26,20 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GuiScene.h"
+#pragma once
 
-#include "common.h"
-#include "gfx/Stage.h"
+#include "Scene.h"
 
 namespace Gfx {
 
-GuiScene::GuiScene(CL_GUIComponent *p_parent) :
-	CL_GUIComponent(p_parent),
-	m_loaded(false)
-{
-	set_visible(false);
-	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight() - 50));
-}
+class DirectScene: public Scene {
 
-GuiScene::~GuiScene()
-{
-}
+	public:
 
-bool GuiScene::isLoaded() const
-{
-	return m_loaded;
-}
+		DirectScene();
 
-SceneType GuiScene::getType() const
-{
-	return ST_GUI;
-}
-
-void GuiScene::setLoaded(bool p_loaded)
-{
-	m_loaded = p_loaded;
-}
-
-void GuiScene::draw(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(m_loaded);
-}
-
-void GuiScene::load(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(!m_loaded);
-}
-
-void GuiScene::pushed()
-{
-	// empty
-}
-
-void GuiScene::poped()
-{
-	// empty
-}
-
-void GuiScene::update(unsigned p_timeElapsed)
-{
-	G_ASSERT(m_loaded);
-}
+		virtual ~DirectScene();
+};
 
 }
+

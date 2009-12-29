@@ -100,16 +100,13 @@ void GameWindow::updateLogic(Scene *p_scene)
 
 			if (p_scene != m_lastScene) {
 
-//				if (m_lastScene != NULL) {
-//					m_lastScene->set_visible(false);
-//					m_lastScene->set_focus(false);
-//				}
-//
-//				// set the scene visibility and focus
-//				p_scene->set_visible(true);
-//				p_scene->set_focus(true);
+				if (m_lastScene != NULL) {
+					m_lastScene->setActive(false);
+				}
 
 				m_lastScene = p_scene;
+
+				p_scene->setActive(true);
 			}
 
 			const unsigned now = CL_System::get_time();

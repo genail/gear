@@ -93,5 +93,4 @@ void MainMenuScene::displayError(const CL_String& p_message)
 {
 	m_errorLabel.set_text(p_message);
 	m_errorLabel.request_repaint();
-
 }

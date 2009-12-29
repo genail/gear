@@ -87,6 +87,11 @@ void DirectScene::poped()
 	// empty
 }
 
+void DirectScene::setActive(bool p_active)
+{
+	// empty
+}
+
 void DirectScene::update(unsigned p_timeElapsed)
 {
 	G_ASSERT(!m_loaded);

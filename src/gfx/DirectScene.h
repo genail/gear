@@ -58,6 +58,8 @@ class DirectScene: public Scene {
 
 		virtual void poped();
 
+		virtual void setActive(bool p_active);
+
 		virtual void update(unsigned p_timeElapsed);
 
 

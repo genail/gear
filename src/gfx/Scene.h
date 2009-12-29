@@ -61,6 +61,14 @@ class Scene {
 
 		virtual void poped() = 0;
 
+		/**
+		 * Called with <code>true</code> if scene goes on top
+		 * of scene stack and it should be displayed.
+		 * Called with <code>false</code> if scene goes under
+		 * other scene or out of scene stack.
+		 */
+		virtual void setActive(bool p_active) = 0;
+
 		virtual void update(unsigned p_timeElapsed) = 0;
 
 };

@@ -52,7 +52,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Dec 29 18:15:29 CET 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Dec 29 19:23:32 CET 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -127,6 +127,21 @@
                   name = 'p_event' isSpecification = 'false'>
                   <UML:Parameter.type>
                     <UML:Class xmi.idref = '127-0-1-1--1ef5f17f:125db43007d:-8000:000000000000106B'/>
+                  </UML:Parameter.type>
+                </UML:Parameter>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:0000000000001072'
+              name = 'setActive' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+              isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:0000000000001073'
+                  name = 'return' isSpecification = 'false' kind = 'return'/>
+                <UML:Parameter xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:0000000000001075'
+                  name = 'p_active' isSpecification = 'false'>
+                  <UML:Parameter.type>
+                    <UML:Class xmi.idref = '127-0-1-1--1ef5f17f:125db43007d:-8000:0000000000001076'/>
                   </UML:Parameter.type>
                 </UML:Parameter>
               </UML:BehavioralFeature.parameter>
@@ -297,6 +312,9 @@
         <UML:Class xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:000000000000106B'
           name = 'CL_InputEvent' visibility = 'public' isSpecification = 'false' isRoot = 'false'
           isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
+        <UML:Class xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:0000000000001076'
+          name = 'bool' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+          isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
       </UML:Namespace.ownedElement>
     </UML:Model>
     <UML:Class xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:0000000000001046'
@@ -315,6 +333,9 @@
       name = 'void' visibility = 'public' isSpecification = 'false' isRoot = 'false'
       isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
     <UML:Class xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:000000000000106E'
+      name = 'void' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+      isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
+    <UML:Class xmi.id = '127-0-1-1--1ef5f17f:125db43007d:-8000:0000000000001074'
       name = 'void' visibility = 'public' isSpecification = 'false' isRoot = 'false'
       isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
   </XMI.content>
@@ -433,7 +454,7 @@
       <text name="Fig0.3.2"
         x="504"
         y="278"
-        width="142"
+        width="140"
         height="14"
         fill="0"
         fillcolor="white"
@@ -449,7 +470,7 @@
       <text name="Fig0.3.3"
         x="504"
         y="292"
-        width="65"
+        width="64"
         height="14"
         fill="0"
         fillcolor="white"
@@ -481,7 +502,7 @@
       <text name="Fig0.3.5"
         x="504"
         y="320"
-        width="233"
+        width="229"
         height="14"
         fill="0"
         fillcolor="white"
@@ -497,8 +518,8 @@
       <text name="Fig0.3.6"
         x="504"
         y="334"
-        width="238"
-        height="20"
+        width="236"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -510,6 +531,22 @@
         textsize="11"
         justification="Left"
       >+inputReleased(p_event : CL_InputEvent)</text>
+      <text name="Fig0.3.7"
+        x="504"
+        y="348"
+        width="156"
+        height="23"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="DejaVu Sans"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >+setActive(p_active : bool)</text>
     </group>
     <rectangle name="Fig0.4"
       x="504"

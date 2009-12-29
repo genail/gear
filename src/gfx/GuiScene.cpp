@@ -93,6 +93,17 @@ void GuiScene::poped()
 	set_visible(false);
 }
 
+void GuiScene::setActive(bool p_active)
+{
+	if (p_active) {
+		set_visible(true);
+		set_focus(true);
+	} else {
+		set_focus(false);
+		set_visible(false);
+	}
+}
+
 void GuiScene::update(unsigned p_timeElapsed)
 {
 	G_ASSERT(m_loaded);

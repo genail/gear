@@ -71,29 +71,6 @@ void GameWindow::draw(CL_GraphicContext &p_gc)
 	m_winMgr->draw_windows(p_gc);
 }
 
-void GameWindow::renderDirect(CL_GraphicContext &p_gc)
-{
-	Scene *scene = Gfx::Stage::peekScene();
-	updateLogic(scene);
-
-	scene->draw(p_gc);
-//	renderScene(p_gc, scene);
-}
-
-
-void GameWindow::renderGui(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
-{
-	Scene *scene = Gfx::Stage::peekScene();
-
-	updateLogic(scene);
-
-//	if (!scene->isGui()) {
-//		cl_log_event(LOG_DEBUG, "native");
-////		renderScene(*m_nativeGC, scene);
-//	} else {
-		renderScene(p_gc, scene);
-//	}
-}
 
 void GameWindow::updateLogic(Scene *p_scene)
 {

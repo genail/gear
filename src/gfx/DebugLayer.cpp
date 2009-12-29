@@ -29,7 +29,7 @@
 #include "DebugLayer.h"
 
 DebugLayer::DebugLayer() :
-	m_label(CL_Pointf(), "", Gfx::Label::F_BOLD)
+	m_label(CL_Pointf(), "", Gfx::Label::F_REGULAR)
 {
 }
 

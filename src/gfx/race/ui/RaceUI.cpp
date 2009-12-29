@@ -49,9 +49,9 @@ struct Comparator {
 RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
 	m_playerList(p_logic),
 	m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
-	m_messageBoardLabel(CL_Pointf(), "", Label::F_BOLD, 14),
+	m_messageBoardLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 	m_lapLabel(CL_Pointf(Stage::getWidth() - 20, 5), "", Label::F_BOLD, 25),
-	m_carLabel(CL_Pointf(), "", Label::F_BOLD, 14),
+	m_carLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 	m_logic(p_logic),
 	m_viewport(p_viewport)
 {

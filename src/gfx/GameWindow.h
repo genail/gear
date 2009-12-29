@@ -41,8 +41,6 @@ class GameWindow : public CL_GUIComponent {
 
 		virtual ~GameWindow();
 
-		void renderDirect(CL_GraphicContext &p_gc);
-
 		void draw(CL_GraphicContext &p_gc);
 
 	private:

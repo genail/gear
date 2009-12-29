@@ -41,20 +41,24 @@ class DirectScene: public Scene {
 		virtual ~DirectScene();
 
 
-		virtual bool isLoaded() const = 0;
+		virtual bool isLoaded() const;
 
-		virtual SceneType getType() const = 0;
+		virtual SceneType getType() const;
 
 
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
+		virtual void draw(CL_GraphicContext &p_gc);
 
-		virtual void load(CL_GraphicContext &p_gc) = 0;
+		virtual void inputPressed(const CL_InputEvent &p_event);
 
-		virtual void pushed() = 0;
+		virtual void inputReleased(const CL_InputEvent &p_event);
 
-		virtual void poped() = 0;
+		virtual void load(CL_GraphicContext &p_gc);
 
-		virtual void update(unsigned p_timeElapsed) = 0;
+		virtual void pushed();
+
+		virtual void poped();
+
+		virtual void update(unsigned p_timeElapsed);
 
 
 	protected:

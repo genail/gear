@@ -50,9 +50,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 
 #else // RACE_SCENE_ONLY
 
-RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
-	Scene(p_guiParent, false),
-
+RaceScene::RaceScene(CL_GUIComponent *p_parent) :
 #endif // !RACE_SCENE_ONLY
 	m_logic(NULL),
 	m_graphics(NULL),
@@ -60,15 +58,10 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	m_inputLock(false),
 	m_turnLeft(false),
 	m_turnRight(false),
-	m_gameMenu(this),
+	m_gameMenu(p_parent),
 	m_gameMenuController(&m_logic, &m_gameMenu)
 {
 #if !defined(RACE_SCENE_ONLY)
-	set_class_name("RaceScene");
-
-	// listen for input
-	func_input_pressed().set(this, &RaceScene::onInputPressed);
-	func_input_released().set(this, &RaceScene::onInputReleased);
 
 #endif
 
@@ -129,7 +122,7 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 	m_graphics->load(p_gc);
 
 #if !defined(RACE_SCENE_ONLY)
-	Scene::load(p_gc);
+	DirectScene::load(p_gc);
 #endif // !RACE_SCENE_ONLY
 
 }
@@ -147,20 +140,18 @@ void RaceScene::update(unsigned p_timeElapsed)
 
 
 
-bool RaceScene::onInputPressed(const CL_InputEvent &p_event)
+void RaceScene::inputPressed(const CL_InputEvent &p_event)
 {
-	G_ASSERT(m_initialized);
-
-	handleInput(Pressed, p_event);
-	return true;
+	if (m_initialized) {
+		handleInput(Pressed, p_event);
+	}
 }
 
-bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
+void RaceScene::inputReleased(const CL_InputEvent &p_event)
 {
-	G_ASSERT(m_initialized);
-
-	handleInput(Released, p_event);
-	return true;
+	if (m_initialized) {
+		handleInput(Released, p_event);
+	}
 }
 
 void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)

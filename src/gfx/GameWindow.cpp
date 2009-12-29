@@ -35,13 +35,14 @@
 
 namespace Gfx {
 
-GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc, CL_GraphicContext *p_nativeGC) :
+GameWindow::GameWindow(CL_GUIManager *p_manager, CL_GUIWindowManagerTexture *p_winMgr, CL_GUIManager *p_guiMgr) :
 	CL_GUIComponent(p_manager, CL_GUITopLevelDescription("GameWindow", CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight() - 50), false)),
+	m_winMgr(p_winMgr),
+	m_guiMgr(p_guiMgr),
 	m_lastLogicUpdateTime(0),
-	m_nativeGC(p_nativeGC),
 	m_lastScene(NULL)
 {
-	func_render().set(this, &GameWindow::renderGui);
+//	func_render().set(this, &GameWindow::renderGui);
 
 }
 
@@ -52,6 +53,18 @@ GameWindow::~GameWindow()
 void GameWindow::repaint()
 {
 	//request_repaint();
+}
+
+void GameWindow::draw(CL_GraphicContext &p_gc)
+{
+	Scene *scene = Gfx::Stage::peekScene();
+	updateLogic(scene);
+
+	m_guiMgr->exec(false);
+
+	renderScene(p_gc, scene);
+
+	m_winMgr->draw_windows(p_gc);
 }
 
 void GameWindow::renderDirect(CL_GraphicContext &p_gc)
@@ -87,14 +100,14 @@ void GameWindow::updateLogic(Scene *p_scene)
 
 			if (p_scene != m_lastScene) {
 
-				if (m_lastScene != NULL) {
-					m_lastScene->set_visible(false);
-					m_lastScene->set_focus(false);
-				}
-
-				// set the scene visibility and focus
-				p_scene->set_visible(true);
-				p_scene->set_focus(true);
+//				if (m_lastScene != NULL) {
+//					m_lastScene->set_visible(false);
+//					m_lastScene->set_focus(false);
+//				}
+//
+//				// set the scene visibility and focus
+//				p_scene->set_visible(true);
+//				p_scene->set_focus(true);
 
 				m_lastScene = p_scene;
 			}
@@ -145,9 +158,9 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 			p_scene->load(p_gc);
 		}
 
-		if (!p_scene->isGui()) {
+//		if (!p_scene->isGui()) {
 			p_scene->draw(p_gc);
-		}
+//		}
 
 	}
 }

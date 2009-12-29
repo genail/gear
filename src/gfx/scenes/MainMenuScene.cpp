@@ -33,7 +33,7 @@
 #include "gfx/Stage.h"
 
 MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
-	Scene(p_parent),
+	GuiScene(p_parent),
 	m_controller(this),
 	m_nameLabel(this),
 	m_serverLabel(this),

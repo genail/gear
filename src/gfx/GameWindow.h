@@ -37,13 +37,19 @@ class Scene;
 class GameWindow : public CL_GUIComponent {
 	public:
 
-		GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc, CL_GraphicContext *p_nativeGC);
+		GameWindow(CL_GUIManager *p_manager, CL_GUIWindowManagerTexture *p_winMgr, CL_GUIManager *p_guiMgr);
 
 		virtual ~GameWindow();
 
 		void renderDirect(CL_GraphicContext &p_gc);
 
+		void draw(CL_GraphicContext &p_gc);
+
 	private:
+
+		CL_GUIWindowManagerTexture *m_winMgr;
+
+		CL_GUIManager *m_guiMgr;
 
 		/** Last update logic time. When 0 then no logic update has been done before. */
 		unsigned m_lastLogicUpdateTime;

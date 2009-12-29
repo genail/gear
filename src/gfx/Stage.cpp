@@ -45,7 +45,7 @@ std::stack<Scene*> Stage::m_sceneStack;
 
 void Stage::pushScene(Scene *p_scene)
 {
-	cl_log_event("stage", "scene push: %1", p_scene->get_class_name());
+//	cl_log_event("stage", "scene push: %1", p_scene->get_class_name());
 	m_sceneStack.push(p_scene);
 
 	p_scene->pushed();
@@ -55,7 +55,7 @@ void Stage::popScene()
 {
 	Scene *scene = peekScene();
 
-	cl_log_event("stage", "scene pop: %1", scene->get_class_name());
+//	cl_log_event("stage", "scene pop: %1", scene->get_class_name());
 	m_sceneStack.pop();
 
 	scene->poped();
@@ -68,7 +68,7 @@ Scene *Stage::peekScene()
 
 void Stage::replaceScene(Scene *p_scene)
 {
-	cl_log_event("stage", "scene replace: %1", p_scene->get_class_name());
+//	cl_log_event("stage", "scene replace: %1", p_scene->get_class_name());
 	m_sceneStack.pop();
 	m_sceneStack.push(p_scene);
 }

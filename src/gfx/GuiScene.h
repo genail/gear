@@ -48,6 +48,10 @@ class GuiScene: public CL_GUIComponent, public Scene {
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
+		virtual void inputPressed(const CL_InputEvent &p_event);
+
+		virtual void inputReleased(const CL_InputEvent &p_event);
+
 		virtual void load(CL_GraphicContext &p_gc);
 
 		virtual void pushed();

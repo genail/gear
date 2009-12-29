@@ -37,7 +37,7 @@ GuiScene::GuiScene(CL_GUIComponent *p_parent) :
 	CL_GUIComponent(p_parent),
 	m_loaded(false)
 {
-	set_visible(false);
+	set_visible(true);
 	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight() - 50));
 }
 
@@ -65,19 +65,32 @@ void GuiScene::draw(CL_GraphicContext &p_gc)
 	G_ASSERT(m_loaded);
 }
 
+void GuiScene::inputPressed(const CL_InputEvent &p_event)
+{
+	// empty
+}
+
+void GuiScene::inputReleased(const CL_InputEvent &p_event)
+{
+	// empty
+}
+
 void GuiScene::load(CL_GraphicContext &p_gc)
 {
 	G_ASSERT(!m_loaded);
+	m_loaded = true;
 }
 
 void GuiScene::pushed()
 {
-	// empty
+	set_visible(true);
+	set_focus(true);
 }
 
 void GuiScene::poped()
 {
-	// empty
+	set_focus(false);
+	set_visible(false);
 }
 
 void GuiScene::update(unsigned p_timeElapsed)

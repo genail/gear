@@ -61,9 +61,20 @@ void DirectScene::draw(CL_GraphicContext &p_gc)
 	G_ASSERT(m_loaded);
 }
 
+void DirectScene::inputPressed(const CL_InputEvent &p_event)
+{
+	// empty
+}
+
+void DirectScene::inputReleased(const CL_InputEvent &p_event)
+{
+	// empty
+}
+
 void DirectScene::load(CL_GraphicContext &p_gc)
 {
 	G_ASSERT(!m_loaded);
+	m_loaded = true;
 }
 
 void DirectScene::pushed()

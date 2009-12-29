@@ -39,9 +39,9 @@ class Scene {
 
 	public:
 
-		Scene();
+		Scene() {}
 
-		virtual ~Scene();
+		virtual ~Scene() {};
 
 
 		virtual bool isLoaded() const = 0;
@@ -50,6 +50,10 @@ class Scene {
 
 
 		virtual void draw(CL_GraphicContext &p_gc) = 0;
+
+		virtual void inputPressed(const CL_InputEvent &p_event) = 0;
+
+		virtual void inputReleased(const CL_InputEvent &p_event) = 0;
 
 		virtual void load(CL_GraphicContext &p_gc) = 0;
 

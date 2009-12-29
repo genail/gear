@@ -182,7 +182,7 @@ int Application::main(const std::vector<CL_String> &args)
 		guiDesc.set_position(CL_Rect(0, 0, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()), true);
 
 		CL_GraphicContext nativeGC = displayWindow.get_gc();
-		Gfx::GameWindow gameWindow(&guiManager, guiDesc, &nativeGC);
+		Gfx::GameWindow gameWindow(&guiManager, &windowManager, &guiManager);
 
 		// load debug layer
 		DebugLayer debugLayer;
@@ -196,11 +196,12 @@ int Application::main(const std::vector<CL_String> &args)
 		Gfx::Stage::pushScene(&mainMenuScene);
 
 		while(true) {
-			guiManager.exec(false);
+//			guiManager.exec(false);
 
-			gameWindow.renderDirect(nativeGC);
+//			gameWindow.renderDirect(nativeGC);
 
-			windowManager.draw_windows(nativeGC);
+//			windowManager.draw_windows(nativeGC);
+			gameWindow.draw(nativeGC);
 
 			displayWindow.flip(1);
 		}

@@ -30,13 +30,13 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "gfx/Scene.h"
+#include "gfx/GuiScene.h"
 #include "controllers/MainMenuController.h"
 
-class MainMenuScene : public Gfx::Scene
+class MainMenuScene : public Gfx::GuiScene
 {
-
 		SIGNAL_0(startRaceClicked);
+
 		SIGNAL_0(quitClicked);
 
 	public:

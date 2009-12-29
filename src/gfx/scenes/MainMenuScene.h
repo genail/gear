@@ -46,6 +46,8 @@ class MainMenuScene : public Gfx::GuiScene
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
+		virtual void load(CL_GraphicContext &p_gc);
+
 		CL_String getPlayerName() const { return m_nameLineEdit.get_text(); }
 
 		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
@@ -69,6 +71,10 @@ class MainMenuScene : public Gfx::GuiScene
 		CL_Label m_errorLabel;
 
 		CL_PushButton m_quitButton;
+
+		// logo
+
+		CL_Sprite m_logoSprite;
 
 
 		//

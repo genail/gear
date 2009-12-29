@@ -35,6 +35,8 @@
 
 namespace Gfx {
 
+const int EXIT_CODE_QUIT = 1;
+
 GameWindow::GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_winMgr, CL_InputContext *p_ic) :
 	CL_GUIComponent(p_guiMgr, CL_GUITopLevelDescription("GameWindow", CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight()), false)),
 	m_winMgr(p_winMgr),
@@ -58,13 +60,25 @@ void GameWindow::repaint()
 	//request_repaint();
 }
 
-void GameWindow::draw(CL_GraphicContext &p_gc)
+bool GameWindow::update()
 {
-	m_guiMgr->exec(false);
+	const int result = m_guiMgr->exec(false);
+
+	if (result == EXIT_CODE_QUIT) {
+		return false;
+	}
+
 	dispatchEvents();
 
 	Scene *scene = Gfx::Stage::peekScene();
 	updateLogic(scene);
+
+	return true;
+}
+
+void GameWindow::draw(CL_GraphicContext &p_gc)
+{
+	Scene *scene = Gfx::Stage::peekScene();
 	renderScene(p_gc, scene);
 
 	m_winMgr->draw_windows(p_gc);
@@ -114,6 +128,7 @@ void GameWindow::updateLogic(Scene *p_scene)
 #endif // NDEBUG
 			}
 
+
 			m_lastLogicUpdateTime = now;
 		}
 
@@ -121,7 +136,7 @@ void GameWindow::updateLogic(Scene *p_scene)
 		// when there are no scenes on stack, then probably application
 		// should be ended
 		cl_log_event(LOG_DEBUG, "Closing application because of empty scene stack");
-		exit_with_code(0);
+		exit_with_code(EXIT_CODE_QUIT);
 	}
 }
 
@@ -169,28 +184,31 @@ void GameWindow::onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_st
 void GameWindow::dispatchEvents()
 {
 	Scene *scene = Gfx::Stage::peekScene();
-	std::vector<int> usedKeys;
 
-	std::list<CL_InputEvent>::reverse_iterator ritor = m_events.rbegin();
-	bool used;
+	if (scene != NULL) {
+		std::vector<int> usedKeys;
 
-	for (;ritor != m_events.rend(); ++ritor) {
-		used = false;
-		foreach (int k, usedKeys) {
-			if (ritor->id == k) {
-				used = true;
-				break;
-			}
-		}
+		std::list<CL_InputEvent>::reverse_iterator ritor = m_events.rbegin();
+		bool used;
 
-		if (!used) {
-			if (ritor->type == CL_InputEvent::pressed) {
-				scene->inputPressed(*ritor);
-			} else {
-				scene->inputReleased(*ritor);
+		for (;ritor != m_events.rend(); ++ritor) {
+			used = false;
+			foreach (int k, usedKeys) {
+				if (ritor->id == k) {
+					used = true;
+					break;
+				}
 			}
 
-			usedKeys.push_back(ritor->id);
+			if (!used) {
+				if (ritor->type == CL_InputEvent::pressed) {
+					scene->inputPressed(*ritor);
+				} else {
+					scene->inputReleased(*ritor);
+				}
+
+				usedKeys.push_back(ritor->id);
+			}
 		}
 	}
 

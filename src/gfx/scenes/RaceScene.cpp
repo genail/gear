@@ -204,8 +204,13 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 	// handle quit request
 	if (pressed && p_event.id == CL_KEY_ESCAPE) {
-		m_gameMenu.set_visible(true);
-		m_gameMenu.set_focus(true);
+
+		if (!m_gameMenu.is_visible()) {
+			m_gameMenu.set_visible(true);
+			m_gameMenu.set_focus(true);
+		} else {
+			m_gameMenu.set_visible(false);
+		}
 	}
 
 	updateCarTurn();

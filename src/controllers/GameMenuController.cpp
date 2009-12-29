@@ -39,7 +39,6 @@ GameMenuController::GameMenuController(Race::RaceLogic **p_raceLogic, Gfx::GameM
 {
 	m_gameMenu->func_exit_clicked().set(this, &GameMenuController::onExitClicked);
 	m_gameMenu->func_vote_clicked().set(this, &GameMenuController::onVoteClicked);
-	m_gameMenu->func_input_pressed().set(this, &GameMenuController::onInputPressed);
 }
 
 GameMenuController::~GameMenuController()
@@ -56,17 +55,4 @@ void GameMenuController::onVoteClicked()
 {
 	m_gameMenu->set_visible(false);
 	(*m_raceLogic)->callAVote(VOTE_RESTART_RACE);
-}
-
-bool GameMenuController::onInputPressed(const CL_InputEvent &p_event)
-{
-
-	if (m_gameMenu->is_visible()) {
-		if (p_event.id == CL_KEY_ESCAPE) {
-			m_gameMenu->set_visible(false);
-			return true;
-		}
-	}
-
-	return false;
 }

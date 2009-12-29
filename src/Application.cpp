@@ -197,14 +197,8 @@ int Application::main(const std::vector<CL_String> &args)
 		MainMenuScene mainMenuScene(&gameWindow);
 		Gfx::Stage::pushScene(&mainMenuScene);
 
-		while(true) {
-//			guiManager.exec(false);
-
-//			gameWindow.renderDirect(nativeGC);
-
-//			windowManager.draw_windows(nativeGC);
+		while(gameWindow.update()) {
 			gameWindow.draw(gc);
-
 			displayWindow.flip(1);
 		}
 

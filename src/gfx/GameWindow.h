@@ -43,6 +43,8 @@ class GameWindow : public CL_GUIComponent {
 
 		virtual ~GameWindow();
 
+		bool update();
+
 		void draw(CL_GraphicContext &p_gc);
 
 	private:

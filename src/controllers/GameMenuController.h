@@ -57,7 +57,5 @@ class GameMenuController {
 		void onExitClicked();
 
 		void onVoteClicked();
-
-		bool onInputPressed(const CL_InputEvent &p_event);
 };
 

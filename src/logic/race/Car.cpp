@@ -145,7 +145,7 @@ void Car::update1_60() {
 	static const float BRAKE_POWER = 0.05f;
 	static const float ACCEL_POWER = 0.07f;
 	static const float WHEEL_TURN_SPEED = 1.0f / 10.0f;
-	static const float TURN_POWER  = (2 * M_PI / 360.0f) * 2.5f;
+	static const float TURN_POWER  = (2 * CL_PI / 360.0f) * 2.5f;
 	static const float MOV_ALIGN_POWER = TURN_POWER / 2.0f;
 	static const float ROT_ALIGN_POWER = TURN_POWER * 0.7f;
 	static const float AIR_RESITANCE = 0.005f; // per one speed unit

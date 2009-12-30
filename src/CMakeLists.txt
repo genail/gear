@@ -140,6 +140,7 @@ SET(SERVER_LIBS ${LIBS}
 # -Winline
 # -Weffc++
 # Common configuration
+IF (CMAKE_COMPILER_IS_GNUCXX)
 SET(COMMON_COMPILE_FLAGS
     "-isystem/usr/local/include/ClanLib-2.1"
     "-Woverloaded-virtual"
@@ -170,6 +171,7 @@ SET(COMMON_COMPILE_FLAGS
     "-Wenum-compare"
     "-Wvolatile-register-var"
 )
+ENDIF (CMAKE_COMPILER_IS_GNUCXX)
 
 JOIN_LIST("" ${COMMON_COMPILE_FLAGS})
 SET(COMMON_COMPILE_FLAGS "${JOIN_LIST_RESULT}")

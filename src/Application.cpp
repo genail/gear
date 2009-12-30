@@ -64,6 +64,8 @@ class Application
 
 		static void onWindowClose();
 
+		static void wmRepaint() {}
+
 #if defined(RACE_SCENE_ONLY)
 		static void onInputPressed(const CL_InputEvent &p_event, const CL_InputState &p_state) {
 			m_raceScene->onInputPressed(p_event);
@@ -135,7 +137,7 @@ int Application::main(const std::vector<CL_String> &args)
 
 		displayWindowDescription.set_title("Gear");
 		displayWindowDescription.set_size(CL_Size(Gfx::Stage::m_width, Gfx::Stage::m_height), false);
-		displayWindowDescription.set_multisampling(4);
+//		displayWindowDescription.set_multisampling(4);
 
 		CL_DisplayWindow displayWindow(displayWindowDescription);
 #endif // GL1 || GL2
@@ -179,7 +181,10 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_DisplayWindowDescription guiDesc("Gear");
 		guiDesc.set_position(CL_Rect(0, 0, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()), true);
 
-		GameWindow gameWindow(&guiManager, guiDesc);
+		CL_GraphicContext &gc = displayWindow.get_gc();
+		CL_InputContext &ic = displayWindow.get_ic();
+
+		Gfx::GameWindow gameWindow(&guiManager, &windowManager, &ic);
 
 		// load debug layer
 		DebugLayer debugLayer;
@@ -187,10 +192,15 @@ int Application::main(const std::vector<CL_String> &args)
 
 		cl_log_event("init", "launching main scene");
 
+		windowManager.func_repaint().set(&Application::wmRepaint);
+
 		MainMenuScene mainMenuScene(&gameWindow);
 		Gfx::Stage::pushScene(&mainMenuScene);
 
-		guiManager.exec(true);
+		while(gameWindow.update()) {
+			gameWindow.draw(gc);
+			displayWindow.flip(1);
+		}
 
 #else // !RACE_SCENE_ONLY
 

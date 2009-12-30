@@ -1,4 +1,9 @@
 <resources>
+    <section name="menu">
+        <sprite name="logo">
+            <image file="logo.png" />
+        </sprite>
+    </section>
     <section name="race">
         <sprite name="car" base_angle="90">
             <image file="car.png" />

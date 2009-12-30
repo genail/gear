@@ -77,7 +77,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 		// on level objects
 		drawTireTracks(p_gc);
 		drawCars(p_gc);
-//		drawSmokes(p_gc);
+		drawSmokes(p_gc);
 
 		// revert player's viewport
 		m_viewport.finalizeGC(p_gc);

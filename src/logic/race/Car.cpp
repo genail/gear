@@ -61,7 +61,7 @@ Car::Car(const Player *p_owner) :
 	m_inputHandbrake(false),
 	m_inputTurn(0.0f),
 	m_inputLocked(false),
-	m_inputChecksum(0),
+	m_inputChanged(false),
 	m_phySpeedDelta(0.0f),
 	m_phyWheelsTurn(0.0f),
 	m_greatestCheckpointId(0),
@@ -268,14 +268,24 @@ void Car::update1_60() {
 
 	// set speed delta
 	m_phySpeedDelta = m_speed - prevSpeed;
-
 	
+
+	// act to input changes
+	if (m_inputChanged) {
+		INVOKE_1(inputChanged, *this);
+		m_inputChanged = false;
+	}
+
 #if defined(CLIENT)
 #if !defined(NDEBUG)
-			Gfx::Stage::getDebugLayer()->putMessage(CL_String8("speed"),  CL_StringHelp::float_to_local8(m_speed));
-			if (m_level != NULL) {
-				Gfx::Stage::getDebugLayer()->putMessage(CL_String8("resist"), CL_StringHelp::float_to_local8(m_level->getResistance(m_position.x, m_position.y)));
-			}
+	// print debug information
+	DebugLayer *dbgl = Gfx::Stage::getDebugLayer();
+
+	dbgl->putMessage("speed", cl_format("%1", m_speed));
+	if (!m_level) {
+		const float resistance = m_level->getResistance(m_position.x, m_position.y);
+		dbgl->putMessage("resist", cl_format("%1", resistance));
+	}
 #endif // NDEBUG
 #endif // CLIENT
 }
@@ -373,15 +383,6 @@ void Car::applyCarState(const Net::CarState &p_carState)
 	m_inputTurn = p_carState.getTurn();
 	m_inputAccel = p_carState.getAcceleration() > 0.0f;
 	m_inputBrake = p_carState.getAcceleration() < 0.0f;
-}
-
-int Car::calculateInputChecksum() const {
-	int checksum = 0;
-	checksum |= (int) m_inputAccel;
-	checksum |= ((int) m_inputBrake) << 1;
-	checksum += m_inputTurn * 10000.0f;
-
-	return checksum;
 }
 
 void Car::setStartPosition(int p_startPosition) {
@@ -500,11 +501,19 @@ float Car::getSpeedKMS() const
 
 void Car::setAcceleration(bool p_value)
 {
+	if (m_inputAccel != p_value) {
+		m_inputChanged = true;
+	}
+
 	m_inputAccel = p_value;
 }
 
 void Car::setBrake(bool p_value)
 {
+	if (m_inputBrake != p_value) {
+		m_inputChanged = true;
+	}
+
 	m_inputBrake = p_value;
 }
 
@@ -515,6 +524,10 @@ void Car::setLap(int p_lap)
 
 void Car::setTurn(float p_value)
 {
+	if (fabs(p_value - m_inputTurn) > 0.1f) {
+		m_inputChanged = true;
+	}
+
 	m_inputTurn = limit(p_value, -1.0f, 1.0f);
 }
 
@@ -530,6 +543,10 @@ void Car::setRotation(float p_rotation)
 
 void Car::setHandbrake(bool p_handbrake)
 {
+	if (m_inputHandbrake != p_handbrake) {
+		m_inputChanged = true;
+	}
+
 	m_inputHandbrake = p_handbrake;
 }
 

@@ -32,7 +32,7 @@
 #include <ClanLib/gui.h>
 #include <ClanLib/network.h>
 
-#include "gfx/Scene.h"
+#include "gfx/DirectScene.h"
 #include "logic/race/RaceLogic.h"
 #include "logic/race/ScoreTable.h"
 #include "gfx/race/ui/GameMenu.h"
@@ -53,16 +53,18 @@ class RaceScene
 
 #else // RACE_SCENE_ONLY
 
-class RaceScene: public Scene
+class RaceScene: public Gfx::DirectScene
 {
 
 #endif // !RACE_SCENE_ONLY
 
 	public:
 
-		RaceScene(CL_GUIComponent *p_guiParent);
+		RaceScene(CL_GUIComponent *p_parent);
 
 		virtual ~RaceScene();
+
+		virtual bool isNative() const { return true; }
 
 
 		void initialize(const CL_String &p_hostname="", int p_port=0);
@@ -71,6 +73,10 @@ class RaceScene: public Scene
 
 
 		virtual void draw(CL_GraphicContext &p_gc);
+
+		virtual void inputPressed(const CL_InputEvent &p_event);
+
+		virtual void inputReleased(const CL_InputEvent &p_event);
 
 		virtual void load(CL_GraphicContext &p_gc);
 
@@ -140,10 +146,6 @@ class RaceScene: public Scene
 		// input
 
 		void grabInput();
-
-		bool onInputPressed(const CL_InputEvent &p_event);
-
-		bool onInputReleased(const CL_InputEvent &p_event);
 
 		void handleInput(InputState p_state, const CL_InputEvent& p_event);
 

@@ -28,72 +28,50 @@
 
 #pragma once
 
-#include <list>
-
-#include <ClanLib/core.h>
-#include <ClanLib/gui.h>
+#include "Scene.h"
 
 namespace Gfx {
-class Scene;
 
-class GameWindow : public CL_GUIComponent {
+class DirectScene: public Scene {
+
 	public:
 
-		GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_winMgr, CL_InputContext *p_ic);
+		DirectScene();
 
-		virtual ~GameWindow();
+		virtual ~DirectScene();
 
-		bool update();
 
-		void draw(CL_GraphicContext &p_gc);
+		virtual bool isLoaded() const;
+
+		virtual SceneType getType() const;
+
+
+		virtual void draw(CL_GraphicContext &p_gc);
+
+		virtual void inputPressed(const CL_InputEvent &p_event);
+
+		virtual void inputReleased(const CL_InputEvent &p_event);
+
+		virtual void load(CL_GraphicContext &p_gc);
+
+		virtual void pushed();
+
+		virtual void poped();
+
+		virtual void setActive(bool p_active);
+
+		virtual void update(unsigned p_timeElapsed);
+
+
+	protected:
+
+		void setLoaded(bool p_loaded);
+
 
 	private:
 
-		CL_GUIWindowManagerTexture *m_winMgr;
-
-		CL_GUIManager *m_guiMgr;
-
-		CL_InputContext *m_ic;
-
-		/** Last update logic time. When 0 then no logic update has been done before. */
-		unsigned m_lastLogicUpdateTime;
-
-		// scene flow
-
-		/** Last scene */
-		Scene *m_lastScene;
-
-		CL_SlotContainer m_slotContainer;
-
-		//
-		// workaround for missing implementation for repead_count of CL_InputEvent
-		// remove this if http://www.rtsoft.com/forums/showthread.php?t=2839 will
-		// be commited to ClanLib release
-		//
-
-		std::list<CL_InputEvent> m_events;
-
-		//
-		// methods
-		//
-
-		void dispatchEvents();
-
-		void renderGui(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
-
-		void repaint();
-
-		void updateLogic(Scene *p_scene);
-
-		void renderScene(CL_GraphicContext &p_gc, Scene *p_scene);
-
-
-		// signal handlers
-
-		void onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state);
-
-		void onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state);
-
+		bool m_loaded;
 };
 
-} // namespace
+}
+

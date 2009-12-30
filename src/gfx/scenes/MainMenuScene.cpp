@@ -29,9 +29,26 @@
 #include "MainMenuScene.h"
 
 #include "common.h"
+#include "common/Properties.h"
+#include "gfx/Stage.h"
+
+const int LABEL_WIDTH = 80;
+const int LABEL_HEIGHT = 20;
+
+const int ERROR_LABEL_WIDTH = 200;
+const int ERROR_LABEL_HEIGHT = 200;
+
+const int EDIT_WIDTH = 200;
+const int EDIT_HEIGHT = 20;
+
+const int BUTTON_WIDTH = 100;
+const int BUTTON_HEIGHT = 20;
+
+const int H_MARGIN = 20;
+const int V_MARGIN = 40;
 
 MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
-	Scene(p_parent),
+	GuiScene(p_parent),
 	m_controller(this),
 	m_nameLabel(this),
 	m_serverLabel(this),
@@ -43,35 +60,71 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 {
 	set_class_name("MainMenuScene");
 
-	m_nameLabel.set_geometry(CL_Rect(100, 100, 180, 120));
+	static const int START_X = 200;
+	static const int START_Y = 300;
+
+	int x = START_X;
+	int y = START_Y;
+
+	m_nameLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
 	m_nameLabel.set_text("Player's name");
 
-	m_nameLineEdit.set_geometry(CL_Rect(200, 100, 400, 120));
+	x += LABEL_WIDTH + H_MARGIN;
 
-	m_serverLabel.set_geometry(CL_Rect(100, 140, 180, 160));
+	m_nameLineEdit.set_geometry(CL_Rect(x, y, x + EDIT_WIDTH, y + EDIT_HEIGHT));
+
+	x = START_X;
+	y += V_MARGIN;
+
+	m_serverLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
 	m_serverLabel.set_text("Server addr");
 
-	m_serverLineEdit.set_geometry(CL_Rect(200, 140, 400, 160));
+	x += LABEL_WIDTH + H_MARGIN;
 
-	m_okButton.set_geometry(CL_Rect(300, 180, 400, 200));
+	m_serverLineEdit.set_geometry(CL_Rect(x, y, x + EDIT_WIDTH, y + EDIT_HEIGHT));
+
+	x += EDIT_WIDTH;
+	y += V_MARGIN;
+
+	m_okButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 	m_okButton.set_text("Start Race");
 
-	m_errorLabel.set_geometry(CL_Rect(200, 220, 400, 260));
+	x = START_X;
+	y += V_MARGIN;
+
+	m_errorLabel.set_geometry(CL_Rect(x, y, x + ERROR_LABEL_WIDTH, y + ERROR_LABEL_HEIGHT));
 
 	m_quitButton.set_geometry(CL_Rect(Gfx::Stage::getWidth() - 100, Gfx::Stage::getHeight() - 40, Gfx::Stage::getWidth() - 20, Gfx::Stage::getHeight() - 20));
 	m_quitButton.set_text("Quit");
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
+
+	m_nameLineEdit.set_text(Properties::getPropertyAsString("nickname", ""));
+	m_serverLineEdit.set_text(Properties::getPropertyAsString("hostname", ""));
 }
 
 MainMenuScene::~MainMenuScene()
 {
 }
 
+void MainMenuScene::load(CL_GraphicContext &p_gc)
+{
+	m_logoSprite = CL_Sprite(p_gc, "menu/logo", Gfx::Stage::getResourceManager());
+
+	GuiScene::load(p_gc);
+}
+
+
 void MainMenuScene::draw(CL_GraphicContext &p_gc)
 {
 	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
+
+	const float w = Gfx::Stage::getWidth();
+	const float h = w / m_logoSprite.get_width() * m_logoSprite.get_height();
+
+	CL_Rectf spriteRect(0, 0, w, h);
+	m_logoSprite.draw(p_gc, spriteRect);
 }
 
 void MainMenuScene::onOkClicked()
@@ -88,5 +141,4 @@ void MainMenuScene::displayError(const CL_String& p_message)
 {
 	m_errorLabel.set_text(p_message);
 	m_errorLabel.request_repaint();
-
 }

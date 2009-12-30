@@ -26,74 +26,87 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "GuiScene.h"
 
-#include <list>
-
-#include <ClanLib/core.h>
-#include <ClanLib/gui.h>
+#include "common.h"
+#include "gfx/Stage.h"
 
 namespace Gfx {
-class Scene;
 
-class GameWindow : public CL_GUIComponent {
-	public:
+GuiScene::GuiScene(CL_GUIComponent *p_parent) :
+	CL_GUIComponent(p_parent),
+	m_loaded(false)
+{
+	set_visible(true);
+	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
+}
 
-		GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_winMgr, CL_InputContext *p_ic);
+GuiScene::~GuiScene()
+{
+}
 
-		virtual ~GameWindow();
+bool GuiScene::isLoaded() const
+{
+	return m_loaded;
+}
 
-		bool update();
+SceneType GuiScene::getType() const
+{
+	return ST_GUI;
+}
 
-		void draw(CL_GraphicContext &p_gc);
+void GuiScene::setLoaded(bool p_loaded)
+{
+	m_loaded = p_loaded;
+}
 
-	private:
+void GuiScene::draw(CL_GraphicContext &p_gc)
+{
+	G_ASSERT(m_loaded);
+}
 
-		CL_GUIWindowManagerTexture *m_winMgr;
+void GuiScene::inputPressed(const CL_InputEvent &p_event)
+{
+	// empty
+}
 
-		CL_GUIManager *m_guiMgr;
+void GuiScene::inputReleased(const CL_InputEvent &p_event)
+{
+	// empty
+}
 
-		CL_InputContext *m_ic;
+void GuiScene::load(CL_GraphicContext &p_gc)
+{
+	G_ASSERT(!m_loaded);
+	m_loaded = true;
+}
 
-		/** Last update logic time. When 0 then no logic update has been done before. */
-		unsigned m_lastLogicUpdateTime;
+void GuiScene::pushed()
+{
+	set_visible(true);
+	set_focus(true);
+}
 
-		// scene flow
+void GuiScene::poped()
+{
+	set_focus(false);
+	set_visible(false);
+}
 
-		/** Last scene */
-		Scene *m_lastScene;
+void GuiScene::setActive(bool p_active)
+{
+	if (p_active) {
+		set_visible(true);
+		set_focus(true);
+	} else {
+		set_focus(false);
+		set_visible(false);
+	}
+}
 
-		CL_SlotContainer m_slotContainer;
+void GuiScene::update(unsigned p_timeElapsed)
+{
+	G_ASSERT(m_loaded);
+}
 
-		//
-		// workaround for missing implementation for repead_count of CL_InputEvent
-		// remove this if http://www.rtsoft.com/forums/showthread.php?t=2839 will
-		// be commited to ClanLib release
-		//
-
-		std::list<CL_InputEvent> m_events;
-
-		//
-		// methods
-		//
-
-		void dispatchEvents();
-
-		void renderGui(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
-
-		void repaint();
-
-		void updateLogic(Scene *p_scene);
-
-		void renderScene(CL_GraphicContext &p_gc, Scene *p_scene);
-
-
-		// signal handlers
-
-		void onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state);
-
-		void onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state);
-
-};
-
-} // namespace
+}

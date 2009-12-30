@@ -33,9 +33,10 @@
 
 class Application;
 class DebugLayer;
-class Scene;
 
 namespace Gfx {
+
+class Scene;
 
 class Stage {
 	public:

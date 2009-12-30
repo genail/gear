@@ -50,9 +50,7 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 
 #else // RACE_SCENE_ONLY
 
-RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
-	Scene(p_guiParent),
-
+RaceScene::RaceScene(CL_GUIComponent *p_parent) :
 #endif // !RACE_SCENE_ONLY
 	m_logic(NULL),
 	m_graphics(NULL),
@@ -60,15 +58,10 @@ RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
 	m_inputLock(false),
 	m_turnLeft(false),
 	m_turnRight(false),
-	m_gameMenu(this),
+	m_gameMenu(p_parent),
 	m_gameMenuController(&m_logic, &m_gameMenu)
 {
 #if !defined(RACE_SCENE_ONLY)
-	set_class_name("RaceScene");
-
-	// listen for input
-	func_input_pressed().set(this, &RaceScene::onInputPressed);
-	func_input_released().set(this, &RaceScene::onInputReleased);
 
 #endif
 
@@ -129,7 +122,7 @@ void RaceScene::load(CL_GraphicContext &p_gc)
 	m_graphics->load(p_gc);
 
 #if !defined(RACE_SCENE_ONLY)
-	Scene::load(p_gc);
+	DirectScene::load(p_gc);
 #endif // !RACE_SCENE_ONLY
 
 }
@@ -147,20 +140,18 @@ void RaceScene::update(unsigned p_timeElapsed)
 
 
 
-bool RaceScene::onInputPressed(const CL_InputEvent &p_event)
+void RaceScene::inputPressed(const CL_InputEvent &p_event)
 {
-	G_ASSERT(m_initialized);
-
-	handleInput(Pressed, p_event);
-	return true;
+	if (m_initialized) {
+		handleInput(Pressed, p_event);
+	}
 }
 
-bool RaceScene::onInputReleased(const CL_InputEvent &p_event)
+void RaceScene::inputReleased(const CL_InputEvent &p_event)
 {
-	G_ASSERT(m_initialized);
-
-	handleInput(Released, p_event);
-	return true;
+	if (m_initialized) {
+		handleInput(Released, p_event);
+	}
 }
 
 void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
@@ -168,15 +159,14 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 	G_ASSERT(m_initialized);
 
 	Race::Car &car = Game::getInstance().getPlayer().getCar();
-
-	bool state;
+	bool pressed;
 
 	switch (p_state) {
 		case Pressed:
-			state = true;
+			pressed = true;
 			break;
 		case Released:
-			state = false;
+			pressed = false;
 			break;
 		default:
 			assert(0 && "unknown input state");
@@ -184,27 +174,27 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 
 	switch (p_event.id) {
 		case CL_KEY_LEFT:
-			m_turnLeft = state;
+			m_turnLeft = pressed;
 			break;
 		case CL_KEY_RIGHT:
-			m_turnRight = state;
+			m_turnRight = pressed;
 			break;
 		case CL_KEY_UP:
-			car.setAcceleration(state);
+			car.setAcceleration(pressed);
 			break;
 		case CL_KEY_DOWN:
-			car.setBrake(state);
+			car.setBrake(pressed);
 			break;
 		case CL_KEY_SPACE:
-			car.setHandbrake(state);
+			car.setHandbrake(pressed);
 			break;
 		case CL_KEY_F1:
-			if (m_logic->isVoteRunning()) {
+			if (pressed && m_logic->isVoteRunning()) {
 				m_logic->voteYes();
 			}
 			break;
 		case CL_KEY_F2:
-			if (m_logic->isVoteRunning()) {
+			if (pressed && m_logic->isVoteRunning()) {
 				m_logic->voteNo();
 			}
 			break;
@@ -213,16 +203,21 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 	}
 
 	// handle quit request
-	if (p_state == Pressed && p_event.id == CL_KEY_ESCAPE) {
-		m_gameMenu.set_visible(true);
-		m_gameMenu.set_focus(true);
+	if (pressed && p_event.id == CL_KEY_ESCAPE) {
+
+		if (!m_gameMenu.is_visible()) {
+			m_gameMenu.set_visible(true);
+			m_gameMenu.set_focus(true);
+		} else {
+			m_gameMenu.set_visible(false);
+		}
 	}
 
 	updateCarTurn();
 
 #if !defined(NDEBUG)
 	// debug key bindings
-	Dbg::RaceSceneKeyBindings::handleInput(state, p_event);
+	Dbg::RaceSceneKeyBindings::handleInput(pressed, p_event);
 #endif // !NDEBUG
 }
 

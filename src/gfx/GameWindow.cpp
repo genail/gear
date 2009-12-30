@@ -33,13 +33,22 @@
 #include "gfx/Stage.h"
 #include "common/Properties.h"
 
-GameWindow::GameWindow(CL_GUIManager *p_manager, const CL_DisplayWindowDescription &p_desc) :
-	CL_Window(p_manager, p_desc),
+namespace Gfx {
+
+const int EXIT_CODE_QUIT = 1;
+
+GameWindow::GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_winMgr, CL_InputContext *p_ic) :
+	CL_GUIComponent(p_guiMgr, CL_GUITopLevelDescription("GameWindow", CL_Rect(0, 0, Stage::getWidth(), Stage::getHeight()), false)),
+	m_winMgr(p_winMgr),
+	m_guiMgr(p_guiMgr),
+	m_ic(p_ic),
 	m_lastLogicUpdateTime(0),
 	m_lastScene(NULL)
 {
-	func_render().set(this, &GameWindow::onRender);
-	set_constant_repaint(true);
+	CL_InputDevice &keyboard = m_ic->get_keyboard();
+
+	m_slotContainer.connect(keyboard.sig_key_down(), this, &GameWindow::onKeyDown);
+	m_slotContainer.connect(keyboard.sig_key_up(), this, &GameWindow::onKeyUp);
 }
 
 GameWindow::~GameWindow()
@@ -48,16 +57,33 @@ GameWindow::~GameWindow()
 
 void GameWindow::repaint()
 {
-	request_repaint();
+	//request_repaint();
 }
 
-void GameWindow::onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
+bool GameWindow::update()
+{
+	const int result = m_guiMgr->exec(false);
+
+	if (result == EXIT_CODE_QUIT) {
+		return false;
+	}
+
+	dispatchEvents();
+
+	Scene *scene = Gfx::Stage::peekScene();
+	updateLogic(scene);
+
+	return true;
+}
+
+void GameWindow::draw(CL_GraphicContext &p_gc)
 {
 	Scene *scene = Gfx::Stage::peekScene();
-
-	updateLogic(scene);
 	renderScene(p_gc, scene);
+
+	m_winMgr->draw_windows(p_gc);
 }
+
 
 void GameWindow::updateLogic(Scene *p_scene)
 {
@@ -69,15 +95,12 @@ void GameWindow::updateLogic(Scene *p_scene)
 			if (p_scene != m_lastScene) {
 
 				if (m_lastScene != NULL) {
-					m_lastScene->set_visible(false);
-					m_lastScene->set_focus(false);
+					m_lastScene->setActive(false);
 				}
 
-				// set the scene visibility and focus
-				p_scene->set_visible(true);
-				p_scene->set_focus(true);
-
 				m_lastScene = p_scene;
+
+				p_scene->setActive(true);
 			}
 
 			const unsigned now = CL_System::get_time();
@@ -105,6 +128,7 @@ void GameWindow::updateLogic(Scene *p_scene)
 #endif // NDEBUG
 			}
 
+
 			m_lastLogicUpdateTime = now;
 		}
 
@@ -112,7 +136,7 @@ void GameWindow::updateLogic(Scene *p_scene)
 		// when there are no scenes on stack, then probably application
 		// should be ended
 		cl_log_event(LOG_DEBUG, "Closing application because of empty scene stack");
-		exit_with_code(0);
+		exit_with_code(EXIT_CODE_QUIT);
 	}
 }
 
@@ -126,7 +150,69 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 			p_scene->load(p_gc);
 		}
 
-		// scene will be rendered by gui mechanics
+//		if (!p_scene->isGui()) {
+			p_scene->draw(p_gc);
+//		}
 
 	}
 }
+
+void GameWindow::onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state)
+{
+	m_events.push_back(p_event);
+
+	// uncoment when repeat_count fixed
+//	Scene *scene = Gfx::Stage::peekScene();
+//
+//	if (scene != NULL) {
+//		scene->inputPressed(p_event);
+//	}
+}
+
+void GameWindow::onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state)
+{
+	m_events.push_back(p_event);
+
+	// uncoment when repeat_count fixed
+//	Scene *scene = Gfx::Stage::peekScene();
+//
+//	if (scene != NULL) {
+//		scene->inputReleased(p_event);
+//	}
+}
+
+void GameWindow::dispatchEvents()
+{
+	Scene *scene = Gfx::Stage::peekScene();
+
+	if (scene != NULL) {
+		std::vector<int> usedKeys;
+
+		std::list<CL_InputEvent>::reverse_iterator ritor = m_events.rbegin();
+		bool used;
+
+		for (;ritor != m_events.rend(); ++ritor) {
+			used = false;
+			foreach (int k, usedKeys) {
+				if (ritor->id == k) {
+					used = true;
+					break;
+				}
+			}
+
+			if (!used) {
+				if (ritor->type == CL_InputEvent::pressed) {
+					scene->inputPressed(*ritor);
+				} else {
+					scene->inputReleased(*ritor);
+				}
+
+				usedKeys.push_back(ritor->id);
+			}
+		}
+	}
+
+	m_events.clear();
+}
+
+} // namespace

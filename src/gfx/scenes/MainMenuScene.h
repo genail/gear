@@ -30,12 +30,13 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "gfx/Scene.h"
+#include "gfx/GuiScene.h"
 #include "controllers/MainMenuController.h"
 
-class MainMenuScene: public Scene {
-
+class MainMenuScene : public Gfx::GuiScene
+{
 		SIGNAL_0(startRaceClicked);
+
 		SIGNAL_0(quitClicked);
 
 	public:
@@ -44,6 +45,8 @@ class MainMenuScene: public Scene {
 		virtual ~MainMenuScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
+
+		virtual void load(CL_GraphicContext &p_gc);
 
 		CL_String getPlayerName() const { return m_nameLineEdit.get_text(); }
 
@@ -68,6 +71,10 @@ class MainMenuScene: public Scene {
 		CL_Label m_errorLabel;
 
 		CL_PushButton m_quitButton;
+
+		// logo
+
+		CL_Sprite m_logoSprite;
 
 
 		//

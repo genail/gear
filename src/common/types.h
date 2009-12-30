@@ -32,3 +32,8 @@ enum GoodbyeReason {
 	GR_UNSUPPORTED_PROTOCOL_VERSION,
 	GR_NAME_ALREADY_IN_USE
 };
+
+enum SceneType {
+	ST_GUI,
+	ST_DIRECT
+};

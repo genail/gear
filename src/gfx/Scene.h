@@ -31,43 +31,46 @@
 #include <ClanLib/gui.h>
 #include <ClanLib/display.h>
 
-#include "gfx/Stage.h"
+#include "common/types.h"
 
-class Scene : public CL_GUIComponent {
+namespace Gfx {
+
+class Scene {
 
 	public:
 
-		Scene(CL_GUIComponent *p_parent) : CL_GUIComponent(p_parent), m_loaded(false) {
-			set_visible(false),
-			func_render().set(this, &Scene::onRender);
-			set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
-		}
+		Scene() {}
 
-		virtual ~Scene() {}
+		virtual ~Scene() {};
 
 
-		bool isLoaded() const { return m_loaded; }
+		virtual bool isLoaded() const = 0;
+
+		virtual SceneType getType() const = 0;
 
 
-		virtual void draw(CL_GraphicContext &p_gc) {};
+		virtual void draw(CL_GraphicContext &p_gc) = 0;
 
-		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
+		virtual void inputPressed(const CL_InputEvent &p_event) = 0;
 
-		virtual void pushed() {}
+		virtual void inputReleased(const CL_InputEvent &p_event) = 0;
 
-		virtual void poped() {}
+		virtual void load(CL_GraphicContext &p_gc) = 0;
 
-		virtual void update(unsigned p_timeElapsed) {}
+		virtual void pushed() = 0;
 
-	protected:
+		virtual void poped() = 0;
 
-		void setLoaded(bool p_loaded) { m_loaded = p_loaded; }
+		/**
+		 * Called with <code>true</code> if scene goes on top
+		 * of scene stack and it should be displayed.
+		 * Called with <code>false</code> if scene goes under
+		 * other scene or out of scene stack.
+		 */
+		virtual void setActive(bool p_active) = 0;
 
-	private:
-
-		/** True when load() method was invoked */
-		bool m_loaded;
-
-		void onRender(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect) { draw(p_gc); }
+		virtual void update(unsigned p_timeElapsed) = 0;
 
 };
+
+} // namespace

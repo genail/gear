@@ -110,7 +110,6 @@ INCLUDE_DIRECTORIES(
     ${Freetype_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
     ${X11_INCLUDE_DIRS}
-    ${Threads_INCLUDE_DIRS}
 	.
 )
 
@@ -127,7 +126,6 @@ SET(GEAR_LIBS ${LIBS}
     ${FREETYPE_LIBRARY}
     ${ZLIB_LIBRARY}
     ${X11_LIBRARY}
-    ${Threads_LIBRARY}
 )
 
 SET(SERVER_LIBS ${LIBS}
@@ -135,7 +133,6 @@ SET(SERVER_LIBS ${LIBS}
     ${ClanLib_Core_LIBRARY}
     ${ClanLib_Network_LIBRARY}
 	${ZLIB_LIBRARY}
-    ${Threads_LIBRARY}
 )
 
 # Platform specifics
@@ -182,8 +179,8 @@ SET(COMMON_COMPILE_FLAGS
     "-Wvolatile-register-var"
 )
 
-SET (GEAR_LINK_FLAGS "-lfontconfig -lXxf86vm")
-SET (SERVER_LING_GLAGS "-lfontconfig")
+SET (GEAR_LINK_FLAGS "-lfontconfig -lXxf86vm ${CMAKE_THREAD_LIBS_INIT}")
+SET (SERVER_LINK_FLAGS "-lfontconfig ${CMAKE_THREAD_LIBS_INIT}")
 
 ELSEIF (MSVC) # Microsoft Visual Studio
 

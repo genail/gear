@@ -136,7 +136,7 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_OpenGLWindowDescription displayWindowDescription;
 
 		displayWindowDescription.set_title("Gear");
-		displayWindowDescription.set_size(CL_Size(Gfx::Stage::m_width, Gfx::Stage::m_height), false);
+		displayWindowDescription.set_size(CL_Size(Gfx::Stage::m_width, Gfx::Stage::m_height), true);
 //		displayWindowDescription.set_multisampling(4);
 
 		CL_DisplayWindow displayWindow(displayWindowDescription);

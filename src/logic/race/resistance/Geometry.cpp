@@ -163,6 +163,9 @@ bool Geometry::contains(const CL_Pointf &p_point) const
 				break;
 			case Primitive::IT_AND:
 				result = result && pr->contains(p_point);
+
+			default:
+				G_ASSERT(0 && "unknown InsertionType");
 		}
 	}
 

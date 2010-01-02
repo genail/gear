@@ -38,20 +38,78 @@
 
 namespace Race {
 
-Level::Level() :
-	m_initialized(false),
-	m_loaded(false),
-	m_width(0),
-	m_height(0)
+class LevelImpl
 {
+	public:
+
+		bool m_initialized;
+
+		bool m_loaded;
+
+
+		/** All cars */
+		std::vector<Car*> m_cars;
+
+		/** Car's last drift points for all four tires: fr, rr, rl, fl */
+		std::map<Car*, CL_Pointf*> m_carsDriftPoints;
+
+		/** Map of start positions */
+		std::map<int, CL_Pointf> m_startPositions;
+
+
+		/** Checkpoint track */
+		Track m_track;
+
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
+
+		/** Sandpits */
+		typedef std::vector<Sandpit> TSandpitList;
+		TSandpitList m_sandpits;
+
+		/** Resistance mapping */
+		RaceResistance::ResistanceMap m_resistanceMap;
+
+
+		LevelImpl() :
+			m_initialized(false),
+			m_loaded(false)
+			{}
+
+		// level loading
+
+		void loadFromFile(const CL_String& p_filename);
+
+		void loadMetaElement(const CL_DomNode &p_metaNode);
+
+		void loadTrackElement(const CL_DomNode &p_trackNode);
+
+		void loadBoundsElement(const CL_DomNode &p_boundsNode);
+
+		void loadSandElement(const CL_DomNode &p_sandNode);
+
+		CL_SharedPtr<RaceResistance::Geometry> buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const;
+
+
+		// helpers
+
+		CL_Pointf real(const CL_Pointf &p_point) const;
+
+		float real(float p_coord) const;
+
+
+};
+
+Level::Level()
+{
+
 }
 
 void Level::initialize(const CL_String &p_filename)
 {
-	if (!m_initialized) {
-		loadFromFile(p_filename);
-
-		m_initialized = true;
+	if (!m_impl->m_initialized) {
+		m_impl->loadFromFile(p_filename);
+		m_impl->m_initialized = true;
 	}
 }
 
@@ -90,7 +148,7 @@ CL_String8 Level::readLine(CL_File& p_file) {
 	return line;
 }
 
-void Level::loadFromFile(const CL_String& p_filename)
+void LevelImpl::loadFromFile(const CL_String& p_filename)
 {
 	assert(!m_loaded && "level is already loaded");
 
@@ -129,7 +187,7 @@ void Level::loadFromFile(const CL_String& p_filename)
 
 }
 
-void Level::loadMetaElement(const CL_DomNode &p_metaNode)
+void LevelImpl::loadMetaElement(const CL_DomNode &p_metaNode)
 {
 	m_width = p_metaNode.select_int("size/width");
 	m_height = p_metaNode.select_int("size/height");
@@ -137,7 +195,7 @@ void Level::loadMetaElement(const CL_DomNode &p_metaNode)
 	cl_log_event("race", "level size set to %1 x %2", m_width, m_height);
 }
 
-void Level::loadTrackElement(const CL_DomNode &p_trackNode)
+void LevelImpl::loadTrackElement(const CL_DomNode &p_trackNode)
 {
 	// build block type map
 	typedef std::map<CL_String, Common::GroundBlockType> blockMap_t;
@@ -243,7 +301,7 @@ void Level::loadTrackElement(const CL_DomNode &p_trackNode)
 
 }
 
-void Level::loadSandElement(const CL_DomNode &p_sandNode)
+void LevelImpl::loadSandElement(const CL_DomNode &p_sandNode)
 {
 	const CL_DomNodeList sandChildren = p_sandNode.get_child_nodes();
 	const int sandChildrenCount = sandChildren.get_length();
@@ -291,7 +349,7 @@ void Level::loadSandElement(const CL_DomNode &p_sandNode)
 	}
 }
 
-CL_SharedPtr<RaceResistance::Geometry> Level::buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const
+CL_SharedPtr<RaceResistance::Geometry> LevelImpl::buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const
 {
 	CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
 
@@ -361,7 +419,7 @@ CL_SharedPtr<RaceResistance::Geometry> Level::buildResistanceGeometry(int p_x, i
 	return geom;
 }
 
-void Level::loadBoundsElement(const CL_DomNode &p_boundsNode)
+void LevelImpl::loadBoundsElement(const CL_DomNode &p_boundsNode)
 {
 	const CL_DomNodeList boundList = p_boundsNode.get_child_nodes();
 	const int boundListSize = boundList.get_length();
@@ -573,6 +631,21 @@ Car &Level::getCar(int p_index)
 {
 	G_ASSERT(p_index >= 0 && p_index < getCarCount());
 	return *m_cars[static_cast<unsigned>(p_index)];
+}
+
+bool Car::isLoaded() const
+{
+	return m_impl->m_loaded;
+}
+
+const Track &Car::getTrack()
+{
+	return m_impl->m_track;
+}
+
+const TyreStripes &getTyreStripes() const
+{
+	return m_impl->m_tyreStripes;
 }
 
 } // namespace

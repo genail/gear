@@ -43,7 +43,9 @@ class Block;
 class Bound;
 class Car;
 
-class Level
+class LevelImpl;
+
+class Level : public boost::noncopyable
 {
 
 	public:
@@ -52,52 +54,47 @@ class Level
 
 		virtual ~Level();
 
-		void initialize(const CL_String &p_filename);
 
-		void destroy();
+		virtual void initialize(const CL_String &p_filename);
+
+		virtual void destroy();
+
+
+		bool isLoaded() const;
+
+		const Track &getTrack();
+
+		const TyreStripes &getTyreStripes() const;
 
 
 		void addCar(Car *p_car);
 
-		void removeCar(Car *p_car);
+		const Car &getCar(int p_index) const;
 
-		// FIXME: Move all update routines to RaceLogic
-		DEPRECATED(void update(unsigned p_timeElapsed));
+		Car &getCar(int p_index);
 
-		const Sandpit &sandpitAt(unsigned p_index) const;
-
-
-		bool isLoaded() const { return m_loaded; }
-
-		const Bound& getBound(int p_index) const { return *m_bounds[p_index].get(); }
-
-		unsigned getBoundCount() const { return m_bounds.size(); }
+		int getCarCount() const;
 
 		float getResistance(float p_x, float p_y);
+
+		int getSandpitCount() const;
 
 		/**
 		 * @return A start position of <code>p_num</code>
 		 */
 		CL_Pointf getStartPosition(int p_num) const;
 
+		void removeCar(Car *p_car);
 
-		int getCarCount() const;
+		const Sandpit &sandpitAt(unsigned p_index) const;
 
-		const Car &getCar(int p_index) const;
 
-		Car &getCar(int p_index);
 
-		int getWidth() const { return m_width; }
 
-		int getHeight() const { return m_height; }
+		// FIXME: Move all update routines to RaceLogic
+		DEPRECATED(void update(unsigned p_timeElapsed));
 
-		const Block& getBlock(int x, int y) const { return *m_blocks[y * m_width + x].get(); }
 
-		unsigned getSandpitCount() const;
-
-		const Track &getTrack() const { return m_track; }
-
-		const TyreStripes &getTyreStripes() const { return m_tyreStripes; }
 
 
 
@@ -105,73 +102,11 @@ class Level
 
 	private:
 
-		/** Initialized state */
-		bool m_initialized;
-
-		/** Loaded state */
-		bool m_loaded;
-
-		/** level blocks */
-		std::vector< CL_SharedPtr<Race::Block> > m_blocks;
-
-		/** The track (checkpoint system) */
-		Track m_track;
-
-		/** Level bounds */
-		std::vector< CL_SharedPtr<Bound> > m_bounds;
-
-		/** Sandpits */
-		typedef std::vector<Sandpit> TSandpitList;
-		TSandpitList m_sandpits;
-
-		/** Resistance mapping */
-		RaceResistance::ResistanceMap m_resistanceMap;
-
-		/** All cars */
-		std::vector<Car*> m_cars;
-
-		/** Car's last drift points for all four tires: fr, rr, rl, fl */
-		std::map<Car*, CL_Pointf*> m_carsDriftPoints;
-
-		/** level size */
-		int m_width, m_height;
-
-		/** Map of start positions */
-		std::map<int, CL_Pointf> m_startPositions;
-
-		/** Tyre stripes */
-		TyreStripes m_tyreStripes;
+		CL_SharedPtr<LevelImpl> m_impl;
 
 
-
-		Level(const Level& p_level);
-
-		CL_String8 readLine(CL_File& p_file);
-
-
-		/** Collision checking */
-		void checkCollistions();
-
-		// level loading
-
-		void loadFromFile(const CL_String& p_filename);
-
-		void loadMetaElement(const CL_DomNode &p_metaNode);
-
-		void loadTrackElement(const CL_DomNode &p_trackNode);
-
-		void loadBoundsElement(const CL_DomNode &p_boundsNode);
-
-		void loadSandElement(const CL_DomNode &p_sandNode);
-
-		CL_SharedPtr<RaceResistance::Geometry> buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const;
-
-
-		// helpers
-
-		CL_Pointf real(const CL_Pointf &p_point) const;
-
-		float real(float p_coord) const;
+//		/** Collision checking */
+//		void checkCollistions();
 
 };
 

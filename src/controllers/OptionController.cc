@@ -51,5 +51,5 @@ void OptionController::onCancelClicked()
 
 void OptionController::onOkClicked()
 {
-    Gfx::Stage::popScene();
+	Gfx::Stage::popScene();
 };

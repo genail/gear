@@ -60,6 +60,22 @@ class OptionScene : public Gfx::GuiScene
 
         CL_PushButton m_cancelButton;
 
+		CL_Label m_nameLabel;
+
+		CL_LineEdit m_nameLineEdit;
+
+		CL_Label m_resolutionLabel;
+
+		CL_ComboBox m_resolutionComboBox;
+
+		CL_CheckBox m_fullScreenCheckBox;
+
+		CL_Label m_soundLabel;
+
+		CL_Label m_soundValueLabel;
+
+		CL_Slider m_soundSlider;
+
 		//
 		// Methods
 		//
@@ -70,4 +86,5 @@ class OptionScene : public Gfx::GuiScene
 
         void onCancelClick();
 
+		void onSliderValueChange();
 };

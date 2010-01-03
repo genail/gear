@@ -38,6 +38,66 @@
 
 namespace Race {
 
+template <typename T>
+class LoopVector : public std::vector<T>
+{
+	public:
+
+		T &operator[] (int p_index) {
+			return std::vector<T>::operator[](norm(p_index));
+		}
+
+		const T &operator[] (int p_index) const {
+			return std::vector<T>::operator[](norm(p_index));
+		}
+
+	private:
+
+		int norm(int p_index) const {
+			const int s = static_cast<signed> (std::vector<T>::size());
+
+			if (p_index >= 0 && p_index < s) {
+				return p_index;
+			}
+
+			p_index = p_index % s;
+
+			if (p_index < 0) {
+				p_index += s;
+			}
+
+			return p_index;
+		}
+};
+
+class RoadPoint : public CL_Pointf
+{
+	public:
+
+		RoadPoint(float x, float y, float p_modifier = 0.0f) :
+			CL_Pointf(x, y),
+			m_modifier(p_modifier)
+		{}
+
+		RoadPoint(const RoadPoint &copy) :
+			CL_Pointf(copy.x, copy.y),
+			m_modifier(copy.get_modifier())
+		{}
+
+		RoadPoint(const CL_Vec2f &copy) :
+			CL_Pointf(copy.x, copy.y),
+			m_modifier(0.0f)
+		{}
+
+		float get_modifier() const { return m_modifier; }
+
+		void set_modifier(float p_modifier) { m_modifier = p_modifier; }
+
+	private:
+		/** -1.0 (left) to 1.0 (right) */
+		float m_modifier;
+};
+
 class LevelImpl
 {
 	public:

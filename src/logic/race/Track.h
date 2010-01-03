@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <limits>
 #include <vector>
 #include <ClanLib/core.h>
 
@@ -42,6 +43,18 @@ class Track {
 		Track();
 
 		virtual ~Track();
+
+
+		void addPoint(
+				const CL_Pointf &p_point,
+				float p_radius,
+				float p_shift,
+				int p_index = numeric_limits<int>::max()
+		);
+
+		const TrackPoint &getPoint(int p_index) const;
+
+		int getPointCount() const;
 
 
 		void addCheckpointAtPosition(const CL_Pointf &p_position);

@@ -26,88 +26,49 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
-#include <ClanLib/core.h>
-
-#include "common.h"
-#include "Track.h"
-#include "TyreStripes.h"
-#include "Sandpit.h"
-#include "common/GroundBlockType.h"
-#include "resistance/ResistanceMap.h"
+#include "TrackPoint.h"
 
 namespace Race {
 
-class Block;
-class Bound;
-class Car;
-
-class LevelImpl;
-
-class Level : public boost::noncopyable
+class TrackPointImpl
 {
-
 	public:
 
-		Level();
+		CL_Pointf m_position;
 
-		virtual ~Level();
+		float m_radius;
 
+		float m_shift;
 
-		virtual void initialize(const CL_String &p_filename);
-
-		virtual void destroy();
-
-
-		bool isLoaded() const;
-
-		const Track &getTrack();
-
-		const TyreStripes &getTyreStripes() const;
-
-
-		void addCar(Car *p_car);
-
-		const Car &getCar(int p_index) const;
-
-		Car &getCar(int p_index);
-
-		int getCarCount() const;
-
-		float getResistance(float p_x, float p_y);
-
-//		int getSandpitCount() const;
-
-		/**
-		 * @return A start position of <code>p_num</code>
-		 */
-		CL_Pointf getStartPosition(int p_num) const;
-
-		void removeCar(Car *p_car);
-
-//		const Sandpit &sandpitAt(unsigned p_index) const;
-
-
-
-
-		// FIXME: Move all update routines to RaceLogic
-		DEPRECATED(void update(unsigned p_timeElapsed));
-
-
-
-
-
-
-
-	private:
-
-		CL_SharedPtr<LevelImpl> m_impl;
-
-
-//		/** Collision checking */
-//		void checkCollistions();
-
+		TrackPointImpl(const CL_Pointf &p_position, float p_radius, float p_shift) :
+			m_position(p_position),
+			m_radius(p_radius),
+			m_shift(p_shift)
+		{}
 };
 
-} // namespace
+TrackPoint::TrackPoint(const CL_Pointf &p_position, float p_radius, float p_shift) :
+		m_impl(new TrackPointImpl(p_position, p_radius, p_shift))
+{
+}
+
+TrackPoint::~TrackPoint()
+{
+}
+
+const CL_Pointf &TrackPoint::getPosition() const
+{
+	return m_impl->m_position;
+}
+
+float TrackPoint::getRadius() const
+{
+	return m_impl->m_radius;
+}
+
+float TrackPoint::getShift() const
+{
+	return m_impl->m_shift;
+}
+
+}

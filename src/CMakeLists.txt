@@ -33,6 +33,7 @@ SET(COMMON_SRCS
     logic/race/Sandpit.cpp
     logic/race/ScoreTable.cpp
     logic/race/Track.cpp
+    logic/race/TrackPoint.cpp
     logic/race/TyreStripes.cpp
     logic/race/resistance/Circle.cpp
     logic/race/resistance/Geometry.cpp

@@ -31,157 +31,58 @@
 #include <assert.h>
 
 #include "common.h"
-#include "Checkpoint.h"
+#include "logic/race/Checkpoint.h"
+#include "logic/race/TrackPoint.h"
 
 namespace Race {
 
+class TrackImpl
+{
+	public:
+
+		typedef std::vector<TrackPoint> TTrackPoints;
+
+		TTrackPoints m_trackPoints;
+};
+
 Track::Track() :
-	m_closed(false)
+		m_impl(new TrackImpl())
 {
 }
 
 Track::~Track()
 {
-	clear();
 }
 
-void Track::addCheckpointAtPosition(const CL_Pointf &p_position)
+void Track::addPoint(
+		const CL_Pointf &p_point,
+		float p_radius,
+		float p_shift,
+		int p_index
+)
 {
-	assert(!m_closed);
+	G_ASSERT(p_index >= 0);
 
-	const int id = m_checkpoints.size() + 1;
-	m_checkpoints.push_back(new Checkpoint(id, p_position));
-}
+	const TrackPoint trackPoint(p_point, p_radius, p_shift);
 
-unsigned Track::getCheckpointCount() const
-{
-	return m_checkpoints.size();
-}
-
-const Checkpoint *Track::getCheckpoint(unsigned p_index) const
-{
-	assert(p_index < m_checkpoints.size());
-	assert(m_closed);
-
-	return m_checkpoints[p_index];
-}
-
-const Checkpoint *Track::getFirst() const
-{
-	assert(m_checkpoints.size() > 0);
-	assert(m_closed);
-
-	return m_checkpoints[0];
-}
-
-void Track::clear()
-{
-	foreach(Checkpoint *checkpoint, m_checkpoints) {
-		delete checkpoint;
-	}
-
-	m_checkpoints.clear();
-	m_closed = false;
-}
-
-const Checkpoint *Track::check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap) const
-{
-	assert(m_closed);
-
-	// get before and after checkpoint
-	Checkpoint *prev, *next;
-	getPrevAndNext(p_lastCheckPoint, &prev, &next);
-
-	// calculate distances
-	const float prevDistance = p_position.distance(prev->getPosition());
-	const float currentDistance = p_position.distance(p_lastCheckPoint->getPosition());
-	const float nextDistance = p_position.distance(next->getPosition());
-
-	*p_newLap = false;
-	*p_movingForward = true;
-	Checkpoint *result;
-
-	if (nextDistance < currentDistance && nextDistance < prevDistance) {
-		// moving forward
-
-		if (next == m_checkpoints[0]) {
-			// made a lap
-			*p_newLap = true;
-		}
-
-		result = next;
-	} else if (prevDistance < currentDistance && prevDistance < nextDistance) {
-		// moving backwards
-		*p_movingForward = false;
-
-		result = prev;
+	if (p_index >= static_cast<signed>(m_impl->m_trackPoints.size())) {
+		m_impl->m_trackPoints.push_back(trackPoint);
 	} else {
-		// moving forward without a change
-		result = const_cast<Checkpoint*>(p_lastCheckPoint);
-	}
+		TrackImpl::TTrackPoints::iterator itor = m_impl->m_trackPoints.begin();
+		itor += p_index;
 
-	return result;
+		m_impl->m_trackPoints.insert(itor, trackPoint);
+	}
 }
 
-void Track::getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_prev, Checkpoint **p_next) const
+const TrackPoint &Track::getPoint(int p_index) const
 {
-	assert(m_checkpoints.size() >= 3);
-	assert(m_closed);
-
-	Checkpoint *current;
-	Checkpoint *prev = NULL;
-	Checkpoint *next;
-	bool found = false;
-
-	TCheckpointVector::const_iterator itor = m_checkpoints.begin();
-
-	for (;itor != m_checkpoints.end(); ++itor) {
-		current = *itor;
-
-		if (current == p_current) {
-
-			// if current is first, then previous will be the last
-			if (prev == NULL) {
-				prev = *(--m_checkpoints.end());
-			}
-
-			// get after
-			++itor;
-
-			// if next is the end, then it will be the first
-			if (itor != m_checkpoints.end()) {
-				next = *itor;
-			} else {
-				next = *m_checkpoints.begin();
-			}
-
-			found = true;
-			break;
-		} else {
-			prev = current;
-		}
-	}
-
-	assert(found);
-
-	// assign pointers
-	*p_prev = prev;
-	*p_next = next;
+	return m_impl->m_trackPoints[p_index];
 }
 
-void Track::close()
+int Track::getPointCount() const
 {
-	// set progress to every checkpoint
-	const unsigned size = m_checkpoints.size();
-
-	for (unsigned i = 0; i < size - 1; ++i) {
-		m_checkpoints[i]->m_progress = i / (float) (size - 1);
-	}
-
-	m_checkpoints[size - 1]->m_progress = 1.0f;
-
-	// set track closed
-	m_closed = true;
+	return m_impl->m_trackPoints.size();
 }
 
 } // namespace

@@ -35,6 +35,9 @@
 namespace Race {
 
 class Checkpoint;
+class TrackPoint;
+
+class TrackImpl;
 
 class Track {
 
@@ -49,7 +52,7 @@ class Track {
 				const CL_Pointf &p_point,
 				float p_radius,
 				float p_shift,
-				int p_index = numeric_limits<int>::max()
+				int p_index = std::numeric_limits<int>::max()
 		);
 
 		const TrackPoint &getPoint(int p_index) const;
@@ -57,32 +60,21 @@ class Track {
 		int getPointCount() const;
 
 
-		void addCheckpointAtPosition(const CL_Pointf &p_position);
-
-		unsigned getCheckpointCount() const;
-
-		const Checkpoint *getCheckpoint(unsigned p_index) const;
-
-		const Checkpoint *getFirst() const;
+//		void addCheckpointAtPosition(const CL_Pointf &p_position);
 
 		void clear();
 
-		/** Closes the track.  */
-		void close();
-
-
-		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap) const;
+//		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap) const;
 
 	private:
 
-		/** Registered checkpoints */
-		typedef std::vector<Checkpoint*> TCheckpointVector;
-		TCheckpointVector m_checkpoints;
+		CL_SharedPtr<TrackImpl> m_impl;
 
-		/** Closed track cannot get new checkpoints */
-		bool m_closed;
-
-		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after) const;
+//		/** Registered checkpoints */
+//		typedef std::vector<Checkpoint*> TCheckpointVector;
+//		TCheckpointVector m_checkpoints;
+//
+//		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after) const;
 
 };
 

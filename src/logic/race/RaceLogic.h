@@ -28,8 +28,10 @@
 
 #pragma once
 
-#include <vector>
 #include <map>
+#include <list>
+#include <vector>
+
 #include <ClanLib/core.h>
 
 #include "common.h"

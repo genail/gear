@@ -31,17 +31,14 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "Track.h"
-#include "TyreStripes.h"
-#include "Sandpit.h"
-#include "common/GroundBlockType.h"
-#include "resistance/ResistanceMap.h"
 
 namespace Race {
 
 class Block;
 class Bound;
 class Car;
+class Track;
+class TyreStripes;
 
 class LevelImpl;
 

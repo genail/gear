@@ -197,107 +197,127 @@ void LevelImpl::loadMetaElement(const CL_DomNode &p_metaNode)
 
 void LevelImpl::loadTrackElement(const CL_DomNode &p_trackNode)
 {
-	// build block type map
-	typedef std::map<CL_String, Common::GroundBlockType> blockMap_t;
-	blockMap_t blockMap;
-	blockMap_t::iterator blockMapItor;
-
-	blockMap["vert"] = Common::BT_STREET_VERT;
-	blockMap["horiz"] = Common::BT_STREET_HORIZ;
-	blockMap["turn_bottom_right"] = Common::BT_TURN_BOTTOM_RIGHT;
-	blockMap["turn_bottom_left"] = Common::BT_TURN_BOTTOM_LEFT;
-	blockMap["turn_top_right"] = Common::BT_TURN_TOP_RIGHT;
-	blockMap["turn_top_left"] = Common::BT_TURN_TOP_LEFT;
-	blockMap["start_line_up"] = Common::BT_START_LINE_UP;
-
-	// prepare level blocks
-	const int blocksCount = m_width * m_height;
-	m_blocks.clear();
-	m_blocks.reserve(blocksCount);
-
-	for (int i = 0; i < blocksCount; ++i) {
-		m_blocks.push_back(CL_SharedPtr<Block>(new Block(Common::BT_GRASS)));
-	}
-
-	// create global resistance geometry
-	CL_SharedPtr<RaceResistance::Geometry> globalResGeom(new RaceResistance::Geometry());
-	globalResGeom->addRectangle(CL_Rectf(real(0), real(0), real(m_width), real(m_height)));
-
-	m_resistanceMap.addGeometry(globalResGeom, 0.3f);
-
-	// add sand resistance
-	foreach (const Sandpit &sandpit, m_sandpits) {
-		const unsigned circleCount = sandpit.getCircleCount();
-
-		CL_SharedPtr<RaceResistance::Geometry> sandpitGeometry(new RaceResistance::Geometry());
-
-		for (unsigned i = 0; i < circleCount; ++i) {
-			// sandpit values are real
-			const Sandpit::Circle &circle = sandpit.circleAt(i);
-			sandpitGeometry->addCircle(CL_Circlef(circle.getCenter().x, circle.getCenter().y, circle.getRadius()));
-		}
-
-		m_resistanceMap.addGeometry(sandpitGeometry, 0.8f);
-	}
-
-	// read blocks
 	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
 	const int blockListSize = blockList.get_length();
 
 	cl_log_event("debug", "Track node child count: %1", blockListSize);
 
-	CL_Pointf lastCP; // last checkpoint
-
 	for (int i = 0; i < blockListSize; ++i) {
-		const CL_DomNode blockNode = blockList.item(i);
+		const CL_DomNode blockNode = blockList[i];
 
-		if (blockNode.get_node_name() == "block") {
-			CL_DomNamedNodeMap attrs = blockNode.get_attributes();
+		if (blockNode.get_name() == "point") {
+			const float x = blockNode.select_float("x");
+			const float y = blockNode.select_float("y");
+			const float radius = blockNode.select_float("radius");
+			const float modifier = blockNode.select_float("modifier");
 
-			const int x = CL_StringHelp::local8_to_int(attrs.get_named_item("x").get_node_value());
-			const int y = CL_StringHelp::local8_to_int(attrs.get_named_item("y").get_node_value());
-			const CL_String typeStr = attrs.get_named_item("type").get_node_value();
-
-			if (x < 0 || y < 0 || x >= m_width || y >= m_height) {
-				cl_log_event("debug", "coords x=%1, y=%2", x, y);
-				throw CL_Exception("Blocks coords out of bounds");
-			}
-
-			blockMapItor = blockMap.find(typeStr);
-
-			if (blockMapItor != blockMap.end()) {
-
-				const Common::GroundBlockType blockType = blockMapItor->second;
-				m_blocks[m_width * y + x]->setType(blockType);
-
-				// add checkpoint to track
-				if (blockType == Common::BT_START_LINE_UP) {
-					lastCP = CL_Pointf((x + 0.5f) * Block::WIDTH, (y + 0.2f) * Block::WIDTH);
-					const CL_Pointf firstCP((x + 0.5f) * Block::WIDTH, (y + 0.2 - 0.01f) * Block::WIDTH);
-
-					m_track.addCheckpointAtPosition(firstCP);
-				} else {
-					const CL_Pointf checkPosition((x + 0.5f) * Block::WIDTH, (y + 0.5f) * Block::WIDTH);
-
-					m_track.addCheckpointAtPosition(checkPosition);
-				}
-
-				// add resistance geometry based on block
-				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(x, y, blockType);
-				m_resistanceMap.addGeometry(resGeom, 0.0f);
-
-			} else {
-				cl_log_event("race", "Unknown block type: %1", typeStr);
-			}
 
 		} else {
-			cl_log_event("race", "Unknown node '%1', ignoring", blockNode.get_node_name());
+			cl_log_event(LOG_WARN, "Unknown element in <track>: %1", blockNode.get_name());
 		}
-
 	}
 
-	m_track.addCheckpointAtPosition(lastCP);
-	m_track.close();
+//	// build block type map
+//	typedef std::map<CL_String, Common::GroundBlockType> blockMap_t;
+//	blockMap_t blockMap;
+//	blockMap_t::iterator blockMapItor;
+//
+//	blockMap["vert"] = Common::BT_STREET_VERT;
+//	blockMap["horiz"] = Common::BT_STREET_HORIZ;
+//	blockMap["turn_bottom_right"] = Common::BT_TURN_BOTTOM_RIGHT;
+//	blockMap["turn_bottom_left"] = Common::BT_TURN_BOTTOM_LEFT;
+//	blockMap["turn_top_right"] = Common::BT_TURN_TOP_RIGHT;
+//	blockMap["turn_top_left"] = Common::BT_TURN_TOP_LEFT;
+//	blockMap["start_line_up"] = Common::BT_START_LINE_UP;
+//
+//	// prepare level blocks
+//	const int blocksCount = m_width * m_height;
+//	m_blocks.clear();
+//	m_blocks.reserve(blocksCount);
+//
+//	for (int i = 0; i < blocksCount; ++i) {
+//		m_blocks.push_back(CL_SharedPtr<Block>(new Block(Common::BT_GRASS)));
+//	}
+//
+//	// create global resistance geometry
+//	CL_SharedPtr<RaceResistance::Geometry> globalResGeom(new RaceResistance::Geometry());
+//	globalResGeom->addRectangle(CL_Rectf(real(0), real(0), real(m_width), real(m_height)));
+//
+//	m_resistanceMap.addGeometry(globalResGeom, 0.3f);
+//
+//	// add sand resistance
+//	foreach (const Sandpit &sandpit, m_sandpits) {
+//		const unsigned circleCount = sandpit.getCircleCount();
+//
+//		CL_SharedPtr<RaceResistance::Geometry> sandpitGeometry(new RaceResistance::Geometry());
+//
+//		for (unsigned i = 0; i < circleCount; ++i) {
+//			// sandpit values are real
+//			const Sandpit::Circle &circle = sandpit.circleAt(i);
+//			sandpitGeometry->addCircle(CL_Circlef(circle.getCenter().x, circle.getCenter().y, circle.getRadius()));
+//		}
+//
+//		m_resistanceMap.addGeometry(sandpitGeometry, 0.8f);
+//	}
+//
+//	// read blocks
+//	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
+//	const int blockListSize = blockList.get_length();
+//
+//	cl_log_event("debug", "Track node child count: %1", blockListSize);
+//
+//	CL_Pointf lastCP; // last checkpoint
+//
+//	for (int i = 0; i < blockListSize; ++i) {
+//		const CL_DomNode blockNode = blockList.item(i);
+//
+//		if (blockNode.get_node_name() == "block") {
+//			CL_DomNamedNodeMap attrs = blockNode.get_attributes();
+//
+//			const int x = CL_StringHelp::local8_to_int(attrs.get_named_item("x").get_node_value());
+//			const int y = CL_StringHelp::local8_to_int(attrs.get_named_item("y").get_node_value());
+//			const CL_String typeStr = attrs.get_named_item("type").get_node_value();
+//
+//			if (x < 0 || y < 0 || x >= m_width || y >= m_height) {
+//				cl_log_event("debug", "coords x=%1, y=%2", x, y);
+//				throw CL_Exception("Blocks coords out of bounds");
+//			}
+//
+//			blockMapItor = blockMap.find(typeStr);
+//
+//			if (blockMapItor != blockMap.end()) {
+//
+//				const Common::GroundBlockType blockType = blockMapItor->second;
+//				m_blocks[m_width * y + x]->setType(blockType);
+//
+//				// add checkpoint to track
+//				if (blockType == Common::BT_START_LINE_UP) {
+//					lastCP = CL_Pointf((x + 0.5f) * Block::WIDTH, (y + 0.2f) * Block::WIDTH);
+//					const CL_Pointf firstCP((x + 0.5f) * Block::WIDTH, (y + 0.2 - 0.01f) * Block::WIDTH);
+//
+//					m_track.addCheckpointAtPosition(firstCP);
+//				} else {
+//					const CL_Pointf checkPosition((x + 0.5f) * Block::WIDTH, (y + 0.5f) * Block::WIDTH);
+//
+//					m_track.addCheckpointAtPosition(checkPosition);
+//				}
+//
+//				// add resistance geometry based on block
+//				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(x, y, blockType);
+//				m_resistanceMap.addGeometry(resGeom, 0.0f);
+//
+//			} else {
+//				cl_log_event("race", "Unknown block type: %1", typeStr);
+//			}
+//
+//		} else {
+//			cl_log_event("race", "Unknown node '%1', ignoring", blockNode.get_node_name());
+//		}
+//
+//	}
+//
+//	m_track.addCheckpointAtPosition(lastCP);
+//	m_track.close();
 
 }
 

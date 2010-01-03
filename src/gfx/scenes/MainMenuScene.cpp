@@ -56,7 +56,8 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_serverLineEdit(this),
 	m_okButton(this),
 	m_errorLabel(this),
-	m_quitButton(this)
+	m_quitButton(this),
+    m_optionButton(this)
 {
 	set_class_name("MainMenuScene");
 
@@ -89,8 +90,13 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_okButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 	m_okButton.set_text("Start Race");
 
+    y += V_MARGIN;
+
+    m_optionButton.set_text("Option");
+    m_optionButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
+
 	x = START_X;
-	y += V_MARGIN;
+    y -= V_MARGIN;
 
 	m_errorLabel.set_geometry(CL_Rect(x, y, x + ERROR_LABEL_WIDTH, y + ERROR_LABEL_HEIGHT));
 
@@ -99,6 +105,8 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
+    m_optionButton.func_clicked().set(this, &MainMenuScene::onOptionClicked);
+
 
 	m_nameLineEdit.set_text(Properties::getPropertyAsString("nickname", ""));
 	m_serverLineEdit.set_text(Properties::getPropertyAsString("hostname", ""));
@@ -135,6 +143,11 @@ void MainMenuScene::onOkClicked()
 void MainMenuScene::onQuitClicked()
 {
 	INVOKE_0(quitClicked);
+}
+
+void MainMenuScene::onOptionClicked()
+{
+    INVOKE_0(optionClicked);
 }
 
 void MainMenuScene::displayError(const CL_String& p_message)

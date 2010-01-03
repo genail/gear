@@ -32,18 +32,22 @@
 #include "gfx/Stage.h"
 #include "gfx/scenes/MainMenuScene.h"
 #include "gfx/scenes/RaceScene.h"
+#include "gfx/scenes/OptionScene.h"
 
 MainMenuController::MainMenuController(MainMenuScene *p_scene) :
 	m_scene(p_scene),
-	m_raceScene(new RaceScene(p_scene->get_parent_component()))
+	m_raceScene(new RaceScene(p_scene->get_parent_component())),
+    m_optionScene(new OptionScene(p_scene->get_parent_component()))
 {
 	m_slots.connect(m_scene->sig_startRaceClicked(), this, &MainMenuController::onRaceStartClicked);
 	m_slots.connect(m_scene->sig_quitClicked(), this, &MainMenuController::onQuitClicked);
+    m_slots.connect(m_scene->sig_optionClicked(), this, &MainMenuController::onOptionClicked);
 }
 
 MainMenuController::~MainMenuController()
 {
 	delete m_raceScene;
+    delete m_optionScene;
 }
 
 
@@ -85,4 +89,9 @@ void MainMenuController::onRaceStartClicked()
 void MainMenuController::onQuitClicked()
 {
 	Gfx::Stage::popScene();
+}
+
+void MainMenuController::onOptionClicked()
+{
+    Gfx::Stage::pushScene(m_optionScene);
 }

@@ -39,6 +39,8 @@ class MainMenuScene : public Gfx::GuiScene
 
 		SIGNAL_0(quitClicked);
 
+        SIGNAL_0(optionClicked);
+
 	public:
 		MainMenuScene(CL_GUIComponent *p_parent);
 
@@ -70,6 +72,8 @@ class MainMenuScene : public Gfx::GuiScene
 
 		CL_Label m_errorLabel;
 
+        CL_PushButton m_optionButton;
+
 		CL_PushButton m_quitButton;
 
 		// logo
@@ -86,5 +90,7 @@ class MainMenuScene : public Gfx::GuiScene
 		void onOkClicked();
 
 		void onQuitClicked();
+
+        void onOptionClicked();
 
 };

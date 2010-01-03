@@ -32,6 +32,7 @@
 
 class MainMenuScene;
 class RaceScene;
+class OptionScene;
 
 class MainMenuController {
 
@@ -49,6 +50,9 @@ class MainMenuController {
 		/** Next scene */
 		RaceScene *m_raceScene;
 
+        /** Next scene */
+        OptionScene *m_optionScene;
+
 		/** The slot container */
 		CL_SlotContainer m_slots;
 
@@ -58,5 +62,7 @@ class MainMenuController {
 		void onRaceStartClicked();
 
 		void onQuitClicked();
+
+        void onOptionClicked();
 };
 

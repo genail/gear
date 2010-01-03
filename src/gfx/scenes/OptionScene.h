@@ -31,55 +31,34 @@
 
 #include "common.h"
 #include "gfx/GuiScene.h"
-#include "controllers/MainMenuController.h"
+#include "controllers/OptionController.h"
 
-class MainMenuScene : public Gfx::GuiScene
+class OptionScene : public Gfx::GuiScene
 {
-		SIGNAL_0(startRaceClicked);
+        SIGNAL_0(okClicked);
 
-		SIGNAL_0(quitClicked);
-
-        SIGNAL_0(optionClicked);
+        SIGNAL_0(cancelClicked);
 
 	public:
-		MainMenuScene(CL_GUIComponent *p_parent);
+		OptionScene(CL_GUIComponent *p_parent);
 
-		virtual ~MainMenuScene();
+		virtual ~OptionScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);
 
-		CL_String getPlayerName() const { return m_nameLineEdit.get_text(); }
-
-		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
-
-		void displayError(const CL_String& p_message);
-
 	private:
 
 		// scene controller
 
-		MainMenuController m_controller;
+		OptionController m_controller;
 
 		// gui components
+        
+        CL_PushButton m_okButton;
 
-		CL_Label m_nameLabel, m_serverLabel;
-
-		CL_LineEdit m_nameLineEdit, m_serverLineEdit;
-
-		CL_PushButton m_okButton;
-
-		CL_Label m_errorLabel;
-
-        CL_PushButton m_optionButton;
-
-		CL_PushButton m_quitButton;
-
-		// logo
-
-		CL_Sprite m_logoSprite;
-
+        CL_PushButton m_cancelButton;
 
 		//
 		// Methods
@@ -87,10 +66,8 @@ class MainMenuScene : public Gfx::GuiScene
 
 		// action slots
 
-		void onOkClicked();
+        void onOkClick();
 
-		void onQuitClicked();
-
-        void onOptionClicked();
+        void onCancelClick();
 
 };

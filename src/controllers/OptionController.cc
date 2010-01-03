@@ -25,72 +25,31 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#pragma once
 
-#include <ClanLib/core.h>
+#include "OptionController.h"
 
-#include "common.h"
-#include "gfx/GuiScene.h"
-#include "controllers/MainMenuController.h"
+#include "common/Game.h"
+#include "gfx/Stage.h"
+#include "gfx/scenes/OptionScene.h"
 
-class MainMenuScene : public Gfx::GuiScene
+OptionController::OptionController(OptionScene *p_scene) :
+	m_scene(p_scene)
 {
-		SIGNAL_0(startRaceClicked);
+    m_slots.connect(m_scene->sig_cancelClicked(), this, &OptionController::onCancelClicked);
+    m_slots.connect(m_scene->sig_okClicked(), this, &OptionController::onOkClicked);
+}
 
-		SIGNAL_0(quitClicked);
+OptionController::~OptionController()
+{
 
-        SIGNAL_0(optionClicked);
+}
 
-	public:
-		MainMenuScene(CL_GUIComponent *p_parent);
+void OptionController::onCancelClicked()
+{
+    Gfx::Stage::popScene();
+}
 
-		virtual ~MainMenuScene();
-
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-
-		CL_String getPlayerName() const { return m_nameLineEdit.get_text(); }
-
-		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
-
-		void displayError(const CL_String& p_message);
-
-	private:
-
-		// scene controller
-
-		MainMenuController m_controller;
-
-		// gui components
-
-		CL_Label m_nameLabel, m_serverLabel;
-
-		CL_LineEdit m_nameLineEdit, m_serverLineEdit;
-
-		CL_PushButton m_okButton;
-
-		CL_Label m_errorLabel;
-
-        CL_PushButton m_optionButton;
-
-		CL_PushButton m_quitButton;
-
-		// logo
-
-		CL_Sprite m_logoSprite;
-
-
-		//
-		// Methods
-		//
-
-		// action slots
-
-		void onOkClicked();
-
-		void onQuitClicked();
-
-        void onOptionClicked();
-
+void OptionController::onOkClicked()
+{
+    Gfx::Stage::popScene();
 };

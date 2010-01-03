@@ -25,72 +25,72 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#pragma once
 
-#include <ClanLib/core.h>
+#include "OptionScene.h"
 
 #include "common.h"
-#include "gfx/GuiScene.h"
-#include "controllers/MainMenuController.h"
+#include "common/Properties.h"
+#include "gfx/Stage.h"
 
-class MainMenuScene : public Gfx::GuiScene
+const int LABEL_WIDTH = 80;
+const int LABEL_HEIGHT = 20;
+
+const int ERROR_LABEL_WIDTH = 200;
+const int ERROR_LABEL_HEIGHT = 200;
+
+const int EDIT_WIDTH = 200;
+const int EDIT_HEIGHT = 20;
+
+const int BUTTON_WIDTH = 100;
+const int BUTTON_HEIGHT = 20;
+
+const int H_MARGIN = 20;
+const int V_MARGIN = 40;
+
+OptionScene::OptionScene(CL_GUIComponent *p_parent) :
+	GuiScene(p_parent),
+    m_controller(this),
+    m_cancelButton(this),
+    m_okButton(this)
 {
-		SIGNAL_0(startRaceClicked);
+	set_class_name("OptionScene");
 
-		SIGNAL_0(quitClicked);
+	static const int START_X = 200;
+	static const int START_Y = 300;
 
-        SIGNAL_0(optionClicked);
+    int x = (Gfx::Stage::getWidth() - (2 * BUTTON_WIDTH + H_MARGIN)) / 2;
+    int y = Gfx::Stage::getHeight() - (BUTTON_HEIGHT + V_MARGIN);
 
-	public:
-		MainMenuScene(CL_GUIComponent *p_parent);
+    m_okButton.set_text("Ok");
+    m_okButton.set_geometry(CL_Rect(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT));
 
-		virtual ~MainMenuScene();
+    x += V_MARGIN + BUTTON_WIDTH;
 
-		virtual void draw(CL_GraphicContext &p_gc);
+    m_cancelButton.set_text("Cancel");
+    m_cancelButton.set_geometry(CL_Rect(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT));
+}
 
-		virtual void load(CL_GraphicContext &p_gc);
+OptionScene::~OptionScene()
+{
+}
 
-		CL_String getPlayerName() const { return m_nameLineEdit.get_text(); }
+void OptionScene::load(CL_GraphicContext &p_gc)
+{
 
-		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
-
-		void displayError(const CL_String& p_message);
-
-	private:
-
-		// scene controller
-
-		MainMenuController m_controller;
-
-		// gui components
-
-		CL_Label m_nameLabel, m_serverLabel;
-
-		CL_LineEdit m_nameLineEdit, m_serverLineEdit;
-
-		CL_PushButton m_okButton;
-
-		CL_Label m_errorLabel;
-
-        CL_PushButton m_optionButton;
-
-		CL_PushButton m_quitButton;
-
-		// logo
-
-		CL_Sprite m_logoSprite;
+}
 
 
-		//
-		// Methods
-		//
+void OptionScene::draw(CL_GraphicContext &p_gc)
+{
 
-		// action slots
+}
 
-		void onOkClicked();
+void OptionScene::onCancelClick()
+{
+    INVOKE_0(cancelClicked);
+}
 
-		void onQuitClicked();
-
-        void onOptionClicked();
-
-};
+void OptionScene::onOkClick()
+{
+    INVOKE_0(okClicked);
+}

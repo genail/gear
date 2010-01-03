@@ -37,7 +37,7 @@ GuiScene::GuiScene(CL_GUIComponent *p_parent) :
 	CL_GUIComponent(p_parent),
 	m_loaded(false)
 {
-	set_visible(true);
+	set_visible(false);
 	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
 }
 

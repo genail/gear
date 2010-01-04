@@ -26,74 +26,44 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MainMenuController.h"
+#include "OptionController.h"
 
 #include "common/Game.h"
 #include "gfx/Stage.h"
-#include "gfx/scenes/MainMenuScene.h"
-#include "gfx/scenes/RaceScene.h"
 #include "gfx/scenes/OptionScene.h"
+#include "common/Properties.h"
 
-MainMenuController::MainMenuController(MainMenuScene *p_scene) :
-	m_scene(p_scene),
-	m_raceScene(new RaceScene(p_scene->get_parent_component())),
-    m_optionScene(new OptionScene(p_scene->get_parent_component()))
+OptionController::OptionController(OptionScene *p_scene) :
+	m_scene(p_scene)
 {
-	m_slots.connect(m_scene->sig_startRaceClicked(), this, &MainMenuController::onRaceStartClicked);
-	m_slots.connect(m_scene->sig_quitClicked(), this, &MainMenuController::onQuitClicked);
-    m_slots.connect(m_scene->sig_optionClicked(), this, &MainMenuController::onOptionClicked);
+    m_slots.connect(m_scene->sig_cancelClicked(), this, &OptionController::onCancelClicked);
+    m_slots.connect(m_scene->sig_okClicked(), this, &OptionController::onOkClicked);
 }
 
-MainMenuController::~MainMenuController()
+OptionController::~OptionController()
 {
-	delete m_raceScene;
-    delete m_optionScene;
+
 }
 
-
-void MainMenuController::onRaceStartClicked()
+void OptionController::onCancelClicked()
 {
-	m_scene->displayError("");
+    Gfx::Stage::popScene();
+}
 
-	if (m_scene->getPlayerName().empty()) {
+void OptionController::onOkClicked()
+{
+	if (CL_StringHelp::trim(m_scene->getPlayersName()) == "")
+	{
 		m_scene->displayError("No player's name choosen");
 		return;
 	}
 
-	Game &game = Game::getInstance();
+	Properties::setProperty("opt_screen_width", m_scene->getResolutionWidth());
+	Properties::setProperty("opt_screen_height", m_scene->getResolutionHeight());
+	Properties::setProperty("opt_fullscreen", m_scene->getFullScreen());
+	Properties::setProperty("opt_sound_volume", m_scene->getSound());
+	Properties::setProperty("opt_player_name", m_scene->getPlayersName());
+	Properties::setProperty("opt_use_wsad", m_scene->getWSAD());
 
-	game.getPlayer().setName(m_scene->getPlayerName());
-
-	// create race scene
-	m_raceScene->destroy();
-
-	if (!m_scene->getServerAddr().empty()) {
-		// separate server addr from port if possible
-		std::vector<CL_TempString> parts = CL_StringHelp::split_text(m_scene->getServerAddr(), ":");
-
-		const CL_String serverAddr = parts[0];
-		const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
-
-		// online initialization
-		m_raceScene->initialize(serverAddr, serverPort);
-	} else {
-		// offline initialization
-		m_raceScene->initialize();
-	}
-
-#if !defined(RACE_SCENE_ONLY)
-	Gfx::Stage::pushScene(m_raceScene);
-#endif // !RACE_SCENE_ONLY
-}
-
-void MainMenuController::onQuitClicked()
-{
 	Gfx::Stage::popScene();
-}
-
-void MainMenuController::onOptionClicked()
-{
-	m_optionScene->onLoad();
-
-    Gfx::Stage::pushScene(m_optionScene);
-}
+};

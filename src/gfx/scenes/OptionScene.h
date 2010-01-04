@@ -28,6 +28,7 @@
 #pragma once
 
 #include <ClanLib/core.h>
+#include <vector>
 
 #include "common.h"
 #include "gfx/GuiScene.h"
@@ -48,7 +49,27 @@ class OptionScene : public Gfx::GuiScene
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+		void displayError(const CL_String& p_message);
+
+		void onLoad();
+		
+		void addResolution(int p_width, int p_height);
+
+		CL_String getPlayersName() const { return m_nameLineEdit.get_text(); }
+
+		int getResolutionWidth() const { return m_resolutions[m_resolutionComboBox.get_selected_item()].width; }
+
+		int getResolutionHeight() const { return m_resolutions[m_resolutionComboBox.get_selected_item()].height; }
+
+		bool getFullScreen() const { return m_fullScreenCheckBox.is_checked(); }
+
+		int getSound() const { return m_soundSlider.get_position(); }
+
+		bool getWSAD() const { return m_wsadCheckBox.is_checked(); }
+
 	private:
+
+		std::vector<CL_Size> m_resolutions;
 
 		// scene controller
 
@@ -76,9 +97,19 @@ class OptionScene : public Gfx::GuiScene
 
 		CL_Slider m_soundSlider;
 
-		//
+		CL_CheckBox m_wsadCheckBox;
+
+		CL_Label m_errorLabel;
+
+		CL_PopupMenu m_menu;
+
 		// Methods
-		//
+
+		int searchResolution(const int& p_searchWidth, const int& p_searchHeight);
+
+		void setSliderLabelValue();
+
+		void useDefaultSetings();
 
 		// action slots
 

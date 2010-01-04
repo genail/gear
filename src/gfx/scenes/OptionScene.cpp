@@ -36,7 +36,7 @@ const int LABEL_WIDTH = 80;
 const int LABEL_HEIGHT = 20;
 
 const int ERROR_LABEL_WIDTH = 200;
-const int ERROR_LABEL_HEIGHT = 200;
+const int ERROR_LABEL_HEIGHT = 20;
 
 const int EDIT_WIDTH = 200;
 const int EDIT_HEIGHT = 20;
@@ -68,7 +68,11 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	m_fullScreenCheckBox(this),
 	m_soundLabel(this),
 	m_soundValueLabel(this),
-	m_soundSlider(this)
+	m_soundSlider(this),
+	m_wsadCheckBox(this),
+	m_errorLabel(this),
+	m_menu(),
+	m_resolutions()
 {
 	set_class_name("OptionScene");
 
@@ -93,12 +97,8 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 
 	x += LABEL_WIDTH + H_MARGIN;
 
-	// bercik 3 sty.
-	// do zmiany na wczytywanie rozdzielczoœci z pliku resolution.cpp lub .h
-	CL_PopupMenu menu;
-	menu.insert_item("800x600");
-	menu.insert_item("1024x768");
-	m_resolutionComboBox.set_popup_menu(menu);
+	addResolution(800, 600);
+	addResolution(1024, 768);
 	m_resolutionComboBox.set_geometry(CL_Rect(x, y, x + COMBOBOX_WIDTH, y + COMBOBOX_HEIGHT));
 	m_resolutionComboBox.set_selected_item(0);
 
@@ -107,6 +107,12 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 
 	m_fullScreenCheckBox.set_text("Full screen");
 	m_fullScreenCheckBox.set_geometry(CL_Rect(x, y, x + CHECKBOX_WIDTH, y + CHECKBOX_HEIGHT));
+
+	x = START_X;
+	y += V_MARGIN;
+
+	m_wsadCheckBox.set_text("Use WSAD");
+	m_wsadCheckBox.set_geometry(CL_Rect(x, y, x + CHECKBOX_WIDTH, y + CHECKBOX_HEIGHT));
 
 	x = START_X;
 	y += V_MARGIN;
@@ -123,6 +129,12 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	x += SLIDER_WIDTH + H_MARGIN;
 
 	m_soundValueLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
+	setSliderLabelValue();
+
+	x = (Gfx::Stage::getWidth() - (2 * BUTTON_WIDTH + H_MARGIN)) / 2;
+	y = Gfx::Stage::getHeight() - (BUTTON_HEIGHT + V_MARGIN + ERROR_LABEL_HEIGHT);
+
+	m_errorLabel.set_geometry(CL_Rect(x, y, x + ERROR_LABEL_WIDTH, y + ERROR_LABEL_HEIGHT));
 
     x = (Gfx::Stage::getWidth() - (2 * BUTTON_WIDTH + H_MARGIN)) / 2;
     y = Gfx::Stage::getHeight() - (BUTTON_HEIGHT + V_MARGIN);
@@ -149,12 +161,59 @@ void OptionScene::load(CL_GraphicContext &p_gc)
 	GuiScene::load(p_gc);
 }
 
-
 void OptionScene::draw(CL_GraphicContext &p_gc)
 {
 	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
 
 	GuiScene::draw(p_gc);
+}
+
+void OptionScene::displayError(const CL_String& p_message)
+{
+	m_errorLabel.set_text(p_message);
+}
+
+void OptionScene::onLoad()
+{
+	if (Properties::getPropertyAsString("opt_player_name", "") != "")
+	{
+		int width = Properties::getPropertyAsInt("opt_screen_width", -1);
+		int height = Properties::getPropertyAsInt("opt_screen_height", -1);
+		m_resolutionComboBox.set_selected_item(searchResolution(width, height));
+
+		m_nameLineEdit.set_text(Properties::getPropertyAsString("opt_player_name", ""));
+		m_fullScreenCheckBox.set_checked(Properties::getPropertyAsBool("opt_fullscreen", false));
+		m_wsadCheckBox.set_checked(Properties::getPropertyAsBool("opt_use_wsad", false));
+		m_soundSlider.set_position(Properties::getPropertyAsInt("opt_sound_volume", 100));
+		setSliderLabelValue();
+	}
+	else
+	{
+		useDefaultSetings();
+	}
+}
+
+int OptionScene::searchResolution(const int& p_searchWidth, const int& p_searchHeight)
+{
+	for (unsigned i = 0; i < m_resolutions.size(); ++i)
+	{
+		if (m_resolutions[i].width == p_searchWidth && m_resolutions[i].height == p_searchHeight)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void OptionScene::addResolution(int p_width, int p_height)
+{
+	m_resolutions.push_back(CL_Size(p_width, p_height));
+
+	CL_String resolution = CL_StringHelp::int_to_local8(p_width) + "x" + CL_StringHelp::int_to_local8(p_height);
+	m_menu.insert_item(resolution);
+	
+	m_resolutionComboBox.set_popup_menu(m_menu);
 }
 
 void OptionScene::onCancelClick()
@@ -169,5 +228,21 @@ void OptionScene::onOkClick()
 
 void OptionScene::onSliderValueChange()
 {
-	m_soundValueLabel.set_text(CL_StringHelp::int_to_text(m_soundSlider.get_position()));
+	setSliderLabelValue();
+}
+
+void OptionScene::setSliderLabelValue()
+{
+	m_soundValueLabel.set_text(CL_StringHelp::int_to_local8(m_soundSlider.get_position()));
+}
+
+void OptionScene::useDefaultSetings()
+{
+	m_nameLineEdit.set_text("");
+	m_resolutionComboBox.set_selected_item(0);
+	m_fullScreenCheckBox.set_checked(false);
+	m_wsadCheckBox.set_checked(false);
+	m_soundSlider.set_position(0);
+	setSliderLabelValue();
+	m_errorLabel.set_text("");
 }

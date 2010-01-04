@@ -52,7 +52,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Jan 03 12:31:50 CET 2010'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Jan 03 22:05:26 CET 2010'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -258,7 +258,7 @@
       name="Class Diagram"
 >
   <group name="Fig0"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[168, 176, 64, 67]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[288, 208, 64, 67]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1-1b050b91:125f3c0b165:-8000:000000000000175F"
        fill="1"
        fillcolor="255 255 200"
@@ -269,8 +269,8 @@
     </private>
     
     <rectangle name="Fig0.0"
-      x="168"
-      y="176"
+      x="288"
+      y="208"
       width="64"
       height="67"
       fill="1"
@@ -279,7 +279,7 @@
       strokecolor="black"
     />
     <group name="Fig0.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[168, 176, 64, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesGroup[288, 208, 64, 0]"
          href="127-0-1-1-1b050b91:125f3c0b165:-8000:000000000000175F"
          fill="1"
          fillcolor="255 255 200"
@@ -290,8 +290,8 @@
       </private>
       
       <rectangle name="Fig0.1.0"
-        x="168"
-        y="176"
+        x="288"
+        y="208"
         width="64"
         height="0"
         fill="1"
@@ -301,8 +301,8 @@
       />
     </group>
     <text name="Fig0.2"
-      x="168"
-      y="176"
+      x="288"
+      y="208"
       width="64"
       height="21"
       fill="1"
@@ -317,7 +317,7 @@
       justification="Center"
     >+ Level</text>
     <group name="Fig0.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[168, 218, 64, 24]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[288, 250, 64, 24]"
          href="127-0-1-1-1b050b91:125f3c0b165:-8000:000000000000175F"
          fill="1"
          fillcolor="255 255 200"
@@ -328,8 +328,8 @@
       </private>
       
       <rectangle name="Fig0.3.0"
-        x="168"
-        y="218"
+        x="288"
+        y="250"
         width="64"
         height="24"
         fill="1"
@@ -344,14 +344,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="168"
-                y="218" />
-        <lineto x="231"
-                y="218" />
+        <moveto x="288"
+                y="250" />
+        <lineto x="351"
+                y="250" />
       </path>
     </group>
     <group name="Fig0.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[168, 197, 64, 21]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[288, 229, 64, 21]"
          href="127-0-1-1-1b050b91:125f3c0b165:-8000:000000000000175F"
          fill="1"
          fillcolor="255 255 200"
@@ -362,8 +362,8 @@
       </private>
       
       <rectangle name="Fig0.4.0"
-        x="168"
-        y="197"
+        x="288"
+        y="229"
         width="64"
         height="21"
         fill="1"
@@ -378,15 +378,15 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="168"
-                y="197" />
-        <lineto x="231"
-                y="197" />
+        <moveto x="288"
+                y="229" />
+        <lineto x="351"
+                y="229" />
       </path>
     </group>
     <rectangle name="Fig0.5"
-      x="168"
-      y="176"
+      x="288"
+      y="208"
       width="64"
       height="67"
       fill="0"
@@ -491,7 +491,7 @@
         x="368"
         y="396"
         width="413"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -506,8 +506,8 @@
       <text name="Fig1.3.3"
         x="368"
         y="410"
-        width="206"
-        height="17"
+        width="209"
+        height="14"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -522,8 +522,8 @@
       <text name="Fig1.3.4"
         x="368"
         y="424"
-        width="127"
-        height="23"
+        width="128"
+        height="20"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -693,7 +693,7 @@
         x="864"
         y="226"
         width="116"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -709,7 +709,7 @@
         x="864"
         y="240"
         width="104"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"

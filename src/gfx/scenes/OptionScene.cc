@@ -169,5 +169,5 @@ void OptionScene::onOkClick()
 
 void OptionScene::onSliderValueChange()
 {
-	m_soundValueLabel.set_text(CL_StringHelp::int_to_local8(m_soundSlider.get_position()));
+	m_soundValueLabel.set_text(CL_StringHelp::int_to_text(m_soundSlider.get_position()));
 }

@@ -93,5 +93,7 @@ void MainMenuController::onQuitClicked()
 
 void MainMenuController::onOptionClicked()
 {
+	m_optionScene->onLoad();
+
     Gfx::Stage::pushScene(m_optionScene);
 }

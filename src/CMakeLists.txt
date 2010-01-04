@@ -47,7 +47,7 @@ SET(CLIENT_SRCS
     Application.cpp
     controllers/GameMenuController.cpp
     controllers/MainMenuController.cpp
-	controllers/OptionController.cc
+	controllers/OptionController.cpp
     debug/RaceSceneKeyBindings.cpp
     gfx/DebugLayer.cpp
     gfx/DirectScene.cpp
@@ -70,7 +70,7 @@ SET(CLIENT_SRCS
     gfx/race/ui/SpeedMeter.cpp
     gfx/scenes/MainMenuScene.cpp
     gfx/scenes/RaceScene.cpp
-	gfx/scenes/OptionScene.cc
+	gfx/scenes/OptionScene.cpp
     logic/race/OfflineRaceLogic.cpp
     logic/race/OnlineRaceLogic.cpp
     math/Easing.cpp

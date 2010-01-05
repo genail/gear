@@ -241,6 +241,7 @@ void OptionScene::onSliderValueChange()
 void OptionScene::setSliderLabelValue()
 {
 	m_soundValueLabel.set_text(CL_StringHelp::int_to_local8(m_soundSlider.get_position()));
+	m_soundValueLabel.paint();
 }
 
 void OptionScene::useDefaultSetings()

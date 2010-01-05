@@ -55,17 +55,17 @@ class OptionScene : public Gfx::GuiScene
 		
 		void addResolution(int p_width, int p_height);
 
-		CL_String getPlayersName() const { return m_nameLineEdit.get_text(); }
+		CL_String getPlayersName() const;
 
-		int getResolutionWidth() const { return m_resolutions[m_resolutionComboBox.get_selected_item()].width; }
+		int getResolutionWidth() const;
 
-		int getResolutionHeight() const { return m_resolutions[m_resolutionComboBox.get_selected_item()].height; }
+		int getResolutionHeight() const;
 
-		bool getFullScreen() const { return m_fullScreenCheckBox.is_checked(); }
+		bool getFullScreen() const;
 
-		int getSound() const { return m_soundSlider.get_position(); }
+		int getSound() const;
 
-		bool getWSAD() const { return m_wsadCheckBox.is_checked(); }
+		bool getWSAD() const;
 
 	private:
 

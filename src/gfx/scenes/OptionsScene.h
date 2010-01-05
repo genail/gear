@@ -32,7 +32,7 @@
 
 #include "common.h"
 #include "gfx/GuiScene.h"
-#include "controllers/OptionController.h"
+#include "controllers/OptionsController.h"
 
 class OptionScene : public Gfx::GuiScene
 {

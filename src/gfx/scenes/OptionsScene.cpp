@@ -26,7 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "OptionScene.h"
+#include "OptionsScene.h"
 
 #include "common.h"
 #include "common/Properties.h"

@@ -26,11 +26,12 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "OptionController.h"
+#include "OptionsController.h"
 
 #include "common/Game.h"
 #include "gfx/Stage.h"
-#include "gfx/scenes/OptionScene.h"
+#include "gfx/scenes/OptionsScene.h"
+#include "common/Properties.h"
 
 OptionController::OptionController(OptionScene *p_scene) :
 	m_scene(p_scene)
@@ -51,5 +52,18 @@ void OptionController::onCancelClicked()
 
 void OptionController::onOkClicked()
 {
+	if (CL_StringHelp::trim(m_scene->getPlayersName()) == "")
+	{
+		m_scene->displayError("No player's name choosen");
+		return;
+	}
+
+	Properties::setProperty("opt_screen_width", m_scene->getResolutionWidth());
+	Properties::setProperty("opt_screen_height", m_scene->getResolutionHeight());
+	Properties::setProperty("opt_fullscreen", m_scene->getFullScreen());
+	Properties::setProperty("opt_sound_volume", m_scene->getSound());
+	Properties::setProperty("opt_player_name", m_scene->getPlayersName());
+	Properties::setProperty("opt_use_wsad", m_scene->getWSAD());
+
 	Gfx::Stage::popScene();
 };

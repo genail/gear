@@ -31,10 +31,10 @@
 #include <assert.h>
 
 #include "logic/race/Block.h"
-#include "logic/race/Bound.h"
-#include "logic/race/Checkpoint.h"
+#include "logic/race/level/Bound.h"
+#include "logic/race/level/Checkpoint.h"
 #include "logic/race/Car.h"
-#include "logic/race/Track.h"
+#include "logic/race/level/Track.h"
 #include "logic/race/TyreStripes.h"
 #include "logic/race/resistance/Geometry.h"
 #include "logic/race/resistance/ResistanceMap.h"

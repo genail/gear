@@ -33,7 +33,7 @@
 
 #include "Player.h"
 #include "network/client/Client.h"
-#include "logic/race/Level.h"
+#include "logic/race/level/Level.h"
 
 class Game {
 

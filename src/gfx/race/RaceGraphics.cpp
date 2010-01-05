@@ -40,7 +40,7 @@
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
 #include "logic/race/Block.h"
-#include "logic/race/Bound.h"
+#include "logic/race/level/Bound.h"
 #include "logic/race/RaceLogic.h"
 #include "logic/race/TyreStripes.h"
 

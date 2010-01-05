@@ -29,6 +29,8 @@ SET(COMMON_SRCS
     logic/race/level/Sandpit.cpp
     logic/race/level/Track.cpp
     logic/race/level/TrackPoint.cpp
+    logic/race/level/TrackSegment.cpp
+    logic/race/level/TrackTriangulator.cpp
     logic/race/Block.cpp
     logic/race/Car.cpp
     logic/race/MessageBoard.cpp

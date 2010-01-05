@@ -170,10 +170,13 @@ void OptionScene::draw(CL_GraphicContext &p_gc)
 
 void OptionScene::displayError(const CL_String& p_message)
 {
-	m_errorLabel.set_text(p_message);
+	CL_Font font(get_gc(), "arial", 14);
+	CL_SpanLayout span;
+	span.add_text(p_message, font, CL_Colorf::red);
+	m_errorLabel.set_span(span);
 }
 
-void OptionScene::onLoad()
+void OptionScene::pushed()
 {
 	if (Properties::getPropertyAsString("opt_player_name", "") != "")
 	{
@@ -191,6 +194,8 @@ void OptionScene::onLoad()
 	{
 		useDefaultSetings();
 	}
+
+	GuiScene::pushed();
 }
 
 int OptionScene::searchResolution(const int& p_searchWidth, const int& p_searchHeight)
@@ -245,4 +250,34 @@ void OptionScene::useDefaultSetings()
 	m_soundSlider.set_position(0);
 	setSliderLabelValue();
 	m_errorLabel.set_text("");
+}
+
+CL_String OptionScene::getPlayersName() const
+{ 
+	return m_nameLineEdit.get_text(); 
+}
+
+int OptionScene::getResolutionWidth() const
+{
+	return m_resolutions[m_resolutionComboBox.get_selected_item()].width; 
+}
+
+int OptionScene::getResolutionHeight() const
+{
+	return m_resolutions[m_resolutionComboBox.get_selected_item()].height; 
+}
+
+bool OptionScene::getFullScreen() const
+{ 
+	return m_fullScreenCheckBox.is_checked();
+}
+
+int OptionScene::getSound() const
+{
+	return m_soundSlider.get_position(); 
+}
+
+bool OptionScene::getWSAD() const
+{
+	return m_wsadCheckBox.is_checked(); 
 }

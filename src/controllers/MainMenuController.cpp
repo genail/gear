@@ -32,7 +32,7 @@
 #include "gfx/Stage.h"
 #include "gfx/scenes/MainMenuScene.h"
 #include "gfx/scenes/RaceScene.h"
-#include "gfx/scenes/OptionScene.h"
+#include "gfx/scenes/OptionsScene.h"
 
 MainMenuController::MainMenuController(MainMenuScene *p_scene) :
 	m_scene(p_scene),
@@ -93,7 +93,5 @@ void MainMenuController::onQuitClicked()
 
 void MainMenuController::onOptionClicked()
 {
-	m_optionScene->onLoad();
-
     Gfx::Stage::pushScene(m_optionScene);
 }

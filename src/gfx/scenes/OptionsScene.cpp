@@ -178,6 +178,8 @@ void OptionScene::displayError(const CL_String& p_message)
 
 void OptionScene::pushed()
 {
+	m_errorLabel.set_text("");
+
 	if (Properties::getPropertyAsString("opt_player_name", "") != "")
 	{
 		int width = Properties::getPropertyAsInt("opt_screen_width", -1);

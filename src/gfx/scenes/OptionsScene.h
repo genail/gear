@@ -49,9 +49,9 @@ class OptionScene : public Gfx::GuiScene
 
 		virtual void load(CL_GraphicContext &p_gc);
 
-		void displayError(const CL_String& p_message);
-
 		virtual void pushed();
+
+		void displayError(const CL_String& p_message);
 		
 		void addResolution(int p_width, int p_height);
 

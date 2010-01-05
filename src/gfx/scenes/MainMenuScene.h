@@ -30,6 +30,7 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
+#include "common/Properties.h"
 #include "gfx/GuiScene.h"
 #include "controllers/MainMenuController.h"
 
@@ -50,7 +51,9 @@ class MainMenuScene : public Gfx::GuiScene
 
 		virtual void load(CL_GraphicContext &p_gc);
 
-		CL_String getPlayerName() const { return m_nameLineEdit.get_text(); }
+		virtual void pushed();
+
+		CL_String getPlayerName() const { return Properties::getPropertyAsString("opt_player_name", ""); }
 
 		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
 
@@ -64,9 +67,9 @@ class MainMenuScene : public Gfx::GuiScene
 
 		// gui components
 
-		CL_Label m_nameLabel, m_serverLabel;
+		CL_Label m_serverLabel;
 
-		CL_LineEdit m_nameLineEdit, m_serverLineEdit;
+		CL_LineEdit m_serverLineEdit;
 
 		CL_PushButton m_okButton;
 

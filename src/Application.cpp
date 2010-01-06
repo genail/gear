@@ -110,6 +110,9 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_ConsoleLogger logger;
 		CL_SlotContainer slots;
 
+		CL_Console::write_line("loading properties");
+		Properties::load();
+
 		cl_log_event("init", "initializing display");
 		CL_SetupDisplay setup_display;
 
@@ -281,6 +284,8 @@ int Application::main(const std::vector<CL_String> &args)
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);
 	}
+
+	Properties::save();
 
 	CL_Console::write_line("Thanks for playing :-)");
 

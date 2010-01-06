@@ -42,6 +42,11 @@ class Properties {
 
 	public:
 
+		static void load();
+
+		static void save();
+
+
 		static void setProperty(const CL_String &p_key, bool p_value);
 
 		static void setProperty(const CL_String &p_key, int p_value);

@@ -47,15 +47,13 @@ class OptionScene : public Gfx::GuiScene
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
-		virtual void load(CL_GraphicContext &p_gc);
-
 		virtual void pushed();
 
 		void displayError(const CL_String& p_message);
 		
 		void addResolution(int p_width, int p_height);
 
-		CL_String getPlayersName() const;
+		CL_StringRef getPlayersName() const;
 
 		int getResolutionWidth() const;
 
@@ -65,7 +63,7 @@ class OptionScene : public Gfx::GuiScene
 
 		int getSound() const;
 
-		bool getWSAD() const;
+		bool getWASD() const;
 
 	private:
 
@@ -76,10 +74,6 @@ class OptionScene : public Gfx::GuiScene
 		OptionController m_controller;
 
 		// gui components
-        
-        CL_PushButton m_okButton;
-
-        CL_PushButton m_cancelButton;
 
 		CL_Label m_nameLabel;
 
@@ -91,15 +85,19 @@ class OptionScene : public Gfx::GuiScene
 
 		CL_CheckBox m_fullScreenCheckBox;
 
+		CL_CheckBox m_wsadCheckBox;
+
 		CL_Label m_soundLabel;
 
 		CL_Label m_soundValueLabel;
 
 		CL_Slider m_soundSlider;
 
-		CL_CheckBox m_wsadCheckBox;
-
 		CL_Label m_errorLabel;
+
+		CL_PushButton m_okButton;
+
+        CL_PushButton m_cancelButton;
 
 		CL_PopupMenu m_menu;
 

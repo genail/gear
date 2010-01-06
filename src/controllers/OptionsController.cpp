@@ -63,7 +63,7 @@ void OptionController::onOkClicked()
 	Properties::setProperty("opt_fullscreen", m_scene->getFullScreen());
 	Properties::setProperty("opt_sound_volume", m_scene->getSound());
 	Properties::setProperty("opt_player_name", m_scene->getPlayersName());
-	Properties::setProperty("opt_use_wsad", m_scene->getWSAD());
+	Properties::setProperty("opt_use_wasd", m_scene->getWASD());
 
 	Gfx::Stage::popScene();
 };

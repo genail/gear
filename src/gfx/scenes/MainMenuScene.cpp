@@ -146,7 +146,7 @@ void MainMenuScene::onOptionClicked()
 
 void MainMenuScene::displayError(const CL_String& p_message)
 {
-	CL_Font font(get_gc(), "arial", 14);
+	CL_Font font(get_gc(), "helvetica", 14);
 	CL_SpanLayout span;
 	span.add_text(p_message, font, CL_Colorf::red);
 	m_errorLabel.set_span(span);

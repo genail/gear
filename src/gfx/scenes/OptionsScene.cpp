@@ -59,8 +59,6 @@ const int V_MARGIN = 40;
 OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	GuiScene(p_parent),
     m_controller(this),
-    m_cancelButton(this),
-    m_okButton(this),
 	m_nameLabel(this),
 	m_nameLineEdit(this),
 	m_resolutionLabel(this),
@@ -68,9 +66,11 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	m_fullScreenCheckBox(this),
 	m_soundLabel(this),
 	m_soundValueLabel(this),
-	m_soundSlider(this),
 	m_wsadCheckBox(this),
+	m_soundSlider(this),
 	m_errorLabel(this),
+	m_cancelButton(this),
+    m_okButton(this),
 	m_menu(),
 	m_resolutions()
 {
@@ -111,7 +111,7 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	x = START_X;
 	y += V_MARGIN;
 
-	m_wsadCheckBox.set_text("Use WSAD");
+	m_wsadCheckBox.set_text("Use WASD");
 	m_wsadCheckBox.set_geometry(CL_Rect(x, y, x + CHECKBOX_WIDTH, y + CHECKBOX_HEIGHT));
 
 	x = START_X;
@@ -156,11 +156,6 @@ OptionScene::~OptionScene()
 {
 }
 
-void OptionScene::load(CL_GraphicContext &p_gc)
-{
-	GuiScene::load(p_gc);
-}
-
 void OptionScene::draw(CL_GraphicContext &p_gc)
 {
 	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
@@ -170,7 +165,7 @@ void OptionScene::draw(CL_GraphicContext &p_gc)
 
 void OptionScene::displayError(const CL_String& p_message)
 {
-	CL_Font font(get_gc(), "arial", 14);
+	CL_Font font(get_gc(), "helvetica", 14);
 	CL_SpanLayout span;
 	span.add_text(p_message, font, CL_Colorf::red);
 	m_errorLabel.set_span(span);
@@ -188,7 +183,7 @@ void OptionScene::pushed()
 
 		m_nameLineEdit.set_text(Properties::getPropertyAsString("opt_player_name", ""));
 		m_fullScreenCheckBox.set_checked(Properties::getPropertyAsBool("opt_fullscreen", false));
-		m_wsadCheckBox.set_checked(Properties::getPropertyAsBool("opt_use_wsad", false));
+		m_wsadCheckBox.set_checked(Properties::getPropertyAsBool("opt_use_wasd", false));
 		m_soundSlider.set_position(Properties::getPropertyAsInt("opt_sound_volume", 100));
 		setSliderLabelValue();
 	}
@@ -250,12 +245,12 @@ void OptionScene::useDefaultSetings()
 	m_resolutionComboBox.set_selected_item(0);
 	m_fullScreenCheckBox.set_checked(false);
 	m_wsadCheckBox.set_checked(false);
-	m_soundSlider.set_position(0);
+	m_soundSlider.set_position(100);
 	setSliderLabelValue();
 	m_errorLabel.set_text("");
 }
 
-CL_String OptionScene::getPlayersName() const
+CL_StringRef OptionScene::getPlayersName() const
 { 
 	return m_nameLineEdit.get_text(); 
 }
@@ -280,7 +275,7 @@ int OptionScene::getSound() const
 	return m_soundSlider.get_position(); 
 }
 
-bool OptionScene::getWSAD() const
+bool OptionScene::getWASD() const
 {
 	return m_wsadCheckBox.is_checked(); 
 }

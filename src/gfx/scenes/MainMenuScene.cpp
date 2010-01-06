@@ -55,7 +55,8 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_okButton(this),
 	m_errorLabel(this),
 	m_quitButton(this),
-    m_optionButton(this)
+    m_optionButton(this),
+	m_authorsButton(this)
 {
 	set_class_name("MainMenuScene");
 
@@ -80,20 +81,28 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
     y += V_MARGIN;
 
-    m_optionButton.set_text("Option");
+    m_optionButton.set_text("Options");
     m_optionButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 
+	y += V_MARGIN;
+
+	m_authorsButton.set_text(_("Authors"));
+	m_authorsButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + LABEL_HEIGHT));
+
+	y += V_MARGIN;
+
+	m_quitButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + LABEL_HEIGHT));
+	m_quitButton.set_text("Quit");
+
 	x = START_X;
-    y -= V_MARGIN;
+	y = m_okButton.get_geometry().top;
 
 	m_errorLabel.set_geometry(CL_Rect(x, y, x + ERROR_LABEL_WIDTH, y + ERROR_LABEL_HEIGHT));
-
-	m_quitButton.set_geometry(CL_Rect(get_width() - 100, get_height() - 40, get_width() - 20, get_height() - 20));
-	m_quitButton.set_text("Quit");
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
     m_optionButton.func_clicked().set(this, &MainMenuScene::onOptionClicked);
+	m_authorsButton.func_clicked().set(this, &MainMenuScene::onAuthorsClicked);
 
 
 	m_serverLineEdit.set_text(Properties::getPropertyAsString("hostname", ""));
@@ -142,6 +151,11 @@ void MainMenuScene::onQuitClicked()
 void MainMenuScene::onOptionClicked()
 {
     INVOKE_0(optionClicked);
+}
+
+void MainMenuScene::onAuthorsClicked()
+{
+	INVOKE_0(authorsClicked);
 }
 
 void MainMenuScene::displayError(const CL_String& p_message)

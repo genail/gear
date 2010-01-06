@@ -30,77 +30,40 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "common/Properties.h"
 #include "gfx/GuiScene.h"
-#include "controllers/MainMenuController.h"
+#include "controllers/AuthorsController.h"
 
-class MainMenuScene : public Gfx::GuiScene
+class AuthorsScene : public Gfx::GuiScene
 {
-		SIGNAL_0(startRaceClicked);
-
-		SIGNAL_0(quitClicked);
-
-        SIGNAL_0(optionClicked);
-
-		SIGNAL_0(authorsClicked);
+        SIGNAL_0(okClicked);
 
 	public:
-		MainMenuScene(CL_GUIComponent *p_parent);
+		AuthorsScene(CL_GUIComponent *p_parent);
 
-		virtual ~MainMenuScene();
-
-		virtual void draw(CL_GraphicContext &p_gc);
+		virtual ~AuthorsScene();
 
 		virtual void load(CL_GraphicContext &p_gc);
 
-		virtual void pushed();
-
-		CL_String getPlayerName() const { return Properties::getPropertyAsString("opt_player_name", ""); }
-
-		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
-
-		void displayError(const CL_String& p_message);
+		virtual void draw(CL_GraphicContext &p_gc);
 
 	private:
-
 		// scene controller
 
-		MainMenuController m_controller;
+		AuthorsController m_controller;
 
 		// gui components
 
-		CL_Label m_serverLabel;
+		CL_Sprite m_logoSprite;
 
-		CL_LineEdit m_serverLineEdit;
+		CL_Label m_authorsLabel;
 
 		CL_PushButton m_okButton;
 
-		CL_Label m_errorLabel;
-
-        CL_PushButton m_optionButton;
-
-		CL_PushButton m_authorsButton;
-
-		CL_PushButton m_quitButton;
-
-
-		// logo
-
-		CL_Sprite m_logoSprite;
-
-
-		//
 		// Methods
-		//
+
+		CL_SpanLayout getAuthorsSpan();
 
 		// action slots
 
-		void onOkClicked();
-
-		void onQuitClicked();
-
-        void onOptionClicked();
-
-		void onAuthorsClicked();
-
+        void onOkClick();
 };

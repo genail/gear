@@ -25,82 +25,33 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #pragma once
 
 #include <ClanLib/core.h>
 
-#include "common.h"
-#include "common/Properties.h"
-#include "gfx/GuiScene.h"
-#include "controllers/MainMenuController.h"
+class AuthorsScene;
 
-class MainMenuScene : public Gfx::GuiScene
-{
-		SIGNAL_0(startRaceClicked);
-
-		SIGNAL_0(quitClicked);
-
-        SIGNAL_0(optionClicked);
-
-		SIGNAL_0(authorsClicked);
+class AuthorsController {
 
 	public:
-		MainMenuScene(CL_GUIComponent *p_parent);
 
-		virtual ~MainMenuScene();
+		AuthorsController(AuthorsScene *p_scene);
 
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-
-		virtual void pushed();
-
-		CL_String getPlayerName() const { return Properties::getPropertyAsString("opt_player_name", ""); }
-
-		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
-
-		void displayError(const CL_String& p_message);
+		virtual ~AuthorsController();
 
 	private:
 
-		// scene controller
+		/** This scene */
+		AuthorsScene *m_scene;
 
-		MainMenuController m_controller;
-
-		// gui components
-
-		CL_Label m_serverLabel;
-
-		CL_LineEdit m_serverLineEdit;
-
-		CL_PushButton m_okButton;
-
-		CL_Label m_errorLabel;
-
-        CL_PushButton m_optionButton;
-
-		CL_PushButton m_authorsButton;
-
-		CL_PushButton m_quitButton;
+		/** The slot container */
+		CL_SlotContainer m_slots;
 
 
-		// logo
+		// action handlers
 
-		CL_Sprite m_logoSprite;
-
-
-		//
-		// Methods
-		//
-
-		// action slots
-
-		void onOkClicked();
-
-		void onQuitClicked();
-
-        void onOptionClicked();
-
-		void onAuthorsClicked();
+        void onOkClicked();
 
 };
+

@@ -25,82 +25,25 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#pragma once
 
-#include <ClanLib/core.h>
+#include "AuthorsController.h"
 
-#include "common.h"
-#include "common/Properties.h"
-#include "gfx/GuiScene.h"
-#include "controllers/MainMenuController.h"
+#include "common/Game.h"
+#include "gfx/Stage.h"
+#include "gfx/scenes/AuthorsScene.h"
 
-class MainMenuScene : public Gfx::GuiScene
+AuthorsController::AuthorsController(AuthorsScene *p_scene) :
+	m_scene(p_scene)
 {
-		SIGNAL_0(startRaceClicked);
+    m_slots.connect(m_scene->sig_okClicked(), this, &AuthorsController::onOkClicked);
+}
 
-		SIGNAL_0(quitClicked);
+AuthorsController::~AuthorsController()
+{
 
-        SIGNAL_0(optionClicked);
+}
 
-		SIGNAL_0(authorsClicked);
-
-	public:
-		MainMenuScene(CL_GUIComponent *p_parent);
-
-		virtual ~MainMenuScene();
-
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-
-		virtual void pushed();
-
-		CL_String getPlayerName() const { return Properties::getPropertyAsString("opt_player_name", ""); }
-
-		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
-
-		void displayError(const CL_String& p_message);
-
-	private:
-
-		// scene controller
-
-		MainMenuController m_controller;
-
-		// gui components
-
-		CL_Label m_serverLabel;
-
-		CL_LineEdit m_serverLineEdit;
-
-		CL_PushButton m_okButton;
-
-		CL_Label m_errorLabel;
-
-        CL_PushButton m_optionButton;
-
-		CL_PushButton m_authorsButton;
-
-		CL_PushButton m_quitButton;
-
-
-		// logo
-
-		CL_Sprite m_logoSprite;
-
-
-		//
-		// Methods
-		//
-
-		// action slots
-
-		void onOkClicked();
-
-		void onQuitClicked();
-
-        void onOptionClicked();
-
-		void onAuthorsClicked();
-
+void AuthorsController::onOkClicked()
+{
+	Gfx::Stage::popScene();
 };

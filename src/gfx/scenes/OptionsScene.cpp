@@ -82,7 +82,7 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	int x = START_X;
 	int y = START_Y;
 
-	m_nameLabel.set_text("Player's name");
+	m_nameLabel.set_text(_("Player's name"));
 	m_nameLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
 
 	x += LABEL_WIDTH + H_MARGIN;
@@ -92,7 +92,7 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	x = START_X;
 	y += V_MARGIN;
 
-	m_resolutionLabel.set_text("Resolution");
+	m_resolutionLabel.set_text(_("Resolution"));
 	m_resolutionLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
 
 	x += LABEL_WIDTH + H_MARGIN;
@@ -105,19 +105,19 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	x = START_X;
 	y += V_MARGIN;
 
-	m_fullScreenCheckBox.set_text("Full screen");
+	m_fullScreenCheckBox.set_text(_("Full screen"));
 	m_fullScreenCheckBox.set_geometry(CL_Rect(x, y, x + CHECKBOX_WIDTH, y + CHECKBOX_HEIGHT));
 
 	x = START_X;
 	y += V_MARGIN;
 
-	m_wsadCheckBox.set_text("Use WASD");
+	m_wsadCheckBox.set_text(_("Use WASD"));
 	m_wsadCheckBox.set_geometry(CL_Rect(x, y, x + CHECKBOX_WIDTH, y + CHECKBOX_HEIGHT));
 
 	x = START_X;
 	y += V_MARGIN;
 
-	m_soundLabel.set_text("Sound");
+	m_soundLabel.set_text(_("Sound"));
 	m_soundLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
 
 	x += LABEL_WIDTH + H_MARGIN;
@@ -139,12 +139,12 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
     x = (Gfx::Stage::getWidth() - (2 * BUTTON_WIDTH + H_MARGIN)) / 2;
     y = Gfx::Stage::getHeight() - (BUTTON_HEIGHT + V_MARGIN);
 
-    m_okButton.set_text("Ok");
+    m_okButton.set_text(_("Ok"));
     m_okButton.set_geometry(CL_Rect(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT));
 
     x += V_MARGIN + BUTTON_WIDTH;
 
-    m_cancelButton.set_text("Cancel");
+    m_cancelButton.set_text(_("Cancel"));
     m_cancelButton.set_geometry(CL_Rect(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT));
 
 	m_soundSlider.func_value_changed().set(this, &OptionScene::onSliderValueChange);

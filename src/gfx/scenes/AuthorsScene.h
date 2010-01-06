@@ -42,28 +42,47 @@ class AuthorsScene : public Gfx::GuiScene
 
 		virtual ~AuthorsScene();
 
-		virtual void load(CL_GraphicContext &p_gc);
-
 		virtual void draw(CL_GraphicContext &p_gc);
 
 	private:
+
+		bool isDown;
+
+		bool isRight;
+		
+		int max;
+
+		CL_Timer m_timer;
+
+		CL_Font typeFont;
+
+		CL_Font authorsFont;
+		
+		CL_Colorf fontColor;
+
 		// scene controller
 
 		AuthorsController m_controller;
 
 		// gui components
 
-		CL_Sprite m_logoSprite;
+		CL_Label m_programmersLabel;
 
-		CL_Label m_authorsLabel;
+		CL_Label m_graphicsLabel;
 
 		CL_PushButton m_okButton;
 
 		// Methods
 
-		CL_SpanLayout getAuthorsSpan();
+		CL_SpanLayout getProgrammersSpan();
+
+		CL_SpanLayout getGraphicsSpan();
 
 		// action slots
 
         void onOkClick();
+
+		void onTimerInterval();
+
+		void SetLabelPosition(CL_Label* p_label, int p_changeTop, int p_changeLeft);
 };

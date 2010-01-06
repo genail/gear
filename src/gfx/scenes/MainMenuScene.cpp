@@ -66,7 +66,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	int y = START_Y;
 
 	m_serverLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
-	m_serverLabel.set_text("Server addr");
+	m_serverLabel.set_text(_("Server addr"));
 
 	x += LABEL_WIDTH + H_MARGIN;
 
@@ -76,11 +76,11 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	y += V_MARGIN;
 
 	m_okButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
-	m_okButton.set_text("Start Race");
+	m_okButton.set_text(_("Start Race"));
 
     y += V_MARGIN;
 
-    m_optionButton.set_text("Option");
+    m_optionButton.set_text(_("Options"));
     m_optionButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 
 	x = START_X;
@@ -89,14 +89,14 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_errorLabel.set_geometry(CL_Rect(x, y, x + ERROR_LABEL_WIDTH, y + ERROR_LABEL_HEIGHT));
 
 	m_quitButton.set_geometry(CL_Rect(get_width() - 100, get_height() - 40, get_width() - 20, get_height() - 20));
-	m_quitButton.set_text("Quit");
+	m_quitButton.set_text(_("Quit"));
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
     m_optionButton.func_clicked().set(this, &MainMenuScene::onOptionClicked);
 
 
-	m_serverLineEdit.set_text(Properties::getPropertyAsString("hostname", ""));
+	m_serverLineEdit.set_text(Properties::getPropertyAsString("opt_hostname", ""));
 }
 
 MainMenuScene::~MainMenuScene()

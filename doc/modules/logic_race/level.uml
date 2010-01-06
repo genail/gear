@@ -52,7 +52,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Jan 05 22:05:36 CET 2010'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Jan 05 22:48:32 CET 2010'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -252,11 +252,11 @@
                 <UML:Parameter xmi.id = '127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F02'
                   name = 'p_segment' isSpecification = 'false' kind = 'in'>
                   <UML:Parameter.defaultValue>
-                    <UML:Expression xmi.id = '127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F03'
+                    <UML:Expression xmi.id = '127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F24'
                       language = 'UML 1.4' body = '-1'/>
                   </UML:Parameter.defaultValue>
                   <UML:Parameter.type>
-                    <UML:Class xmi.idref = '127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F01'/>
+                    <UML:Class xmi.idref = '127-0-1-1-1b050b91:125f3c0b165:-8000:000000000000177E'/>
                   </UML:Parameter.type>
                 </UML:Parameter>
               </UML:BehavioralFeature.parameter>
@@ -418,6 +418,8 @@
           isLeaf = 'false' isAbstract = 'false'/>
       </UML:Namespace.ownedElement>
     </UML:Model>
+    <UML:Expression xmi.id = '127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F03'
+      language = 'UML 1.4' body = '-1'/>
     <UML:Multiplicity xmi.id = '127-0-1-1-1b050b91:125f3c0b165:-8000:0000000000001778'>
       <UML:Multiplicity.range>
         <UML:MultiplicityRange xmi.id = '127-0-1-1-1b050b91:125f3c0b165:-8000:0000000000001779'
@@ -693,7 +695,7 @@
         x="368"
         y="396"
         width="413"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -709,7 +711,7 @@
         x="368"
         y="410"
         width="209"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -725,7 +727,7 @@
         x="368"
         y="424"
         width="128"
-        height="20"
+        height="23"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -1120,7 +1122,7 @@
       <text name="Fig4.3.2"
         x="440"
         y="621"
-        width="298"
+        width="289"
         height="14"
         fill="0"
         fillcolor="white"
@@ -1132,7 +1134,7 @@
         bold="false"
         textsize="11"
         justification="Left"
-      >+triangulate(p_track : Track,p_segment : void = -1)</text>
+      >+triangulate(p_track : Track,p_segment : int = -1)</text>
       <text name="Fig4.3.3"
         x="440"
         y="635"

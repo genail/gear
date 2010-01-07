@@ -28,13 +28,81 @@
 
 #include "Properties.h"
 
+#include "common.h"
+
 std::map<CL_String, CL_String> Properties::m_keyValueMap;
 
-Properties::Properties() {
+const char* FILENAME = "gear.cfg";
+
+Properties::Properties()
+{
 
 }
 
-Properties::~Properties() {
+Properties::~Properties()
+{
+
+}
+
+void Properties::load()
+{
+	try {
+		CL_File file(FILENAME, CL_File::open_existing, CL_File::access_read);
+
+		CL_DataBuffer buffer(file.get_size());
+		file.read(buffer.get_data(), buffer.get_size());
+
+		file.close();
+
+		const std::vector<CL_TempString> lines =
+				CL_StringHelp::split_text(buffer.get_data(), END_OF_LINE, true);
+
+		const int linesCount = static_cast<signed>(lines.size());
+
+		std::vector<CL_TempString> parts;
+
+		for (int i = 0; i < linesCount; ++i) {
+			parts = CL_StringHelp::split_text(lines[i], "=", false);
+
+			if (parts.size() == 2) {
+				const CL_TempString left = CL_StringHelp::trim(parts[0]);
+				const CL_TempString right = CL_StringHelp::trim(parts[1]);
+
+				Properties::setProperty(left, right);
+
+				cl_log_event(LOG_DEBUG, "Option '%1' set to '%2'", left, right);
+			} else {
+				cl_log_event(LOG_DEBUG, "Cannot parse line: %1", lines[i]);
+			}
+		}
+
+
+	} catch (CL_Exception &e) {
+		cl_log_event(LOG_DEBUG, "File %1 cannot be read: %2", FILENAME, e.message);
+	}
+
+}
+
+void Properties::save()
+{
+	try {
+		CL_File file(FILENAME, CL_File::create_always, CL_File::access_write);
+
+		std::pair<CL_String, CL_String> pair;
+		CL_String line;
+
+		foreach(pair, m_keyValueMap) {
+			line = cl_format("%1 = %2\n", pair.first, pair.second);
+			file.write(line.c_str(), line.length());
+
+			cl_log_event(LOG_DEBUG, "Option '%1' saved with value '%2'", pair.first, pair.second);
+		}
+
+		file.close();
+
+	} catch (CL_Exception &e) {
+		cl_log_event(LOG_DEBUG, "File %1 cannot be written: %2", FILENAME, e.message);
+	}
 }
 
 void Properties::setProperty(const CL_String &p_key, bool p_value)

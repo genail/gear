@@ -50,6 +50,7 @@ SET(CLIENT_SRCS
     Application.cpp
     controllers/GameMenuController.cpp
     controllers/MainMenuController.cpp
+	controllers/OptionsController.cpp
     debug/RaceSceneKeyBindings.cpp
     gfx/DebugLayer.cpp
     gfx/DirectScene.cpp
@@ -72,6 +73,7 @@ SET(CLIENT_SRCS
     gfx/race/ui/SpeedMeter.cpp
     gfx/scenes/MainMenuScene.cpp
     gfx/scenes/RaceScene.cpp
+	gfx/scenes/OptionsScene.cpp
     logic/race/OfflineRaceLogic.cpp
     logic/race/OnlineRaceLogic.cpp
     math/Easing.cpp
@@ -139,6 +141,8 @@ SET(SERVER_LIBS ${LIBS}
 )
 
 # Platform specifics
+SET(COMMON_COMPILE_FLAGS " ")
+
 SET(GEAR_COMPILE_FLAGS " ")
 SET(GEAR_LINK_FLAGS " ")
 
@@ -217,6 +221,17 @@ ENDIF (CMAKE_COMPILER_IS_GNUCXX)
 
 JOIN_LIST("" ${COMMON_COMPILE_FLAGS})
 SET(COMMON_COMPILE_FLAGS "${JOIN_LIST_RESULT}")
+
+IF (UNIX)
+    SET (COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} -DUNIX")
+ELSEIF (WIN32)
+    SET (COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} -DWINDOWS")
+ELSEIF (APPLE)
+    SET (COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} -DAPPLE")
+ELSE (UNIX)
+    MESSAGE (FATAL_ERROR "Unsuppored platform")
+ENDIF (UNIX)
+
 
 # Game client configuration
 IF (USE_GL2)

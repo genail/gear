@@ -50,13 +50,12 @@ const int V_MARGIN = 40;
 MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	GuiScene(p_parent),
 	m_controller(this),
-	m_nameLabel(this),
 	m_serverLabel(this),
-	m_nameLineEdit(this),
 	m_serverLineEdit(this),
 	m_okButton(this),
 	m_errorLabel(this),
-	m_quitButton(this)
+	m_quitButton(this),
+    m_optionButton(this)
 {
 	set_class_name("MainMenuScene");
 
@@ -66,18 +65,8 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	int x = START_X;
 	int y = START_Y;
 
-	m_nameLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
-	m_nameLabel.set_text("Player's name");
-
-	x += LABEL_WIDTH + H_MARGIN;
-
-	m_nameLineEdit.set_geometry(CL_Rect(x, y, x + EDIT_WIDTH, y + EDIT_HEIGHT));
-
-	x = START_X;
-	y += V_MARGIN;
-
 	m_serverLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
-	m_serverLabel.set_text("Server addr");
+	m_serverLabel.set_text(_("Server addr"));
 
 	x += LABEL_WIDTH + H_MARGIN;
 
@@ -87,21 +76,27 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	y += V_MARGIN;
 
 	m_okButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
-	m_okButton.set_text("Start Race");
+	m_okButton.set_text(_("Start Race"));
+
+    y += V_MARGIN;
+
+    m_optionButton.set_text(_("Options"));
+    m_optionButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 
 	x = START_X;
-	y += V_MARGIN;
+    y -= V_MARGIN;
 
 	m_errorLabel.set_geometry(CL_Rect(x, y, x + ERROR_LABEL_WIDTH, y + ERROR_LABEL_HEIGHT));
 
-	m_quitButton.set_geometry(CL_Rect(Gfx::Stage::getWidth() - 100, Gfx::Stage::getHeight() - 40, Gfx::Stage::getWidth() - 20, Gfx::Stage::getHeight() - 20));
-	m_quitButton.set_text("Quit");
+	m_quitButton.set_geometry(CL_Rect(get_width() - 100, get_height() - 40, get_width() - 20, get_height() - 20));
+	m_quitButton.set_text(_("Quit"));
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
+    m_optionButton.func_clicked().set(this, &MainMenuScene::onOptionClicked);
 
-	m_nameLineEdit.set_text(Properties::getPropertyAsString("nickname", ""));
-	m_serverLineEdit.set_text(Properties::getPropertyAsString("hostname", ""));
+
+	m_serverLineEdit.set_text(Properties::getPropertyAsString("opt_hostname", ""));
 }
 
 MainMenuScene::~MainMenuScene()
@@ -127,6 +122,13 @@ void MainMenuScene::draw(CL_GraphicContext &p_gc)
 	m_logoSprite.draw(p_gc, spriteRect);
 }
 
+void MainMenuScene::pushed()
+{
+	m_errorLabel.set_text("");
+
+	GuiScene::pushed();
+}
+
 void MainMenuScene::onOkClicked()
 {
 	INVOKE_0(startRaceClicked);
@@ -137,8 +139,15 @@ void MainMenuScene::onQuitClicked()
 	INVOKE_0(quitClicked);
 }
 
+void MainMenuScene::onOptionClicked()
+{
+    INVOKE_0(optionClicked);
+}
+
 void MainMenuScene::displayError(const CL_String& p_message)
 {
-	m_errorLabel.set_text(p_message);
-	m_errorLabel.request_repaint();
+	CL_Font font(get_gc(), "helvetica", 14);
+	CL_SpanLayout span;
+	span.add_text(p_message, font, CL_Colorf::red);
+	m_errorLabel.set_span(span);
 }

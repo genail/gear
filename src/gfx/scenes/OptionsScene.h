@@ -25,88 +25,95 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#pragma once
 
-#include "GuiScene.h"
+#include <ClanLib/core.h>
+#include <vector>
 
 #include "common.h"
-#include "gfx/Stage.h"
+#include "gfx/GuiScene.h"
+#include "controllers/OptionsController.h"
 
-namespace Gfx {
-
-GuiScene::GuiScene(CL_GUIComponent *p_parent) :
-	CL_GUIComponent(p_parent),
-	m_loaded(false)
+class OptionScene : public Gfx::GuiScene
 {
-	set_visible(false);
-	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
-}
+        SIGNAL_0(okClicked);
 
-GuiScene::~GuiScene()
-{
-}
+        SIGNAL_0(cancelClicked);
 
-bool GuiScene::isLoaded() const
-{
-	return m_loaded;
-}
+	public:
+		OptionScene(CL_GUIComponent *p_parent);
 
-SceneType GuiScene::getType() const
-{
-	return ST_GUI;
-}
+		virtual ~OptionScene();
 
-void GuiScene::setLoaded(bool p_loaded)
-{
-	m_loaded = p_loaded;
-}
+		virtual void draw(CL_GraphicContext &p_gc);
 
-void GuiScene::draw(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(m_loaded);
-}
+		virtual void pushed();
 
-void GuiScene::inputPressed(const CL_InputEvent &p_event)
-{
-	// empty
-}
+		void displayError(const CL_String& p_message);
+		
+		void addResolution(int p_width, int p_height);
 
-void GuiScene::inputReleased(const CL_InputEvent &p_event)
-{
-	// empty
-}
+		CL_StringRef getPlayersName() const;
 
-void GuiScene::load(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(!m_loaded);
-	m_loaded = true;
-}
+		int getResolutionWidth() const;
 
-void GuiScene::pushed()
-{
-	set_visible(true);
-	set_focus(true);
-}
+		int getResolutionHeight() const;
 
-void GuiScene::poped()
-{
-	set_focus(false);
-	set_visible(false);
-}
+		bool getFullScreen() const;
 
-void GuiScene::setActive(bool p_active)
-{
-	if (p_active) {
-		set_visible(true);
-		set_focus(true);
-	} else {
-		set_focus(false);
-		set_visible(false);
-	}
-}
+		int getSound() const;
 
-void GuiScene::update(unsigned p_timeElapsed)
-{
-	G_ASSERT(m_loaded);
-}
+		bool getWASD() const;
 
-}
+	private:
+
+		std::vector<CL_Size> m_resolutions;
+
+		// scene controller
+
+		OptionController m_controller;
+
+		// gui components
+
+		CL_Label m_nameLabel;
+
+		CL_LineEdit m_nameLineEdit;
+
+		CL_Label m_resolutionLabel;
+
+		CL_ComboBox m_resolutionComboBox;
+
+		CL_CheckBox m_fullScreenCheckBox;
+
+		CL_CheckBox m_wsadCheckBox;
+
+		CL_Label m_soundLabel;
+
+		CL_Label m_soundValueLabel;
+
+		CL_Slider m_soundSlider;
+
+		CL_Label m_errorLabel;
+
+		CL_PushButton m_okButton;
+
+        CL_PushButton m_cancelButton;
+
+		CL_PopupMenu m_menu;
+
+		// Methods
+
+		int searchResolution(const int& p_searchWidth, const int& p_searchHeight);
+
+		void setSliderLabelValue();
+
+		void useDefaultSetings();
+
+		// action slots
+
+        void onOkClick();
+
+        void onCancelClick();
+
+		void onSliderValueChange();
+};

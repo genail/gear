@@ -26,87 +26,44 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GuiScene.h"
+#include "OptionsController.h"
 
-#include "common.h"
+#include "common/Game.h"
 #include "gfx/Stage.h"
+#include "gfx/scenes/OptionsScene.h"
+#include "common/Properties.h"
 
-namespace Gfx {
-
-GuiScene::GuiScene(CL_GUIComponent *p_parent) :
-	CL_GUIComponent(p_parent),
-	m_loaded(false)
+OptionController::OptionController(OptionScene *p_scene) :
+	m_scene(p_scene)
 {
-	set_visible(false);
-	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
+    m_slots.connect(m_scene->sig_cancelClicked(), this, &OptionController::onCancelClicked);
+    m_slots.connect(m_scene->sig_okClicked(), this, &OptionController::onOkClicked);
 }
 
-GuiScene::~GuiScene()
+OptionController::~OptionController()
 {
+
 }
 
-bool GuiScene::isLoaded() const
+void OptionController::onCancelClicked()
 {
-	return m_loaded;
+    Gfx::Stage::popScene();
 }
 
-SceneType GuiScene::getType() const
+void OptionController::onOkClicked()
 {
-	return ST_GUI;
-}
-
-void GuiScene::setLoaded(bool p_loaded)
-{
-	m_loaded = p_loaded;
-}
-
-void GuiScene::draw(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(m_loaded);
-}
-
-void GuiScene::inputPressed(const CL_InputEvent &p_event)
-{
-	// empty
-}
-
-void GuiScene::inputReleased(const CL_InputEvent &p_event)
-{
-	// empty
-}
-
-void GuiScene::load(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(!m_loaded);
-	m_loaded = true;
-}
-
-void GuiScene::pushed()
-{
-	set_visible(true);
-	set_focus(true);
-}
-
-void GuiScene::poped()
-{
-	set_focus(false);
-	set_visible(false);
-}
-
-void GuiScene::setActive(bool p_active)
-{
-	if (p_active) {
-		set_visible(true);
-		set_focus(true);
-	} else {
-		set_focus(false);
-		set_visible(false);
+	if (CL_StringHelp::trim(m_scene->getPlayersName()) == "")
+	{
+		m_scene->displayError("No player's name choosen");
+		return;
 	}
-}
 
-void GuiScene::update(unsigned p_timeElapsed)
-{
-	G_ASSERT(m_loaded);
-}
+	Properties::setProperty("opt_screen_width", m_scene->getResolutionWidth());
+	Properties::setProperty("opt_screen_height", m_scene->getResolutionHeight());
+	Properties::setProperty("opt_fullscreen", m_scene->getFullScreen());
+	Properties::setProperty("opt_sound_volume", m_scene->getSound());
+	Properties::setProperty("opt_player_name", m_scene->getPlayersName());
+	Properties::setProperty("opt_use_wasd", m_scene->getWASD());
 
-}
+	Gfx::Stage::popScene();
+};

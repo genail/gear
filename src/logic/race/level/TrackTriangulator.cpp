@@ -310,7 +310,7 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 		}
 
 		// update triangle points in map
-		m_intSegMap[p_segment] = triPoints;
+		m_impl->m_intSegMap[p_segment] = triPoints;
 
 	}
 

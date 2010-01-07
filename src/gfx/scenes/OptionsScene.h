@@ -53,7 +53,7 @@ class OptionScene : public Gfx::GuiScene
 		
 		void addResolution(int p_width, int p_height);
 
-		CL_StringRef getPlayersName() const;
+		const CL_String& getPlayersName() const;
 
 		int getResolutionWidth() const;
 

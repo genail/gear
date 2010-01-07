@@ -31,7 +31,7 @@
 #include "common.h"
 #include "gfx/Stage.h"
 
-const int LABEL_WIDTH = 200;
+const int LABEL_WIDTH = 280;
 const int LABEL_HEIGHT = 200;
 
 const int ERROR_LABEL_WIDTH = 200;
@@ -58,7 +58,8 @@ const int V_MARGIN = 40;
 AuthorsScene::AuthorsScene(CL_GUIComponent *p_parent) :
 	GuiScene(p_parent),
     m_controller(this),
-	m_programmersLabel(this),
+	m_leadProgramerLabel(this),
+	m_programersLabel(this),
 	m_graphicsLabel(this),
     m_okButton(this),
 	isDown(true),
@@ -77,17 +78,24 @@ AuthorsScene::AuthorsScene(CL_GUIComponent *p_parent) :
 	int y = 0;
 	int x = 0;
 
-	span = getProgrammersSpan();
+	span = getLeadProgramerSpan();
 	size = span.find_preferred_size(get_gc());
-	m_programmersLabel.set_span(span);
-	m_programmersLabel.set_geometry(CL_Rect(x, y, x + size.width, y + size.height));
+	m_leadProgramerLabel.set_span(span);
+	m_leadProgramerLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + size.height));
 
-	y += size.height + V_MARGIN;
+	y += size.height;
+
+	span = getProgramersSpan();
+	size = span.find_preferred_size(get_gc());
+	m_programersLabel.set_span(span);
+	m_programersLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + size.height));
+
+	y += size.height;
 
 	span = getGraphicsSpan();
 	size = span.find_preferred_size(get_gc());
 	m_graphicsLabel.set_span(span);
-	m_graphicsLabel.set_geometry(CL_Rect(x, y, x + size.width, y + size.height));
+	m_graphicsLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + size.height));
 
 	x = (get_width() - BUTTON_WIDTH) / 2;
 	y = get_height() - (V_MARGIN + BUTTON_HEIGHT);
@@ -97,23 +105,38 @@ AuthorsScene::AuthorsScene(CL_GUIComponent *p_parent) :
 
 	m_okButton.func_clicked().set(this, &AuthorsScene::onOkClick);
 
-	max = y - V_MARGIN;
+	max = y;
 
 	m_timer.func_expired().set(this, &AuthorsScene::onTimerInterval);
-	m_timer.start(20);
+	m_timer.start(40);
 }
 
 AuthorsScene::~AuthorsScene()
 {
 }
 
-CL_SpanLayout AuthorsScene::getProgrammersSpan()
+CL_SpanLayout AuthorsScene::getLeadProgramerSpan()
 {
 	CL_SpanLayout span;
 	CL_String type, authors;
 
-	type = "Programmers:\n";
-	authors = "chudzielec\nbercik\n";
+	type = _("Lead programer:\n");
+	authors = _("Piotr Korzuszek");
+	span.add_text(type, typeFont, fontColor);
+	span.add_text(authors, authorsFont, fontColor);
+
+	return span;
+}
+
+CL_SpanLayout AuthorsScene::getProgramersSpan()
+{
+	CL_SpanLayout span;
+	CL_String type, authors;
+
+	type = _("Programers:\n");
+	authors = _("Robert Cebula\n");
+	authors += _("Bartosz Platak\n");
+	authors += _("Pawe³ Rybarczyk");
 	span.add_text(type, typeFont, fontColor);
 	span.add_text(authors, authorsFont, fontColor);
 
@@ -125,8 +148,8 @@ CL_SpanLayout AuthorsScene::getGraphicsSpan()
 	CL_SpanLayout span;
 	CL_String type, authors;
 
-	type = "Graphics:\n";
-	authors = "mrchipples\n";
+	type = _("Graphics:\n");
+	authors = _("Piotr Uchman");
 	span.add_text(type, typeFont, fontColor);
 	span.add_text(authors, authorsFont, fontColor);
 
@@ -152,7 +175,7 @@ void AuthorsScene::onTimerInterval()
 
 	if (isRight)
 	{
-		if (m_programmersLabel.get_geometry().right >= get_width())
+		if (m_leadProgramerLabel.get_geometry().right >= get_width())
 		{
 			isRight = false;
 			return;
@@ -162,7 +185,7 @@ void AuthorsScene::onTimerInterval()
 	}
 	else
 	{
-		if (m_programmersLabel.get_geometry().left <= 0)
+		if (m_leadProgramerLabel.get_geometry().left <= 0)
 		{
 			isRight = true;
 			return;
@@ -183,7 +206,7 @@ void AuthorsScene::onTimerInterval()
 	}
 	else
 	{
-		if (m_programmersLabel.get_geometry().top <= 0)
+		if (m_leadProgramerLabel.get_geometry().top <= 0)
 		{
 			isDown = true;
 			return;
@@ -192,11 +215,12 @@ void AuthorsScene::onTimerInterval()
 		topChange = -1;
 	}
 
-	SetLabelPosition(&m_programmersLabel, topChange, rightChange);
-	SetLabelPosition(&m_graphicsLabel, topChange, rightChange);
+	ChangeLabelPosition(&m_leadProgramerLabel, topChange, rightChange);
+	ChangeLabelPosition(&m_programersLabel, topChange, rightChange);
+	ChangeLabelPosition(&m_graphicsLabel, topChange, rightChange);
 }
 
-void AuthorsScene::SetLabelPosition(CL_Label *p_label, int p_changeTop, int p_changeLeft)
+void AuthorsScene::ChangeLabelPosition(CL_Label *p_label, int p_changeTop, int p_changeLeft)
 {
 	CL_Rect rect = (*p_label).get_geometry();
 	rect.top += p_changeTop;

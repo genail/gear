@@ -66,7 +66,9 @@ class AuthorsScene : public Gfx::GuiScene
 
 		// gui components
 
-		CL_Label m_programmersLabel;
+		CL_Label m_leadProgramerLabel;
+
+		CL_Label m_programersLabel;
 
 		CL_Label m_graphicsLabel;
 
@@ -74,7 +76,9 @@ class AuthorsScene : public Gfx::GuiScene
 
 		// Methods
 
-		CL_SpanLayout getProgrammersSpan();
+		CL_SpanLayout getLeadProgramerSpan();
+
+		CL_SpanLayout getProgramersSpan();
 
 		CL_SpanLayout getGraphicsSpan();
 
@@ -84,5 +88,5 @@ class AuthorsScene : public Gfx::GuiScene
 
 		void onTimerInterval();
 
-		void SetLabelPosition(CL_Label* p_label, int p_changeTop, int p_changeLeft);
+		void ChangeLabelPosition(CL_Label* p_label, int p_changeTop, int p_changeLeft);
 };

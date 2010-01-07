@@ -67,7 +67,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	int y = START_Y;
 
 	m_serverLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
-	m_serverLabel.set_text("Server addr");
+	m_serverLabel.set_text(_("Server addr"));
 
 	x += LABEL_WIDTH + H_MARGIN;
 
@@ -77,11 +77,11 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	y += V_MARGIN;
 
 	m_okButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
-	m_okButton.set_text("Start Race");
+	m_okButton.set_text(_("Start Race"));
 
     y += V_MARGIN;
 
-    m_optionButton.set_text("Options");
+    m_optionButton.set_text(_("Options"));
     m_optionButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 
 	y += V_MARGIN;
@@ -92,7 +92,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	y += V_MARGIN;
 
 	m_quitButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + LABEL_HEIGHT));
-	m_quitButton.set_text("Quit");
+	m_quitButton.set_text(_("Quit"));
 
 	x = START_X;
 	y = m_okButton.get_geometry().top;
@@ -105,7 +105,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_authorsButton.func_clicked().set(this, &MainMenuScene::onAuthorsClicked);
 
 
-	m_serverLineEdit.set_text(Properties::getPropertyAsString("hostname", ""));
+	m_serverLineEdit.set_text(Properties::getPropertyAsString("opt_hostname", ""));
 }
 
 MainMenuScene::~MainMenuScene()

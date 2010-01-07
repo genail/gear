@@ -263,11 +263,57 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 				prev.getShift(), next.getShift()
 		);
 
+		const int curveSize = static_cast<signed>(curvePoints.size());
+		std::vector<CL_Pointf> triPoints;
 
+		CL_Pointf lastLeftPoint, lastRightPoint;
+		bool first = true;
 
+		for (int i = 1; i < curveSize; ++i) {
+			const TrackPoint &tprev = trackPoints[i - 1];
+			const TrackPoint &tnext = trackPoints[i];
+
+			const CL_Pointf prevPoint = tprev.getPosition();
+			const CL_Pointf nextPoint = tnext.getPosition();
+
+			CL_Vec2f tvec = nextPoint - prevPoint;
+			tvec.normalize();
+			tvec *= tprev.getRadius();
+
+			// calculate left and right wing
+			CL_Vec2f leftVec(tvec.y, -tvec.x); // due to inverted Y the left side is actually a right side
+			CL_Vec2f rightVec(-leftVec.x, -leftVec.y);
+
+			leftVec += leftVec * (tprev.getShift() * -1);
+			rightVec += rightVec * tprev.getShift();
+
+			if (!first) {
+
+				const CL_Pointf leftPoint = prevPoint + leftVec;
+				const CL_Pointf rightPoint = prevPoint + rightVec;
+
+				// got 4 points, can make two triangles
+				triPoints.push_back(lastLeftPoint);
+				triPoints.push_back(lastRightPoint);
+				triPoints.push_back(rightPoint);
+
+				triPoints.push_back(lastLeftPoint);
+				triPoints.push_back(rightPoint);
+				triPoints.push_back(leftPoint);
+
+			} else {
+				first = false;
+			}
+
+			lastLeftPoint = prevPoint + leftVec;
+			lastRightPoint = prevPoint + rightVec;
+		}
+
+		// update triangle points in map
+		m_intSegMap[p_segment] = triPoints;
 
 	}
 
 }
 
-}
+} // namespace

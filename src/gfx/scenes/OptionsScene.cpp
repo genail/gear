@@ -189,7 +189,12 @@ void OptionScene::pushed()
 	{
 		int width = Properties::getPropertyAsInt("opt_screen_width", -1);
 		int height = Properties::getPropertyAsInt("opt_screen_height", -1);
-		m_resolutionComboBox.set_selected_item(searchResolution(width, height));
+		int index = 0;
+		if ((index = searchResolution(width, height)) == -1)
+		{
+			index = 0;
+		}
+		m_resolutionComboBox.set_selected_item(index);
 
 		m_nameLineEdit.set_text(Properties::getPropertyAsString("opt_player_name", ""));
 		m_fullScreenCheckBox.set_checked(Properties::getPropertyAsBool("opt_fullscreen", false));

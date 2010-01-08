@@ -86,7 +86,7 @@ void Properties::load()
 void Properties::save()
 {
 	try {
-		CL_File file(FILENAME, CL_File::create_new, CL_File::access_write);
+		CL_File file(FILENAME, CL_File::create_always, CL_File::access_write);
 
 		std::pair<CL_String, CL_String> pair;
 		CL_String line;

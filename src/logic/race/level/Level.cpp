@@ -159,7 +159,8 @@ class LevelImpl
 
 };
 
-Level::Level()
+Level::Level() :
+		m_impl(new LevelImpl())
 {
 
 }

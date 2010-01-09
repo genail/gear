@@ -51,7 +51,7 @@ class TrackTriangulatorImpl
 			S_RIGHT
 		};
 
-		typedef std::map<int, TrackSegment> TIntSegmentMap;
+		typedef std::map<int, CL_SharedPtr<TrackSegment> > TIntSegmentMap;
 
 
 		TIntSegmentMap m_intSegMap;
@@ -310,7 +310,8 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 		}
 
 		// update triangle points in map
-		m_impl->m_intSegMap[p_segment] = triPoints;
+		m_impl->m_intSegMap[p_segment] =
+				CL_SharedPtr<TrackSegment>(new TrackSegment(triPoints));
 
 	}
 

@@ -46,7 +46,7 @@ class Level : public Gfx::Drawable
 {
 	public:
 
-		Level(const Race::Level &p_levelLogic);
+		explicit Level(const Race::Level &p_levelLogic);
 
 		virtual ~Level();
 

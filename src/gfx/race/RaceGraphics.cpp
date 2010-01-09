@@ -77,6 +77,12 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 
 	if (m_logic->getLevel().isLoaded()) {
 
+		// load level graphics when level logic is loaded
+		// FIXME: Maybe I should wait for gamestate in separate scene?
+		if (!m_level.isLoaded()) {
+			m_level.load(p_gc);
+		}
+
 		// initialize player's viewport
 		m_viewport.prepareGC(p_gc);
 
@@ -106,7 +112,6 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 
 void RaceGraphics::load(CL_GraphicContext &p_gc)
 {
-	m_level.load(p_gc);
 	m_raceUI.load(p_gc);
 	loadGroundBlocks(p_gc);
 	loadDecorations(p_gc);

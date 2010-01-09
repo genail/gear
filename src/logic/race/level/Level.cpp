@@ -188,6 +188,7 @@ void Level::destroy()
 
 		m_impl->m_startPositions.clear();
 		m_impl->m_tyreStripes.clear();
+		m_impl->m_track.clear();
 
 		m_impl->m_loaded = false;
 	}
@@ -198,9 +199,10 @@ Level::~Level() {
 
 void LevelImpl::loadFromFile(const CL_String& p_filename)
 {
-	assert(!m_loaded && "level is already loaded");
+	G_ASSERT(!m_loaded && "level is already loaded");
 
 	try {
+		cl_log_event(LOG_DEBUG, "loading level %1", p_filename);
 		CL_File file(p_filename, CL_File::open_existing, CL_File::access_read);
 
 
@@ -227,6 +229,8 @@ void LevelImpl::loadFromFile(const CL_String& p_filename)
 		loadBoundsElement(boundsNode);
 
 		file.close();
+
+		cl_log_event(LOG_DEBUG, "level loaded");
 		m_loaded = true;
 
 	} catch (CL_Exception e) {
@@ -244,19 +248,17 @@ void LevelImpl::loadTrackElement(const CL_DomNode &p_trackNode)
 	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
 	const int blockListSize = blockList.get_length();
 
-	cl_log_event("debug", "Track node child count: %1", blockListSize);
-
 	for (int i = 0; i < blockListSize; ++i) {
 		const CL_DomNode blockNode = blockList.item(i);
 
 		if (blockNode.get_node_name() == "point") {
-			const float x = blockNode.select_float("x");
-			const float y = blockNode.select_float("y");
-			const float radius = blockNode.select_float("radius");
-			const float modifier = blockNode.select_float("modifier");
+			const float x = blockNode.select_float("@x");
+			const float y = blockNode.select_float("@y");
+			const float radius = blockNode.select_float("@radius");
+			const float modifier = blockNode.select_float("@modifier");
 
+			cl_log_event(LOG_DEBUG, "Loaded track point %1 x %2, rad = %3, mod = %4", x, y, radius, modifier);
 			m_track.addPoint(CL_Pointf(x, y), radius, modifier);
-
 		} else {
 			cl_log_event(LOG_WARN, "Unknown element in <track>: %1", blockNode.get_node_name());
 		}
@@ -699,6 +701,7 @@ bool Level::isLoaded() const
 
 const Track &Level::getTrack() const
 {
+	G_ASSERT(m_impl->m_loaded);
 	return m_impl->m_track;
 }
 

@@ -96,7 +96,8 @@ class LoopVector : public std::vector<T>
         }
 };
 
-TrackTriangulator::TrackTriangulator()
+TrackTriangulator::TrackTriangulator() :
+		m_impl(new TrackTriangulatorImpl())
 {
 }
 
@@ -172,8 +173,6 @@ float TrackTriangulatorImpl::lengthTotal(const std::vector<CL_Pointf> &p_points)
 float TrackTriangulatorImpl::interpolate(float p_pos, float p_prev, float p_next)
 {
 	G_ASSERT(p_pos >= 0.0f && p_pos <= 1.0f);
-	G_ASSERT(p_prev >= -1.0f && p_prev <= 1.0f);
-	G_ASSERT(p_next >= -1.0f && p_next <= 1.0f);
 
 	p_pos = (p_pos * p_pos) * (3.0f - (2.0f * p_pos));
 	return (p_prev + ((p_next - p_prev) * p_pos));

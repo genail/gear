@@ -85,4 +85,9 @@ int Track::getPointCount() const
 	return m_impl->m_trackPoints.size();
 }
 
+void Track::clear()
+{
+	m_impl->m_trackPoints.clear();
+}
+
 } // namespace

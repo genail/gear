@@ -119,6 +119,7 @@ void Level::load(CL_GraphicContext &p_gc)
 	const int pointCount = track.getPointCount();
 
 	for (int i = 0; i < pointCount; ++i) {
+		cl_log_event(LOG_DEBUG, "%1", i);
 		m_impl->m_triangulator.triangulate(track, i);
 	}
 

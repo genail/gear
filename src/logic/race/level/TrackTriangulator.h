@@ -48,6 +48,14 @@ class TrackTriangulator
 		virtual ~TrackTriangulator();
 
 
+		const CL_Pointf &getFirstLeftPoint(int p_segIndex) const;
+
+		const CL_Pointf &getFirstRightPoint(int p_segIndex) const;
+
+		const CL_Pointf &getLastLeftPoint(int p_segIndex) const;
+
+		const CL_Pointf &getLastRightPoint(int p_segIndex) const;
+
 		const TrackSegment &getSegment(int p_index) const;
 
 		void triangulate(const Track &p_track, int p_segment = -1);

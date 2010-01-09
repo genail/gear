@@ -97,6 +97,17 @@ void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
 
 			drawTriangle(p_gc, p1, p2, p3);
 		}
+
+		// connect to next one
+		const CL_Pointf &prevLeft = m_triangulator.getLastLeftPoint(i);
+		const CL_Pointf &prevRight = m_triangulator.getLastRightPoint(i);
+
+		const int nextIdx = i + 1 < trackPointCount ? i + 1 : 0;
+		const CL_Pointf &nextLeft = m_triangulator.getFirstLeftPoint(nextIdx);
+		const CL_Pointf &nextRight = m_triangulator.getFirstRightPoint(nextIdx);
+
+		drawTriangle(p_gc, prevLeft, prevRight, nextRight);
+		drawTriangle(p_gc, prevLeft, nextRight, nextLeft);
 	}
 }
 

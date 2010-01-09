@@ -334,4 +334,32 @@ const TrackSegment &TrackTriangulator::getSegment(int p_index) const
 	return *(itor->second);
 }
 
+const CL_Pointf &TrackTriangulator::getFirstLeftPoint(int p_segIndex) const
+{
+	const TrackSegment &seg = getSegment(p_segIndex);
+	return seg.getTrianglePoints()[0];
+}
+
+const CL_Pointf &TrackTriangulator::getFirstRightPoint(int p_segIndex) const
+{
+	const TrackSegment &seg = getSegment(p_segIndex);
+	return seg.getTrianglePoints()[1];
+}
+
+const CL_Pointf &TrackTriangulator::getLastLeftPoint(int p_segIndex) const
+{
+	const TrackSegment &seg = getSegment(p_segIndex);
+	const std::vector<CL_Pointf> &pts = seg.getTrianglePoints();
+
+	return pts[pts.size() - 1];
+}
+
+const CL_Pointf &TrackTriangulator::getLastRightPoint(int p_segIndex) const
+{
+	const TrackSegment &seg = getSegment(p_segIndex);
+	const std::vector<CL_Pointf> &pts = seg.getTrianglePoints();
+
+	return pts[pts.size() - 2];
+}
+
 } // namespace

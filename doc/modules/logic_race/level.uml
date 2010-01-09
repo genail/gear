@@ -52,7 +52,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Jan 05 22:48:32 CET 2010'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Jan 09 17:42:13 CET 2010'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.28.1(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -369,6 +369,32 @@
                   name = 'return' isSpecification = 'false' kind = 'return'>
                   <UML:Parameter.type>
                     <UML:Class xmi.idref = '127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F10'/>
+                  </UML:Parameter.type>
+                </UML:Parameter>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id = '127-0-1-1--6ad38dd4:12613861c00:-8000:0000000000000F25'
+              name = 'getFirstLeftPoint' visibility = 'public' isSpecification = 'false'
+              ownerScope = 'instance' isQuery = 'false' concurrency = 'sequential' isRoot = 'false'
+              isLeaf = 'false' isAbstract = 'false'>
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id = '127-0-1-1--6ad38dd4:12613861c00:-8000:0000000000000F26'
+                  name = 'return' isSpecification = 'false' kind = 'return'>
+                  <UML:Parameter.type>
+                    <UML:Class xmi.idref = '127-0-1-1-1b050b91:125f3c0b165:-8000:000000000000176E'/>
+                  </UML:Parameter.type>
+                </UML:Parameter>
+              </UML:BehavioralFeature.parameter>
+            </UML:Operation>
+            <UML:Operation xmi.id = '127-0-1-1--6ad38dd4:12613861c00:-8000:0000000000000F27'
+              name = 'getFirtsRightPoint' visibility = 'public' isSpecification = 'false'
+              ownerScope = 'instance' isQuery = 'false' concurrency = 'sequential' isRoot = 'false'
+              isLeaf = 'false' isAbstract = 'false'>
+              <UML:BehavioralFeature.parameter>
+                <UML:Parameter xmi.id = '127-0-1-1--6ad38dd4:12613861c00:-8000:0000000000000F28'
+                  name = 'return' isSpecification = 'false' kind = 'return'>
+                  <UML:Parameter.type>
+                    <UML:Class xmi.idref = '127-0-1-1-1b050b91:125f3c0b165:-8000:000000000000176E'/>
                   </UML:Parameter.type>
                 </UML:Parameter>
               </UML:BehavioralFeature.parameter>
@@ -695,7 +721,7 @@
         x="368"
         y="396"
         width="413"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -711,7 +737,7 @@
         x="368"
         y="410"
         width="209"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -727,7 +753,7 @@
         x="368"
         y="424"
         width="128"
-        height="23"
+        height="20"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -881,7 +907,7 @@
         x="864"
         y="212"
         width="150"
-        height="14"
+        height="17"
         fill="0"
         fillcolor="255 255 200"
         stroke="0"
@@ -1046,7 +1072,7 @@
       fill="1"
       fillcolor="255 255 200"
       stroke="0"
-      strokecolor="0 255 255"
+      strokecolor="black"
     />
     <group name="Fig4.1"
          description="org.argouml.uml.diagram.ui.FigStereotypesGroup[440, 576, 298, 0]"
@@ -1125,7 +1151,7 @@
         width="289"
         height="14"
         fill="0"
-        fillcolor="white"
+        fillcolor="255 255 200"
         stroke="0"
         strokecolor="black"
         textcolor="black"
@@ -1139,9 +1165,9 @@
         x="440"
         y="635"
         width="264"
-        height="20"
+        height="23"
         fill="0"
-        fillcolor="white"
+        fillcolor="255 255 200"
         stroke="0"
         strokecolor="black"
         textcolor="black"
@@ -1191,7 +1217,7 @@
         width="243"
         height="20"
         fill="0"
-        fillcolor="white"
+        fillcolor="255 255 200"
         stroke="0"
         strokecolor="black"
         textcolor="black"
@@ -1233,7 +1259,7 @@
                         offset="25" />
     </private>
     <path name="Fig5.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -1246,7 +1272,7 @@
     </path>
   </group>
   <group name="Fig6"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[944, 576, 246, 71]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[944, 576, 246, 102]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F0C"
        fill="1"
        fillcolor="255 255 200"
@@ -1260,11 +1286,11 @@
       x="944"
       y="576"
       width="246"
-      height="71"
+      height="102"
       fill="1"
       fillcolor="255 255 200"
       stroke="0"
-      strokecolor="0 255 255"
+      strokecolor="black"
     />
     <group name="Fig6.1"
          description="org.argouml.uml.diagram.ui.FigStereotypesGroup[944, 576, 246, 0]"
@@ -1305,7 +1331,7 @@
       justification="Center"
     >+ TrackSegment</text>
     <group name="Fig6.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[944, 620, 246, 26]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[944, 621, 246, 56]"
          href="127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F0C"
          fill="1"
          fillcolor="255 255 200"
@@ -1317,9 +1343,9 @@
       
       <rectangle name="Fig6.3.0"
         x="944"
-        y="620"
+        y="621"
         width="246"
-        height="26"
+        height="56"
         fill="1"
         fillcolor="255 255 200"
         stroke="0"
@@ -1333,15 +1359,31 @@
         strokecolor="black"
       >
         <moveto x="944"
-                y="620" />
+                y="621" />
         <lineto x="1189"
-                y="620" />
+                y="621" />
       </path>
       <text name="Fig6.3.2"
         x="944"
-        y="621"
+        y="622"
         width="246"
-        height="20"
+        height="14"
+        fill="0"
+        fillcolor="255 255 200"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="DejaVu Sans"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >+getTrianglesPoints() : vector&lt;CL_Pointf&gt;</text>
+      <text name="Fig6.3.3"
+        x="944"
+        y="636"
+        width="179"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -1352,10 +1394,26 @@
         bold="false"
         textsize="11"
         justification="Left"
-      >+getTrianglesPoints() : vector&lt;CL_Pointf&gt;</text>
+      >+getFirstLeftPoint() : CL_Pointf</text>
+      <text name="Fig6.3.4"
+        x="944"
+        y="650"
+        width="186"
+        height="23"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="DejaVu Sans"
+        italic="false"
+        bold="false"
+        textsize="11"
+        justification="Left"
+      >+getFirtsRightPoint() : CL_Pointf</text>
     </group>
     <group name="Fig6.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[944, 597, 246, 23]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[944, 597, 246, 24]"
          href="127-0-1-1-510a1f9c:126003c0595:-8000:0000000000000F0C"
          fill="1"
          fillcolor="255 255 200"
@@ -1369,7 +1427,7 @@
         x="944"
         y="597"
         width="246"
-        height="23"
+        height="24"
         fill="1"
         fillcolor="255 255 200"
         stroke="0"
@@ -1393,7 +1451,7 @@
         width="191"
         height="20"
         fill="0"
-        fillcolor="white"
+        fillcolor="255 255 200"
         stroke="0"
         strokecolor="black"
         textcolor="black"
@@ -1408,7 +1466,7 @@
       x="944"
       y="576"
       width="246"
-      height="71"
+      height="102"
       fill="0"
       fillcolor="255 255 200"
       stroke="1"
@@ -1459,7 +1517,7 @@
                         offset="5" />
     </private>
     <path name="Fig7.0"
-      description="org.tigris.gef.presentation.FigPoly"
+      description="org.argouml.gefext.ArgoFigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"

@@ -190,10 +190,10 @@ std::vector<TrackPoint> TrackTriangulatorImpl::toTrackPoints(
 	const int size = static_cast<signed>(p_points.size());
 
 	float pos = 0.0f;
+	int nextIdx;
 
-	for (int i = 1; i < size; ++i) {
-		const CL_Pointf &prev = p_points[i - 1];
-		const CL_Pointf &next = p_points[i];
+	for (int i = 0; i < size; ++i) {
+		const CL_Pointf &prev = p_points[i];
 
 		const float normPos = pos / length;
 
@@ -207,8 +207,14 @@ std::vector<TrackPoint> TrackTriangulatorImpl::toTrackPoints(
 		);
 
 		// update position
-		const CL_Vec2f vec(next - prev);
-		pos += vec.length();
+		nextIdx = i + 1;
+
+		if (nextIdx < size) {
+			const CL_Pointf &next = p_points[nextIdx];
+
+			const CL_Vec2f vec(next - prev);
+			pos += vec.length();
+		}
 	}
 
 	return trackPoints;
@@ -263,6 +269,8 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 		);
 
 		const int curveSize = static_cast<signed>(curvePoints.size());
+		G_ASSERT(static_cast<signed>(trackPoints.size()) == curveSize);
+
 		std::vector<CL_Pointf> triPoints;
 
 		CL_Pointf lastLeftPoint, lastRightPoint;

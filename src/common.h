@@ -118,6 +118,17 @@
 #define G_ASSERT_PERROR(expr) \
 	assert_perror(expr)
 
+// end of line string
+#if defined(WINDOWS)
+#define END_OF_LINE "\r\n"
+#elif defined(UNIX)
+#define END_OF_LINE "\n"
+#elif defined(APPLE)
+#define END_OF_LINE "\r"
+#else
+#error Unsupported platform
+#endif
+
 // log levels
 #define LOG_DEBUG "debug"
 #define LOG_WARN "warning"

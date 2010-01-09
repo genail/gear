@@ -26,87 +26,34 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GuiScene.h"
+#pragma once
 
-#include "common.h"
-#include "gfx/Stage.h"
+#include <ClanLib/core.h>
 
-namespace Gfx {
+class OptionScene;
 
-GuiScene::GuiScene(CL_GUIComponent *p_parent) :
-	CL_GUIComponent(p_parent),
-	m_loaded(false)
-{
-	set_visible(false);
-	set_geometry(CL_Rectf(0.0f, 0.0f, Gfx::Stage::getWidth(), Gfx::Stage::getHeight()));
-}
+class OptionController {
 
-GuiScene::~GuiScene()
-{
-}
+	public:
 
-bool GuiScene::isLoaded() const
-{
-	return m_loaded;
-}
+		OptionController(OptionScene *p_scene);
 
-SceneType GuiScene::getType() const
-{
-	return ST_GUI;
-}
+		virtual ~OptionController();
 
-void GuiScene::setLoaded(bool p_loaded)
-{
-	m_loaded = p_loaded;
-}
+	private:
 
-void GuiScene::draw(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(m_loaded);
-}
+		/** This scene */
+		OptionScene *m_scene;
 
-void GuiScene::inputPressed(const CL_InputEvent &p_event)
-{
-	// empty
-}
+		/** The slot container */
+		CL_SlotContainer m_slots;
 
-void GuiScene::inputReleased(const CL_InputEvent &p_event)
-{
-	// empty
-}
 
-void GuiScene::load(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(!m_loaded);
-	m_loaded = true;
-}
+		// action handlers
 
-void GuiScene::pushed()
-{
-	set_visible(true);
-	set_focus(true);
-}
+        void onOkClicked();
 
-void GuiScene::poped()
-{
-	set_focus(false);
-	set_visible(false);
-}
+        void onCancelClicked();
 
-void GuiScene::setActive(bool p_active)
-{
-	if (p_active) {
-		set_visible(true);
-		set_focus(true);
-	} else {
-		set_focus(false);
-		set_visible(false);
-	}
-}
+};
 
-void GuiScene::update(unsigned p_timeElapsed)
-{
-	G_ASSERT(m_loaded);
-}
-
-}

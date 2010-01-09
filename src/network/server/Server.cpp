@@ -279,7 +279,7 @@ GameState Server::prepareGameState()
 		gamestate.addPlayer(player.m_name, player.m_lastCarState);
 	}
 
-	gamestate.setLevel("resources/level.xml"); // FIXME: How to choose level?
+	gamestate.setLevel("resources/level2.0.xml"); // FIXME: How to choose level?
 
 	return gamestate;
 }

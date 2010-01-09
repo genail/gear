@@ -36,7 +36,7 @@
 #include "common/votetypes.h"
 #include "common/Player.h"
 #include "logic/race/Car.h"
-#include "logic/race/Level.h"
+#include "logic/race/level/Level.h"
 
 namespace Net {
 

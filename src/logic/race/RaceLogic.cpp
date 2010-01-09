@@ -70,32 +70,32 @@ void RaceLogic::updateLevel(unsigned p_timeElapsed)
 
 void RaceLogic::updateCheckpoints()
 {
-	const int carCount = m_level.getCarCount();
-
-
-	for (int i = 0; i < carCount; ++i) {
-		Car &car = m_level.getCar(i);
-
-		const Checkpoint *currentCheckpoint = car.getCurrentCheckpoint() ? car.getCurrentCheckpoint() : m_level.getTrack().getFirst();
-
-		// find next checkpoint
-		bool movingForward, newLap;
-		const Checkpoint *nextCheckpoint = m_level.getTrack().check(car.getPosition(), currentCheckpoint, &movingForward, &newLap);
-
-		// apply to car
-		if (nextCheckpoint != currentCheckpoint) {
-			car.updateCurrentCheckpoint(nextCheckpoint);
-
-			if (!movingForward) {
-				display(_("Wrong way"));
-			}
-
-			if (newLap) {
-				display(_("New lap"));
-			}
-		}
-
-	}
+//	const int carCount = m_level.getCarCount();
+//
+//
+//	for (int i = 0; i < carCount; ++i) {
+//		Car &car = m_level.getCar(i);
+//
+//		const Checkpoint *currentCheckpoint = car.getCurrentCheckpoint() ? car.getCurrentCheckpoint() : m_level.getTrack().getFirst();
+//
+//		// find next checkpoint
+//		bool movingForward, newLap;
+//		const Checkpoint *nextCheckpoint = m_level.getTrack().check(car.getPosition(), currentCheckpoint, &movingForward, &newLap);
+//
+//		// apply to car
+//		if (nextCheckpoint != currentCheckpoint) {
+//			car.updateCurrentCheckpoint(nextCheckpoint);
+//
+//			if (!movingForward) {
+//				display(_("Wrong way"));
+//			}
+//
+//			if (newLap) {
+//				display(_("New lap"));
+//			}
+//		}
+//
+//	}
 }
 
 void RaceLogic::updatePlayersProgress()

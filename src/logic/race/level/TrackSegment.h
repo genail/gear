@@ -29,37 +29,31 @@
 #pragma once
 
 #include <vector>
-#include <assert.h>
 
-#include "Player.h"
-#include "network/client/Client.h"
-#include "logic/race/level/Level.h"
+#include <ClanLib/core.h>
 
-class Game {
+#include "common.h"
+
+namespace Race
+{
+
+class TrackSegment : public boost::noncopyable
+{
 
 	public:
 
-		virtual ~Game();
+		explicit TrackSegment(const std::vector<CL_Pointf> &p_triPoints);
+
+		virtual ~TrackSegment();
 
 
-		static Game &getInstance();
+		const std::vector<CL_Pointf> &getTrianglePoints() const;
 
-		Net::Client &getNetworkConnection();
-
-		Player &getPlayer();
 
 	private:
 
-		Player m_player;
-
-		Net::Client m_client;
-
-		/** Slots containter */
-		CL_SlotContainer m_slots;
-
-
-		Game();
-
-		friend class Application;
+		std::vector<CL_Pointf> m_triPoints;
 };
+
+}
 

@@ -26,40 +26,23 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "TrackSegment.h"
 
-#include <vector>
-#include <assert.h>
+namespace Race
+{
 
-#include "Player.h"
-#include "network/client/Client.h"
-#include "logic/race/level/Level.h"
+TrackSegment::TrackSegment(const std::vector<CL_Pointf> &p_triPoints) :
+		m_triPoints(p_triPoints)
+{
+}
 
-class Game {
+TrackSegment::~TrackSegment()
+{
+}
 
-	public:
+const std::vector<CL_Pointf> &TrackSegment::getTrianglePoints() const
+{
+	return m_triPoints;
+}
 
-		virtual ~Game();
-
-
-		static Game &getInstance();
-
-		Net::Client &getNetworkConnection();
-
-		Player &getPlayer();
-
-	private:
-
-		Player m_player;
-
-		Net::Client m_client;
-
-		/** Slots containter */
-		CL_SlotContainer m_slots;
-
-
-		Game();
-
-		friend class Application;
-};
-
+}

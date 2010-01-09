@@ -28,49 +28,46 @@
 
 #pragma once
 
-#include <vector>
 #include <ClanLib/core.h>
 
-namespace Race {
+namespace Race
+{
 
-class Checkpoint;
+class Track;
+class TrackSegment;
 
-class Track {
+class TrackTriangulatorImpl;
+
+class TrackTriangulator
+{
 
 	public:
 
-		Track();
+		TrackTriangulator();
 
-		virtual ~Track();
-
-
-		void addCheckpointAtPosition(const CL_Pointf &p_position);
-
-		unsigned getCheckpointCount() const;
-
-		const Checkpoint *getCheckpoint(unsigned p_index) const;
-
-		const Checkpoint *getFirst() const;
-
-		void clear();
-
-		/** Closes the track.  */
-		void close();
+		virtual ~TrackTriangulator();
 
 
-		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap) const;
+		/** @return First left side point from selected segment */
+		const CL_Pointf &getFirstLeftPoint(int p_segIndex) const;
+
+		/** @return First right side point from selected segment */
+		const CL_Pointf &getFirstRightPoint(int p_segIndex) const;
+
+		/** @return Last left side point from selected segment */
+		const CL_Pointf &getLastLeftPoint(int p_segIndex) const;
+
+		/** @return Last right side point from selected segment */
+		const CL_Pointf &getLastRightPoint(int p_segIndex) const;
+
+		const TrackSegment &getSegment(int p_index) const;
+
+		void triangulate(const Track &p_track, int p_segment = -1);
+
 
 	private:
 
-		/** Registered checkpoints */
-		typedef std::vector<Checkpoint*> TCheckpointVector;
-		TCheckpointVector m_checkpoints;
-
-		/** Closed track cannot get new checkpoints */
-		bool m_closed;
-
-		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after) const;
-
+		CL_SharedPtr<TrackTriangulatorImpl> m_impl;
 };
 
 }

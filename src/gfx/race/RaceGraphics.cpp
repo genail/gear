@@ -40,14 +40,16 @@
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
 #include "logic/race/Block.h"
-#include "logic/race/Bound.h"
+#include "logic/race/level/Bound.h"
 #include "logic/race/RaceLogic.h"
+#include "logic/race/TyreStripes.h"
 
 namespace Gfx {
 
 RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
 		m_loaded(false),
 		m_logic(p_logic),
+		m_level(p_logic->getLevel()),
 		m_viewport(),
 		m_raceUI(p_logic, &m_viewport)
 {
@@ -66,7 +68,20 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 {
 	G_ASSERT(m_loaded);
 
+	// clear the background
+	CL_Draw::fill(
+			p_gc, 0.0f, 0.0f,
+			Stage::getWidth(), Stage::getHeight(),
+			CL_Colorf::black
+	);
+
 	if (m_logic->getLevel().isLoaded()) {
+
+		// load level graphics when level logic is loaded
+		// FIXME: Maybe I should wait for gamestate in separate scene?
+		if (!m_level.isLoaded()) {
+			m_level.load(p_gc);
+		}
 
 		// initialize player's viewport
 		m_viewport.prepareGC(p_gc);
@@ -120,43 +135,43 @@ void RaceGraphics::loadGroundBlocks(CL_GraphicContext &p_gc)
 
 void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
 {
-	// load decorations
-	const Race::Level &level = m_logic->getLevel();
-	const int w = level.getWidth();
-	const int h = level.getHeight();
-
-	for (int x = 0; x < w; ++x) {
-		for (int y = 0; y < h; ++y) {
-
-			for (int i = 0; i < 3; ++i) {
-				CL_SharedPtr<Gfx::DecorationSprite> decoration(new Gfx::DecorationSprite("race/decorations/grass"));
-
-				const CL_Pointf point(x * Race::Block::WIDTH + rand() % Race::Block::WIDTH, y * Race::Block::WIDTH + rand() % Race::Block::WIDTH);
-				decoration->setPosition(point);
-
-				decoration->load(p_gc);
-
-				m_decorations.push_back(decoration);
-			}
-
-		}
-	}
+//	// load decorations
+//	const Race::Level &level = m_logic->getLevel();
+//	const int w = level.getWidth();
+//	const int h = level.getHeight();
+//
+//	for (int x = 0; x < w; ++x) {
+//		for (int y = 0; y < h; ++y) {
+//
+//			for (int i = 0; i < 3; ++i) {
+//				CL_SharedPtr<Gfx::DecorationSprite> decoration(new Gfx::DecorationSprite("race/decorations/grass"));
+//
+//				const CL_Pointf point(x * Race::Block::WIDTH + rand() % Race::Block::WIDTH, y * Race::Block::WIDTH + rand() % Race::Block::WIDTH);
+//				decoration->setPosition(point);
+//
+//				decoration->load(p_gc);
+//
+//				m_decorations.push_back(decoration);
+//			}
+//
+//		}
+//	}
 }
 
 void RaceGraphics::loadSandPits(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-	const unsigned sandpitCount = level.getSandpitCount();
-
-	for (unsigned i = 0; i < sandpitCount; ++i) {
-		const Race::Sandpit &logicSandpit = level.sandpitAt(i);
-		CL_SharedPtr<Gfx::Sandpit> gfxSandpit(new Gfx::Sandpit(&logicSandpit));
-
-		// load and add to list
-
-		gfxSandpit->load(p_gc);
-		m_sandpits.push_back(gfxSandpit);
-	}
+//	const Race::Level &level = m_logic->getLevel();
+//	const unsigned sandpitCount = level.getSandpitCount();
+//
+//	for (unsigned i = 0; i < sandpitCount; ++i) {
+//		const Race::Sandpit &logicSandpit = level.sandpitAt(i);
+//		CL_SharedPtr<Gfx::Sandpit> gfxSandpit(new Gfx::Sandpit(&logicSandpit));
+//
+//		// load and add to list
+//
+//		gfxSandpit->load(p_gc);
+//		m_sandpits.push_back(gfxSandpit);
+//	}
 }
 
 void RaceGraphics::drawSandpits(CL_GraphicContext &p_gc)
@@ -203,6 +218,9 @@ void RaceGraphics::drawTireTracks(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 {
+	m_level.draw(p_gc);
+
+
 	const Race::Level &level = m_logic->getLevel();
 
 	drawBackBlocks(p_gc);
@@ -211,16 +229,16 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 
 	drawForeBlocks(p_gc);
 
-	// draw bounds
-	const size_t boundCount = level.getBoundCount();
-	Gfx::Bound gfxBound;
-
-	for (size_t i = 0; i < boundCount; ++i) {
-		const Race::Bound &bound = level.getBound(i);
-		gfxBound.setSegment(bound.getSegment());
-
-		gfxBound.draw(p_gc);
-	}
+//	// draw bounds
+//	const size_t boundCount = level.getBoundCount();
+//	Gfx::Bound gfxBound;
+//
+//	for (size_t i = 0; i < boundCount; ++i) {
+//		const Race::Bound &bound = level.getBound(i);
+//		gfxBound.setSegment(bound.getSegment());
+//
+//		gfxBound.draw(p_gc);
+//	}
 
 #if !defined(NDEBUG) && defined(DRAW_CHECKPOINTS)
 
@@ -253,45 +271,45 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawBackBlocks(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-
-	const size_t w = level.getWidth();
-	const size_t h = level.getHeight();
-
-	// draw grass
-	CL_SharedPtr<Gfx::GroundBlock> gfxGrassBlock = m_blockMapping[Common::BT_GRASS];
-
-	for (size_t iw = 0; iw < w; ++iw) {
-		for (size_t ih = 0; ih < h; ++ih) {
-			gfxGrassBlock->setPosition(real(CL_Pointf(iw, ih)));
-			gfxGrassBlock->draw(p_gc);
-
-			// draw grass decoration sprites
-			foreach(CL_SharedPtr<Gfx::DecorationSprite> &decoration, m_decorations) {
-				const CL_Pointf &position = decoration->getPosition();
-
-				if (position.x >= real(iw) && position.x < real(iw) + Race::Block::WIDTH && position.y >= real(ih) && position.y < real(ih) + Race::Block::WIDTH) {
-					decoration->draw(p_gc);
-				}
-			}
-		}
-	}
+//	const Race::Level &level = m_logic->getLevel();
+//
+//	const size_t w = level.getWidth();
+//	const size_t h = level.getHeight();
+//
+//	// draw grass
+//	CL_SharedPtr<Gfx::GroundBlock> gfxGrassBlock = m_blockMapping[Common::BT_GRASS];
+//
+//	for (size_t iw = 0; iw < w; ++iw) {
+//		for (size_t ih = 0; ih < h; ++ih) {
+//			gfxGrassBlock->setPosition(real(CL_Pointf(iw, ih)));
+//			gfxGrassBlock->draw(p_gc);
+//
+//			// draw grass decoration sprites
+//			foreach(CL_SharedPtr<Gfx::DecorationSprite> &decoration, m_decorations) {
+//				const CL_Pointf &position = decoration->getPosition();
+//
+//				if (position.x >= real(iw) && position.x < real(iw) + Race::Block::WIDTH && position.y >= real(ih) && position.y < real(ih) + Race::Block::WIDTH) {
+//					decoration->draw(p_gc);
+//				}
+//			}
+//		}
+//	}
 }
 
 void RaceGraphics::drawForeBlocks(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-
-	const size_t w = level.getWidth();
-	const size_t h = level.getHeight();
-
-	// draw foreground
-
-	for (size_t iw = 0; iw < w; ++iw) {
-		for (size_t ih = 0; ih < h; ++ih) {
-			drawGroundBlock(p_gc, level.getBlock(iw, ih), real(iw), real(ih));
-		}
-	}
+//	const Race::Level &level = m_logic->getLevel();
+//
+//	const size_t w = level.getWidth();
+//	const size_t h = level.getHeight();
+//
+//	// draw foreground
+//
+//	for (size_t iw = 0; iw < w; ++iw) {
+//		for (size_t ih = 0; ih < h; ++ih) {
+//			drawGroundBlock(p_gc, level.getBlock(iw, ih), real(iw), real(ih));
+//		}
+//	}
 }
 
 void RaceGraphics::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y)
@@ -326,7 +344,7 @@ void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	CL_SharedPtr<Gfx::Car> gfxCar;
 
 	if (itor == m_carMapping.end()) {
-		gfxCar = CL_SharedPtr<Gfx::Car>(cl_new Gfx::Car());
+		gfxCar = CL_SharedPtr<Gfx::Car>(new Gfx::Car());
 		gfxCar->load(p_gc);
 
 		m_carMapping[&p_car] = gfxCar;

@@ -26,40 +26,68 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Track.h"
 
-#include <vector>
 #include <assert.h>
 
-#include "Player.h"
-#include "network/client/Client.h"
-#include "logic/race/level/Level.h"
+#include "common.h"
+#include "logic/race/level/Checkpoint.h"
+#include "logic/race/level/TrackPoint.h"
 
-class Game {
+namespace Race {
 
+class TrackImpl
+{
 	public:
 
-		virtual ~Game();
+		typedef std::vector<TrackPoint> TTrackPoints;
 
-
-		static Game &getInstance();
-
-		Net::Client &getNetworkConnection();
-
-		Player &getPlayer();
-
-	private:
-
-		Player m_player;
-
-		Net::Client m_client;
-
-		/** Slots containter */
-		CL_SlotContainer m_slots;
-
-
-		Game();
-
-		friend class Application;
+		TTrackPoints m_trackPoints;
 };
 
+Track::Track() :
+		m_impl(new TrackImpl())
+{
+}
+
+Track::~Track()
+{
+}
+
+void Track::addPoint(
+		const CL_Pointf &p_point,
+		float p_radius,
+		float p_shift,
+		int p_index
+)
+{
+	G_ASSERT(p_index >= 0);
+
+	const TrackPoint trackPoint(p_point, p_radius, p_shift);
+
+	if (p_index >= static_cast<signed>(m_impl->m_trackPoints.size())) {
+		m_impl->m_trackPoints.push_back(trackPoint);
+	} else {
+		TrackImpl::TTrackPoints::iterator itor = m_impl->m_trackPoints.begin();
+		itor += p_index;
+
+		m_impl->m_trackPoints.insert(itor, trackPoint);
+	}
+}
+
+const TrackPoint &Track::getPoint(int p_index) const
+{
+	return m_impl->m_trackPoints[p_index];
+}
+
+int Track::getPointCount() const
+{
+	return m_impl->m_trackPoints.size();
+}
+
+void Track::clear()
+{
+	m_impl->m_trackPoints.clear();
+}
+
+} // namespace

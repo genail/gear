@@ -28,38 +28,55 @@
 
 #pragma once
 
+#include <limits>
 #include <vector>
-#include <assert.h>
+#include <ClanLib/core.h>
 
-#include "Player.h"
-#include "network/client/Client.h"
-#include "logic/race/level/Level.h"
+namespace Race {
 
-class Game {
+class Checkpoint;
+class TrackPoint;
+
+class TrackImpl;
+
+class Track {
 
 	public:
 
-		virtual ~Game();
+		Track();
+
+		virtual ~Track();
 
 
-		static Game &getInstance();
+		void addPoint(
+				const CL_Pointf &p_point,
+				float p_radius,
+				float p_shift,
+				int p_index = std::numeric_limits<int>::max()
+		);
 
-		Net::Client &getNetworkConnection();
+		const TrackPoint &getPoint(int p_index) const;
 
-		Player &getPlayer();
+		int getPointCount() const;
+
+
+//		void addCheckpointAtPosition(const CL_Pointf &p_position);
+
+		void clear();
+
+//		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap) const;
 
 	private:
 
-		Player m_player;
+		CL_SharedPtr<TrackImpl> m_impl;
 
-		Net::Client m_client;
+//		/** Registered checkpoints */
+//		typedef std::vector<Checkpoint*> TCheckpointVector;
+//		TCheckpointVector m_checkpoints;
+//
+//		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after) const;
 
-		/** Slots containter */
-		CL_SlotContainer m_slots;
-
-
-		Game();
-
-		friend class Application;
 };
+
+}
 

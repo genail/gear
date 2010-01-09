@@ -26,40 +26,49 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "TrackPoint.h"
 
-#include <vector>
-#include <assert.h>
+namespace Race {
 
-#include "Player.h"
-#include "network/client/Client.h"
-#include "logic/race/level/Level.h"
-
-class Game {
-
+class TrackPointImpl
+{
 	public:
 
-		virtual ~Game();
+		CL_Pointf m_position;
 
+		float m_radius;
 
-		static Game &getInstance();
+		float m_shift;
 
-		Net::Client &getNetworkConnection();
-
-		Player &getPlayer();
-
-	private:
-
-		Player m_player;
-
-		Net::Client m_client;
-
-		/** Slots containter */
-		CL_SlotContainer m_slots;
-
-
-		Game();
-
-		friend class Application;
+		TrackPointImpl(const CL_Pointf &p_position, float p_radius, float p_shift) :
+			m_position(p_position),
+			m_radius(p_radius),
+			m_shift(p_shift)
+		{}
 };
 
+TrackPoint::TrackPoint(const CL_Pointf &p_position, float p_radius, float p_shift) :
+		m_impl(new TrackPointImpl(p_position, p_radius, p_shift))
+{
+}
+
+TrackPoint::~TrackPoint()
+{
+}
+
+const CL_Pointf &TrackPoint::getPosition() const
+{
+	return m_impl->m_position;
+}
+
+float TrackPoint::getRadius() const
+{
+	return m_impl->m_radius;
+}
+
+float TrackPoint::getShift() const
+{
+	return m_impl->m_shift;
+}
+
+}

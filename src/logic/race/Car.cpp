@@ -35,9 +35,9 @@
 #include "gfx/Stage.h"
 #include "gfx/DebugLayer.h"
 #include "logic/race/Car.h"
-#include "logic/race/Level.h"
-#include "logic/race/Checkpoint.h"
-#include "logic/race/Bound.h"
+#include "logic/race/level/Level.h"
+#include "logic/race/level/Checkpoint.h"
+#include "logic/race/level/Bound.h"
 #include "network/packets/CarState.h"
 
 namespace Race {

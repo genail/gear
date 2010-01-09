@@ -23,16 +23,19 @@ SET(COMMON_SRCS
     network/packets/VoteEnd.cpp
     network/packets/VoteStart.cpp
     network/packets/VoteTick.cpp
+    logic/race/level/Bound.cpp
+    logic/race/level/Checkpoint.cpp
+    logic/race/level/Level.cpp
+    logic/race/level/Sandpit.cpp
+    logic/race/level/Track.cpp
+    logic/race/level/TrackPoint.cpp
+    logic/race/level/TrackSegment.cpp
+    logic/race/level/TrackTriangulator.cpp
     logic/race/Block.cpp
-    logic/race/Bound.cpp
     logic/race/Car.cpp
-    logic/race/Checkpoint.cpp
-    logic/race/Level.cpp
     logic/race/MessageBoard.cpp
     logic/race/RaceLogic.cpp
-    logic/race/Sandpit.cpp
     logic/race/ScoreTable.cpp
-    logic/race/Track.cpp
     logic/race/TyreStripes.cpp
     logic/race/resistance/Circle.cpp
     logic/race/resistance/Geometry.cpp
@@ -61,6 +64,7 @@ SET(CLIENT_SRCS
     gfx/race/level/Car.cpp
     gfx/race/level/DecorationSprite.cpp
     gfx/race/level/GroundBlock.cpp
+    gfx/race/level/Level.cpp
     gfx/race/level/Sandpit.cpp
     gfx/race/level/Smoke.cpp
     gfx/race/level/TireTrack.cpp
@@ -246,6 +250,10 @@ ENDIF (DRAW_CAR_VECTORS)
 IF (DRAW_CHECKPOINTS)
     SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DDRAW_CHECKPOINTS")
 ENDIF (DRAW_CHECKPOINTS)
+
+IF (DRAW_WIREFRAME)
+    SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DDRAW_WIREFRAME")
+ENDIF (DRAW_WIREFRAME)
 
 IF (RACE_SCENE_ONLY)
     SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DRACE_SCENE_ONLY")

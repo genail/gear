@@ -28,38 +28,37 @@
 
 #pragma once
 
-#include <vector>
-#include <assert.h>
+#include <ClanLib/core.h>
 
-#include "Player.h"
-#include "network/client/Client.h"
-#include "logic/race/level/Level.h"
+#include "gfx/Drawable.h"
 
-class Game {
+namespace Race
+{
+	class Level;
+}
 
+namespace Gfx
+{
+
+class LevelImpl;
+
+class Level : public Gfx::Drawable
+{
 	public:
 
-		virtual ~Game();
+		Level(const Race::Level &p_levelLogic);
+
+		virtual ~Level();
 
 
-		static Game &getInstance();
+		virtual void draw(CL_GraphicContext &p_gc);
 
-		Net::Client &getNetworkConnection();
-
-		Player &getPlayer();
+		virtual void load(CL_GraphicContext &p_gc);
 
 	private:
 
-		Player m_player;
-
-		Net::Client m_client;
-
-		/** Slots containter */
-		CL_SlotContainer m_slots;
-
-
-		Game();
-
-		friend class Application;
+		CL_SharedPtr<LevelImpl> m_impl;
 };
+
+} // namespace
 

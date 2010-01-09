@@ -28,13 +28,15 @@
 
 #pragma once
 
-#include <vector>
 #include <map>
+#include <list>
+#include <vector>
+
 #include <ClanLib/core.h>
 
 #include "common.h"
 #include "common/votetypes.h"
-#include "logic/race/Level.h"
+#include "logic/race/level/Level.h"
 #include "logic/race/MessageBoard.h"
 
 class Player;

@@ -28,38 +28,83 @@
 
 #pragma once
 
-#include <vector>
-#include <assert.h>
+#include <ClanLib/core.h>
 
-#include "Player.h"
-#include "network/client/Client.h"
-#include "logic/race/level/Level.h"
+#include "common.h"
 
-class Game {
+namespace Race {
+
+class Block;
+class Bound;
+class Car;
+class Track;
+class TyreStripes;
+
+class LevelImpl;
+
+class Level : public boost::noncopyable
+{
 
 	public:
 
-		virtual ~Game();
+		Level();
+
+		virtual ~Level();
 
 
-		static Game &getInstance();
+		virtual void initialize(const CL_String &p_filename);
 
-		Net::Client &getNetworkConnection();
+		virtual void destroy();
 
-		Player &getPlayer();
+
+		bool isLoaded() const;
+
+		const Track &getTrack() const;
+
+		const TyreStripes &getTyreStripes() const;
+
+
+		void addCar(Car *p_car);
+
+		const Car &getCar(int p_index) const;
+
+		Car &getCar(int p_index);
+
+		int getCarCount() const;
+
+		float getResistance(float p_x, float p_y);
+
+//		int getSandpitCount() const;
+
+		/**
+		 * @return A start position of <code>p_num</code>
+		 */
+		CL_Pointf getStartPosition(int p_num) const;
+
+		void removeCar(Car *p_car);
+
+//		const Sandpit &sandpitAt(unsigned p_index) const;
+
+
+
+
+		// FIXME: Move all update routines to RaceLogic
+		DEPRECATED(void update(unsigned p_timeElapsed));
+
+
+
+
+
+
 
 	private:
 
-		Player m_player;
-
-		Net::Client m_client;
-
-		/** Slots containter */
-		CL_SlotContainer m_slots;
+		CL_SharedPtr<LevelImpl> m_impl;
 
 
-		Game();
+//		/** Collision checking */
+//		void checkCollistions();
 
-		friend class Application;
 };
 
+} // namespace

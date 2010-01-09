@@ -28,38 +28,42 @@
 
 #pragma once
 
-#include <vector>
-#include <assert.h>
+#include <ClanLib/core.h>
 
-#include "Player.h"
-#include "network/client/Client.h"
-#include "logic/race/level/Level.h"
+namespace Race {
 
-class Game {
+class TrackPointImpl;
+
+/**
+ * Control point for track creating.
+ */
+class TrackPoint {
 
 	public:
 
-		virtual ~Game();
+		/**
+		 * @param p_position Position of track point.
+		 * @param p_radius Radius of track at this point in meters.
+		 * @param p_shift Shift of track ( less than 0 is to the left,
+		 * more than 0 to the right)
+		 * @return
+		 */
+		TrackPoint(const CL_Pointf &p_position, float p_radius, float p_shift);
+
+		virtual ~TrackPoint();
 
 
-		static Game &getInstance();
+		const CL_Pointf &getPosition() const;
 
-		Net::Client &getNetworkConnection();
+		float getRadius() const;
 
-		Player &getPlayer();
+		float getShift() const;
+
 
 	private:
 
-		Player m_player;
-
-		Net::Client m_client;
-
-		/** Slots containter */
-		CL_SlotContainer m_slots;
-
-
-		Game();
-
-		friend class Application;
+		CL_SharedPtr<TrackPointImpl> m_impl;
 };
+
+}
 

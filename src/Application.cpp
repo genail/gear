@@ -50,7 +50,7 @@
 #include "gfx/race/ui/RaceUI.h"
 #include "network/client/Client.h"
 #include "gfx/scenes/MainMenuScene.h"
-#include "logic/race/Level.h"
+#include "logic/race/level/Level.h"
 
 
 #if defined(RACE_SCENE_ONLY)

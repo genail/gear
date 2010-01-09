@@ -697,4 +697,9 @@ bool Level::isLoaded() const
 	return m_impl->m_loaded;
 }
 
+const Track &Level::getTrack() const
+{
+	return m_impl->m_track;
+}
+
 } // namespace

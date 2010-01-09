@@ -34,6 +34,7 @@ namespace Race
 {
 
 class Track;
+class TrackSegment;
 
 class TrackTriangulatorImpl;
 
@@ -46,6 +47,8 @@ class TrackTriangulator
 
 		virtual ~TrackTriangulator();
 
+
+		const TrackSegment &getSegment(int p_index) const;
 
 		void triangulate(const Track &p_track, int p_segment = -1);
 

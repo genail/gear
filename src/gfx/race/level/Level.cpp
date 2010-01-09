@@ -26,85 +26,72 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Level.h"
 
-#include <ClanLib/core.h>
+#include "logic/race/level/Level.h"
+#include "logic/race/level/Track.h"
+#include "logic/race/level/TrackTriangulator.h"
+#include "logic/race/level/TrackSegment.h"
 
-#include "common.h"
-
-namespace Race {
-
-class Block;
-class Bound;
-class Car;
-class Track;
-class TyreStripes;
-
-class LevelImpl;
-
-class Level : public boost::noncopyable
+namespace Gfx
 {
 
+class LevelImpl
+{
 	public:
 
-		Level();
-
-		virtual ~Level();
-
-
-		virtual void initialize(const CL_String &p_filename);
-
-		virtual void destroy();
+		LevelImpl(const Race::Level &p_levelLogic) :
+				m_levelLogic(p_levelLogic)
+		{
+			// empty
+		}
 
 
-		bool isLoaded() const;
-
-		const Track &getTrack() const;
-
-		const TyreStripes &getTyreStripes() const;
+		void drawTriangles(CL_GraphicContext &p_gc);
 
 
-		void addCar(Car *p_car);
+		const Race::Level &m_levelLogic;
 
-		const Car &getCar(int p_index) const;
-
-		Car &getCar(int p_index);
-
-		int getCarCount() const;
-
-		float getResistance(float p_x, float p_y);
-
-//		int getSandpitCount() const;
-
-		/**
-		 * @return A start position of <code>p_num</code>
-		 */
-		CL_Pointf getStartPosition(int p_num) const;
-
-		void removeCar(Car *p_car);
-
-//		const Sandpit &sandpitAt(unsigned p_index) const;
-
-
-
-
-		// FIXME: Move all update routines to RaceLogic
-		DEPRECATED(void update(unsigned p_timeElapsed));
-
-
-
-
-
-
-
-	private:
-
-		CL_SharedPtr<LevelImpl> m_impl;
-
-
-//		/** Collision checking */
-//		void checkCollistions();
-
+		Race::TrackTriangulator m_triangulator;
 };
+
+Level::Level(const Race::Level &p_levelLogic) :
+		m_impl(new LevelImpl(p_levelLogic))
+{
+	// empty
+}
+
+Level::~Level()
+{
+	// empty
+}
+
+void Level::draw(CL_GraphicContext &p_gc)
+{
+}
+
+void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
+{
+	const Race::Track &track = m_levelLogic.getTrack();
+	const int pointCount = track.getPointCount();
+
+	for (int i = 0; i < pointCount; ++i) {
+		m_triangulator.getSegment(i);
+	}
+}
+
+void Level::load(CL_GraphicContext &p_gc)
+{
+	Drawable::load(p_gc);
+
+	// triangulate loaded track
+	const Race::Track &track = m_impl->m_levelLogic.getTrack();
+	const int pointCount = track.getPointCount();
+
+	for (int i = 0; i < pointCount; ++i) {
+		m_impl->m_triangulator.triangulate(track, i);
+	}
+
+}
 
 } // namespace

@@ -317,4 +317,14 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 
 }
 
+const TrackSegment &TrackTriangulator::getSegment(int p_index) const
+{
+	TrackTriangulatorImpl::TIntSegmentMap::const_iterator itor =
+			m_impl->m_intSegMap.find(p_index);
+
+	G_ASSERT(itor != m_impl->m_intSegMap.end());
+
+	return *(itor->second);
+}
+
 } // namespace

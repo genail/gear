@@ -28,6 +28,8 @@
 
 #include "Level.h"
 
+#include <vector>
+
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackTriangulator.h"
@@ -49,6 +51,11 @@ class LevelImpl
 
 		void drawTriangles(CL_GraphicContext &p_gc);
 
+		void drawTriangle(
+				CL_GraphicContext &p_gc,
+				const CL_Pointf& p_a, const CL_Pointf& p_b, const CL_Pointf& p_c
+		);
+
 
 		const Race::Level &m_levelLogic;
 
@@ -68,16 +75,39 @@ Level::~Level()
 
 void Level::draw(CL_GraphicContext &p_gc)
 {
+	m_impl->drawTriangles(p_gc);
 }
 
 void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
 {
 	const Race::Track &track = m_levelLogic.getTrack();
-	const int pointCount = track.getPointCount();
+	const int trackPointCount = track.getPointCount();
 
-	for (int i = 0; i < pointCount; ++i) {
-		m_triangulator.getSegment(i);
+	for (int i = 0; i < trackPointCount; ++i) {
+		const Race::TrackSegment &seg = m_triangulator.getSegment(i);
+		const std::vector<CL_Pointf> &points = seg.getTrianglePoints();
+
+		const int triPointCount = static_cast<signed>(points.size());
+		G_ASSERT(triPointCount % 3 == 0);
+
+		for (int j = 0; j < triPointCount;) {
+			const CL_Pointf &p1 = points[j++];
+			const CL_Pointf &p2 = points[j++];
+			const CL_Pointf &p3 = points[j++];
+
+			drawTriangle(p_gc, p1, p2, p3);
+		}
 	}
+}
+
+void LevelImpl::drawTriangle(
+		CL_GraphicContext &p_gc,
+		const CL_Pointf& p_a, const CL_Pointf& p_b, const CL_Pointf& p_c
+)
+{
+	CL_Draw::line(p_gc, p_a, p_b, CL_Colorf::green);
+	CL_Draw::line(p_gc, p_b, p_c, CL_Colorf::green);
+	CL_Draw::line(p_gc, p_a, p_c, CL_Colorf::green);
 }
 
 void Level::load(CL_GraphicContext &p_gc)

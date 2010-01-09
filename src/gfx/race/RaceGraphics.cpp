@@ -49,6 +49,7 @@ namespace Gfx {
 RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
 		m_loaded(false),
 		m_logic(p_logic),
+		m_level(p_logic->getLevel()),
 		m_viewport(),
 		m_raceUI(p_logic, &m_viewport)
 {
@@ -66,6 +67,13 @@ RaceGraphics::~RaceGraphics()
 void RaceGraphics::draw(CL_GraphicContext &p_gc)
 {
 	G_ASSERT(m_loaded);
+
+	// clear the background
+	CL_Draw::fill(
+			p_gc, 0.0f, 0.0f,
+			Stage::getWidth(), Stage::getHeight(),
+			CL_Colorf::black
+	);
 
 	if (m_logic->getLevel().isLoaded()) {
 
@@ -98,6 +106,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 
 void RaceGraphics::load(CL_GraphicContext &p_gc)
 {
+	m_level.load(p_gc);
 	m_raceUI.load(p_gc);
 	loadGroundBlocks(p_gc);
 	loadDecorations(p_gc);
@@ -204,6 +213,9 @@ void RaceGraphics::drawTireTracks(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 {
+	m_level.draw(p_gc);
+
+
 	const Race::Level &level = m_logic->getLevel();
 
 	drawBackBlocks(p_gc);

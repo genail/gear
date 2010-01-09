@@ -29,11 +29,13 @@
 #pragma once
 
 #include <list>
+
 #include <ClanLib/display.h>
 
 #include "common/GroundBlockType.h"
-#include "gfx/race/ui/RaceUI.h"
 #include "gfx/Viewport.h"
+#include "gfx/race/level/Level.h"
+#include "gfx/race/ui/RaceUI.h"
 
 namespace Race {
 	class Block;
@@ -69,6 +71,9 @@ class RaceGraphics {
 
 		/** Logic with data for reading only */
 		const Race::RaceLogic *m_logic;
+
+		/** Level graphics */
+		Gfx::Level m_level;
 
 		/** How player sees the scene */
 		Gfx::Viewport m_viewport;

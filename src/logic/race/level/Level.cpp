@@ -258,7 +258,7 @@ void LevelImpl::loadTrackElement(const CL_DomNode &p_trackNode)
 			const float modifier = blockNode.select_float("@modifier");
 
 			cl_log_event(LOG_DEBUG, "Loaded track point %1 x %2, rad = %3, mod = %4", x, y, radius, modifier);
-			m_track.addPoint(CL_Pointf(x, y), radius, modifier);
+			m_track.addPoint(real(CL_Pointf(x, y)), real(radius), modifier);
 		} else {
 			cl_log_event(LOG_WARN, "Unknown element in <track>: %1", blockNode.get_node_name());
 		}
@@ -664,12 +664,12 @@ void Level::update(unsigned p_timeElapsed)
 
 CL_Pointf LevelImpl::real(const CL_Pointf &p_point) const
 {
-	return p_point;
+	return CL_Pointf(p_point.x * 30.0f, p_point.y * 30.0f);
 }
 
 float LevelImpl::real(float p_coord) const
 {
-	return p_coord;
+	return p_coord * 30.0f;
 }
 
 int Level::getCarCount() const

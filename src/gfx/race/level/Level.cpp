@@ -116,9 +116,13 @@ void LevelImpl::drawTriangle(
 		const CL_Pointf& p_a, const CL_Pointf& p_b, const CL_Pointf& p_c
 )
 {
-	CL_Draw::line(p_gc, p_a, p_b, CL_Colorf::green);
-	CL_Draw::line(p_gc, p_b, p_c, CL_Colorf::green);
-	CL_Draw::line(p_gc, p_a, p_c, CL_Colorf::green);
+	CL_Draw::triangle(p_gc, p_a, p_b, p_c, CL_Colorf::gray);
+
+#if !defined(NDEBUG) && defined(DRAW_WIREFRAME)
+	CL_Draw::line(p_gc, p_a, p_b, CL_Colorf::purple);
+	CL_Draw::line(p_gc, p_b, p_c, CL_Colorf::purple);
+	CL_Draw::line(p_gc, p_a, p_c, CL_Colorf::purple);
+#endif
 }
 
 void Level::load(CL_GraphicContext &p_gc)

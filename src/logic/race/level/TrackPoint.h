@@ -34,10 +34,20 @@ namespace Race {
 
 class TrackPointImpl;
 
+/**
+ * Control point for track creating.
+ */
 class TrackPoint {
 
 	public:
 
+		/**
+		 * @param p_position Position of track point.
+		 * @param p_radius Radius of track at this point in meters.
+		 * @param p_shift Shift of track ( less than 0 is to the left,
+		 * more than 0 to the right)
+		 * @return
+		 */
 		TrackPoint(const CL_Pointf &p_position, float p_radius, float p_shift);
 
 		virtual ~TrackPoint();

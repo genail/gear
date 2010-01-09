@@ -48,12 +48,16 @@ class TrackTriangulator
 		virtual ~TrackTriangulator();
 
 
+		/** @return First left side point from selected segment */
 		const CL_Pointf &getFirstLeftPoint(int p_segIndex) const;
 
+		/** @return First right side point from selected segment */
 		const CL_Pointf &getFirstRightPoint(int p_segIndex) const;
 
+		/** @return Last left side point from selected segment */
 		const CL_Pointf &getLastLeftPoint(int p_segIndex) const;
 
+		/** @return Last right side point from selected segment */
 		const CL_Pointf &getLastRightPoint(int p_segIndex) const;
 
 		const TrackSegment &getSegment(int p_index) const;

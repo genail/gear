@@ -74,8 +74,6 @@ class Level : public boost::noncopyable
 
 		float getResistance(float p_x, float p_y);
 
-//		int getSandpitCount() const;
-
 		/**
 		 * @return A start position of <code>p_num</code>
 		 */
@@ -83,27 +81,14 @@ class Level : public boost::noncopyable
 
 		void removeCar(Car *p_car);
 
-//		const Sandpit &sandpitAt(unsigned p_index) const;
-
-
-
 
 		// FIXME: Move all update routines to RaceLogic
 		DEPRECATED(void update(unsigned p_timeElapsed));
 
 
-
-
-
-
-
 	private:
 
 		CL_SharedPtr<LevelImpl> m_impl;
-
-
-//		/** Collision checking */
-//		void checkCollistions();
 
 };
 

@@ -92,7 +92,7 @@ void Properties::save()
 		CL_String line;
 
 		foreach(pair, m_keyValueMap) {
-			line = cl_format("%1 = %2\n", pair.first, pair.second);
+			line = cl_format("%1 = %2%3", pair.first, pair.second, END_OF_LINE);
 			file.write(line.c_str(), line.length());
 
 			cl_log_event(LOG_DEBUG, "Option '%1' saved with value '%2'", pair.first, pair.second);

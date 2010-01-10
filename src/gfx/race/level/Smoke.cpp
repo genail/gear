@@ -51,7 +51,7 @@ void Smoke::start()
 	m_alpha.animate(0.1f, 0.3f, 500, Math::Easing::NONE, 0);
 	m_alpha.animate(0.3f, 0.0f, 5500, Math::Easing::NONE, 500);
 
-	m_size.animate(0.15f, 1.0f, 6000);
+	m_size.animate(0.3f, 2.0f, 6000);
 }
 
 void Smoke::update(unsigned p_timeElapsed)

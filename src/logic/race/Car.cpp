@@ -142,20 +142,21 @@ void Car::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad)
 
 void Car::update1_60() {
 	
-	static const float BRAKE_POWER = 0.05f;
-	static const float ACCEL_POWER = 0.07f;
+	static const float BRAKE_POWER = 0.1f;
+	static const float ACCEL_POWER = 0.14f;
 	static const float WHEEL_TURN_SPEED = 1.0f / 10.0f;
 	static const float TURN_POWER  = (2 * CL_PI / 360.0f) * 2.5f;
 	static const float MOV_ALIGN_POWER = TURN_POWER / 2.0f;
 	static const float ROT_ALIGN_POWER = TURN_POWER * 0.7f;
-	static const float AIR_RESITANCE = 0.005f; // per one speed unit
+	static const float AIR_RESITANCE = 0.01f; // per one speed unit
+	static const float DRIFT_SPEED_REDUCTION_RATE = 0.1f;
 
 	// speed limit under what physics angle reduction will be more aggressive
-	static const float LOWER_SPEED_ANGLE_REDUCTION = 3.0f;
+	static const float LOWER_SPEED_ANGLE_REDUCTION = 6.0f;
 	// speed limit under what angle difference will be lower than normal
-	static const float LOWER_SPEED_ROTATION_REDUCTION = 3.0f;
+	static const float LOWER_SPEED_ROTATION_REDUCTION = 6.0f;
 	// speed limit under what turn power will decrease
-	static const float LOWER_SPEED_TURN_REDUCTION = 1.0f;
+	static const float LOWER_SPEED_TURN_REDUCTION = 2.0f;
 
 	// don't do anything if car is locked
 	if (m_inputLocked) {
@@ -240,9 +241,9 @@ void Car::update1_60() {
 		CL_Angle diffAngleNorm = diffAngle;
 		normalizeAngle180(diffAngleNorm);
 
-		// 0.0 when goin straight, 1.0 when 90 deg, > 1.0 when more than 90 deg
+		// 0.0 when going straight, 1.0 when 90 deg, > 1.0 when more than 90 deg
 		const float angleRate = fabs(1.0f - (fabs(diffAngleNorm.to_degrees()) - 90.0f) / 90.0f);
-		const float speedReduction = -0.05f * angleRate;
+		const float speedReduction = -DRIFT_SPEED_REDUCTION_RATE * angleRate;
 
 		if (absSpeed > speedReduction) {
 			m_speed += m_speed > 0.0f ? speedReduction : -speedReduction;
@@ -489,14 +490,19 @@ float Car::getSpeed() const
 
 float Car::getSpeedKMS() const
 {
-	// m_speed - pixels per iteration
-	// 4 - length of avarage car in meters
-	// 50 - length of avarage car in pixels
-	// 60 - one second
-	// 60 * 60 - one minute
-	// 60 * 60 * 60 - one hour
-	// / 1000 - to kmh
-	return m_speed * (4 / 50.0f) * 60 * 60 * 60 / 1000;
+//	// m_speed - pixels per iteration
+//	// 4 - length of avarage car in meters
+//	// 25 - length of avarage car in pixels
+//	// 60 - one second
+//	// 60 * 60 - one minute
+//	// 60 * 60 * 60 - one hour
+//	// / 1000 - to kmh
+//	return m_speed * (4 / 25.0f) * 60 * 60 * 60 / 1000;
+
+	const float m_f =  m_speed / 15.0; // m / frame
+	const float m_s = m_f * 60.0f; // m / s
+	const float m_h = m_s * 3600.0; // m / h
+	return m_h / 1000.0; // km / h
 }
 
 void Car::setAcceleration(bool p_value)

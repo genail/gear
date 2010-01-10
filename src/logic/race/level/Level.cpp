@@ -78,8 +78,8 @@ class RoadPoint : public CL_Pointf
 {
 	public:
 
-		RoadPoint(float x, float y, float p_modifier = 0.0f) :
-			CL_Pointf(x, y),
+		RoadPoint(float p_x, float p_y, float p_modifier = 0.0f) :
+			CL_Pointf(p_x, p_y),
 			m_modifier(p_modifier)
 		{}
 

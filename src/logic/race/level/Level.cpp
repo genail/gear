@@ -136,17 +136,21 @@ class LevelImpl
 			m_loaded(false)
 			{}
 
+		CL_SharedPtr<RaceResistance::Geometry> buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const;
+
+
 		// level loading
 
-		void loadMetaElement(const CL_DomNode &p_metaNode);
+		void loadMetaEl(const CL_DomNode &p_metaNode);
 
-		void loadTrackElement(const CL_DomNode &p_trackNode);
+		void loadTrackEl(const CL_DomNode &p_trackNode);
 
-		void loadBoundsElement(const CL_DomNode &p_boundsNode);
+		void loadBoundsEl(const CL_DomNode &p_boundsNode);
 
-//		void loadSandElement(const CL_DomNode &p_sandNode);
 
-		CL_SharedPtr<RaceResistance::Geometry> buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const;
+		// saving
+
+		void saveTrackEl(CL_DomDocument &p_doc, CL_DomNode &p_trackNode);
 
 
 		// helpers
@@ -154,6 +158,10 @@ class LevelImpl
 		CL_Pointf real(const CL_Pointf &p_point) const;
 
 		float real(float p_coord) const;
+
+		CL_Pointf ireal(const CL_Pointf &p_point) const;
+
+		float ireal(float p_coord) const;
 
 
 };
@@ -210,7 +218,7 @@ void Level::load(const CL_String& p_filename)
 
 		// load meta element
 		const CL_DomNode metaNode = root.named_item("meta");
-		m_impl->loadMetaElement(metaNode);
+		m_impl->loadMetaEl(metaNode);
 
 		// gets level's content
 		const CL_DomNode contentNode = root.named_item("content");
@@ -221,34 +229,29 @@ void Level::load(const CL_String& p_filename)
 
 		// load track
 		const CL_DomNode trackNode = contentNode.named_item("track");
-		m_impl->loadTrackElement(trackNode);
+		m_impl->loadTrackEl(trackNode);
 
 		// load track bounds
 		const CL_DomNode boundsNode = contentNode.named_item("bounds");
-		m_impl->loadBoundsElement(boundsNode);
+		m_impl->loadBoundsEl(boundsNode);
 
 		file.close();
 
 		cl_log_event(LOG_DEBUG, "level loaded");
 		m_impl->m_loaded = true;
 
-	} catch (CL_Exception e) {
-		CL_Console::write_line(e.message);
+	} catch (CL_Exception &e) {
+		cl_log_event(LOG_ERROR, "cannot load level '%1': %2", p_filename, e.message);
 	}
 
 }
 
-void Level::save(const CL_String &p_filename)
-{
-
-}
-
-void LevelImpl::loadMetaElement(const CL_DomNode &p_metaNode)
+void LevelImpl::loadMetaEl(const CL_DomNode &p_metaNode)
 {
 	// TODO
 }
 
-void LevelImpl::loadTrackElement(const CL_DomNode &p_trackNode)
+void LevelImpl::loadTrackEl(const CL_DomNode &p_trackNode)
 {
 	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
 	const int blockListSize = blockList.get_length();
@@ -260,7 +263,7 @@ void LevelImpl::loadTrackElement(const CL_DomNode &p_trackNode)
 			const float x = blockNode.select_float("@x");
 			const float y = blockNode.select_float("@y");
 			const float radius = blockNode.select_float("@radius");
-			const float modifier = blockNode.select_float("@modifier");
+			const float modifier = blockNode.select_float("@shift");
 
 			cl_log_event(LOG_DEBUG, "Loaded track point %1 x %2, rad = %3, mod = %4", x, y, radius, modifier);
 			m_track.addPoint(real(CL_Pointf(x, y)), real(radius), modifier);
@@ -341,7 +344,7 @@ CL_SharedPtr<RaceResistance::Geometry> LevelImpl::buildResistanceGeometry(int p_
 	return geom;
 }
 
-void LevelImpl::loadBoundsElement(const CL_DomNode &p_boundsNode)
+void LevelImpl::loadBoundsEl(const CL_DomNode &p_boundsNode)
 {
 //	const CL_DomNodeList boundList = p_boundsNode.get_child_nodes();
 //	const int boundListSize = boundList.get_length();
@@ -370,6 +373,61 @@ void LevelImpl::loadBoundsElement(const CL_DomNode &p_boundsNode)
 //			cl_log_event("race", "Unknown node '%1', ignoring", boundNode.get_node_name());
 //		}
 //	}
+}
+
+void Level::save(const CL_String &p_filename)
+{
+	CL_File file;
+
+	try {
+
+		CL_DomDocument document;
+
+		CL_DomElement root = document.create_element("level");
+		document.append_child(root);
+
+		CL_DomElement content = document.create_element("content");
+		root.append_child(content);
+
+		CL_DomElement track = document.create_element("track");
+		content.append_child(track);
+
+		m_impl->saveTrackEl(document, track);
+
+		// save to file
+		file = CL_File(p_filename, CL_File::create_always, CL_File::access_write);
+		document.save(file, true);
+
+		cl_log_event(LOG_DEBUG, "level '%1' saved", p_filename);
+
+	} catch (CL_Exception &e) {
+		cl_log_event(LOG_ERROR, "cannot save level '%1': %2", p_filename, e.message);
+	}
+
+	if (!file.is_null()) {
+		file.close();
+	}
+}
+
+void LevelImpl::saveTrackEl(CL_DomDocument &p_doc, CL_DomNode &p_trackNode)
+{
+	const int count = m_track.getPointCount();
+
+	CL_DomElement pointEl;
+	CL_DomAttr xAttr, yAttr, radiusAttr, shiftAttr;
+
+	for (int i = 0; i < count; ++i) {
+		const TrackPoint &point = m_track.getPoint(i);
+		const CL_Pointf &pos = point.getPosition();
+
+		pointEl = p_doc.create_element("point");
+		p_trackNode.append_child(pointEl);
+
+		pointEl.set_attribute("x", CL_StringHelp::float_to_local8(ireal(pos.x)));
+		pointEl.set_attribute("y", CL_StringHelp::float_to_local8(ireal(pos.y)));
+		pointEl.set_attribute("radius", CL_StringHelp::float_to_local8(ireal(point.getRadius())));
+		pointEl.set_attribute("shift", CL_StringHelp::float_to_local8(point.getShift()));
+	}
 }
 
 float Level::getResistance(float p_realX, float p_realY)
@@ -427,6 +485,16 @@ CL_Pointf LevelImpl::real(const CL_Pointf &p_point) const
 float LevelImpl::real(float p_coord) const
 {
 	return p_coord * 15.0f;
+}
+
+CL_Pointf LevelImpl::ireal(const CL_Pointf &p_point) const
+{
+	return CL_Pointf(p_point.x / 15.0f, p_point.y / 15.0f);
+}
+
+float LevelImpl::ireal(float p_coord) const
+{
+	return p_coord / 15.0f;
 }
 
 int Level::getCarCount() const

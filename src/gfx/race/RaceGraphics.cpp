@@ -397,21 +397,25 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 
 void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 {
-	static const float ZOOM_SPEED = 0.005f;
-	static const float MAX_SPEED = 500.0f; // FIXME
+	static const float MIN_SCALE = 0.5f;
+	static const float MAX_SCALE = 1.0f;
+	static const float MAX_SPEED = 5.0f;
 
-	float speed = fabs( ceil(Game::getInstance().getPlayer().getCar().getSpeed() * 500.0f ) / 10.0f);
+	float speed = Game::getInstance().getPlayer().getCar().getSpeed();
 
-	float properScale = -( 1.0f / MAX_SPEED ) * speed + 2.0f;
-	properScale = ceil( properScale * 100.0f ) / 100.0f;
-
-	float scale =  m_viewport.getScale();
-
-	if( properScale > scale ) {
-		m_viewport.setScale( scale + ZOOM_SPEED );
-	} else if ( properScale < scale ){
-		m_viewport.setScale( scale - ZOOM_SPEED );
+	if (speed > MAX_SPEED) {
+		speed = MAX_SPEED;
 	}
+
+	const float scale = m_viewport.getScale();
+
+	const float speedT = speed / MAX_SPEED;
+	float targetScale = MAX_SCALE + speedT * (MIN_SCALE - MAX_SCALE);
+
+	const float nextScale = scale + (targetScale - scale) / 100.0f;
+
+	m_viewport.setScale(nextScale);
+
 
 
 #ifndef NDEBUG

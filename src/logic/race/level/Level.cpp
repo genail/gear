@@ -479,22 +479,22 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 
 CL_Pointf LevelImpl::real(const CL_Pointf &p_point) const
 {
-	return CL_Pointf(p_point.x * 15.0f, p_point.y * 15.0f);
+	return CL_Pointf(p_point.x * 20.0f, p_point.y * 20.0f);
 }
 
 float LevelImpl::real(float p_coord) const
 {
-	return p_coord * 15.0f;
+	return p_coord * 20.0f;
 }
 
 CL_Pointf LevelImpl::ireal(const CL_Pointf &p_point) const
 {
-	return CL_Pointf(p_point.x / 15.0f, p_point.y / 15.0f);
+	return CL_Pointf(p_point.x / 20.0f, p_point.y / 20.0f);
 }
 
 float LevelImpl::ireal(float p_coord) const
 {
-	return p_coord / 15.0f;
+	return p_coord / 20.0f;
 }
 
 int Level::getCarCount() const

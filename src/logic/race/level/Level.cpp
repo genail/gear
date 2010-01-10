@@ -464,16 +464,7 @@ const Track &Level::getTrack() const
 
 void Level::setTrack(const Track &p_track)
 {
-	m_impl->m_track.clear();
-	const int size = p_track.getPointCount();
-
-	for (int i = 0; i < size; ++i) {
-		const TrackPoint &p_point = p_track.getPoint(i);
-
-		m_impl->m_track.addPoint(
-				p_point.getPosition(), p_point.getRadius(), p_point.getShift()
-		);
-	}
+	m_impl->m_track = p_track;
 }
 
 } // namespace

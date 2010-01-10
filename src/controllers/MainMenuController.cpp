@@ -34,12 +34,14 @@
 #include "gfx/scenes/RaceScene.h"
 #include "gfx/scenes/OptionsScene.h"
 #include "gfx/scenes/AuthorsScene.h"
+#include "gfx/scenes/EditorScene.h"
 
 MainMenuController::MainMenuController(MainMenuScene *p_scene) :
 	m_scene(p_scene),
 	m_raceScene(new RaceScene(p_scene->get_parent_component())),
     m_optionScene(new OptionScene(p_scene->get_parent_component())),
-	m_authorsScene(new AuthorsScene(p_scene->get_parent_component()))
+	m_authorsScene(new AuthorsScene(p_scene->get_parent_component())),
+	m_editorScene(new EditorScene(p_scene->get_parent_component()))
 {
 	m_slots.connect(m_scene->sig_startRaceClicked(), this, &MainMenuController::onRaceStartClicked);
 	m_slots.connect(m_scene->sig_quitClicked(), this, &MainMenuController::onQuitClicked);
@@ -52,6 +54,8 @@ MainMenuController::~MainMenuController()
 {
 	delete m_raceScene;
     delete m_optionScene;
+	delete m_authorsScene;
+	delete m_editorScene;
 }
 
 
@@ -111,5 +115,5 @@ void MainMenuController::onAuthorsClicked()
 
 void MainMenuController::onEditorClicked()
 {
-	Gfx::Stage::popScene();
+	Gfx::Stage::pushScene(m_editorScene);
 }

@@ -71,4 +71,19 @@ float TrackPoint::getShift() const
 	return m_impl->m_shift;
 }
 
+void TrackPoint::setPosition(const CL_Pointf &p_pos)
+{
+	m_impl->m_position = p_pos;
+}
+
+void TrackPoint::setRadius(float p_radius)
+{
+	m_impl->m_radius = p_radius;
+}
+
+void TrackPoint::setShift(float p_shift)
+{
+	m_impl->m_shift = p_shift;
+}
+
 }

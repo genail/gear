@@ -48,16 +48,16 @@ class LoopVector : public std::vector<T>
 	public:
 
 		T &operator[] (int p_index) {
-			return std::vector<T>::operator[](norm(p_index));
+			return std::vector<T>::operator[](clamp(p_index));
 		}
 
 		const T &operator[] (int p_index) const {
-			return std::vector<T>::operator[](norm(p_index));
+			return std::vector<T>::operator[](clamp(p_index));
 		}
 
 	private:
 
-		int norm(int p_index) const {
+		int clamp(int p_index) const {
 			const int s = static_cast<signed> (std::vector<T>::size());
 
 			if (p_index >= 0 && p_index < s) {

@@ -32,6 +32,11 @@
 #include <vector>
 #include <ClanLib/core.h>
 
+// shitty Visual C++ hack to get numeric_limits<>::max() to work
+#ifdef max
+#undef max
+#endif
+
 namespace Race {
 
 class Checkpoint;

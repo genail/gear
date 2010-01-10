@@ -46,19 +46,19 @@ class AuthorsScene : public Gfx::GuiScene
 
 	private:
 
-		bool isDown;
+		bool m_isDown;
 
-		bool isRight;
+		bool m_isRight;
 		
-		int max;
+		int m_max;
 
 		CL_Timer m_timer;
 
-		CL_Font typeFont;
+		CL_Font m_typeFont;
 
-		CL_Font authorsFont;
+		CL_Font m_authorsFont;
 		
-		CL_Colorf fontColor;
+		CL_Colorf m_fontColor;
 
 		// scene controller
 
@@ -88,5 +88,5 @@ class AuthorsScene : public Gfx::GuiScene
 
 		void onTimerInterval();
 
-		void ChangeLabelPosition(CL_Label* p_label, int p_changeTop, int p_changeLeft);
+		void changeLabelPosition(CL_Label* p_label, int p_changeTop, int p_changeLeft);
 };

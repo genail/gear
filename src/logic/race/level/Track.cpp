@@ -63,7 +63,7 @@ void Track::addPoint(
 {
 	G_ASSERT(p_index >= 0);
 
-	const TrackPoint trackPoint(p_point, p_radius, p_shift);
+	TrackPoint trackPoint(p_point, p_radius, p_shift);
 
 	if (p_index >= static_cast<signed>(m_impl->m_trackPoints.size())) {
 		m_impl->m_trackPoints.push_back(trackPoint);

@@ -197,14 +197,14 @@ std::vector<TrackPoint> TrackTriangulatorImpl::toTrackPoints(
 
 		const float normPos = pos / length;
 
-		// add track point with proper radius and shift interpolation
-		trackPoints.push_back(
-				TrackPoint(
-						prev,
-						interpolate(normPos, p_prevRadius, p_nextRadius),
-						interpolate(normPos, p_prevShift, p_nextShift)
-				)
+		TrackPoint trackPoint(
+				prev,
+				interpolate(normPos, p_prevRadius, p_nextRadius),
+				interpolate(normPos, p_prevShift, p_nextShift)
 		);
+
+		// add track point with proper radius and shift interpolation
+		trackPoints.push_back(trackPoint);
 
 		// update position
 		nextIdx = i + 1;

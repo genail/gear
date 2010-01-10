@@ -30,6 +30,7 @@
 
 #include <limits>
 #include <vector>
+
 #include <ClanLib/core.h>
 
 // shitty Visual C++ hack to get numeric_limits<>::max() to work
@@ -65,21 +66,11 @@ class Track {
 		int getPointCount() const;
 
 
-//		void addCheckpointAtPosition(const CL_Pointf &p_position);
-
 		void clear();
-
-//		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap) const;
 
 	private:
 
 		CL_SharedPtr<TrackImpl> m_impl;
-
-//		/** Registered checkpoints */
-//		typedef std::vector<Checkpoint*> TCheckpointVector;
-//		TCheckpointVector m_checkpoints;
-//
-//		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after) const;
 
 };
 

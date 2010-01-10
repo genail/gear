@@ -66,7 +66,7 @@ class TrackTriangulatorImpl
 
 		float lengthTotal(const std::vector<CL_Pointf> &p_points);
 
-		std::vector<CL_SharedPtr<TrackPoint> > toTrackPoints(
+		std::vector<TrackPoint> toTrackPoints(
 				const std::vector<CL_Pointf> &p_points,
 				float p_prevRadius, float p_nextRadius,
 				float p_prevShift, float p_nextShift
@@ -178,13 +178,13 @@ float TrackTriangulatorImpl::interpolate(float p_pos, float p_prev, float p_next
 	return (p_prev + ((p_next - p_prev) * p_pos));
 }
 
-std::vector<CL_SharedPtr<TrackPoint> > TrackTriangulatorImpl::toTrackPoints(
+std::vector<TrackPoint> TrackTriangulatorImpl::toTrackPoints(
 		const std::vector<CL_Pointf> &p_points,
 		float p_prevRadius, float p_nextRadius,
 		float p_prevShift, float p_nextShift
 )
 {
-	std::vector<CL_SharedPtr<TrackPoint> > trackPoints;
+	std::vector<TrackPoint> trackPoints;
 
 	const float length = lengthTotal(p_points);
 	const int size = static_cast<signed>(p_points.size());
@@ -197,12 +197,10 @@ std::vector<CL_SharedPtr<TrackPoint> > TrackTriangulatorImpl::toTrackPoints(
 
 		const float normPos = pos / length;
 
-		CL_SharedPtr<TrackPoint> trackPoint(
-				new TrackPoint(
-						prev,
-						interpolate(normPos, p_prevRadius, p_nextRadius),
-						interpolate(normPos, p_prevShift, p_nextShift)
-				)
+		TrackPoint trackPoint(
+				prev,
+				interpolate(normPos, p_prevRadius, p_nextRadius),
+				interpolate(normPos, p_prevShift, p_nextShift)
 		);
 
 		// add track point with proper radius and shift interpolation
@@ -264,7 +262,7 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 		std::vector<CL_Pointf> curvePoints = curve.generate_curve_points(CURVE_RESOLUTION);
 
 		// track points knows thier radius and shift (interpolated values)
-		std::vector<CL_SharedPtr<TrackPoint> > trackPoints = m_impl->toTrackPoints(
+		std::vector<TrackPoint> trackPoints = m_impl->toTrackPoints(
 				curvePoints,
 				prev.getRadius(), next.getRadius(),
 				prev.getShift(), next.getShift()
@@ -279,8 +277,8 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 		bool first = true;
 
 		for (int i = 1; i < curveSize; ++i) {
-			const TrackPoint &tprev = *trackPoints[i - 1];
-			const TrackPoint &tnext = *trackPoints[i];
+			const TrackPoint &tprev = trackPoints[i - 1];
+			const TrackPoint &tnext = trackPoints[i];
 
 			const CL_Pointf prevPoint = tprev.getPosition();
 			const CL_Pointf nextPoint = tnext.getPosition();

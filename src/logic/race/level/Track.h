@@ -33,8 +33,6 @@
 
 #include <ClanLib/core.h>
 
-#include "common.h"
-
 namespace Race {
 
 class Checkpoint;
@@ -42,7 +40,7 @@ class TrackPoint;
 
 class TrackImpl;
 
-class Track : public boost::noncopyable {
+class Track {
 
 	public:
 

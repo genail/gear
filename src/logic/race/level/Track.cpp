@@ -40,7 +40,7 @@ class TrackImpl
 {
 	public:
 
-		typedef std::vector<TrackPoint*> TTrackPoints;
+		typedef std::vector<TrackPoint> TTrackPoints;
 
 		TTrackPoints m_trackPoints;
 };
@@ -63,7 +63,7 @@ void Track::addPoint(
 {
 	G_ASSERT(p_index >= 0);
 
-	TrackPoint *trackPoint = new TrackPoint(p_point, p_radius, p_shift);
+	TrackPoint trackPoint(p_point, p_radius, p_shift);
 
 	if (p_index >= static_cast<signed>(m_impl->m_trackPoints.size())) {
 		m_impl->m_trackPoints.push_back(trackPoint);
@@ -77,7 +77,7 @@ void Track::addPoint(
 
 const TrackPoint &Track::getPoint(int p_index) const
 {
-	return *m_impl->m_trackPoints[p_index];
+	return m_impl->m_trackPoints[p_index];
 }
 
 int Track::getPointCount() const
@@ -87,10 +87,6 @@ int Track::getPointCount() const
 
 void Track::clear()
 {
-	foreach (TrackPoint *point, m_impl->m_trackPoints) {
-		delete point;
-	}
-
 	m_impl->m_trackPoints.clear();
 }
 

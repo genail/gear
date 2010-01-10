@@ -44,6 +44,8 @@ class MainMenuScene : public Gfx::GuiScene
 
 		SIGNAL_0(authorsClicked);
 
+		SIGNAL_0(editorClicked);
+
 	public:
 		MainMenuScene(CL_GUIComponent *p_parent);
 
@@ -81,6 +83,8 @@ class MainMenuScene : public Gfx::GuiScene
 
 		CL_PushButton m_authorsButton;
 
+		CL_PushButton m_editorButton;
+
 		CL_PushButton m_quitButton;
 
 
@@ -102,5 +106,7 @@ class MainMenuScene : public Gfx::GuiScene
         void onOptionClicked();
 
 		void onAuthorsClicked();
+
+		void onEditorClicked();
 
 };

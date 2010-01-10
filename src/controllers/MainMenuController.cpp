@@ -45,6 +45,7 @@ MainMenuController::MainMenuController(MainMenuScene *p_scene) :
 	m_slots.connect(m_scene->sig_quitClicked(), this, &MainMenuController::onQuitClicked);
     m_slots.connect(m_scene->sig_optionClicked(), this, &MainMenuController::onOptionClicked);
 	m_slots.connect(m_scene->sig_authorsClicked(), this, &MainMenuController::onAuthorsClicked);
+	m_slots.connect(m_scene->sig_editorClicked(), this, &MainMenuController::onEditorClicked);
 }
 
 MainMenuController::~MainMenuController()
@@ -106,4 +107,9 @@ void MainMenuController::onAuthorsClicked()
 	m_scene->displayError("");
 
 	Gfx::Stage::pushScene(m_authorsScene);
+}
+
+void MainMenuController::onEditorClicked()
+{
+	Gfx::Stage::popScene();
 }

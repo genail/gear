@@ -34,6 +34,7 @@ class MainMenuScene;
 class RaceScene;
 class OptionScene;
 class AuthorsScene;
+class EditorScene;
 
 class MainMenuController {
 
@@ -57,6 +58,9 @@ class MainMenuController {
 		/** Next scene */
         AuthorsScene *m_authorsScene;
 
+		/** Next scene */
+        EditorScene *m_editorScene;
+
 		/** The slot container */
 		CL_SlotContainer m_slots;
 
@@ -70,5 +74,7 @@ class MainMenuController {
         void onOptionClicked();
 
 		void onAuthorsClicked();
+
+		void onEditorClicked();
 };
 

@@ -56,7 +56,8 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_errorLabel(this),
 	m_quitButton(this),
     m_optionButton(this),
-	m_authorsButton(this)
+	m_authorsButton(this),
+	m_editorButton(this)
 {
 	set_class_name("MainMenuScene");
 
@@ -87,7 +88,12 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	y += V_MARGIN;
 
 	m_authorsButton.set_text(_("Authors"));
-	m_authorsButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + LABEL_HEIGHT));
+	m_authorsButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
+
+	y += V_MARGIN;
+
+	m_editorButton.set_text(_("Map editor"));
+	m_editorButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 
 	y += V_MARGIN;
 
@@ -103,6 +109,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
     m_optionButton.func_clicked().set(this, &MainMenuScene::onOptionClicked);
 	m_authorsButton.func_clicked().set(this, &MainMenuScene::onAuthorsClicked);
+	m_editorButton.func_clicked().set(this, &MainMenuScene::onEditorClicked);
 
 
 	m_serverLineEdit.set_text(Properties::getPropertyAsString("opt_hostname", ""));
@@ -156,6 +163,11 @@ void MainMenuScene::onOptionClicked()
 void MainMenuScene::onAuthorsClicked()
 {
 	INVOKE_0(authorsClicked);
+}
+
+void MainMenuScene::onEditorClicked()
+{
+	INVOKE_0(editorClicked);
 }
 
 void MainMenuScene::displayError(const CL_String& p_message)

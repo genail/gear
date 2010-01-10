@@ -32,27 +32,10 @@
 #include "gfx/Stage.h"
 
 const int LABEL_WIDTH = 280;
-const int LABEL_HEIGHT = 200;
-
-const int ERROR_LABEL_WIDTH = 200;
-const int ERROR_LABEL_HEIGHT = 20;
-
-const int EDIT_WIDTH = 200;
-const int EDIT_HEIGHT = 20;
 
 const int BUTTON_WIDTH = 100;
 const int BUTTON_HEIGHT = 20;
 
-const int COMBOBOX_WIDTH = 200;
-const int COMBOBOX_HEIGHT = 20;
-
-const int CHECKBOX_WIDTH = 200;
-const int CHECKBOX_HEIGHT = 20;
-
-const int SLIDER_WIDTH = 200;
-const int SLIDER_HEIGHT = 20;
-
-const int H_MARGIN = 20;
 const int V_MARGIN = 40;
 
 AuthorsScene::AuthorsScene(CL_GUIComponent *p_parent) :
@@ -62,15 +45,15 @@ AuthorsScene::AuthorsScene(CL_GUIComponent *p_parent) :
 	m_programersLabel(this),
 	m_graphicsLabel(this),
     m_okButton(this),
-	isDown(true),
-	isRight(true),
+	m_isDown(true),
+	m_isRight(true),
 	m_timer()
 {
 	set_class_name("AuthorsScene");
 
-	typeFont = CL_Font(get_gc(), "helvetica", 40);
-	authorsFont = CL_Font(get_gc(), "helvetica", 25);
-	fontColor = CL_Colorf::black;
+	m_typeFont = CL_Font(get_gc(), "helvetica", 40);
+	m_authorsFont = CL_Font(get_gc(), "helvetica", 25);
+	m_fontColor = CL_Colorf::black;
 
 	CL_SpanLayout span;
 	CL_Size size;
@@ -105,7 +88,7 @@ AuthorsScene::AuthorsScene(CL_GUIComponent *p_parent) :
 
 	m_okButton.func_clicked().set(this, &AuthorsScene::onOkClick);
 
-	max = y;
+	m_max = y;
 
 	m_timer.func_expired().set(this, &AuthorsScene::onTimerInterval);
 	m_timer.start(40);
@@ -122,8 +105,8 @@ CL_SpanLayout AuthorsScene::getLeadProgramerSpan()
 
 	type = _("Lead programer:\n");
 	authors = _("Piotr Korzuszek");
-	span.add_text(type, typeFont, fontColor);
-	span.add_text(authors, authorsFont, fontColor);
+	span.add_text(type, m_typeFont, m_fontColor);
+	span.add_text(authors, m_authorsFont, m_fontColor);
 
 	return span;
 }
@@ -137,8 +120,8 @@ CL_SpanLayout AuthorsScene::getProgramersSpan()
 	authors = _("Robert Cebula\n");
 	authors += _("Bartosz Platak\n");
 	authors += _("Pawe³ Rybarczyk");
-	span.add_text(type, typeFont, fontColor);
-	span.add_text(authors, authorsFont, fontColor);
+	span.add_text(type, m_typeFont, m_fontColor);
+	span.add_text(authors, m_authorsFont, m_fontColor);
 
 	return span;
 }
@@ -150,8 +133,8 @@ CL_SpanLayout AuthorsScene::getGraphicsSpan()
 
 	type = _("Graphics:\n");
 	authors = _("Piotr Uchman");
-	span.add_text(type, typeFont, fontColor);
-	span.add_text(authors, authorsFont, fontColor);
+	span.add_text(type, m_typeFont, m_fontColor);
+	span.add_text(authors, m_authorsFont, m_fontColor);
 
 	return span;
 }
@@ -173,11 +156,11 @@ void AuthorsScene::onTimerInterval()
 	int topChange = 0;
 	int rightChange = 0;
 
-	if (isRight)
+	if (m_isRight)
 	{
 		if (m_leadProgramerLabel.get_geometry().right >= get_width())
 		{
-			isRight = false;
+			m_isRight = false;
 			return;
 		}
 
@@ -187,18 +170,18 @@ void AuthorsScene::onTimerInterval()
 	{
 		if (m_leadProgramerLabel.get_geometry().left <= 0)
 		{
-			isRight = true;
+			m_isRight = true;
 			return;
 		}
 
 		rightChange = -1;
 	}
 
-	if (isDown)
+	if (m_isDown)
 	{
-		if (m_graphicsLabel.get_geometry().bottom >= max)
+		if (m_graphicsLabel.get_geometry().bottom >= m_max)
 		{
-			isDown = false;
+			m_isDown = false;
 			return;
 		}
 
@@ -208,19 +191,19 @@ void AuthorsScene::onTimerInterval()
 	{
 		if (m_leadProgramerLabel.get_geometry().top <= 0)
 		{
-			isDown = true;
+			m_isDown = true;
 			return;
 		}
 
 		topChange = -1;
 	}
 
-	ChangeLabelPosition(&m_leadProgramerLabel, topChange, rightChange);
-	ChangeLabelPosition(&m_programersLabel, topChange, rightChange);
-	ChangeLabelPosition(&m_graphicsLabel, topChange, rightChange);
+	changeLabelPosition(&m_leadProgramerLabel, topChange, rightChange);
+	changeLabelPosition(&m_programersLabel, topChange, rightChange);
+	changeLabelPosition(&m_graphicsLabel, topChange, rightChange);
 }
 
-void AuthorsScene::ChangeLabelPosition(CL_Label *p_label, int p_changeTop, int p_changeLeft)
+void AuthorsScene::changeLabelPosition(CL_Label *p_label, int p_changeTop, int p_changeLeft)
 {
 	CL_Rect rect = (*p_label).get_geometry();
 	rect.top += p_changeTop;

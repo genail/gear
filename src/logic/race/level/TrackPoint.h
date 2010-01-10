@@ -30,6 +30,8 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
+
 namespace Race {
 
 class TrackPointImpl;
@@ -37,7 +39,7 @@ class TrackPointImpl;
 /**
  * Control point for track creating.
  */
-class TrackPoint {
+class TrackPoint : public boost::noncopyable {
 
 	public:
 

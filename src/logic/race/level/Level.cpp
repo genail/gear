@@ -35,6 +35,7 @@
 #include "logic/race/level/Checkpoint.h"
 #include "logic/race/Car.h"
 #include "logic/race/level/Track.h"
+#include "logic/race/level/TrackPoint.h"
 #include "logic/race/TyreStripes.h"
 #include "logic/race/resistance/Geometry.h"
 #include "logic/race/resistance/ResistanceMap.h"
@@ -137,8 +138,6 @@ class LevelImpl
 
 		// level loading
 
-		void loadFromFile(const CL_String& p_filename);
-
 		void loadMetaElement(const CL_DomNode &p_metaNode);
 
 		void loadTrackElement(const CL_DomNode &p_trackNode);
@@ -152,9 +151,9 @@ class LevelImpl
 
 		// helpers
 
-		DEPRECATED(CL_Pointf real(const CL_Pointf &p_point) const);
+		CL_Pointf real(const CL_Pointf &p_point) const;
 
-		DEPRECATED(float real(float p_coord) const);
+		float real(float p_coord) const;
 
 
 };
@@ -162,13 +161,17 @@ class LevelImpl
 Level::Level() :
 		m_impl(new LevelImpl())
 {
-
+	// empty
 }
 
-void Level::initialize(const CL_String &p_filename)
+Level::~Level()
+{
+	// empty
+}
+
+void Level::initialize()
 {
 	if (!m_impl->m_initialized) {
-		m_impl->loadFromFile(p_filename);
 		m_impl->m_initialized = true;
 	}
 }
@@ -194,24 +197,20 @@ void Level::destroy()
 	}
 }
 
-Level::~Level() {
-}
-
-void LevelImpl::loadFromFile(const CL_String& p_filename)
+void Level::load(const CL_String& p_filename)
 {
-	G_ASSERT(!m_loaded && "level is already loaded");
+	G_ASSERT(!m_impl->m_loaded && "level is already loaded");
 
 	try {
 		cl_log_event(LOG_DEBUG, "loading level %1", p_filename);
 		CL_File file(p_filename, CL_File::open_existing, CL_File::access_read);
-
 
 		CL_DomDocument document(file);
 		const CL_DomElement root = document.get_document_element();
 
 		// load meta element
 		const CL_DomNode metaNode = root.named_item("meta");
-		loadMetaElement(metaNode);
+		m_impl->loadMetaElement(metaNode);
 
 		// gets level's content
 		const CL_DomNode contentNode = root.named_item("content");
@@ -222,16 +221,16 @@ void LevelImpl::loadFromFile(const CL_String& p_filename)
 
 		// load track
 		const CL_DomNode trackNode = contentNode.named_item("track");
-		loadTrackElement(trackNode);
+		m_impl->loadTrackElement(trackNode);
 
 		// load track bounds
 		const CL_DomNode boundsNode = contentNode.named_item("bounds");
-		loadBoundsElement(boundsNode);
+		m_impl->loadBoundsElement(boundsNode);
 
 		file.close();
 
 		cl_log_event(LOG_DEBUG, "level loaded");
-		m_loaded = true;
+		m_impl->m_loaded = true;
 
 	} catch (CL_Exception e) {
 		CL_Console::write_line(e.message);
@@ -239,8 +238,14 @@ void LevelImpl::loadFromFile(const CL_String& p_filename)
 
 }
 
+void Level::save(const CL_String &p_filename)
+{
+
+}
+
 void LevelImpl::loadMetaElement(const CL_DomNode &p_metaNode)
 {
+	// TODO
 }
 
 void LevelImpl::loadTrackElement(const CL_DomNode &p_trackNode)
@@ -264,157 +269,7 @@ void LevelImpl::loadTrackElement(const CL_DomNode &p_trackNode)
 		}
 	}
 
-//	// build block type map
-//	typedef std::map<CL_String, Common::GroundBlockType> blockMap_t;
-//	blockMap_t blockMap;
-//	blockMap_t::iterator blockMapItor;
-//
-//	blockMap["vert"] = Common::BT_STREET_VERT;
-//	blockMap["horiz"] = Common::BT_STREET_HORIZ;
-//	blockMap["turn_bottom_right"] = Common::BT_TURN_BOTTOM_RIGHT;
-//	blockMap["turn_bottom_left"] = Common::BT_TURN_BOTTOM_LEFT;
-//	blockMap["turn_top_right"] = Common::BT_TURN_TOP_RIGHT;
-//	blockMap["turn_top_left"] = Common::BT_TURN_TOP_LEFT;
-//	blockMap["start_line_up"] = Common::BT_START_LINE_UP;
-//
-//	// prepare level blocks
-//	const int blocksCount = m_width * m_height;
-//	m_blocks.clear();
-//	m_blocks.reserve(blocksCount);
-//
-//	for (int i = 0; i < blocksCount; ++i) {
-//		m_blocks.push_back(CL_SharedPtr<Block>(new Block(Common::BT_GRASS)));
-//	}
-//
-//	// create global resistance geometry
-//	CL_SharedPtr<RaceResistance::Geometry> globalResGeom(new RaceResistance::Geometry());
-//	globalResGeom->addRectangle(CL_Rectf(real(0), real(0), real(m_width), real(m_height)));
-//
-//	m_resistanceMap.addGeometry(globalResGeom, 0.3f);
-//
-//	// add sand resistance
-//	foreach (const Sandpit &sandpit, m_sandpits) {
-//		const unsigned circleCount = sandpit.getCircleCount();
-//
-//		CL_SharedPtr<RaceResistance::Geometry> sandpitGeometry(new RaceResistance::Geometry());
-//
-//		for (unsigned i = 0; i < circleCount; ++i) {
-//			// sandpit values are real
-//			const Sandpit::Circle &circle = sandpit.circleAt(i);
-//			sandpitGeometry->addCircle(CL_Circlef(circle.getCenter().x, circle.getCenter().y, circle.getRadius()));
-//		}
-//
-//		m_resistanceMap.addGeometry(sandpitGeometry, 0.8f);
-//	}
-//
-//	// read blocks
-//	const CL_DomNodeList blockList = p_trackNode.get_child_nodes();
-//	const int blockListSize = blockList.get_length();
-//
-//	cl_log_event("debug", "Track node child count: %1", blockListSize);
-//
-//	CL_Pointf lastCP; // last checkpoint
-//
-//	for (int i = 0; i < blockListSize; ++i) {
-//		const CL_DomNode blockNode = blockList.item(i);
-//
-//		if (blockNode.get_node_name() == "block") {
-//			CL_DomNamedNodeMap attrs = blockNode.get_attributes();
-//
-//			const int x = CL_StringHelp::local8_to_int(attrs.get_named_item("x").get_node_value());
-//			const int y = CL_StringHelp::local8_to_int(attrs.get_named_item("y").get_node_value());
-//			const CL_String typeStr = attrs.get_named_item("type").get_node_value();
-//
-//			if (x < 0 || y < 0 || x >= m_width || y >= m_height) {
-//				cl_log_event("debug", "coords x=%1, y=%2", x, y);
-//				throw CL_Exception("Blocks coords out of bounds");
-//			}
-//
-//			blockMapItor = blockMap.find(typeStr);
-//
-//			if (blockMapItor != blockMap.end()) {
-//
-//				const Common::GroundBlockType blockType = blockMapItor->second;
-//				m_blocks[m_width * y + x]->setType(blockType);
-//
-//				// add checkpoint to track
-//				if (blockType == Common::BT_START_LINE_UP) {
-//					lastCP = CL_Pointf((x + 0.5f) * Block::WIDTH, (y + 0.2f) * Block::WIDTH);
-//					const CL_Pointf firstCP((x + 0.5f) * Block::WIDTH, (y + 0.2 - 0.01f) * Block::WIDTH);
-//
-//					m_track.addCheckpointAtPosition(firstCP);
-//				} else {
-//					const CL_Pointf checkPosition((x + 0.5f) * Block::WIDTH, (y + 0.5f) * Block::WIDTH);
-//
-//					m_track.addCheckpointAtPosition(checkPosition);
-//				}
-//
-//				// add resistance geometry based on block
-//				CL_SharedPtr<RaceResistance::Geometry> resGeom = buildResistanceGeometry(x, y, blockType);
-//				m_resistanceMap.addGeometry(resGeom, 0.0f);
-//
-//			} else {
-//				cl_log_event("race", "Unknown block type: %1", typeStr);
-//			}
-//
-//		} else {
-//			cl_log_event("race", "Unknown node '%1', ignoring", blockNode.get_node_name());
-//		}
-//
-//	}
-//
-//	m_track.addCheckpointAtPosition(lastCP);
-//	m_track.close();
-
 }
-
-//void LevelImpl::loadSandElement(const CL_DomNode &p_sandNode)
-//{
-//	const CL_DomNodeList sandChildren = p_sandNode.get_child_nodes();
-//	const int sandChildrenCount = sandChildren.get_length();
-//
-//	CL_DomNode sandChildNode, groupChildNode;
-//
-//	for (int i = 0; i < sandChildrenCount; ++i) {
-//		sandChildNode = sandChildren.item(i);
-//
-//		if (sandChildNode.get_node_name() == "group") {
-//			const CL_DomNodeList groupChildren = sandChildNode.get_child_nodes();
-//			const int groupChildrenCount = groupChildren.get_length();
-//
-//			// create new sandpit
-//			m_sandpits.push_back(Sandpit());
-//			Sandpit &sandpit = m_sandpits.back();
-//
-//			for (int j = 0; j < groupChildrenCount; ++j) {
-//				groupChildNode = groupChildren.item(j);
-//
-//				if (groupChildNode.get_node_name() == "circle") {
-//
-//					CL_DomNamedNodeMap attrs = groupChildNode.get_attributes();
-//
-//					const float x = CL_StringHelp::local8_to_float(attrs.get_named_item("x").get_node_value());
-//					const float y = CL_StringHelp::local8_to_float(attrs.get_named_item("y").get_node_value());
-//					const float radius = CL_StringHelp::local8_to_float(attrs.get_named_item("radius").get_node_value());
-//
-//					// add to sandpit
-//
-//					// must save as integer
-//					const CL_Pointf centerFloat = real(CL_Pointf(x, y));
-//					const CL_Point centerInt = CL_Point((int) floor(centerFloat.x), (int) floor(centerFloat.y));
-//
-//					sandpit.addCircle(centerInt, real(radius));
-//
-////					m_resistanceMap.addGeometry(geom, 0.8f);
-//				} else {
-//					cl_log_event("error", "unknown element in <sand><group></group></sand>: <%1>", sandChildNode.get_node_name());
-//				}
-//			}
-//		} else {
-//			cl_log_event("error", "unknown element in <sand></sand>: <%1>", sandChildNode.get_node_name());
-//		}
-//	}
-//}
 
 CL_SharedPtr<RaceResistance::Geometry> LevelImpl::buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const
 {
@@ -564,112 +419,14 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 
 }
 
-void Level::update(unsigned p_timeElapsed)
-{
-//#ifdef CLIENT
-//
-//	checkCollistions();
-//
-//#ifndef NO_TYRE_STRIPES
-//	foreach (Car* car, m_cars) {
-//
-//		CL_Pointf* lastDriftPoints = m_carsDriftPoints[car];
-//
-//		const CL_Pointf &carPosition = car->getPosition();
-//
-//		if (car->isDrifting()) {
-//
-//			static const float tyreRadius = 10.0f;
-//			CL_Angle carAngle(car->getRotationRad(), cl_radians);
-//
-//			CL_Vec2f v;
-//			float rad;
-//
-//			for (int i = 0; i < 4; ++i) {
-//
-//				carAngle += CL_Angle(i == 0 ? 45 : 90, cl_degrees);
-//
-//				rad = carAngle.to_radians();
-//
-//				v.x = cos(rad);
-//				v.y = sin(rad);
-//
-//				v.normalize();
-//
-//				v *= tyreRadius;
-//
-//				CL_Pointf stripePointEnd(carPosition);
-//				stripePointEnd += v;
-//
-//				// when last drift point is valid, then add the tire stripe
-//				// if not, only update the drift point
-//				if (lastDriftPoints[i].x != 0.0f && lastDriftPoints[i].y != 0.0f) {
-//
-//					CL_Pointf stripePointStart(lastDriftPoints[i]);
-//
-//					m_tyreStripes.add(stripePointStart, stripePointEnd, car);
-//				}
-//
-//				lastDriftPoints[i].x = stripePointEnd.x;
-//				lastDriftPoints[i].y = stripePointEnd.y;
-//
-//			}
-//
-//		} else {
-//			// nullify all tires drift positions when no drift is done
-//			for (int i = 0; i < 4; ++i) {
-//				lastDriftPoints[i].x = 0;
-//				lastDriftPoints[i].y = 0;
-//			}
-//		}
-//	}
-//#endif // !NO_TYRE_STRIPES
-//#endif // CLIENT
-}
-
-#ifdef CLIENT
-//void LevelImpl::checkCollistions()
-//{
-//	CL_CollisionOutline coll1, coll2;
-//
-//
-//	foreach (Car *c1, m_cars) {
-//		coll1 = c1->calculateCurrentCollisionOutline();
-//
-//		// check car collisions
-//		// TODO: later :-)
-////		foreach (Car *c2, m_cars) {
-////
-////			if (c1 == c2) {
-////				continue;
-////			}
-////
-////			coll2 = c2->calculateCurrentCollisionOutline();
-////
-////			if (coll1.collide(coll2)) {
-////				cl_log_event("debug", "collision");
-////			}
-////		}
-//
-//		// check bounds collisions
-//		foreach (const CL_SharedPtr<Bound> &bound, m_bounds) {
-//			if (coll1.collide(bound->getCollisionOutline())) {
-//				c1->performBoundCollision(*bound);
-//			}
-//		}
-//	}
-
-//}
-#endif // CLIENT
-
 CL_Pointf LevelImpl::real(const CL_Pointf &p_point) const
 {
-	return CL_Pointf(p_point.x * 30.0f, p_point.y * 30.0f);
+	return CL_Pointf(p_point.x * 15.0f, p_point.y * 15.0f);
 }
 
 float LevelImpl::real(float p_coord) const
 {
-	return p_coord * 30.0f;
+	return p_coord * 15.0f;
 }
 
 int Level::getCarCount() const
@@ -703,6 +460,20 @@ const Track &Level::getTrack() const
 {
 	G_ASSERT(m_impl->m_loaded);
 	return m_impl->m_track;
+}
+
+void Level::setTrack(const Track &p_track)
+{
+	m_impl->m_track.clear();
+	const int size = p_track.getPointCount();
+
+	for (int i = 0; i < size; ++i) {
+		const TrackPoint &p_point = p_track.getPoint(i);
+
+		m_impl->m_track.addPoint(
+				p_point.getPosition(), p_point.getRadius(), p_point.getShift()
+		);
+	}
 }
 
 } // namespace

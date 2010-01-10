@@ -52,7 +52,7 @@ class Level : public boost::noncopyable
 		virtual ~Level();
 
 
-		virtual void initialize(const CL_String &p_filename);
+		virtual void initialize();
 
 		virtual void destroy();
 
@@ -66,9 +66,9 @@ class Level : public boost::noncopyable
 
 		void addCar(Car *p_car);
 
-		const Car &getCar(int p_index) const;
-
 		Car &getCar(int p_index);
+
+		const Car &getCar(int p_index) const;
 
 		int getCarCount() const;
 
@@ -79,11 +79,13 @@ class Level : public boost::noncopyable
 		 */
 		CL_Pointf getStartPosition(int p_num) const;
 
+		void load(const CL_String &p_filename);
+
 		void removeCar(Car *p_car);
 
+		void save(const CL_String &p_filename);
 
-		// FIXME: Move all update routines to RaceLogic
-		DEPRECATED(void update(unsigned p_timeElapsed));
+		void setTrack(const Track &p_track);
 
 
 	private:

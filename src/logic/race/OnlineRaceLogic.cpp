@@ -187,7 +187,8 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 {
 	// load level
 	const CL_String &levelName = p_gameState.getLevel();
-	m_level.initialize(levelName);
+	m_level.initialize();
+	m_level.load(levelName);
 
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();

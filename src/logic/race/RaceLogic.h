@@ -142,8 +142,6 @@ class RaceLogic {
 
 		void updateCarPhysics(unsigned p_timeElapsed);
 
-		void updateLevel(unsigned p_timeElapsed);
-
 		void updatePlayersProgress();
 
 		void updateCheckpoints();

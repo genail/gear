@@ -45,7 +45,8 @@ OfflineRaceLogic::~OfflineRaceLogic()
 
 void OfflineRaceLogic::initialize()
 {
-	m_level.initialize(m_levelName);
+	m_level.initialize();
+	m_level.load(m_levelName);
 
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();

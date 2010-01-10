@@ -49,7 +49,6 @@ RaceLogic::~RaceLogic()
 void RaceLogic::update(unsigned p_timeElapsed)
 {
 	updateCarPhysics(p_timeElapsed);
-	updateLevel(p_timeElapsed);
 	updateCheckpoints();
 	updatePlayersProgress();
 }
@@ -61,11 +60,6 @@ void RaceLogic::updateCarPhysics(unsigned p_timeElapsed)
 		Race::Car &car = m_level.getCar(i);
 		car.update(p_timeElapsed);
 	}
-}
-
-void RaceLogic::updateLevel(unsigned p_timeElapsed)
-{
-	m_level.update(p_timeElapsed);
 }
 
 void RaceLogic::updateCheckpoints()

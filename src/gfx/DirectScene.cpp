@@ -77,6 +77,11 @@ void DirectScene::load(CL_GraphicContext &p_gc)
 	m_loaded = true;
 }
 
+void DirectScene::mouseMoved(const CL_Point &p_pos)
+{
+	// empty
+}
+
 void DirectScene::pushed()
 {
 	// empty

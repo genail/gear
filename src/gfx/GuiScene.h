@@ -54,6 +54,8 @@ class GuiScene: public CL_GUIComponent, public Scene {
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+		virtual void mouseMoved(const CL_Point &p_pos);
+
 		virtual void pushed();
 
 		virtual void poped();

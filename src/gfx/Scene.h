@@ -51,11 +51,15 @@ class Scene {
 
 		virtual void draw(CL_GraphicContext &p_gc) = 0;
 
+		/** Keyboard and mouse button actions */
 		virtual void inputPressed(const CL_InputEvent &p_event) = 0;
 
+		/** Keyboard and mouse button actions */
 		virtual void inputReleased(const CL_InputEvent &p_event) = 0;
 
 		virtual void load(CL_GraphicContext &p_gc) = 0;
+
+		virtual void mouseMoved(const CL_Point &p_pos) = 0;
 
 		virtual void pushed() = 0;
 

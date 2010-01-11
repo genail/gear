@@ -94,6 +94,8 @@ class GameWindow : public CL_GUIComponent {
 
 		void onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state);
 
+		void onMouseMove(const CL_InputEvent &p_event, const CL_InputState &p_state);
+
 };
 
 } // namespace

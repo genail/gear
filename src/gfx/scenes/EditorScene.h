@@ -30,20 +30,25 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
-#include "gfx/GuiScene.h"
+#include "gfx/DirectScene.h"
 #include "controllers/EditorController.h"
 
 class EditorSceneImpl;
 
-class EditorScene : public Gfx::GuiScene
+class EditorScene : public Gfx::DirectScene
 {
-
 	public:
-		EditorScene(CL_GUIComponent *p_parent);
+		EditorScene();
 
 		virtual ~EditorScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
+
+		virtual void load(CL_GraphicContext &p_gc);
+
+		virtual void inputPressed(const CL_InputEvent &p_event);
+
+		virtual void inputReleased(const CL_InputEvent &p_event);
 
 	private:
 

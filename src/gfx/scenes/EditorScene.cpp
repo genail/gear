@@ -30,6 +30,13 @@
 
 #include "common.h"
 #include "gfx/Stage.h"
+#include "gfx/race/level/Level.h"
+#include "logic/race/level/Level.h"
+#include "logic/race/level/Track.h"
+#include "logic/race/level/TrackPoint.h"
+
+using namespace Race;
+using namespace Gfx;
 
 const int LABEL_WIDTH = 280;
 
@@ -41,7 +48,47 @@ const int V_MARGIN = 40;
 class EditorSceneImpl
 {
 public:
-	EditorSceneImpl() : m_controller(NULL) { }
+	EditorSceneImpl() : 
+			m_controller(NULL),
+			m_raceLevel(),
+			m_gfxLevel(m_raceLevel),
+			m_track(),
+			m_selectedIndex(-1),
+			m_selectedColor(CL_Colorf::white),
+			m_pointColor(CL_Colorf::blue)
+	{
+		setDefaultPoints();
+
+		m_raceLevel.setTrack(m_track);
+	}
+
+	~EditorSceneImpl()
+	{
+		m_raceLevel.destroy();
+	}
+
+	int m_selectedIndex;
+
+	CL_Colorf m_selectedColor;
+
+	CL_Colorf m_pointColor;
+
+	// track
+
+	Race::Level m_raceLevel;
+
+	Gfx::Level m_gfxLevel;
+
+	Track m_track;
+
+	// input
+
+	bool m_pressed;
+
+	enum InputState {
+			Pressed,
+			Released
+		};
 
 	// scene controller
 
@@ -52,16 +99,109 @@ public:
 
 	// Methods
 
+	void setDefaultPoints();
+
+	void handleInput(InputState p_state, const CL_InputEvent& p_event);
+
+	void draw(CL_GraphicContext &p_gc);
+
+	void load(CL_GraphicContext &p_gc);
+
+	void drawPoints(CL_GraphicContext &p_gc);
+
+	void drawPoint(const TrackPoint &p_trackPoint, bool &p_isSelected, CL_GraphicContext &p_gc);
+
+	int findPointAt(CL_Rect &p_rect);
 
 	// action slots
 };
 
-EditorScene::EditorScene(CL_GUIComponent *p_parent) :
-	GuiScene(p_parent),
+void EditorSceneImpl::setDefaultPoints()
+{
+	m_track.clear();
+
+	m_track.addPoint(CL_Pointf(200.0f, 150.0f), 50.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(600.0f, 150.0f), 50.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(400.0f, 450.0f), 60.0f, 0.0f);
+}
+
+void EditorSceneImpl::draw(CL_GraphicContext &p_gc)
+{
+	m_gfxLevel.draw(p_gc);
+
+	drawPoints(p_gc);
+}
+
+void EditorSceneImpl::load(CL_GraphicContext &p_gc)
+{
+	m_gfxLevel.load(p_gc);
+}
+
+void EditorSceneImpl::drawPoints(CL_GraphicContext &p_gc)
+{
+	for (int i = 0; i < m_track.getPointCount(); ++i)
+	{
+		bool isSelected = (i == m_selectedIndex) ? true : false;
+		drawPoint(m_track.getPoint(i), isSelected, p_gc);
+	}
+}
+
+void EditorSceneImpl::drawPoint(const TrackPoint &p_trackPoint, bool &p_isSelected, CL_GraphicContext &p_gc)
+{
+	CL_Colorf color = p_isSelected ? m_selectedColor : m_pointColor;
+
+	CL_Draw::circle(p_gc, p_trackPoint.getPosition().x, p_trackPoint.getPosition().y, 5.0f, color);
+}
+
+int EditorSceneImpl::findPointAt(CL_Rect &p_rect)
+{
+	for (int i = 0; i < m_track.getPointCount(); ++i)
+	{
+		if (p_rect.contains(m_track.getPoint(i).getPosition()))
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void EditorSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_event)
+{
+	bool pressed;
+
+	switch (p_state) {
+		case Pressed:
+			pressed = true;
+			break;
+		case Released:
+			pressed = false;
+			break;
+		default:
+			assert(0 && "unknown input state");
+	}
+
+	switch (p_event.id) {
+		case CL_MOUSE_LEFT:
+			m_pressed = pressed;
+			break;
+		default:
+			break;
+	}
+
+	CL_Pointf mousePos = p_event.mouse_pos;
+	m_selectedIndex = findPointAt(CL_Rect(mousePos.x - 5, mousePos.y - 5, mousePos.x + 5, mousePos.y + 5));
+
+
+	if (pressed && p_event.id == CL_KEY_ESCAPE) 
+	{
+		Stage::popScene();
+	}
+}
+
+EditorScene::EditorScene() :
 	m_impl(new EditorSceneImpl())
 {
-	set_class_name("EditorScene");
-
 	m_impl->m_controller = EditorController(this);
 }
 
@@ -71,7 +211,26 @@ EditorScene::~EditorScene()
 
 void EditorScene::draw(CL_GraphicContext &p_gc)
 {
-	CL_Draw::fill(p_gc, 0.0f, 0.0f, get_width(), get_height(), CL_Colorf::white);
+	DirectScene::draw(p_gc);
 
-	GuiScene::draw(p_gc);
+	CL_Draw::fill(p_gc, 0.0f, 0.0f, Stage::getWidth(), Stage::getHeight(), CL_Colorf::black);
+
+	m_impl->draw(p_gc);
+}
+
+void EditorScene::load(CL_GraphicContext &p_gc)
+{
+	DirectScene::load(p_gc);
+
+	m_impl->load(p_gc);
+}
+
+void EditorScene::inputPressed(const CL_InputEvent &p_event)
+{
+	m_impl->handleInput(EditorSceneImpl::InputState::Pressed, p_event);
+}
+
+void EditorScene::inputReleased(const CL_InputEvent &p_event)
+{
+	m_impl->handleInput(EditorSceneImpl::InputState::Released, p_event);
 }

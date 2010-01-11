@@ -41,7 +41,7 @@ MainMenuController::MainMenuController(MainMenuScene *p_scene) :
 	m_raceScene(new RaceScene(p_scene->get_parent_component())),
     m_optionScene(new OptionScene(p_scene->get_parent_component())),
 	m_authorsScene(new AuthorsScene(p_scene->get_parent_component())),
-	m_editorScene(new EditorScene(p_scene->get_parent_component()))
+	m_editorScene(new EditorScene())
 {
 	m_slots.connect(m_scene->sig_startRaceClicked(), this, &MainMenuController::onRaceStartClicked);
 	m_slots.connect(m_scene->sig_quitClicked(), this, &MainMenuController::onQuitClicked);

@@ -39,7 +39,7 @@ Viewport::Viewport() :
 	m_width(Gfx::Stage::getWidth()),
 	m_height(Gfx::Stage::getHeight()),
 	m_attachPoint(NULL),
-	m_scale(2.0f)
+	m_scale(1.0f)
 {
 }
 

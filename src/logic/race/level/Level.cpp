@@ -48,16 +48,16 @@ class LoopVector : public std::vector<T>
 	public:
 
 		T &operator[] (int p_index) {
-			return std::vector<T>::operator[](norm(p_index));
+			return std::vector<T>::operator[](clamp(p_index));
 		}
 
 		const T &operator[] (int p_index) const {
-			return std::vector<T>::operator[](norm(p_index));
+			return std::vector<T>::operator[](clamp(p_index));
 		}
 
 	private:
 
-		int norm(int p_index) const {
+		int clamp(int p_index) const {
 			const int s = static_cast<signed> (std::vector<T>::size());
 
 			if (p_index >= 0 && p_index < s) {
@@ -78,8 +78,8 @@ class RoadPoint : public CL_Pointf
 {
 	public:
 
-		RoadPoint(float x, float y, float p_modifier = 0.0f) :
-			CL_Pointf(x, y),
+		RoadPoint(float p_x, float p_y, float p_modifier = 0.0f) :
+			CL_Pointf(p_x, p_y),
 			m_modifier(p_modifier)
 		{}
 
@@ -479,22 +479,22 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 
 CL_Pointf LevelImpl::real(const CL_Pointf &p_point) const
 {
-	return CL_Pointf(p_point.x * 15.0f, p_point.y * 15.0f);
+	return CL_Pointf(p_point.x * 20.0f, p_point.y * 20.0f);
 }
 
 float LevelImpl::real(float p_coord) const
 {
-	return p_coord * 15.0f;
+	return p_coord * 20.0f;
 }
 
 CL_Pointf LevelImpl::ireal(const CL_Pointf &p_point) const
 {
-	return CL_Pointf(p_point.x / 15.0f, p_point.y / 15.0f);
+	return CL_Pointf(p_point.x / 20.0f, p_point.y / 20.0f);
 }
 
 float LevelImpl::ireal(float p_coord) const
 {
-	return p_coord / 15.0f;
+	return p_coord / 20.0f;
 }
 
 int Level::getCarCount() const

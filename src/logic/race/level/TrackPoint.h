@@ -59,6 +59,12 @@ class TrackPoint {
 
 		float getShift() const;
 
+		void setPosition(const CL_Pointf &p_pos);
+
+		void setRadius(float p_radius);
+
+		void setShift(float p_shift);
+
 
 	private:
 

@@ -30,8 +30,6 @@
 
 #include <ClanLib/core.h>
 
-#include "common.h"
-
 namespace Race {
 
 class Block;
@@ -42,7 +40,7 @@ class TyreStripes;
 
 class LevelImpl;
 
-class Level : public boost::noncopyable
+class Level
 {
 
 	public:

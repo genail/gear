@@ -186,7 +186,7 @@ void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
 	for (int i = 0; i < carCount; ++i) {
 
 		const Race::Car &car = level.getCar(i);
-		pos = m_viewport->onScreen(car.getPosition());
+		pos = m_viewport->toScreen(car.getPosition());
 
 		pos.y += 20;
 

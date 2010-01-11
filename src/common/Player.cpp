@@ -27,20 +27,60 @@
  */
 
 #include "Player.h"
+
 #include "logic/race/Car.h"
 
-Player::Player() :
-	m_car(this)
+class PlayerImpl
 {
+	public:
 
-}
+		bool m_initialized;
+
+		/** Nickname of this player */
+		CL_String8 m_name;
+
+		/** The car */
+		Race::Car m_car;
+
+
+		PlayerImpl(const CL_String &p_name = "") :
+			m_initialized(false),
+			m_name(p_name)
+		{ /* empty */ }
+
+};
 
 Player::Player(const CL_String8& p_name) :
-	m_name(p_name),
-	m_car(this)
+	m_impl(new PlayerImpl(p_name))
 {
-
 }
 
-Player::~Player() {
+Player::~Player()
+{
+	// empty
+}
+
+Race::Car &Player::getCar()
+{
+	return m_impl->m_car;
+}
+
+const Race::Car &Player::getCar() const
+{
+	return m_impl->m_car;
+}
+
+const CL_String &Player::getName() const
+{
+	return m_impl->m_name;
+}
+
+void Player::setName(const CL_String &p_name)
+{
+	m_impl->m_name = p_name;
+}
+
+bool Player::operator==(const Player &other) const
+{
+	return &(*m_impl) == &(*other.m_impl);
 }

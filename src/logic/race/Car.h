@@ -36,6 +36,7 @@
 #endif // CLIENT
 
 #include "common.h"
+#include "common/Player.h"
 
 class Player;
 
@@ -60,7 +61,7 @@ class Car
 
 	public:
 
-		Car(const Player *p_owner);
+		Car();
 
 		virtual ~Car();
 
@@ -74,8 +75,6 @@ class Car
 		const Checkpoint *getCurrentCheckpoint() const;
 
 		int getLap() const;
-
-		const Player *getOwner() const;
 
 		const CL_Pointf& getPosition() const;
 
@@ -130,6 +129,9 @@ class Car
 		 */
 		void updateCurrentCheckpoint(const Checkpoint *p_checkpoint);
 
+
+		bool operator==(const Car &p_other) const;
+
 #if defined(CLIENT)
 		/** @return Current collision outline based on car position and rotation */
 		CL_CollisionOutline calculateCurrentCollisionOutline() const;
@@ -140,9 +142,6 @@ class Car
 
 	private:
 
-		/** Parent player */
-		const Player *m_owner;
-		
 		/** Parent level */
 		Race::Level *m_level;
 

@@ -191,7 +191,7 @@ void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
 		pos.y += 20;
 
 		m_carLabel.setPosition(pos);
-		m_carLabel.setText(car.getOwner()->getName());
+		m_carLabel.setText(m_logic->getPlayer(car).getName()); // FIXME: not optimal
 
 		m_carLabel.draw(p_gc);
 	}

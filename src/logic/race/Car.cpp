@@ -48,8 +48,7 @@ const int CAR_WIDTH = 18;
 /* Car height in pixels */
 const int CAR_HEIGHT = 24;
 
-Car::Car(const Player *p_owner) :
-	m_owner(p_owner),
+Car::Car() :
 	m_level(NULL),
 	m_lap(0),
 	m_timeFromLastUpdate(0),
@@ -463,11 +462,6 @@ int Car::getLap() const
 	return m_lap;
 }
 
-const Player *Car::getOwner() const
-{
-	return m_owner;
-}
-
 const CL_Pointf& Car::getPosition() const
 {
 	return m_position;
@@ -603,6 +597,11 @@ void Car::normalizeAngle180(CL_Angle &p_angle)
 {
 	normalizeAngle(p_angle);
 	p_angle.normalize_180();
+}
+
+bool Car::operator==(const Car &p_other) const
+{
+	return this == &p_other;
 }
 
 } // namespace

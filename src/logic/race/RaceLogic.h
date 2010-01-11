@@ -38,10 +38,13 @@
 #include "common/votetypes.h"
 #include "logic/race/level/Level.h"
 #include "logic/race/MessageBoard.h"
+#include "logic/race/TyreStripes.h"
 
 class Player;
 
 namespace Race {
+
+class RaceLogicImpl;
 
 class RaceLogic {
 
@@ -59,32 +62,6 @@ class RaceLogic {
 		virtual void destroy() = 0;
 
 
-		// voting system
-
-		virtual void callAVote(VoteType p_type, const CL_String &p_subject="");
-
-		/** @return Message that will be displayed on screen when vote is running. */
-		virtual const CL_String &getVoteMessage() const;
-
-		virtual int getVoteNoCount() const;
-
-		virtual int getVoteYesCount() const;
-
-		/** @return Time in milliseconds that is deadline to this vote */
-		virtual unsigned getVoteTimeout() const;
-
-		virtual bool isVoteRunning() const;
-
-		virtual void voteNo();
-
-		virtual void voteYes();
-
-
-		bool isRaceFinished() const;
-
-		bool isRacePending() const;
-
-		bool isRaceStarted() const;
 
 		const Race::Level &getLevel() const;
 
@@ -92,13 +69,45 @@ class RaceLogic {
 
 		std::vector<CL_String> getPlayerNames() const;
 
-		const Player &getPlayer(const CL_String& p_name) const;
+		unsigned getRaceFinishTime() const;
 
 		int getRaceLapCount() const;
 
 		unsigned getRaceStartTime() const;
 
-		unsigned getRaceFinishTime() const;
+		const TyreStripes &getTyreStripes() const;
+
+		/** @return Message that will be displayed on screen when vote is running. */
+		virtual const CL_String &getVoteMessage() const;
+
+		virtual int getVoteNoCount() const;
+
+		/** @return Time in milliseconds that is deadline to this vote */
+		virtual unsigned getVoteTimeout() const;
+
+		virtual int getVoteYesCount() const;
+
+		virtual bool isVoteRunning() const;
+
+
+
+		virtual void callAVote(VoteType p_type, const CL_String &p_subject="");
+
+		bool hasPlayer(const CL_String &p_name) const;
+
+		bool isRaceFinished() const;
+
+		bool isRacePending() const;
+
+		bool isRaceStarted() const;
+
+		const Player &getPlayer(int p_index) const;
+
+		const Player &getPlayer(const CL_String& p_name) const;
+
+		const Player &getPlayer(const Car& p_car) const;
+
+		int getPlayerCount() const;
 
 		/**
 		 * Begins the race at <code>p_startTimeMs</code>.
@@ -109,54 +118,28 @@ class RaceLogic {
 
 		virtual void update(unsigned p_timeElapsed);
 
+		virtual void voteNo();
+
+		virtual void voteYes();
+
+
 	protected:
 
-		/** The level */
-		Level m_level;
+		Level &getLevel();
 
-		/** All players map (with local player too) */
-		typedef std::map<CL_String, Player*> TPlayerMap;
-		typedef std::pair<CL_String, Player*> TPlayerMapPair;
-
-		TPlayerMap m_playerMap;
-
-		/** Race beginning time. If 0 then race not started yet */
-		unsigned m_raceStartTimeMs;
-
-		/** Race end time. If 0 then race not finished yet */
-		unsigned m_raceFinishTimeMs;
-
-		/** Laps total */
-		int m_lapCount;
-
-		/** Next place to get on finish */
-		int m_nextPlace;
-
-		/** Players that finished this race */
-		typedef std::vector<const Player*> TConstPlayerList;
-
-		TConstPlayerList m_playersFinished;
-
-
-		// update routines
-
-		void updateCarPhysics(unsigned p_timeElapsed);
-
-		void updatePlayersProgress();
-
-		void updateCheckpoints();
-
-
-		// helpers
-
-		bool hasPlayerFinished(const Player *p_player) const;
+		void addPlayer(const Player &p_player);
 
 		void display(const CL_String &p_message);
 
+		Player &getPlayer(int p_index);
+
+		Player &getPlayer(const CL_String& p_name);
+
+		void removePlayer(const Player &p_player);
+
 	private:
 
-		/** Message board to display game messages */
-		MessageBoard m_messageBoard;
+		CL_SharedPtr<RaceLogicImpl> m_impl;
 
 };
 

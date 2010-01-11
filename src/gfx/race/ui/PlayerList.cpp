@@ -29,45 +29,69 @@
 #include "PlayerList.h"
 
 #include "common/Player.h"
+#include "gfx/race/ui/Label.h"
 #include "logic/race/Car.h"
 #include "logic/race/RaceLogic.h"
 
+
 namespace Gfx {
 
-PlayerList::PlayerList(const Race::RaceLogic *p_logic) :
-	m_logic(p_logic),
-	m_label(CL_Pointf(), "", Label::F_BOLD, 16)
+class PlayerListImpl
 {
+	public:
+
+		const Race::RaceLogic *m_logic;
+
+		CL_Pointf m_position;
+
+		Label m_label;
+
+		int m_labelHeight;
+
+
+		PlayerListImpl(const Race::RaceLogic *p_logic) :
+			m_logic(p_logic),
+			m_label(CL_Pointf(), "", Label::F_BOLD, 16)
+		{ /* empty */ }
+
+		const CL_String &ownerName(const Race::Car &p_car);
+};
+
+PlayerList::PlayerList(const Race::RaceLogic *p_logic) :
+	m_impl(new PlayerListImpl(p_logic))
+{
+	// empty
 }
 
 PlayerList::~PlayerList()
 {
+	// empty
 }
 
 void PlayerList::setPosition(const CL_Pointf &p_pos)
 {
-	m_position = p_pos;
+	m_impl->m_position = p_pos;
 }
 
 
 void PlayerList::draw(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
+	const Race::Level &level = m_impl->m_logic->getLevel();
 	const int carCount = level.getCarCount();
 
 	float h = 0.0f;
 
-	p_gc.mult_translate(m_position.x, m_position.y);
+	p_gc.mult_translate(m_impl->m_position.x, m_impl->m_position.y);
 
 	for (int i = 0; i < carCount; ++i) {
 		const Race::Car &car = level.getCar(i);
 
-		m_label.setPosition(CL_Pointf(0, h));
-		m_label.setText(cl_format("%1. %2", i + 1, car.getOwner()->getName()));
+		m_impl->m_label.setPosition(CL_Pointf(0, h));
+		m_impl->m_label.setText(cl_format("%1. %2", i + 1, m_impl->m_logic->getPlayer(car).getName())); // FIXME: not optimal
 
-		m_label.draw(p_gc);
+		m_impl->m_label.draw(p_gc);
 
-		h += m_labelHeight;
+		h += m_impl->m_labelHeight;
 	}
 
 	p_gc.pop_modelview();
@@ -75,12 +99,25 @@ void PlayerList::draw(CL_GraphicContext &p_gc)
 
 void PlayerList::load(CL_GraphicContext &p_gc)
 {
-	m_label.load(p_gc);
+	m_impl->m_label.load(p_gc);
 
-	m_label.setText("X");
-	m_labelHeight = m_label.size(p_gc).height;
+	m_impl->m_label.setText("X");
+	m_impl->m_labelHeight = m_impl->m_label.size(p_gc).height;
 
 	Drawable::load(p_gc);
 }
 
+const CL_String &PlayerListImpl::ownerName(const Race::Car &p_car)
+{
+	const int playerCount = m_logic->getPlayerCount();
+
+	for (int i = 0; i < playerCount; ++i) {
+		const Player &player = m_logic->getPlayer(i);
+
+		if (player.getCar() == p_car) {
+			return player.getName();
+		}
+	}
 }
+
+} // namespace

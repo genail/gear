@@ -41,6 +41,8 @@ const int V_MARGIN = 40;
 class EditorSceneImpl
 {
 public:
+	EditorSceneImpl() : m_controller(null) { }
+
 	// scene controller
 
 	EditorController m_controller;

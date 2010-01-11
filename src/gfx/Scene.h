@@ -59,6 +59,7 @@ class Scene {
 
 		virtual void load(CL_GraphicContext &p_gc) = 0;
 
+		/** Mouse move action. 0,0 is top left corner of window. */
 		virtual void mouseMoved(const CL_Point &p_pos) = 0;
 
 		virtual void pushed() = 0;

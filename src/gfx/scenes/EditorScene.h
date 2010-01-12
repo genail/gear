@@ -50,6 +50,8 @@ class EditorScene : public Gfx::DirectScene
 
 		virtual void inputReleased(const CL_InputEvent &p_event);
 
+		virtual void mouseMoved(const CL_Point &p_pos);
+
 	private:
 
 		CL_SharedPtr<EditorSceneImpl> m_impl;

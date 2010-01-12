@@ -75,6 +75,11 @@ void Track::addPoint(
 	}
 }
 
+TrackPoint &Track::getPoint(int p_index)
+{
+	return m_impl->m_trackPoints[p_index];
+}
+
 const TrackPoint &Track::getPoint(int p_index) const
 {
 	return m_impl->m_trackPoints[p_index];

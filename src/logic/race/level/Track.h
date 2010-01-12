@@ -56,10 +56,11 @@ class Track {
 				int p_index = std::numeric_limits<int>::max()
 		);
 
+		TrackPoint &getPoint(int p_index);
+
 		const TrackPoint &getPoint(int p_index) const;
 
 		int getPointCount() const;
-
 
 		void clear();
 

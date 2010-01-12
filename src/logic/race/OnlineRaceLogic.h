@@ -94,7 +94,7 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		Net::Client *m_client;
 
 		/** Local player */
-		Player *m_localPlayer;
+		Player m_localPlayer;
 
 		/** Slots container */
 		CL_SlotContainer m_slots;

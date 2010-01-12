@@ -13,9 +13,16 @@
         <!-- Define how track leads to -->
         <track>
             <!-- Coordinates are given in meters -->
-            <point x="0.0" y="0.0" radius="3.0" shift="1.0" />
-            <point x="20.0" y="20.0" radius="3.0" shift="0.0" />
-            <point x="40.0" y="0.0" radius="2.0" shift="1.0" />
+            <point x="0.0" y="0.0" radius="8.0" shift="0.0" />
+            <point x="200.0" y="0.0" radius="8.0" shift="-1.0" />
+            <point x="200.0" y="20.0" radius="8.0" shift="0.0" />
+            <point x="150.0" y="40.0" radius="8.0" shift="0.0" />
+            <point x="120.0" y="80.0" radius="5.0" shift="1.0" />
+            <point x="160.0" y="60.0" radius="6.0" shift="-1.0" />
+            <point x="165.0" y="65.0" radius="7.0" shift="-1.0" />
+            <point x="120.0" y="120.0" radius="5.0" shift="0.0" />
+            <point x="100.0" y="100.0" radius="5.0" shift="0.0" />
+            <point x="0.0" y="100.0" radius="7.0" shift="0.0" />
         </track>
         
         <bounds>

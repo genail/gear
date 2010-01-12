@@ -45,19 +45,21 @@ OfflineRaceLogic::~OfflineRaceLogic()
 
 void OfflineRaceLogic::initialize()
 {
-	m_level.initialize();
-	m_level.load(m_levelName);
+	Level &level = getLevel();
+
+	level.initialize();
+	level.load(m_levelName);
 
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 
-	m_playerMap[player.getName()] = &player;
-	m_level.addCar(&player.getCar());
+	addPlayer(player);
+	level.addCar(&player.getCar());
 }
 
 void OfflineRaceLogic::destroy()
 {
-	m_level.destroy();
+	getLevel().destroy();
 }
 
 }

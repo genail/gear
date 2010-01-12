@@ -29,31 +29,34 @@
 #pragma once
 
 #include <ClanLib/core.h>
-#include "logic/race/Car.h"
+
+namespace Race {
+	class Car;
+}
+
+class PlayerImpl;
 
 class Player {
 
 	public:
 
-		Player();
-
-		Player(const CL_String8 &p_name);
+		explicit Player(const CL_String8 &p_name = "");
 
 		virtual ~Player();
 
-		Race::Car &getCar() { return m_car; }
+		Race::Car &getCar();
 
-		const Race::Car &getCar() const { return m_car; }
+		const Race::Car &getCar() const;
 
-		const CL_String &getName() const { return m_name; }
+		const CL_String &getName() const;
 
-		void setName(const CL_String &p_name) { m_name = p_name; }
+		void setName(const CL_String &p_name);
+
+
+		bool operator==(const Player &other) const;
 
 	private:
-		/** Nickname of this player */
-		CL_String8 m_name;
 
-		/** The car */
-		Race::Car m_car;
+		CL_SharedPtr<PlayerImpl> m_impl;
 
 };

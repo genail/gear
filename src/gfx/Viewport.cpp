@@ -73,11 +73,25 @@ void Viewport::finalizeGC(CL_GraphicContext &p_gc) {
 	p_gc.pop_modelview();
 }
 
-CL_Pointf Viewport::onScreen(const CL_Pointf &p_point) const
+CL_Pointf Viewport::onScreen(const CL_Pointf &p_worldPoint) const
+{
+	return toScreen(p_worldPoint);
+}
+
+CL_Pointf Viewport::toScreen(const CL_Pointf &p_point) const
 {
 	CL_Pointf result;
 	result.x = ((p_point.x - m_x) / m_width) * Stage::getWidth();
 	result.y = ((p_point.y - m_y) / m_height) * Stage::getHeight();
+
+	return result;
+}
+
+CL_Pointf Viewport::toWorld(const CL_Pointf &p_point) const
+{
+	CL_Pointf result;
+	result.x = m_x + (p_point.x / Stage::getWidth()) * m_width;
+	result.y = m_y + (p_point.y / Stage::getHeight()) * m_height;
 
 	return result;
 }

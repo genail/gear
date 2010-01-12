@@ -81,6 +81,11 @@ void GuiScene::load(CL_GraphicContext &p_gc)
 	m_loaded = true;
 }
 
+void GuiScene::mouseMoved(const CL_Point &p_pos)
+{
+	// empty
+}
+
 void GuiScene::pushed()
 {
 	set_visible(true);

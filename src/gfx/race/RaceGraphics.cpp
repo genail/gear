@@ -72,7 +72,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 	CL_Draw::fill(
 			p_gc, 0.0f, 0.0f,
 			Stage::getWidth(), Stage::getHeight(),
-			CL_Colorf::black
+			CL_Colorf::green
 	);
 
 	if (m_logic->getLevel().isLoaded()) {
@@ -399,7 +399,7 @@ void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 {
 	static const float MIN_SCALE = 0.5f;
 	static const float MAX_SCALE = 1.0f;
-	static const float MAX_SPEED = 5.0f;
+	static const float MAX_SPEED = 10.0f;
 
 	float speed = Game::getInstance().getPlayer().getCar().getSpeed();
 
@@ -447,7 +447,7 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 
 	timeFromLastSmoke += p_timeElapsed;
 
-	static const int RAND_LIMIT = 10;
+	static const int RAND_LIMIT = 20;
 
 	if (car.isDrifting() && timeFromLastSmoke >= SMOKE_PERIOD) {
 

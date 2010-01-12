@@ -30,6 +30,8 @@
 
 #include <ClanLib/display.h>
 
+#include "common.h"
+
 namespace Gfx
 {
 
@@ -51,11 +53,18 @@ class Viewport {
 
 		void finalizeGC(CL_GraphicContext &p_gc);
 
-		CL_Pointf onScreen(const CL_Pointf &p_point) const;
+		/** Please use toScreen() instead */
+		DEPRECATED(CL_Pointf onScreen(const CL_Pointf &p_worldPoint) const);
 
 		void prepareGC(CL_GraphicContext &p_gc);
 
 		void setScale(float p_scale);
+
+		/** Converts world coordinate to screen (window) coordinate. */
+		CL_Pointf toScreen(const CL_Pointf &p_worldPoint) const;
+
+		/** Converts screen (window) coordinate to world coordinate. */
+		CL_Pointf toWorld(const CL_Pointf &p_screenPoint) const;
 
 		void update(unsigned int p_elapsedTime);
 

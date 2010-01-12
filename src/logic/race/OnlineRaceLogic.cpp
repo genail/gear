@@ -53,8 +53,8 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 
 	// connect signal and slots from player's car
 	Game &game = Game::getInstance();
-	m_localPlayer = &game.getPlayer();
-	Car &car = m_localPlayer->getCar();
+	m_localPlayer = game.getPlayer();
+	Car &car = m_localPlayer.getCar();
 
 	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogic::onInputChange);
 
@@ -95,21 +95,15 @@ void OnlineRaceLogic::destroy()
 	if (m_initialized) {
 		m_client->disconnect();
 
-		// remove players
-		TPlayerMapPair pair;
-		foreach (pair, m_playerMap) {
-			Player *player = pair.second;
+		// remove cars from level
+		const int playerCount = getPlayerCount();
 
-			// remove car from level
-			m_level.removeCar(&player->getCar());
-
-			// delete player if belongs to me
-			if (player != &Game::getInstance().getPlayer()) {
-				delete player;
-			}
+		for (int i = 0; i < playerCount; ++i) {
+			Player &player = getPlayer(i);
+			getLevel().removeCar(&player.getCar());
 		}
 
-		m_level.destroy();
+		getLevel().destroy();
 	}
 }
 
@@ -120,7 +114,7 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 	RaceLogic::update(p_timeElapsed);
 
 	// make sure that car is not locked when race is started
-	Race::Car &car = m_localPlayer->getCar();
+	Race::Car &car = m_localPlayer.getCar();
 	if (isRaceStarted() && car.isLocked()) {
 		car.setLocked(false);
 
@@ -146,75 +140,68 @@ void OnlineRaceLogic::onGoodbye(GoodbyeReason p_reason, const CL_String &p_messa
 void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 {
 	// check player existence
-	TPlayerMap::iterator itor = m_playerMap.find(p_name);
 
-	if (itor == m_playerMap.end()) {
+	if (!hasPlayer(p_name)) {
 		// create new player
-		Player *player = new Player(p_name);
-		m_playerMap[p_name] = player;
+		Player player(p_name);
+		addPlayer(player);
 
-		// add his car to level
-		m_level.addCar(&player->getCar());
+		// add his car to the level
+		getLevel().addCar(&player.getCar());
 
 		display(cl_format(_("Player %1 joined"), p_name));
 	} else {
 		cl_log_event(LOG_ERROR, "Player named '%1' already in list", p_name);
 	}
-
 }
 
 void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 {
 	// get the player
-	TPlayerMap::iterator itor = m_playerMap.find(p_name);
+	Player &player = getPlayer(p_name);
 
-	if (itor != m_playerMap.end()) {
-		Player *player = itor->second;
+	// remove from level
+	getLevel().removeCar(&player.getCar());
 
-		// remove car from level
-		m_level.removeCar(&player->getCar());
+	// remove from game
+	removePlayer(player);
 
-		// remove player
-		delete player;
 
-		display(cl_format("Player %1 leaved", p_name));
-	} else {
-		cl_log_event(LOG_ERROR, "No player named '%1' in list", p_name);
-	}
+	display(cl_format("Player %1 leaved", p_name));
 }
 
 void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 {
 	// load level
 	const CL_String &levelName = p_gameState.getLevel();
-	m_level.initialize();
-	m_level.load(levelName);
+	getLevel().initialize();
+	getLevel().load(levelName);
 
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();
 
-	Player *player;
+	Player player;
 	Car *car;
 
 	for (unsigned i = 0; i < playerCount; ++i) {
 		const CL_String &playerName = p_gameState.getPlayerName(i);
 
-		if (playerName == m_localPlayer->getName()) {
+		if (playerName == m_localPlayer.getName()) {
 			// this is local player, so it exists now
 			player = m_localPlayer;
 		} else {
 			// this is remote player
-			player = new Player(playerName);
+			player = Player(playerName);
 		}
 
 		// put player to player list
-		m_playerMap[playerName] = player;
+		addPlayer(player);
 
 		// prepare car and put it to level
-		car = &player->getCar();
+		car = &player.getCar();
 		car->applyCarState(p_gameState.getCarState(i));
 
-		m_level.addCar(car);
+		getLevel().addCar(&player.getCar());
 	}
 
 
@@ -223,10 +210,9 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
 {
 	const CL_String &playerName = p_carState.getName();
-	TPlayerMap::iterator itor = m_playerMap.find(playerName);
 
-	if (itor != m_playerMap.end()) {
-		itor->second->getCar().applyCarState(p_carState);
+	if (hasPlayer(playerName)) {
+		getPlayer(playerName).getCar().applyCarState(p_carState);
 	} else {
 		cl_log_event(LOG_ERROR, "Player %1 do not exists", playerName);
 	}

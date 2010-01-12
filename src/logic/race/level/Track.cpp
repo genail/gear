@@ -29,6 +29,7 @@
 #include "Track.h"
 
 #include <assert.h>
+#include <vector>
 
 #include "common.h"
 #include "logic/race/level/Checkpoint.h"

@@ -28,10 +28,9 @@
 
 #pragma once
 
-#include <limits>
-#include <vector>
-
 #include <ClanLib/core.h>
+
+#include <limits>
 
 namespace Race {
 

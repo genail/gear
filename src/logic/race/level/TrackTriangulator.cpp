@@ -223,9 +223,11 @@ std::vector<TrackPoint> TrackTriangulatorImpl::toTrackPoints(
 void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 {
 	const int pointCount = p_track.getPointCount();
-	G_ASSERT(p_segment >= 0 && p_segment <= pointCount);
+	G_ASSERT(p_segment >= -1 && p_segment <= pointCount);
 
 	if (p_segment == -1) {
+
+		clear();
 
 		for (int i = 0; i < pointCount; ++i) {
 			triangulate(p_track, i);
@@ -329,7 +331,7 @@ const TrackSegment &TrackTriangulator::getSegment(int p_index) const
 	TrackTriangulatorImpl::TIntSegmentMap::const_iterator itor =
 			m_impl->m_intSegMap.find(p_index);
 
-	G_ASSERT(itor != m_impl->m_intSegMap.end());
+	G_ASSERT(itor != m_impl->m_intSegMap.end() && "segment not triangulated");
 
 	return *(itor->second);
 }
@@ -360,6 +362,11 @@ const CL_Pointf &TrackTriangulator::getLastRightPoint(int p_segIndex) const
 	const std::vector<CL_Pointf> &pts = seg.getTrianglePoints();
 
 	return pts[pts.size() - 2];
+}
+
+void TrackTriangulator::clear()
+{
+	m_impl->m_intSegMap.clear();
 }
 
 } // namespace

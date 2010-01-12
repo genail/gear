@@ -35,6 +35,7 @@
 namespace Race
 {
 	class Level;
+	class TrackTriangulator;
 }
 
 namespace Gfx
@@ -49,6 +50,9 @@ class Level : public Gfx::Drawable
 		explicit Level(const Race::Level &p_levelLogic);
 
 		virtual ~Level();
+
+		/** @return Source of track rendering. */
+		Race::TrackTriangulator &getTrackTriangulator();
 
 
 		virtual void draw(CL_GraphicContext &p_gc);

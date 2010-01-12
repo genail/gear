@@ -140,4 +140,9 @@ void Level::load(CL_GraphicContext &p_gc)
 
 }
 
+Race::TrackTriangulator &Level::getTrackTriangulator()
+{
+	return m_impl->m_triangulator;
+}
+
 } // namespace

@@ -30,7 +30,7 @@
 
 #include <ClanLib/core.h>
 
-<<<<<<< HEAD
+
 // shitty Visual C++ hack to get numeric_limits<>::max() to work
 #ifdef max
 #undef max

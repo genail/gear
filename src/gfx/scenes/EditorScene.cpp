@@ -26,6 +26,8 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <cmath>
+
 #include "EditorScene.h"
 
 #include "common.h"
@@ -34,6 +36,7 @@
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackPoint.h"
+#include "logic/race/level/TrackTriangulator.h"
 
 using namespace Race;
 using namespace Gfx;
@@ -45,7 +48,7 @@ const int BUTTON_HEIGHT = 20;
 
 const int V_MARGIN = 40;
 
-const int MIN_LINE_LENGTH = 40;
+const int POINT_WIDTH = 5;
 const int PAINT_LINE_WIDTH = 2;
 const int DISCOVER_LINE_WIDTH = 12;
 
@@ -55,19 +58,20 @@ public:
 	EditorSceneImpl() : 
 			m_controller(NULL),
 			m_raceLevel(),
+			m_gfxLevel(m_raceLevel),
 			m_track(),
 			m_selectedIndex(-1),
 			m_lightIndex(-1),
 			m_selectedPointColor(CL_Colorf::yellow),
 			m_pointColor(CL_Colorf::blue),
-			m_lineColor(CL_Colorf::white),
+			m_radiusLineColor(CL_Colorf::white),
+			m_shiftLineColor(CL_Colorf::green),
 			m_selectedPointFrameColor(CL_Colorf::red),
 			m_lastMousePos(0.0f, 0.0f),
-			m_pressedState(PressedState::None),
-			m_isPressed(false)
+			m_pressedState(None),
+			m_isPressed(false),
+			m_isCtrlPressed(false)
 	{
-		m_gfxLevel = new Gfx::Level(m_raceLevel);
-
 		setDefaultPoints();
 
 		m_raceLevel.setTrack(m_track);
@@ -88,13 +92,15 @@ public:
 
 	CL_Colorf m_pointColor;
 
-	CL_Colorf m_lineColor;
+	CL_Colorf m_radiusLineColor;
+
+	CL_Colorf m_shiftLineColor;
 
 	// track
 
 	Race::Level m_raceLevel;
 
-	Gfx::Level* m_gfxLevel;
+	Gfx::Level m_gfxLevel;
 
 	Track m_track;
 
@@ -104,8 +110,6 @@ public:
 	{
 		None,
 		Point,
-		ShiftLeft,
-		ShiftRight,
 		RadiusUp,
 		RadiusDown
 	};
@@ -121,6 +125,8 @@ public:
 	PressedState m_pressedState;
 
 	bool m_isPressed;
+
+	bool m_isCtrlPressed;
 
 	// scene controller
 
@@ -147,21 +153,17 @@ public:
 
 	void findPointAt(const CL_Point &p_pos, int &p_index, PressedState &p_pressedState);
 
-	CL_Rect& getRadiusUpRect(const TrackPoint &p_trackPoint, int p_lineWidth);
+	CL_Rect getRadiusUpRect(const TrackPoint &p_trackPoint, int p_lineWidth);
 
-	CL_Rect& getRadiusDownRect(const TrackPoint &p_trackPoint, int p_lineWidth);
+	CL_Rect getRadiusDownRect(const TrackPoint &p_trackPoint, int p_lineWidth);
 
-	CL_Rect& getRadiusRect(const TrackPoint &p_trackPoint, int p_lineWidth);
+	CL_Rect getRadiusRect(const TrackPoint &p_trackPoint, int p_lineWidth);
 
-	CL_Rect& getShiftLeftRect(const TrackPoint &p_trackPoint, int p_lineWidth);
+	CL_Rect getShiftRect(const TrackPoint &p_trackPoint, int p_lineWidth);
 
-	CL_Rect& getShiftRightRect(const TrackPoint &p_trackPoint, int p_lineWidth);
+	CL_Rect getPointRect(const TrackPoint &p_trackPoint);
 
-	CL_Rect& getShiftRect(const TrackPoint &p_trackPoint, int p_lineWidth);
-
-	CL_Rect& getPointRect(const TrackPoint &p_trackPoint);
-
-	CL_Rect& getPointRect(const CL_Point &p_point);
+	CL_Rect getPointRect(const CL_Point &p_point);
 
 	// action slots
 };
@@ -170,21 +172,21 @@ void EditorSceneImpl::setDefaultPoints()
 {
 	m_track.clear();
 
-	m_track.addPoint(CL_Pointf(200.0f, 150.0f), 50.0f, 0.0f);
-	m_track.addPoint(CL_Pointf(600.0f, 150.0f), 50.0f, 0.0f);
-	m_track.addPoint(CL_Pointf(400.0f, 450.0f), 60.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(200.0f, 100.0f), 50.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(600.0f, 100.0f), 50.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(400.0f, 500.0f), 60.0f, 0.0f);
 }
 
 void EditorSceneImpl::draw(CL_GraphicContext &p_gc)
 {
-	(*m_gfxLevel).draw(p_gc);
+	m_gfxLevel.draw(p_gc);
 
 	drawPoints(p_gc);
 }
 
 void EditorSceneImpl::load(CL_GraphicContext &p_gc)
 {
-	(*m_gfxLevel).load(p_gc);
+	m_gfxLevel.load(p_gc);
 }
 
 void EditorSceneImpl::drawPoints(CL_GraphicContext &p_gc)
@@ -203,8 +205,10 @@ void EditorSceneImpl::drawPoint(const TrackPoint &p_trackPoint, bool &p_isSelect
 
 	if (p_isSelected)
 	{
-		CL_Draw::fill(p_gc, getRadiusRect(p_trackPoint, PAINT_LINE_WIDTH), m_lineColor);
-		CL_Draw::fill(p_gc, getShiftRect(p_trackPoint, PAINT_LINE_WIDTH), m_lineColor);
+		CL_Draw::fill(p_gc, getRadiusRect(p_trackPoint, PAINT_LINE_WIDTH), m_radiusLineColor);
+	
+		if (m_isCtrlPressed)
+			CL_Draw::fill(p_gc, getShiftRect(p_trackPoint, PAINT_LINE_WIDTH), m_shiftLineColor);
 	}
 
 	CL_Draw::fill(p_gc, getPointRect(p_trackPoint), color);
@@ -217,10 +221,10 @@ void EditorSceneImpl::drawPoint(const TrackPoint &p_trackPoint, bool &p_isSelect
 
 void EditorSceneImpl::findPointAt(const CL_Point &p_pos, int &p_index, PressedState &p_pressedState)
 {
-	if (!m_isPressed)
+	if (!m_isPressed && !m_isCtrlPressed)
 	{
 		p_index = -1;
-		p_pressedState = PressedState::None;
+		p_pressedState = None;
 
 		CL_Rect rect = getPointRect(p_pos);
 
@@ -228,7 +232,7 @@ void EditorSceneImpl::findPointAt(const CL_Point &p_pos, int &p_index, PressedSt
 		{
 			if (rect.contains(m_track.getPoint(i).getPosition()))
 			{
-				p_pressedState = PressedState::Point;
+				p_pressedState = Point;
 				p_index = i;
 
 				return;
@@ -240,7 +244,7 @@ void EditorSceneImpl::findPointAt(const CL_Point &p_pos, int &p_index, PressedSt
 			rect = getRadiusUpRect(m_track.getPoint(m_selectedIndex), DISCOVER_LINE_WIDTH);
 			if (rect.contains(p_pos))
 			{
-				p_pressedState = PressedState::RadiusUp;
+				p_pressedState = RadiusUp;
 				p_index = m_selectedIndex;
 
 				return;
@@ -249,25 +253,7 @@ void EditorSceneImpl::findPointAt(const CL_Point &p_pos, int &p_index, PressedSt
 			rect = getRadiusDownRect(m_track.getPoint(m_selectedIndex), DISCOVER_LINE_WIDTH);
 			if (rect.contains(p_pos))
 			{
-				p_pressedState = PressedState::RadiusDown;
-				p_index = m_selectedIndex;
-
-				return;
-			}
-
-			rect = getShiftLeftRect(m_track.getPoint(m_selectedIndex), DISCOVER_LINE_WIDTH);
-			if (rect.contains(p_pos))
-			{
-				p_pressedState = PressedState::ShiftLeft;
-				p_index = m_selectedIndex;
-
-				return;
-			}
-
-			rect = getShiftRightRect(m_track.getPoint(m_selectedIndex), DISCOVER_LINE_WIDTH);
-			if (rect.contains(p_pos))
-			{
-				p_pressedState = PressedState::ShiftRight;
+				p_pressedState = RadiusDown;
 				p_index = m_selectedIndex;
 
 				return;
@@ -276,10 +262,10 @@ void EditorSceneImpl::findPointAt(const CL_Point &p_pos, int &p_index, PressedSt
 	}
 }
 
-CL_Rect& EditorSceneImpl::getRadiusRect(const TrackPoint &p_trackPoint, int p_lineWidth)
+CL_Rect EditorSceneImpl::getRadiusRect(const TrackPoint &p_trackPoint, int p_lineWidth)
 {
 	CL_Point pos = p_trackPoint.getPosition();
-	int radiusLine = p_trackPoint.getRadius() + MIN_LINE_LENGTH;
+	int radiusLine = p_trackPoint.getRadius();
 
 	CL_Point point(pos.x - (p_lineWidth / 2), pos.y - (radiusLine / 2));
 	CL_Size size(p_lineWidth, radiusLine);
@@ -289,10 +275,10 @@ CL_Rect& EditorSceneImpl::getRadiusRect(const TrackPoint &p_trackPoint, int p_li
 	return rect;
 }
 
-CL_Rect& EditorSceneImpl::getRadiusUpRect(const TrackPoint &p_trackPoint, int p_lineWidth)
+CL_Rect EditorSceneImpl::getRadiusUpRect(const TrackPoint &p_trackPoint, int p_lineWidth)
 {
 	CL_Point pos = p_trackPoint.getPosition();
-	int radiusLine = (p_trackPoint.getRadius() + MIN_LINE_LENGTH) / 2;
+	int radiusLine = (p_trackPoint.getRadius()) / 2;
 
 	CL_Point point(pos.x - (p_lineWidth / 2), pos.y - (radiusLine));
 	CL_Size size(p_lineWidth, radiusLine);
@@ -302,10 +288,10 @@ CL_Rect& EditorSceneImpl::getRadiusUpRect(const TrackPoint &p_trackPoint, int p_
 	return rect;
 }
 
-CL_Rect& EditorSceneImpl::getRadiusDownRect(const TrackPoint &p_trackPoint, int p_lineWidth)
+CL_Rect EditorSceneImpl::getRadiusDownRect(const TrackPoint &p_trackPoint, int p_lineWidth)
 {
 	CL_Point pos = p_trackPoint.getPosition();
-	int radiusLine = (p_trackPoint.getRadius() + MIN_LINE_LENGTH) / 2;
+	int radiusLine = (p_trackPoint.getRadius()) / 2;
 
 	CL_Point point(pos.x - (p_lineWidth / 2), pos.y);
 	CL_Size size(p_lineWidth, radiusLine);
@@ -315,12 +301,12 @@ CL_Rect& EditorSceneImpl::getRadiusDownRect(const TrackPoint &p_trackPoint, int 
 	return rect;
 }
 
-CL_Rect& EditorSceneImpl::getShiftRect(const TrackPoint &p_trackPoint, int p_lineWidth)
+CL_Rect EditorSceneImpl::getShiftRect(const TrackPoint &p_trackPoint, int p_lineWidth)
 {
 	CL_Point pos = p_trackPoint.getPosition();
-	int shiftLine = p_trackPoint.getShift() + MIN_LINE_LENGTH;
+	int shiftLine = (abs(p_trackPoint.getShift() * 100)) + POINT_WIDTH;
 
-	CL_Point point(pos.x - (shiftLine / 2), pos.y - (p_lineWidth / 2));
+	CL_Point point(pos.x - (shiftLine /2), pos.y - (p_lineWidth / 2));
 	CL_Size size(shiftLine, p_lineWidth);
 
 	CL_Rect rect(point, size);
@@ -328,52 +314,26 @@ CL_Rect& EditorSceneImpl::getShiftRect(const TrackPoint &p_trackPoint, int p_lin
 	return rect;
 }
 
-CL_Rect& EditorSceneImpl::getShiftLeftRect(const TrackPoint &p_trackPoint, int p_lineWidth)
-{
-	CL_Point pos = p_trackPoint.getPosition();
-	int shiftLine = (p_trackPoint.getShift() + MIN_LINE_LENGTH) / 2;
-
-	CL_Point point(pos.x - shiftLine, pos.y - (p_lineWidth / 2));
-	CL_Size size(shiftLine, p_lineWidth);
-
-	CL_Rect rect(point, size);
-
-	return rect;
-}
-
-CL_Rect& EditorSceneImpl::getShiftRightRect(const TrackPoint &p_trackPoint, int p_lineWidth)
-{
-	CL_Point pos = p_trackPoint.getPosition();
-	int shiftLine = (p_trackPoint.getShift() + MIN_LINE_LENGTH) / 2;
-
-	CL_Point point(pos.x, pos.y - (p_lineWidth / 2));
-	CL_Size size(shiftLine, p_lineWidth);
-
-	CL_Rect rect(point, size);
-
-	return rect;
-}
-
-CL_Rect& EditorSceneImpl::getPointRect(const TrackPoint &p_trackPoint)
+CL_Rect EditorSceneImpl::getPointRect(const TrackPoint &p_trackPoint)
 {
 	CL_Rect rect;
 
-	rect.left = p_trackPoint.getPosition().x - 5.0f;
-	rect.top = p_trackPoint.getPosition().y - 5.0f;
-	rect.right = p_trackPoint.getPosition().x + 5.0f;
-	rect.bottom = p_trackPoint.getPosition().y + 5.0f;
+	rect.left = p_trackPoint.getPosition().x - POINT_WIDTH;
+	rect.top = p_trackPoint.getPosition().y - POINT_WIDTH;
+	rect.right = p_trackPoint.getPosition().x + POINT_WIDTH;
+	rect.bottom = p_trackPoint.getPosition().y + POINT_WIDTH;
 
 	return rect;
 }
 
-CL_Rect& EditorSceneImpl::getPointRect(const CL_Point &p_point)
+CL_Rect EditorSceneImpl::getPointRect(const CL_Point &p_point)
 {
 	CL_Rect rect;
 
-	rect.left = p_point.x - 5.0f;
-	rect.top = p_point.y - 5.0f;
-	rect.right = p_point.x + 5.0f;
-	rect.bottom = p_point.y + 5.0f;
+	rect.left = p_point.x - POINT_WIDTH;
+	rect.top = p_point.y - POINT_WIDTH;
+	rect.right = p_point.x + POINT_WIDTH;
+	rect.bottom = p_point.y + POINT_WIDTH;
 
 	return rect;
 }
@@ -397,15 +357,18 @@ void EditorSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_eve
 		case CL_MOUSE_LEFT:
 			m_isPressed = pressed;
 			break;
+		case CL_KEY_CONTROL:
+			m_isCtrlPressed = pressed;
+			break;
 		default:
 			break;
 	}
 
 	if (m_isPressed)
 	{
-		if (m_pressedState == PressedState::Point)
+		if (m_pressedState == Point)
 			m_selectedIndex = m_lightIndex;
-		else if (m_pressedState == PressedState::None)
+		else if (m_pressedState == None)
 			m_selectedIndex = m_lightIndex = -1;
 	}
 
@@ -419,38 +382,61 @@ void EditorSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_eve
 void EditorSceneImpl::mouseMoved(const CL_Point &p_pos)
 {
 	findPointAt(p_pos, m_lightIndex, m_pressedState);
-
 	
-	if (m_selectedIndex != -1 && m_isPressed)
+	if (m_selectedIndex != -1)
 	{
-		TrackPoint *trackPoint = const_cast<TrackPoint*>(&m_track.getPoint(m_selectedIndex));
+		TrackPoint trackPoint = m_track.getPoint(m_selectedIndex);
 		CL_Point deltaPos = p_pos - m_lastMousePos;
 
-		switch (m_pressedState)
+		if (m_isCtrlPressed)
 		{
-		case PressedState::Point:
-			trackPoint->setPosition(trackPoint->getPosition() + deltaPos);
-			break;
-		case PressedState::RadiusUp:
-			if (trackPoint->getRadius() - (deltaPos.y * 2) > 0.0f)
-				trackPoint->setRadius(trackPoint->getRadius() - (deltaPos.y * 2));
-			break;
-		case PressedState::RadiusDown:
-			if (trackPoint->getRadius() + (deltaPos.y * 2) > 0.0f)
-				trackPoint->setRadius(trackPoint->getRadius() + (deltaPos.y * 2));
-			break;
-		case PressedState::ShiftLeft:
-			if (trackPoint->getShift() - deltaPos.x > 0.0f)
-				trackPoint->setShift(trackPoint->getShift() - (deltaPos.x * 2));
-			break;
-		case PressedState::ShiftRight:
-			if (trackPoint->getShift() + deltaPos.x > 0.0f)
-				trackPoint->setShift(trackPoint->getShift() + (deltaPos.x * 2));
-			break;
+			double newShift = trackPoint.getShift() + (deltaPos.y / 100.0f);
+
+			if (newShift > -1.0f && newShift < 1.0f)
+				trackPoint.setShift(newShift);
+		}
+		else if (m_isPressed)
+		{
+			switch (m_pressedState)
+			{
+				float newRadius;
+
+			case Point:
+				trackPoint.setPosition(trackPoint.getPosition() + deltaPos);
+				break;
+			case RadiusUp:
+				newRadius = trackPoint.getRadius() - deltaPos.y;
+				if (newRadius > 20.0f)
+					trackPoint.setRadius(newRadius);
+				break;
+			case RadiusDown:
+				newRadius = trackPoint.getRadius() + deltaPos.y;
+				if (newRadius > 20.0f)
+					trackPoint.setRadius(newRadius);
+				break;
+			}
 		}
 
-		m_raceLevel.setTrack(m_track);
-		//m_gfxLevel = new Gfx::Level(m_raceLevel);
+		int first = 0, second = 0;
+
+		if (m_selectedIndex == 0)
+		{
+			first = 0;
+			second = m_track.getPointCount() - 1;
+		}
+		else if (m_selectedIndex == m_track.getPointCount() - 1)
+		{
+			first = m_track.getPointCount() - 2;
+			second = m_track.getPointCount() - 1;
+		}
+		else
+		{
+			first = m_selectedIndex - 1;
+			second = m_selectedIndex;
+		}
+
+		m_gfxLevel.getTrackTriangulator().triangulate(m_track, first);
+		m_gfxLevel.getTrackTriangulator().triangulate(m_track, second);
 	}
 
 	m_lastMousePos = p_pos;

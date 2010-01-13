@@ -38,6 +38,14 @@ class TrackSegment;
 
 class TrackTriangulatorImpl;
 
+/**
+ * Track triangulator.
+ * <p>
+ * This class takes track object and generates triangle representation of
+ * track. After calculation the data is stored in triangulator memory.
+ * Stored data can be updated by passing modified track and segment index
+ * to triangulate() method.
+ */
 class TrackTriangulator
 {
 
@@ -47,6 +55,8 @@ class TrackTriangulator
 
 		virtual ~TrackTriangulator();
 
+		/** Removes all triangulation data. */
+		void clear();
 
 		/** @return First left side point from selected segment */
 		const CL_Pointf &getFirstLeftPoint(int p_segIndex) const;
@@ -62,6 +72,17 @@ class TrackTriangulator
 
 		const TrackSegment &getSegment(int p_index) const;
 
+		/**
+		 * Triangulates whole track (if p_segment is -1) or
+		 * single segment by replacing old triangulate data
+		 * with new one.
+		 * <p>
+		 * When track size has changed is strongly recommended to triangulate
+		 * whole track again.
+		 *
+		 * @param p_track The track.
+		 * @param p_segment Segment index.
+		 */
 		void triangulate(const Track &p_track, int p_segment = -1);
 
 

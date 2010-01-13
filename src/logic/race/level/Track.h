@@ -28,15 +28,15 @@
 
 #pragma once
 
-#include <limits>
-#include <vector>
-
 #include <ClanLib/core.h>
 
+<<<<<<< HEAD
 // shitty Visual C++ hack to get numeric_limits<>::max() to work
 #ifdef max
 #undef max
 #endif
+
+#include <limits>
 
 namespace Race {
 
@@ -61,10 +61,11 @@ class Track {
 				int p_index = std::numeric_limits<int>::max()
 		);
 
+		TrackPoint &getPoint(int p_index);
+
 		const TrackPoint &getPoint(int p_index) const;
 
 		int getPointCount() const;
-
 
 		void clear();
 

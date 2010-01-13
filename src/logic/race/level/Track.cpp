@@ -29,6 +29,7 @@
 #include "Track.h"
 
 #include <assert.h>
+#include <vector>
 
 #include "common.h"
 #include "logic/race/level/Checkpoint.h"
@@ -73,6 +74,11 @@ void Track::addPoint(
 
 		m_impl->m_trackPoints.insert(itor, trackPoint);
 	}
+}
+
+TrackPoint &Track::getPoint(int p_index)
+{
+	return m_impl->m_trackPoints[p_index];
 }
 
 const TrackPoint &Track::getPoint(int p_index) const

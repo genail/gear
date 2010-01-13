@@ -172,9 +172,10 @@ void EditorSceneImpl::setDefaultPoints()
 {
 	m_track.clear();
 
-	m_track.addPoint(CL_Pointf(200.0f, 100.0f), 50.0f, 0.0f);
-	m_track.addPoint(CL_Pointf(600.0f, 100.0f), 50.0f, 0.0f);
-	m_track.addPoint(CL_Pointf(400.0f, 500.0f), 60.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(150.0f, 150.0f), 50.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(600.0f, 120.0f), 50.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(600.0f, 400.0f), 60.0f, 0.0f);
+	m_track.addPoint(CL_Pointf(200.0f, 450.0f), 40.0f, 0.0f);
 }
 
 void EditorSceneImpl::draw(CL_GraphicContext &p_gc)
@@ -417,26 +418,21 @@ void EditorSceneImpl::mouseMoved(const CL_Point &p_pos)
 			}
 		}
 
-		int first = 0, second = 0;
+		int segment = m_selectedIndex - 2;
+		if (m_selectedIndex < 0)
+			segment = m_track.getPointCount() - segment;
 
-		if (m_selectedIndex == 0)
+		for (int i = 0; i < 4; ++i)
 		{
-			first = 0;
-			second = m_track.getPointCount() - 1;
-		}
-		else if (m_selectedIndex == m_track.getPointCount() - 1)
-		{
-			first = m_track.getPointCount() - 2;
-			second = m_track.getPointCount() - 1;
-		}
-		else
-		{
-			first = m_selectedIndex - 1;
-			second = m_selectedIndex;
-		}
+			if (segment < 0)
+				segment = m_track.getPointCount() - 1;
+			else if (segment > m_track.getPointCount() - 1)
+				segment = 0;
 
-		m_gfxLevel.getTrackTriangulator().triangulate(m_track, first);
-		m_gfxLevel.getTrackTriangulator().triangulate(m_track, second);
+			m_gfxLevel.getTrackTriangulator().triangulate(m_track, segment);
+
+			++segment;
+		}
 	}
 
 	m_lastMousePos = p_pos;

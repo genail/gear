@@ -53,8 +53,12 @@ class TrackTriangulatorImpl
 
 		typedef std::map<int, CL_SharedPtr<TrackSegment> > TIntSegmentMap;
 
+		typedef std::map<int, CL_Vec2f> TIntGuideMap;
+
 
 		TIntSegmentMap m_intSegMap;
+
+		TIntGuideMap m_intGuideMap;
 
 
 		static int clamp(int p_index, int p_size);
@@ -322,6 +326,9 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 		m_impl->m_intSegMap[p_segment] =
 				CL_SharedPtr<TrackSegment>(new TrackSegment(triPoints));
 
+		// update direction vector
+		m_impl->m_intGuideMap[p_segment] = prevHelper;
+
 	}
 
 }
@@ -334,6 +341,16 @@ const TrackSegment &TrackTriangulator::getSegment(int p_index) const
 	G_ASSERT(itor != m_impl->m_intSegMap.end() && "segment not triangulated");
 
 	return *(itor->second);
+}
+
+const CL_Vec2f &TrackTriangulator::getGuide(int p_pointIndex) const
+{
+	TrackTriangulatorImpl::TIntGuideMap::const_iterator itor =
+			m_impl->m_intGuideMap.find(p_pointIndex);
+
+	G_ASSERT(itor != m_impl->m_intGuideMap.end() && "segment not triangulated");
+
+	return itor->second;
 }
 
 const CL_Pointf &TrackTriangulator::getFirstLeftPoint(int p_segIndex) const

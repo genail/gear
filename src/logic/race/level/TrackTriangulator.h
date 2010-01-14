@@ -70,7 +70,17 @@ class TrackTriangulator
 		/** @return Last right side point from selected segment */
 		const CL_Pointf &getLastRightPoint(int p_segIndex) const;
 
-		const TrackSegment &getSegment(int p_index) const;
+		/**
+		 * Provides guide vector for selected point. It is available only
+		 * after segment triangulation, so don't try to retrieve it earlier.
+		 * <p>
+		 * It always points to forward direction of the track.
+		 *
+		 * @return Guide vector for selected point.
+		 */
+		const CL_Vec2f &getGuide(int p_pointIndex) const;
+
+		const TrackSegment &getSegment(int p_segIndex) const;
 
 		/**
 		 * Triangulates whole track (if p_segment is -1) or

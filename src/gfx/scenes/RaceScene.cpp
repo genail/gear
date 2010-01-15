@@ -60,9 +60,6 @@ RaceScene::RaceScene(CL_GUIComponent *p_parent) :
 	m_gameMenu(p_parent),
 	m_gameMenuController(&m_logic, &m_gameMenu)
 {
-#if !defined(RACE_SCENE_ONLY)
-
-#endif
 
 }
 

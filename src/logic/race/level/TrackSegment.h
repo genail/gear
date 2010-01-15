@@ -42,12 +42,19 @@ class TrackSegment
 
 	public:
 
-		explicit TrackSegment(const std::vector<CL_Pointf> &p_triPoints);
+		TrackSegment(
+				const std::vector<CL_Pointf> &p_triPoints,
+				const std::vector<CL_Pointf> &p_midPoints
+		);
 
 		virtual ~TrackSegment();
 
+
 		/** @return bounding rectangle (reverse y) */
 		const CL_Rectf &getBounds() const;
+
+		/** @return Middle track points from what track was constructed. */
+		const std::vector<CL_Pointf> &getMidPoints() const;
 
 		const std::vector<CL_Pointf> &getTrianglePoints() const;
 

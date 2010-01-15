@@ -39,19 +39,28 @@ class TrackSegmentImpl
 
 		std::vector<CL_Pointf> m_triPoints;
 
+		std::vector<CL_Pointf> m_midPoints;
+
 		CL_Rectf m_bounds;
 
 
-		TrackSegmentImpl(const std::vector<CL_Pointf> &p_triPoints) :
-			m_triPoints(p_triPoints)
+		TrackSegmentImpl(
+				const std::vector<CL_Pointf> &p_triPoints,
+				const std::vector<CL_Pointf> &p_midPoints
+		) :
+			m_triPoints(p_triPoints),
+			m_midPoints(p_midPoints)
 		{ /* empty */ }
 
 
 		void calculateBounds();
 };
 
-TrackSegment::TrackSegment(const std::vector<CL_Pointf> &p_triPoints) :
-	m_impl(new TrackSegmentImpl(p_triPoints))
+TrackSegment::TrackSegment(
+		const std::vector<CL_Pointf> &p_triPoints,
+		const std::vector<CL_Pointf> &p_midPoints
+) :
+	m_impl(new TrackSegmentImpl(p_triPoints, p_midPoints))
 {
 	m_impl->calculateBounds();
 }
@@ -93,6 +102,11 @@ void TrackSegmentImpl::calculateBounds()
 const CL_Rectf &TrackSegment::getBounds() const
 {
 	return m_impl->m_bounds;
+}
+
+const std::vector<CL_Pointf> &TrackSegment::getMidPoints() const
+{
+	return m_impl->m_midPoints;
 }
 
 const std::vector<CL_Pointf> &TrackSegment::getTrianglePoints() const

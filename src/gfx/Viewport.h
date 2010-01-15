@@ -28,12 +28,15 @@
 
 #pragma once
 
+#include <ClanLib/core.h>
 #include <ClanLib/display.h>
 
 #include "common.h"
 
 namespace Gfx
 {
+
+class ViewportImpl;
 
 class Viewport {
 
@@ -69,14 +72,8 @@ class Viewport {
 		void update(unsigned int p_elapsedTime);
 
 	private:
-		/** Coordinates of view */
-		float m_x, m_y, m_width, m_height;
 
-		/** Stick point */
-		const CL_Pointf *m_attachPoint;
-
-		/** Scale (only when attached) */
-		float m_scale;
+		CL_SharedPtr<ViewportImpl> m_impl;
 };
 
 } // namespace

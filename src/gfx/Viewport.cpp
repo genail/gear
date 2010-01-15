@@ -33,13 +33,31 @@
 namespace Gfx
 {
 
+class ViewportImpl
+{
+	public:
+
+		/** Coordinates of view */
+		float m_x, m_y, m_width, m_height;
+
+		/** Stick point */
+		const CL_Pointf *m_attachPoint;
+
+		/** Scale (only when attached) */
+		float m_scale;
+
+		ViewportImpl() :
+			m_x(0),
+			m_y(0),
+			m_width(Gfx::Stage::getWidth()),
+			m_height(Gfx::Stage::getHeight()),
+			m_attachPoint(NULL),
+			m_scale(1.0f)
+		{ /* empty */ }
+};
+
 Viewport::Viewport() :
-	m_x(0),
-	m_y(0),
-	m_width(Gfx::Stage::getWidth()),
-	m_height(Gfx::Stage::getHeight()),
-	m_attachPoint(NULL),
-	m_scale(1.0f)
+	m_impl(new ViewportImpl)
 {
 }
 
@@ -49,24 +67,22 @@ Viewport::~Viewport() {
 void Viewport::prepareGC(CL_GraphicContext &p_gc) {
 	p_gc.push_modelview();
 
-	if (m_attachPoint != NULL) {
+	if (m_impl->m_attachPoint != NULL) {
 		const int stageWidth = Gfx::Stage::getWidth();
 		const int stageHeight = Gfx::Stage::getHeight();
 
-		m_x = m_attachPoint->x - stageWidth / 2 / m_scale;
-		m_y = m_attachPoint->y - stageHeight / 2 / m_scale;
-		m_width = stageWidth / m_scale;
-		m_height = stageHeight / m_scale;
+		m_impl->m_x = m_impl->m_attachPoint->x - stageWidth / 2 / m_impl->m_scale;
+		m_impl->m_y = m_impl->m_attachPoint->y - stageHeight / 2 / m_impl->m_scale;
+		m_impl->m_width = stageWidth / m_impl->m_scale;
+		m_impl->m_height = stageHeight / m_impl->m_scale;
 	}
 
-	const float horizScale = p_gc.get_width() / m_width;
-	const float vertScale = p_gc.get_height() / m_height;
+	const float horizScale = p_gc.get_width() / m_impl->m_width;
+	const float vertScale = p_gc.get_height() / m_impl->m_height;
 
 	p_gc.mult_scale(horizScale, vertScale);
 
-	p_gc.mult_translate(-m_x, -m_y);
-
-
+	p_gc.mult_translate(-m_impl->m_x, -m_impl->m_y);
 }
 
 void Viewport::finalizeGC(CL_GraphicContext &p_gc) {
@@ -81,8 +97,8 @@ CL_Pointf Viewport::onScreen(const CL_Pointf &p_worldPoint) const
 CL_Pointf Viewport::toScreen(const CL_Pointf &p_point) const
 {
 	CL_Pointf result;
-	result.x = ((p_point.x - m_x) / m_width) * Stage::getWidth();
-	result.y = ((p_point.y - m_y) / m_height) * Stage::getHeight();
+	result.x = ((p_point.x - m_impl->m_x) / m_impl->m_width) * Stage::getWidth();
+	result.y = ((p_point.y - m_impl->m_y) / m_impl->m_height) * Stage::getHeight();
 
 	return result;
 }
@@ -90,30 +106,30 @@ CL_Pointf Viewport::toScreen(const CL_Pointf &p_point) const
 CL_Pointf Viewport::toWorld(const CL_Pointf &p_point) const
 {
 	CL_Pointf result;
-	result.x = m_x + (p_point.x / Stage::getWidth()) * m_width;
-	result.y = m_y + (p_point.y / Stage::getHeight()) * m_height;
+	result.x = m_impl->m_x + (p_point.x / Stage::getWidth()) * m_impl->m_width;
+	result.y = m_impl->m_y + (p_point.y / Stage::getHeight()) * m_impl->m_height;
 
 	return result;
 }
 
 void Viewport::attachTo(const CL_Pointf* p_point)
 {
-	m_attachPoint = p_point;
+	m_impl->m_attachPoint = p_point;
 }
 
 void Viewport::detach()
 {
-	m_attachPoint = NULL;
+	m_impl->m_attachPoint = NULL;
 }
 
 float Viewport::getScale() const
 {
-	return m_scale;
+	return m_impl->m_scale;
 }
 
 void Viewport::setScale(float p_scale)
 {
-	m_scale = p_scale;
+	m_impl->m_scale = p_scale;
 }
 
 } // namespace

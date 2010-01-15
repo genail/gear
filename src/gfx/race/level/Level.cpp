@@ -30,6 +30,7 @@
 
 #include <vector>
 
+#include "gfx/Viewport.h"
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackTriangulator.h"
@@ -42,8 +43,15 @@ class LevelImpl
 {
 	public:
 
-		LevelImpl(const Race::Level &p_levelLogic) :
-				m_levelLogic(p_levelLogic)
+		const Race::Level m_levelLogic;
+
+		const Viewport m_viewport;
+
+		Race::TrackTriangulator m_triangulator;
+
+		LevelImpl(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
+				m_levelLogic(p_levelLogic),
+				m_viewport(p_viewport)
 		{
 			// empty
 		}
@@ -56,14 +64,10 @@ class LevelImpl
 				const CL_Pointf& p_a, const CL_Pointf& p_b, const CL_Pointf& p_c
 		);
 
-
-		const Race::Level &m_levelLogic;
-
-		Race::TrackTriangulator m_triangulator;
 };
 
-Level::Level(const Race::Level &p_levelLogic) :
-		m_impl(new LevelImpl(p_levelLogic))
+Level::Level(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
+		m_impl(new LevelImpl(p_levelLogic, p_viewport))
 {
 	// empty
 }
@@ -83,22 +87,30 @@ void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
 	const Race::Track &track = m_levelLogic.getTrack();
 	const int trackPointCount = track.getPointCount();
 
+	const CL_Rectf &viewportBounds = m_viewport.getWorldClipRect();
+
 	for (int i = 0; i < trackPointCount; ++i) {
 		const Race::TrackSegment &seg = m_triangulator.getSegment(i);
-		const std::vector<CL_Pointf> &points = seg.getTrianglePoints();
 
-		const int triPointCount = static_cast<signed>(points.size());
-		G_ASSERT(triPointCount % 3 == 0);
+		// run only if this segment is visible
+		if (viewportBounds.is_overlapped(seg.getBounds())) {
+			const std::vector<CL_Pointf> &points = seg.getTrianglePoints();
 
-		for (int j = 0; j < triPointCount;) {
-			const CL_Pointf &p1 = points[j++];
-			const CL_Pointf &p2 = points[j++];
-			const CL_Pointf &p3 = points[j++];
+			const int triPointCount = static_cast<signed>(points.size());
+			G_ASSERT(triPointCount % 3 == 0);
 
-			drawTriangle(p_gc, p1, p2, p3);
+			for (int j = 0; j < triPointCount;) {
+				const CL_Pointf &p1 = points[j++];
+				const CL_Pointf &p2 = points[j++];
+				const CL_Pointf &p3 = points[j++];
+
+				drawTriangle(p_gc, p1, p2, p3);
+			}
+
 		}
 
-		// connect to next one
+		// fill the gaps between two segments
+		// FIXME: check when to not draw this
 		const CL_Pointf &prevLeft = m_triangulator.getLastLeftPoint(i);
 		const CL_Pointf &prevRight = m_triangulator.getLastRightPoint(i);
 

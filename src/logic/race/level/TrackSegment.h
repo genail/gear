@@ -46,6 +46,8 @@ class TrackSegment
 
 		virtual ~TrackSegment();
 
+		/** @return bounding rectangle (reverse y) */
+		const CL_Rectf &getBounds() const;
 
 		const std::vector<CL_Pointf> &getTrianglePoints() const;
 

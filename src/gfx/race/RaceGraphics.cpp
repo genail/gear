@@ -47,9 +47,9 @@ namespace Gfx {
 
 RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
 		m_loaded(false),
-		m_logic(p_logic),
-		m_level(p_logic->getLevel()),
 		m_viewport(),
+		m_logic(p_logic),
+		m_level(p_logic->getLevel(), m_viewport),
 		m_raceUI(p_logic, &m_viewport),
 		m_tyreStripes(p_logic->getLevel())
 {

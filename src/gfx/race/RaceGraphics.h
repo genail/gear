@@ -70,14 +70,14 @@ class RaceGraphics {
 
 		bool m_loaded;
 
+		/** How player sees the scene */
+		Gfx::Viewport m_viewport;
+
 		/** Logic with data for reading only */
 		const Race::RaceLogic *m_logic;
 
 		/** Level graphics */
 		Gfx::Level m_level;
-
-		/** How player sees the scene */
-		Gfx::Viewport m_viewport;
 
 		/** Race scene interface */
 		Gfx::RaceUI m_raceUI;

@@ -36,7 +36,6 @@ class Block;
 class Bound;
 class Car;
 class Track;
-class TyreStripes;
 
 class LevelImpl;
 
@@ -58,9 +57,6 @@ class Level
 		bool isLoaded() const;
 
 		const Track &getTrack() const;
-
-		const TyreStripes &getTyreStripes() const;
-
 
 		void addCar(Car *p_car);
 

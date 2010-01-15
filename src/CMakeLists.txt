@@ -35,8 +35,7 @@ SET(COMMON_SRCS
     logic/race/Car.cpp
     logic/race/MessageBoard.cpp
     logic/race/RaceLogic.cpp
-    logic/race/ScoreTable.cpp
-    logic/race/TyreStripes.cpp
+    logic/race/ScoreTable.cpp    
     logic/race/resistance/Circle.cpp
     logic/race/resistance/Geometry.cpp
     logic/race/resistance/Primitive.cpp
@@ -69,6 +68,7 @@ SET(CLIENT_SRCS
     gfx/race/level/Sandpit.cpp
     gfx/race/level/Smoke.cpp
     gfx/race/level/TireTrack.cpp
+    gfx/race/level/TyreStripes.cpp
     gfx/race/ui/Label.cpp
     gfx/race/ui/GameMenu.cpp
     gfx/race/ui/PlayerList.cpp
@@ -241,18 +241,28 @@ ENDIF (UNIX)
 # Game client configuration
 IF (USE_GL2)
     SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DGL2")
-ELSE(USE_GL2)
+ELSE (USE_GL2)
     SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DGL1")
-ENDIF(USE_GL2)
+ENDIF (USE_GL2)
 
+# Vertical synchronization
+IF (VSYNC)
+    SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DVSYNC")
+ELSE (VSYNC)
+    SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DNO_VSYNC")
+ENDIF (VSYNC)
+
+# Drawing car vectors
 IF (DRAW_CAR_VECTORS)
     SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DDRAW_CAR_VECTORS")
 ENDIF (DRAW_CAR_VECTORS)
 
+# Drawing level checkpoints
 IF (DRAW_CHECKPOINTS)
     SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DDRAW_CHECKPOINTS")
 ENDIF (DRAW_CHECKPOINTS)
 
+# Drawing level wireframe
 IF (DRAW_WIREFRAME)
     SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DDRAW_WIREFRAME")
 ENDIF (DRAW_WIREFRAME)

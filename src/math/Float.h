@@ -44,6 +44,9 @@ class Float {
 
 	public:
 
+		static bool cmp(float p_a, float p_b, float p_precision);
+
+
 		Float();
 
 		virtual ~Float();

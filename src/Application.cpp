@@ -52,6 +52,14 @@
 #include "gfx/scenes/MainMenuScene.h"
 #include "logic/race/level/Level.h"
 
+#if defined(VSYNC)
+const int SYNC_PARAM = 1;
+#elif defined(NO_VSYNC)
+const int SYNC_PARAM = 0;
+#else
+const int SYNC_PARAM = 1;
+#endif
+
 
 #if defined(RACE_SCENE_ONLY)
 RaceScene *m_raceScene;
@@ -202,7 +210,7 @@ int Application::main(const std::vector<CL_String> &args)
 
 		while(gameWindow.update()) {
 			gameWindow.draw(gc);
-			displayWindow.flip(1);
+			displayWindow.flip(SYNC_PARAM);
 		}
 
 #else // !RACE_SCENE_ONLY

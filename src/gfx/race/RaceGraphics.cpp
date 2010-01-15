@@ -42,16 +42,16 @@
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
 #include "logic/race/RaceLogic.h"
-#include "logic/race/TyreStripes.h"
 
 namespace Gfx {
 
 RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
 		m_loaded(false),
-		m_logic(p_logic),
-		m_level(p_logic->getLevel()),
 		m_viewport(),
-		m_raceUI(p_logic, &m_viewport)
+		m_logic(p_logic),
+		m_level(p_logic->getLevel(), m_viewport),
+		m_raceUI(p_logic, &m_viewport),
+		m_tyreStripes(p_logic->getLevel())
 {
 	// attach viewport to player's car
 	Game &game = Game::getInstance();
@@ -90,7 +90,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 		drawLevel(p_gc);
 
 		// on level objects
-		drawTireTracks(p_gc);
+		drawTyreStripes(p_gc);
 		drawCars(p_gc);
 		drawSmokes(p_gc);
 
@@ -113,6 +113,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 void RaceGraphics::load(CL_GraphicContext &p_gc)
 {
 	m_raceUI.load(p_gc);
+	loadTyreStripes(p_gc);
 	loadGroundBlocks(p_gc);
 	loadDecorations(p_gc);
 	loadSandPits(p_gc);
@@ -174,6 +175,11 @@ void RaceGraphics::loadSandPits(CL_GraphicContext &p_gc)
 //	}
 }
 
+void RaceGraphics::loadTyreStripes(CL_GraphicContext &p_gc)
+{
+	m_tyreStripes.load(p_gc);
+}
+
 void RaceGraphics::drawSandpits(CL_GraphicContext &p_gc)
 {
 	foreach (CL_SharedPtr<Gfx::Sandpit> &sandpit, m_sandpits) {
@@ -200,20 +206,9 @@ void RaceGraphics::drawUI(CL_GraphicContext &p_gc)
 	m_raceUI.draw(p_gc);
 }
 
-void RaceGraphics::drawTireTracks(CL_GraphicContext &p_gc)
+void RaceGraphics::drawTyreStripes(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-	const Race::TyreStripes &tireStripes = level.getTyreStripes();
-
-	Gfx::TireTrack track;
-
-	foreach (const Race::TyreStripes::Stripe &stripe, tireStripes.getStripeList()) {
-		track.setFromPoint(stripe.getFromPoint());
-		track.setToPoint(stripe.getToPoint());
-
-		track.draw(p_gc);
-	}
-
+	m_tyreStripes.draw(p_gc);
 }
 
 void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
@@ -386,6 +381,7 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 	G_ASSERT(m_loaded);
 
 	updateViewport(p_timeElapsed);
+	updateTyreStripes();
 	updateSmokes(p_timeElapsed);
 
 #if !defined(NDEBUG)
@@ -421,6 +417,11 @@ void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 #ifndef NDEBUG
 	Gfx::Stage::getDebugLayer()->putMessage("scale",  CL_StringHelp::float_to_local8(scale));
 #endif
+}
+
+void RaceGraphics::updateTyreStripes()
+{
+	m_tyreStripes.update();
 }
 
 void RaceGraphics::updateSmokes(unsigned p_timeElapsed)

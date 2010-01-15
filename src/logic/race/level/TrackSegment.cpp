@@ -28,21 +28,76 @@
 
 #include "TrackSegment.h"
 
+#include "common.h"
+
 namespace Race
 {
 
-TrackSegment::TrackSegment(const std::vector<CL_Pointf> &p_triPoints) :
-		m_triPoints(p_triPoints)
+class TrackSegmentImpl
 {
+	public:
+
+		std::vector<CL_Pointf> m_triPoints;
+
+		CL_Rectf m_bounds;
+
+
+		TrackSegmentImpl(const std::vector<CL_Pointf> &p_triPoints) :
+			m_triPoints(p_triPoints)
+		{ /* empty */ }
+
+
+		void calculateBounds();
+};
+
+TrackSegment::TrackSegment(const std::vector<CL_Pointf> &p_triPoints) :
+	m_impl(new TrackSegmentImpl(p_triPoints))
+{
+	m_impl->calculateBounds();
 }
 
 TrackSegment::~TrackSegment()
 {
+	// empty
+}
+
+void TrackSegmentImpl::calculateBounds()
+{
+	bool first = true;
+
+	foreach (const CL_Pointf &p, m_triPoints) {
+
+		if (!first) {
+			if (p.x < m_bounds.left) {
+				m_bounds.left = p.x;
+			} else if (p.x > m_bounds.right) {
+				m_bounds.right = p.x;
+			}
+
+			if (p.y < m_bounds.top) {
+				m_bounds.top = p.y;
+			} else if (p.y > m_bounds.bottom) {
+				m_bounds.bottom = p.y;
+			}
+		} else {
+			m_bounds.left = p.x;
+			m_bounds.right = p.x;
+			m_bounds.top = p.y;
+			m_bounds.bottom = p.y;
+
+			first = false;
+		}
+	}
+}
+
+const CL_Rectf &TrackSegment::getBounds() const
+{
+	return m_impl->m_bounds;
 }
 
 const std::vector<CL_Pointf> &TrackSegment::getTrianglePoints() const
 {
-	return m_triPoints;
+	return m_impl->m_triPoints;
 }
 
 }

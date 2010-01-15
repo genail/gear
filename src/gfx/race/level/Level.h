@@ -42,12 +42,13 @@ namespace Gfx
 {
 
 class LevelImpl;
+class Viewport;
 
 class Level : public Gfx::Drawable
 {
 	public:
 
-		explicit Level(const Race::Level &p_levelLogic);
+		Level(const Race::Level &p_levelLogic, const Viewport &p_viewport);
 
 		virtual ~Level();
 

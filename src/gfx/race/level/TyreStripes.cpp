@@ -34,6 +34,7 @@
 #include "common.h"
 #include "logic/race/Car.h"
 #include "logic/race/level/Level.h"
+#include "math/Float.h"
 
 namespace Gfx {
 
@@ -90,6 +91,11 @@ class TyreStripesImpl
 
 		void add4WheelStripe(const Race::Car &p_car, const CL_Pointf &p_from);
 
+		bool equals(
+				const CL_Pointf &p_a, const CL_Pointf &p_b,
+				float p_precission
+		);
+
 };
 
 TyreStripes::TyreStripes(const Race::Level &p_level) :
@@ -110,8 +116,11 @@ void TyreStripesImpl::add(
 )
 {
 	static const unsigned STRIPE_LIMIT = 200;
-	static const unsigned STRIPE_LENGTH_LIMIT = 15;
+	static const unsigned STRIPE_LENGTH_LIMIT = 30;
+	// how many last stripes that belongs to this car should I check?
 	static const unsigned BACK_SEARCH_LIMIT = 4;
+	// point equals check precission
+	static const float EQUAL_CHECK_PRECISSION = 3.0f;
 
 	// search for four last stripes of this car and check if I can merge
 	// this stripe to the last one
@@ -130,7 +139,10 @@ void TyreStripesImpl::add(
 			++foundCount;
 
 			// must end on the same point and length must be below limit
-			if (s.m_to == p_from && s.length() < STRIPE_LENGTH_LIMIT) {
+			if (
+					equals(s.m_to, p_from, EQUAL_CHECK_PRECISSION)
+					&& s.length() < STRIPE_LENGTH_LIMIT
+				) {
 				Stripe copy = s;
 
 				// remove old stripe
@@ -159,6 +171,15 @@ void TyreStripesImpl::add(
 		m_stripes.pop_back(); // there will be always one stripe to much
 	}
 
+}
+
+bool TyreStripesImpl::equals(
+		const CL_Pointf &p_a, const CL_Pointf &p_b,
+		float p_precission
+)
+{
+	return Math::Float::cmp(p_a.x, p_b.x, p_precission)
+		&& Math::Float::cmp(p_a.y, p_b.y, p_precission);
 }
 
 void TyreStripes::clear()

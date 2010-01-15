@@ -29,11 +29,17 @@
 #include "Float.h"
 
 #include <map>
+#include <math.h>
 
 #include "common.h"
 #include "Easing.h"
 
 namespace Math {
+
+bool Float::cmp(float p_a, float p_b, float p_precision)
+{
+	return fabs(p_a - p_b) <= p_precision;
+}
 
 class Animation {
 

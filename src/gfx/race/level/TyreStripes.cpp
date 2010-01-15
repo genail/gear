@@ -26,58 +26,79 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "TyreStripes.h"
 
-#include <list>
-#include <ClanLib/core.h>
+#include "common.h"
+#include "Car.h"
 
-namespace Race {
+namespace Gfx {
 
-class Car;
+TyreStripes::TyreStripes()
+{
+}
 
-class TyreStripes {
+TyreStripes::~TyreStripes()
+{
+}
 
-	public:
-		class Stripe {
+void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner)
+{
+	static const unsigned STRIPE_LIMIT = 200;
+	static const unsigned STRIPE_LENGTH_LIMIT = 15;
+	static const unsigned BACK_SEARCH_LIMIT = 4;
 
-			public:
+	// search for four last stripes of this car and check if I can merge
+	// this stripe to the last one
+	bool merged = false;
+	unsigned foundCount = 0;
 
-				float length() const { return m_from.distance(m_to); }
+	for (
+			stripeList_t::iterator itor = m_stripes.begin();
+			itor != m_stripes.end();
+			++itor
+	) {
+		Stripe s = *itor;
 
-				const CL_Pointf &getFromPoint() const { return m_from; }
+		if (s.m_owner == p_owner) {
 
-				const CL_Pointf &getToPoint() const { return m_to; }
+			++foundCount;
 
+			// must end on the same point and length must be below limit
+			if (s.m_to == p_from && s.length() < STRIPE_LENGTH_LIMIT) {
+				Stripe copy = s;
 
-			private:
+				// remove old stripe
+				m_stripes.erase(itor);
 
-				CL_Pointf m_from, m_to;
-				const Race::Car *m_owner;
+				// and construct new one
+				m_stripes.push_front(Stripe(copy.m_from, p_to, p_owner));
+				merged = true;
 
-				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner) :
-					m_from(p_from), m_to(p_to), m_owner(p_owner) {}
+				break;
+			}
 
-				friend class TyreStripes;
-		};
+			if (foundCount == BACK_SEARCH_LIMIT) {
+				break;
+			}
+		}
+	}
 
-		typedef std::list<Stripe> stripeList_t;
+	if (!merged) {
+		// when not merged, then create a new stripe
+		m_stripes.push_front(Stripe(p_from, p_to, p_owner));
+	}
 
+	// remove all stripes above the limit
+	if (m_stripes.size() > STRIPE_LIMIT) {
+		m_stripes.pop_back(); // there will be always one stripe to much
+	}
 
-		TyreStripes();
+}
 
-		virtual ~TyreStripes();
-
-
-		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner);
-
-		void clear();
-
-
-		const stripeList_t &getStripeList() const { return m_stripes; }
-
-	private:
-
-		stripeList_t m_stripes;
-};
+void TyreStripes::clear()
+{
+	m_stripes.clear();
+}
 
 } // namespace
+

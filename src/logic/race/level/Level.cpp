@@ -36,7 +36,6 @@
 #include "logic/race/Car.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackPoint.h"
-#include "logic/race/TyreStripes.h"
 #include "logic/race/resistance/Geometry.h"
 #include "logic/race/resistance/ResistanceMap.h"
 
@@ -114,18 +113,11 @@ class LevelImpl
 		/** All cars */
 		std::vector<Car*> m_cars;
 
-		/** Car's last drift points for all four tires: fr, rr, rl, fl */
-		std::map<Car*, CL_Pointf*> m_carsDriftPoints;
-
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
 
-
 		/** Checkpoint track */
 		Track m_track;
-
-		/** Tyre stripes */
-		TyreStripes m_tyreStripes;
 
 		/** Resistance mapping */
 		RaceResistance::ResistanceMap m_resistanceMap;
@@ -191,14 +183,8 @@ void Level::destroy()
 		m_impl->m_cars.clear();
 
 		std::pair<Car*, CL_Pointf*> entry;
-		foreach(entry, m_impl->m_carsDriftPoints) {
-			delete[] entry.second;
-		}
-
-		m_impl->m_carsDriftPoints.clear();
 
 		m_impl->m_startPositions.clear();
-		m_impl->m_tyreStripes.clear();
 		m_impl->m_track.clear();
 
 		m_impl->m_loaded = false;
@@ -444,7 +430,6 @@ void Level::addCar(Car *p_car) {
 
 
 	m_impl->m_cars.push_back(p_car);
-	m_impl->m_carsDriftPoints[p_car] = new CL_Pointf[4];
 }
 
 void Level::removeCar(Car *p_car) {
@@ -460,9 +445,6 @@ void Level::removeCar(Car *p_car) {
 	}
 
 	p_car->m_level = NULL;
-
-	delete[] m_impl->m_carsDriftPoints[p_car];
-	m_impl->m_carsDriftPoints.erase(m_impl->m_carsDriftPoints.find(p_car));
 }
 
 CL_Pointf Level::getStartPosition(int p_num) const {
@@ -512,11 +494,6 @@ Car &Level::getCar(int p_index)
 {
 	G_ASSERT(p_index >= 0 && p_index < getCarCount());
 	return *m_impl->m_cars[static_cast<unsigned>(p_index)];
-}
-
-const TyreStripes &Level::getTyreStripes() const
-{
-	return m_impl->m_tyreStripes;
 }
 
 bool Level::isLoaded() const

@@ -28,20 +28,84 @@
 
 #include "TyreStripes.h"
 
+#include <map>
+#include <list>
+
 #include "common.h"
-#include "Car.h"
+#include "logic/race/Car.h"
+#include "logic/race/level/Level.h"
 
 namespace Gfx {
 
-TyreStripes::TyreStripes()
+class Stripe {
+
+	public:
+
+		/** Stipe from -> to points */
+		CL_Pointf m_from, m_to;
+
+		/** Owner to continue last stripe */
+		const Race::Car *m_owner;
+
+		Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner) :
+			m_from(p_from), m_to(p_to), m_owner(p_owner) {}
+
+
+		float length() const { return m_from.distance(m_to); }
+
+		const CL_Pointf &getFromPoint() const { return m_from; }
+
+		const CL_Pointf &getToPoint() const { return m_to; }
+
+};
+
+
+class TyreStripesImpl
 {
+	public:
+
+		typedef std::list<Stripe> TStripeList;
+		typedef std::map<const Race::Car*, CL_Pointf> TDriftPointMap;
+
+		/** Level at what stripes are drawn */
+		Race::Level m_level;
+
+		/** Stripes container */
+		TStripeList m_stripes;
+
+		/** Last drift point map */
+		TDriftPointMap m_lastDriftMap;
+
+
+		TyreStripesImpl(const Race::Level &p_level) :
+			m_level(p_level)
+		{ /* empty */ }
+
+
+		void add(
+				const CL_Pointf &p_from,
+				const CL_Pointf &p_to,
+				const Race::Car *p_owner
+		);
+
+};
+
+TyreStripes::TyreStripes(const Race::Level &p_level) :
+	m_impl(new TyreStripesImpl(p_level))
+{
+	// empty
 }
 
 TyreStripes::~TyreStripes()
 {
+	// empty
 }
 
-void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner)
+void TyreStripesImpl::add(
+		const CL_Pointf &p_from,
+		const CL_Pointf &p_to,
+		const Race::Car *p_owner
+)
 {
 	static const unsigned STRIPE_LIMIT = 200;
 	static const unsigned STRIPE_LENGTH_LIMIT = 15;
@@ -53,7 +117,7 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race
 	unsigned foundCount = 0;
 
 	for (
-			stripeList_t::iterator itor = m_stripes.begin();
+			TStripeList::iterator itor = m_stripes.begin();
 			itor != m_stripes.end();
 			++itor
 	) {
@@ -97,7 +161,40 @@ void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race
 
 void TyreStripes::clear()
 {
-	m_stripes.clear();
+	m_impl->m_stripes.clear();
+	m_impl->m_lastDriftMap.clear();
+}
+
+void TyreStripes::update()
+{
+	const int carCount = m_impl->m_level.getCarCount();
+	TyreStripesImpl::TDriftPointMap::iterator itor;
+
+	for (int i = 0; i < carCount; ++i) {
+		const Race::Car &car = m_impl->m_level.getCar(i);
+		itor = m_impl->m_lastDriftMap.find(&car);
+
+		if (car.isDrifting()) {
+			// add drift point if has last drift point
+			if (itor != m_impl->m_lastDriftMap.end()) {
+				m_impl->add(itor->second, car.getPosition(), &car);
+			}
+
+			// remember this point
+			m_impl->m_lastDriftMap[&car] = car.getPosition();
+		} else {
+			// remove last drift point if not drifting
+			if (itor != m_impl->m_lastDriftMap.end()) {
+				m_impl->m_lastDriftMap.erase(itor);
+			}
+		}
+	}
+
+}
+
+void TyreStripes::draw(CL_GraphicContext &p_gc)
+{
+
 }
 
 } // namespace

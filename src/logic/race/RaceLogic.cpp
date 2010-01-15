@@ -72,9 +72,6 @@ class RaceLogicImpl
 		/** Message board to display game messages */
 		MessageBoard m_messageBoard;
 
-		TyreStripes m_tyreStripes;
-
-
 		bool hasPlayerFinished(const Player &p_player) const;
 
 		// update routines
@@ -333,11 +330,6 @@ unsigned RaceLogic::getRaceStartTime() const
 unsigned RaceLogic::getRaceFinishTime() const
 {
 	return m_impl->m_raceFinishTimeMs;
-}
-
-const TyreStripes &RaceLogic::getTyreStripes() const
-{
-	return m_impl->m_tyreStripes;
 }
 
 Level &RaceLogic::getLevel()

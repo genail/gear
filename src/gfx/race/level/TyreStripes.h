@@ -28,56 +28,37 @@
 
 #pragma once
 
-#include <list>
 #include <ClanLib/core.h>
+
+#include "gfx/Drawable.h"
+
+namespace Race {
+	class Level;
+}
 
 namespace Gfx {
 
 class Car;
+class TyreStripesImpl;
 
-class TyreStripes {
+class TyreStripes : public Drawable {
 
 	public:
-		class Stripe {
 
-			public:
-
-				float length() const { return m_from.distance(m_to); }
-
-				const CL_Pointf &getFromPoint() const { return m_from; }
-
-				const CL_Pointf &getToPoint() const { return m_to; }
-
-
-			private:
-
-				CL_Pointf m_from, m_to;
-				const Race::Car *m_owner;
-
-				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner) :
-					m_from(p_from), m_to(p_to), m_owner(p_owner) {}
-
-				friend class TyreStripes;
-		};
-
-		typedef std::list<Stripe> stripeList_t;
-
-
-		TyreStripes();
+		TyreStripes(const Race::Level &p_level);
 
 		virtual ~TyreStripes();
 
 
-		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner);
+		virtual void draw(CL_GraphicContext &p_gc);
 
 		void clear();
 
-
-		const stripeList_t &getStripeList() const { return m_stripes; }
+		void update();
 
 	private:
 
-		stripeList_t m_stripes;
+		CL_SharedPtr<TyreStripesImpl> m_impl;
 };
 
 } // namespace

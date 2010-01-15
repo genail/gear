@@ -38,7 +38,6 @@
 #include "common/votetypes.h"
 #include "logic/race/level/Level.h"
 #include "logic/race/MessageBoard.h"
-#include "logic/race/TyreStripes.h"
 
 class Player;
 
@@ -74,8 +73,6 @@ class RaceLogic {
 		int getRaceLapCount() const;
 
 		unsigned getRaceStartTime() const;
-
-		const TyreStripes &getTyreStripes() const;
 
 		/** @return Message that will be displayed on screen when vote is running. */
 		virtual const CL_String &getVoteMessage() const;

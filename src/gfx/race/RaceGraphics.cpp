@@ -42,7 +42,6 @@
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
 #include "logic/race/RaceLogic.h"
-#include "logic/race/TyreStripes.h"
 
 namespace Gfx {
 
@@ -202,18 +201,7 @@ void RaceGraphics::drawUI(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawTireTracks(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-	const Race::TyreStripes &tireStripes = level.getTyreStripes();
-
-	Gfx::TireTrack track;
-
-	foreach (const Race::TyreStripes::Stripe &stripe, tireStripes.getStripeList()) {
-		track.setFromPoint(stripe.getFromPoint());
-		track.setToPoint(stripe.getToPoint());
-
-		track.draw(p_gc);
-	}
-
+	// TODO
 }
 
 void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)

@@ -88,6 +88,8 @@ class TyreStripesImpl
 				const Race::Car *p_owner
 		);
 
+		void add4WheelStripe(const Race::Car &p_car, const CL_Pointf &p_from);
+
 };
 
 TyreStripes::TyreStripes(const Race::Level &p_level) :
@@ -177,7 +179,8 @@ void TyreStripes::update()
 		if (car.isDrifting()) {
 			// add drift point if has last drift point
 			if (itor != m_impl->m_lastDriftMap.end()) {
-				m_impl->add(itor->second, car.getPosition(), &car);
+				//m_impl->add(itor->second, car.getPosition(), &car);
+				m_impl->add4WheelStripe(car, itor->second);
 			}
 
 			// remember this point
@@ -192,9 +195,60 @@ void TyreStripes::update()
 
 }
 
+void TyreStripesImpl::add4WheelStripe(
+		const Race::Car &p_car,
+		const CL_Pointf &p_from
+)
+{
+	static const int WHEEL_COUNT = 4;
+	static const float TYRE_RADIUS = 20.0f; // tire distance from car center
+	static const float DEG_90_RAD = CL_PI / 2;
+	static const float DEG_45_RAD = DEG_90_RAD / 2;
+
+	const CL_Pointf carPos = p_car.getPosition();
+	const CL_Vec2f posDelta = carPos - p_from;
+
+	CL_Angle angle(p_car.getRotationRad(), cl_radians);
+
+	CL_Vec2f v;
+	float rad;
+
+	CL_Pointf tyrePosA, tyrePosB;
+
+	for (int i = 0; i < WHEEL_COUNT; ++i) {
+		angle += CL_Angle(i == 0 ? DEG_45_RAD : DEG_90_RAD, cl_radians);
+
+		rad = angle.to_radians();
+		v.x = cos(rad);
+		v.y = sin(rad);
+
+		v.normalize();
+
+		v *= TYRE_RADIUS;
+
+		tyrePosB = carPos + v;
+		tyrePosA = tyrePosB - posDelta;
+
+		add(tyrePosA, tyrePosB, &p_car);
+	}
+}
+
 void TyreStripes::draw(CL_GraphicContext &p_gc)
 {
+	CL_Pen oldPen = p_gc.get_pen();
 
+	CL_Pen newPen;
+	newPen.set_line_width(3);
+	p_gc.set_pen(newPen);
+
+	static const CL_Colorf color(0.0f, 0.0f, 0.0f, 0.5f);
+
+	foreach (const Stripe &stripe, m_impl->m_stripes) {
+		const CL_Pointf &from = stripe.getFromPoint();
+		const CL_Pointf &to = stripe.getToPoint();
+
+		CL_Draw::line(p_gc, from, to, color);
+	}
 }
 
 } // namespace

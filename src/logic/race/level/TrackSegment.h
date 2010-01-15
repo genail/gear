@@ -32,12 +32,12 @@
 
 #include <ClanLib/core.h>
 
-#include "common.h"
-
 namespace Race
 {
 
-class TrackSegment : public boost::noncopyable
+class TrackSegmentImpl;
+
+class TrackSegment
 {
 
 	public:
@@ -52,7 +52,7 @@ class TrackSegment : public boost::noncopyable
 
 	private:
 
-		std::vector<CL_Pointf> m_triPoints;
+		CL_SharedPtr<TrackSegmentImpl> m_impl;
 };
 
 }

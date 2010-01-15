@@ -28,21 +28,36 @@
 
 #include "TrackSegment.h"
 
+#include "common.h"
+
 namespace Race
 {
 
-TrackSegment::TrackSegment(const std::vector<CL_Pointf> &p_triPoints) :
-		m_triPoints(p_triPoints)
+class TrackSegmentImpl
 {
+	public:
+
+		std::vector<CL_Pointf> m_triPoints;
+
+		TrackSegmentImpl(const std::vector<CL_Pointf> &p_triPoints) :
+			m_triPoints(p_triPoints)
+		{ /* empty */ }
+};
+
+TrackSegment::TrackSegment(const std::vector<CL_Pointf> &p_triPoints) :
+	m_impl(new TrackSegmentImpl(p_triPoints))
+{
+	// empty
 }
 
 TrackSegment::~TrackSegment()
 {
+	// empty
 }
 
 const std::vector<CL_Pointf> &TrackSegment::getTrianglePoints() const
 {
-	return m_triPoints;
+	return m_impl->m_triPoints;
 }
 
 }

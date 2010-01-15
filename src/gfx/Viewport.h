@@ -49,6 +49,8 @@ class Viewport {
 
 		float getScale() const;
 
+		const CL_Rectf &getWorldClipRect() const;
+
 
 		void attachTo(const CL_Pointf* p_point);
 

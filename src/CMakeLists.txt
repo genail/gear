@@ -65,7 +65,6 @@ SET(CLIENT_SRCS
     gfx/race/level/Level.cpp
     gfx/race/level/Sandpit.cpp
     gfx/race/level/Smoke.cpp
-    gfx/race/level/TireTrack.cpp
     gfx/race/level/TyreStripes.cpp
     gfx/race/ui/Label.cpp
     gfx/race/ui/GameMenu.cpp

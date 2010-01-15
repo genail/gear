@@ -40,7 +40,6 @@
 #include "network/packets/CarState.h"
 #include "network/client/Client.h"
 #include "gfx/race/RaceGraphics.h"
-#include "gfx/race/level/TireTrack.h"
 #include "gfx/race/level/Bound.h"
 #include "debug/RaceSceneKeyBindings.h"
 

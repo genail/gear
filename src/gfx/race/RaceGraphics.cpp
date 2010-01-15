@@ -36,7 +36,6 @@
 #include "gfx/race/level/Car.h"
 #include "gfx/race/level/DecorationSprite.h"
 #include "gfx/race/level/GroundBlock.h"
-#include "gfx/race/level/TireTrack.h"
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
 #include "logic/race/Block.h"

@@ -45,6 +45,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_host(p_host),
 	m_port(p_port),
 	m_client(&Game::getInstance().getNetworkConnection()),
+	m_localPlayer(Game::getInstance().getPlayer()),
 	m_voteRunning(false)
 {
 	G_ASSERT(p_port > 0 && p_port <= 0xFFFF);
@@ -53,8 +54,6 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_client->setServerPort(m_port);
 
 	// connect signal and slots from player's car
-	Game &game = Game::getInstance();
-	m_localPlayer = game.getPlayer();
 	Car &car = m_localPlayer.getCar();
 
 	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogic::onInputChange);
@@ -146,9 +145,9 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 	if (!hasPlayer(p_name)) {
 		// create new player
 
-		// FIXME: This shouldn't be a temporary object
-		// create a own list of players and manage it
-		Player player(p_name);
+		m_remotePlayers.push_back(Player(p_name));
+
+		Player &player = m_remotePlayers.back();
 		addPlayer(player);
 
 		// add his car to the level
@@ -171,7 +170,15 @@ void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 	// remove from game
 	removePlayer(player);
 
+	TPlayerList::iterator itor;
+	for (itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
+		if (*itor == player) {
+			m_remotePlayers.erase(itor);
+			break;
+		}
+	}
 
+	G_ASSERT(itor != m_remotePlayers.end());
 	display(cl_format("Player %1 leaved", p_name));
 }
 
@@ -188,7 +195,7 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();
 
-	Player player;
+	Player *player;
 	Car *car;
 
 	for (unsigned i = 0; i < playerCount; ++i) {
@@ -196,20 +203,21 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 
 		if (playerName == m_localPlayer.getName()) {
 			// this is local player, so it exists now
-			player = m_localPlayer;
+			player = &m_localPlayer;
 		} else {
 			// this is remote player
-			player = Player(playerName);
+			m_remotePlayers.push_back(Player(playerName));
+			player = &m_remotePlayers.back();
 		}
 
 		// put player to player list
-		addPlayer(player);
+		addPlayer(*player);
 
 		// prepare car and put it to level
-		car = &player.getCar();
+		car = &player->getCar();
 		car->applyCarState(p_gameState.getCarState(i));
 
-		getLevel().addCar(&player.getCar());
+		getLevel().addCar(&player->getCar());
 	}
 
 

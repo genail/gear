@@ -125,7 +125,7 @@ class RaceLogic {
 
 		Level &getLevel();
 
-		void addPlayer(const Player &p_player);
+		void addPlayer(Player &p_player);
 
 		void display(const CL_String &p_message);
 

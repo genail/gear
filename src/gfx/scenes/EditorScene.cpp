@@ -190,13 +190,20 @@ void EditorSceneImpl::setDefaultPoints()
 	m_track.addPoint(CL_Pointf(600.0f, 120.0f), 50.0f, 0.0f);
 	m_track.addPoint(CL_Pointf(600.0f, 400.0f), 60.0f, 0.0f);
 	m_track.addPoint(CL_Pointf(200.0f, 450.0f), 40.0f, 0.0f);
+
+	m_gfxLevel.getTrackTriangulator().triangulate(m_track);
 }
 
 void EditorSceneImpl::draw(CL_GraphicContext &p_gc)
 {
+	m_viewport.attachTo(&CL_Pointf(400, 400));
+	m_viewport.prepareGC(p_gc);
+
 	m_gfxLevel.draw(p_gc);
 
 	drawPoints(p_gc);
+
+	m_viewport.finalizeGC(p_gc);
 }
 
 void EditorSceneImpl::load(CL_GraphicContext &p_gc)
@@ -310,7 +317,28 @@ void EditorSceneImpl::setToPerpendicular(CL_Vec2f& p_vector2, float p_shift)
 
 void EditorSceneImpl::setMinAndMaxShiftPoint(int p_index)
 {
-	
+	const TrackPoint& trackPoint = m_track.getPoint(p_index);
+
+	float minShift = -1.0f - trackPoint.getShift();
+	float maxShift = 1.0f - trackPoint.getShift();
+	float radius = trackPoint.getRadius();
+
+	CL_Vec2f guide = m_gfxLevel.getTrackTriangulator().getGuide(p_index);
+
+	guide /= guide.length();
+
+	CL_Vec2f minShiftGuide = guide;
+	minShiftGuide.y = -minShiftGuide.y;
+	minShiftGuide *= radius * minShift;
+
+	CL_Vec2f maxShiftGuide = guide;
+	maxShiftGuide.x = -maxShiftGuide.x;
+	maxShiftGuide *= radius * maxShift;
+
+	const CL_Pointf& pos = trackPoint.getPosition();
+
+	m_minShiftPoint = pos + minShiftGuide;
+	m_maxShiftPoint = pos + maxShiftGuide;
 }
 
 CL_Rect EditorSceneImpl::getRadiusRect(int p_index, int p_lineWidth)

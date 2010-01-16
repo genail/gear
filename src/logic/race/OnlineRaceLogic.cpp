@@ -32,6 +32,7 @@
 
 #include "Car.h"
 #include "common/Game.h"
+#include "logic/race/Progress.h"
 #include "network/packets/GameState.h"
 #include "network/packets/CarState.h"
 
@@ -103,6 +104,7 @@ void OnlineRaceLogic::destroy()
 			getLevel().removeCar(&player.getCar());
 		}
 
+		getProgress().destroy();
 		getLevel().destroy();
 	}
 }
@@ -143,6 +145,9 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 
 	if (!hasPlayer(p_name)) {
 		// create new player
+
+		// FIXME: This shouldn't be a temporary object
+		// create a own list of players and manage it
 		Player player(p_name);
 		addPlayer(player);
 
@@ -176,6 +181,9 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 	const CL_String &levelName = p_gameState.getLevel();
 	getLevel().initialize();
 	getLevel().load(levelName);
+
+	// initialize progress object
+	getProgress().initialize();
 
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();

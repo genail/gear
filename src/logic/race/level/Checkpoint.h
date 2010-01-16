@@ -38,6 +38,8 @@ class Checkpoint {
 
 	public:
 
+		Checkpoint();
+
 		Checkpoint(int p_idx, const CL_Pointf &p_pos);
 
 		virtual ~Checkpoint();

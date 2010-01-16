@@ -30,6 +30,7 @@
 
 #include "common/Game.h"
 #include "common/Player.h"
+#include "logic/race/Progress.h"
 
 namespace Race {
 
@@ -37,20 +38,18 @@ class RaceLogicImpl
 {
 	public:
 
-		RaceLogicImpl() :
-			m_raceStartTimeMs(0),
-			m_raceFinishTimeMs(0),
-			m_lapCount(0),
-			m_nextPlace(1)
-		{ /* empty */ }
+		typedef std::vector<Player> TPlayerList;
+		typedef std::vector<Player> TConstPlayerList;
+
 
 		/** The level */
 		Level m_level;
 
 		/** All players vector (with local player too) */
-		typedef std::vector<Player> TPlayerList;
-
 		TPlayerList m_playerList;
+
+		/** Progress object */
+		Progress m_progress;
 
 		/** Race beginning time. If 0 then race not started yet */
 		unsigned m_raceStartTimeMs;
@@ -65,12 +64,22 @@ class RaceLogicImpl
 		int m_nextPlace;
 
 		/** Players that finished this race */
-		typedef std::vector<Player> TConstPlayerList;
-
 		TConstPlayerList m_playersFinished;
 
 		/** Message board to display game messages */
 		MessageBoard m_messageBoard;
+
+
+
+		RaceLogicImpl() :
+			m_level(),
+			m_progress(m_level),
+			m_raceStartTimeMs(0),
+			m_raceFinishTimeMs(0),
+			m_lapCount(0),
+			m_nextPlace(1)
+		{ /* empty */ }
+
 
 		bool hasPlayerFinished(const Player &p_player) const;
 
@@ -356,6 +365,7 @@ void RaceLogic::display(const CL_String &p_message)
 void RaceLogic::addPlayer(const Player &p_player)
 {
 	m_impl->m_playerList.push_back(p_player);
+	m_impl->m_progress.addCar(p_player.getCar());
 }
 
 const Player &RaceLogic::getPlayer(int p_index) const
@@ -384,10 +394,16 @@ void RaceLogic::removePlayer(const Player &p_player)
 			++itor
 		) {
 		if (p_player == *itor) {
+			m_impl->m_progress.removeCar(itor->getCar());
 			m_impl->m_playerList.erase(itor);
 			break;
 		}
 	}
+}
+
+Progress &RaceLogic::getProgress()
+{
+	return m_impl->m_progress;
 }
 
 } // namespace

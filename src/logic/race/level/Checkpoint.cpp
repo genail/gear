@@ -48,6 +48,12 @@ class CheckpointImpl
 		{ /* empty */ }
 };
 
+Checkpoint::Checkpoint() :
+	m_impl(new CheckpointImpl(0, CL_Pointf()))
+{
+	// empty
+}
+
 Checkpoint::Checkpoint(int p_idx, const CL_Pointf &p_pos) :
 	m_impl(new CheckpointImpl(p_idx, p_pos))
 {

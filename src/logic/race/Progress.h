@@ -51,6 +51,8 @@ class Progress
 
 		void addCar(const Car &p_car);
 
+		void destroy();
+
 		const Checkpoint &getCheckpoint(const Car &p_car) const;
 
 		const Checkpoint &getCheckpoint(int p_idx) const;
@@ -61,9 +63,9 @@ class Progress
 
 		void initialize();
 
-		void destroy();
-
 		void removeCar(const Car &p_car);
+
+		void update();
 
 
 	private:

@@ -30,6 +30,7 @@
 
 #include "common.h"
 #include "common/Game.h"
+#include "logic/race/Progress.h"
 
 namespace Race {
 
@@ -50,6 +51,10 @@ void OfflineRaceLogic::initialize()
 	level.initialize();
 	level.load(m_levelName);
 
+	// init progress object
+	Progress &prog = getProgress();
+	prog.initialize();
+
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 
@@ -59,6 +64,7 @@ void OfflineRaceLogic::initialize()
 
 void OfflineRaceLogic::destroy()
 {
+	getProgress().destroy();
 	getLevel().destroy();
 }
 

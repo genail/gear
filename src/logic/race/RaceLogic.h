@@ -43,6 +43,7 @@ class Player;
 
 namespace Race {
 
+class Progress;
 class RaceLogicImpl;
 
 class RaceLogic {
@@ -131,6 +132,8 @@ class RaceLogic {
 		Player &getPlayer(int p_index);
 
 		Player &getPlayer(const CL_String& p_name);
+
+		Progress &getProgress();
 
 		void removePlayer(const Player &p_player);
 

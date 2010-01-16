@@ -90,20 +90,8 @@ void Progress::addCar(const Car &p_car)
 {
 	G_ASSERT(m_impl->m_initd);
 
-//	ProgressInfo pinfo = {0, ??};
-//	m_impl->m_cars[&p_car] = pinfo;
-}
-
-int Progress::getLapNumber(const Car &p_car) const
-{
-	G_ASSERT(m_impl->m_initd);
-
-	ProgressImpl::TCarProgressMap::const_iterator itor =
-			m_impl->m_cars.find(&p_car);
-
-	G_ASSERT(itor != m_impl->m_cars.end());
-
-	return itor->second.m_lapNum;
+	const ProgressInfo pinfo = {0, m_impl->m_chkpts[0]};
+	m_impl->m_cars[&p_car] = pinfo;
 }
 
 void Progress::initialize()
@@ -134,6 +122,8 @@ void Progress::initialize()
 		}
 	}
 
+	G_ASSERT(m_impl->m_chkpts.size() > 0 && "no checkpoints loaded");
+
 	m_impl->m_initd = true;
 
 }
@@ -158,6 +148,45 @@ void Progress::removeCar(const Car &p_car)
 	G_ASSERT(itor != m_impl->m_cars.end());
 
 	m_impl->m_cars.erase(itor);
+}
+
+int Progress::getLapNumber(const Car &p_car) const
+{
+	G_ASSERT(m_impl->m_initd);
+
+	ProgressImpl::TCarProgressMap::const_iterator itor =
+			m_impl->m_cars.find(&p_car);
+
+	G_ASSERT(itor != m_impl->m_cars.end());
+
+	return itor->second.m_lapNum;
+}
+
+const Checkpoint &Progress::getCheckpoint(const Car &p_car) const
+{
+	G_ASSERT(m_impl->m_initd);
+
+	ProgressImpl::TCarProgressMap::const_iterator itor =
+			m_impl->m_cars.find(&p_car);
+
+	G_ASSERT(itor != m_impl->m_cars.end());
+
+
+	return itor->second.m_checkpoint;
+}
+
+const Checkpoint &Progress::getCheckpoint(int p_idx) const
+{
+	G_ASSERT(m_impl->m_initd);
+	G_ASSERT(p_idx >= 0 && p_idx < static_cast<signed>(m_impl->m_chkpts.size()));
+
+	return m_impl->m_chkpts[p_idx];
+}
+
+int Progress::getCheckpointCount() const
+{
+	G_ASSERT(m_impl->m_initd);
+	return static_cast<signed>(m_impl->m_chkpts.size());
 }
 
 } // namespace

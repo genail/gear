@@ -30,6 +30,7 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
 #include "gfx/Drawable.h"
 
 namespace Race
@@ -53,7 +54,7 @@ class Level : public Gfx::Drawable
 		virtual ~Level();
 
 		/** @return Source of track rendering. */
-		Race::TrackTriangulator &getTrackTriangulator();
+		DEPRECATED(Race::TrackTriangulator &getTrackTriangulator());
 
 
 		virtual void draw(CL_GraphicContext &p_gc);

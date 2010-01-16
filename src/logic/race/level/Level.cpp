@@ -35,6 +35,7 @@
 #include "logic/race/level/Checkpoint.h"
 #include "logic/race/Car.h"
 #include "logic/race/level/Track.h"
+#include "logic/race/level/TrackTriangulator.h"
 #include "logic/race/level/TrackPoint.h"
 #include "logic/race/resistance/Geometry.h"
 #include "logic/race/resistance/ResistanceMap.h"
@@ -116,8 +117,11 @@ class LevelImpl
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
 
-		/** Checkpoint track */
+		/** Orginal track */
 		Track m_track;
+
+		/** Triangulator object */
+		TrackTriangulator m_trackTriangulator;
 
 		/** Resistance mapping */
 		RaceResistance::ResistanceMap m_resistanceMap;
@@ -225,6 +229,10 @@ void Level::load(const CL_String& p_filename)
 
 		cl_log_event(LOG_DEBUG, "level loaded");
 		m_impl->m_loaded = true;
+
+		// run triangulator
+		m_impl->m_trackTriangulator.clear();
+		m_impl->m_trackTriangulator.triangulate(m_impl->m_track);
 
 	} catch (CL_Exception &e) {
 		cl_log_event(LOG_ERROR, "cannot load level '%1': %2", p_filename, e.message);
@@ -510,6 +518,16 @@ const Track &Level::getTrack() const
 void Level::setTrack(const Track &p_track)
 {
 	m_impl->m_track = p_track;
+}
+
+const TrackTriangulator &Level::getTrackTriangulator() const
+{
+	return m_impl->m_trackTriangulator;
+}
+
+TrackTriangulator &Level::getTrackTriangulator()
+{
+	return m_impl->m_trackTriangulator;
 }
 
 } // namespace

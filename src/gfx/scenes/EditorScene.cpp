@@ -84,6 +84,12 @@ public:
 		m_raceLevel.destroy();
 	}
 
+	// help variables
+
+	CL_Pointf m_minShiftPoint;
+
+	CL_Pointf m_maxShiftPoint;
+
 	int m_selectedIndex;
 
 	int m_lightIndex;
@@ -169,7 +175,9 @@ public:
 
 	CL_Rect getPointRect(const CL_Point &p_point);
 
-	void SetToPerpendicular(CL_Vec2f& p_vector2, float p_shift);
+	void setToPerpendicular(CL_Vec2f& p_vector2, float p_shift);
+
+	void setMinAndMaxShiftPoint(int p_index);
 
 	// action slots
 };
@@ -218,7 +226,7 @@ void EditorSceneImpl::drawPoint(int p_index, bool &p_isSelected, bool &p_isLight
 		{
 			CL_Pen pen;
 
-			pen.set_line_width(2.0f);
+			pen.set_line_width(PAINT_LINE_WIDTH);
 			p_gc.set_pen(pen);
 
 			int x1, y1, x2, y2;
@@ -282,22 +290,27 @@ void EditorSceneImpl::findPointAt(const CL_Point &p_pos, int &p_index, PressedSt
 	}
 }
 
-void EditorSceneImpl::SetToPerpendicular(CL_Vec2f& p_vector2, float p_shift)
+void EditorSceneImpl::setToPerpendicular(CL_Vec2f& p_vector2, float p_shift)
 {
-	if (p_shift > 0)
-	{
+	//if (p_shift > 0)
+	//{
 		if ((p_vector2.x > 0 && p_vector2.y > 0) || (p_vector2.x < 0 && p_vector2.y < 0))
 			p_vector2.x = -p_vector2.x;
 		else 
 			p_vector2.y = -p_vector2.y;
-	}
+	/*}
 	else
 	{
 		if ((p_vector2.x > 0 && p_vector2.y > 0) || (p_vector2.y < 0 && p_vector2.x < 0))
 			p_vector2.x = -p_vector2.x;
 		else 
 			p_vector2.y = -p_vector2.y;
-	}
+	}*/
+}
+
+void EditorSceneImpl::setMinAndMaxShiftPoint(int p_index)
+{
+	
 }
 
 CL_Rect EditorSceneImpl::getRadiusRect(int p_index, int p_lineWidth)

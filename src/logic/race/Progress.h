@@ -28,40 +28,50 @@
 
 #pragma once
 
-#define TIRE_TRACK_DEFAULT_ALPHA 0.2f
-
 #include <ClanLib/core.h>
 
-#include "gfx/Drawable.h"
+namespace Race
+{
 
-namespace Gfx {
+class Car;
+class Checkpoint;
+class Level;
+class ProgressImpl;
 
-class TireTrack : public Gfx::Drawable {
-
+class Progress
+{
 	public:
 
-		TireTrack();
+		Progress(const Level &p_level);
 
-		virtual ~TireTrack();
-
-
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
+		virtual ~Progress();
 
 
-		void setFromPoint(const CL_Pointf &p_from, float p_alpha = TIRE_TRACK_DEFAULT_ALPHA);
+		// operations
 
-		void setToPoint(const CL_Pointf &p_to, float p_alpha = TIRE_TRACK_DEFAULT_ALPHA);
+		void addCar(const Car &p_car);
+
+		void destroy();
+
+		const Checkpoint &getCheckpoint(const Car &p_car) const;
+
+		const Checkpoint &getCheckpoint(int p_idx) const;
+
+		int getCheckpointCount() const;
+
+		int getLapNumber(const Car &p_car) const;
+
+		void initialize();
+
+		void removeCar(const Car &p_car);
+
+		void update();
+
 
 	private:
 
-		/** Track line */
-		CL_Pointf m_fromPoint, m_toPoint;
-
-		/** End's alphas */
-		float m_fromAlpha, m_toAlpha;
-
+		CL_SharedPtr<ProgressImpl> m_impl;
 };
 
 }
+

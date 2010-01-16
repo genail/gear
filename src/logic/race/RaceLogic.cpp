@@ -30,6 +30,7 @@
 
 #include "common/Game.h"
 #include "common/Player.h"
+#include "logic/race/Progress.h"
 
 namespace Race {
 
@@ -37,20 +38,18 @@ class RaceLogicImpl
 {
 	public:
 
-		RaceLogicImpl() :
-			m_raceStartTimeMs(0),
-			m_raceFinishTimeMs(0),
-			m_lapCount(0),
-			m_nextPlace(1)
-		{ /* empty */ }
+		typedef std::vector<Player*> TPlayerList;
+		typedef std::vector<const Player*> TConstPlayerList;
+
 
 		/** The level */
 		Level m_level;
 
 		/** All players vector (with local player too) */
-		typedef std::vector<Player> TPlayerList;
-
 		TPlayerList m_playerList;
+
+		/** Progress object */
+		Progress m_progress;
 
 		/** Race beginning time. If 0 then race not started yet */
 		unsigned m_raceStartTimeMs;
@@ -65,12 +64,22 @@ class RaceLogicImpl
 		int m_nextPlace;
 
 		/** Players that finished this race */
-		typedef std::vector<Player> TConstPlayerList;
-
 		TConstPlayerList m_playersFinished;
 
 		/** Message board to display game messages */
 		MessageBoard m_messageBoard;
+
+
+
+		RaceLogicImpl() :
+			m_level(),
+			m_progress(m_level),
+			m_raceStartTimeMs(0),
+			m_raceFinishTimeMs(0),
+			m_lapCount(0),
+			m_nextPlace(1)
+		{ /* empty */ }
+
 
 		bool hasPlayerFinished(const Player &p_player) const;
 
@@ -150,9 +159,9 @@ void RaceLogicImpl::updatePlayersProgress()
 
 	unsigned now = 0, min = 0, sec = 0, centi = 0;
 
-	foreach (Player &player, m_playerList) {
+	foreach (const Player *player, m_playerList) {
 
-		if (player.getCar().getLap() > m_lapCount && !hasPlayerFinished(player)) {
+		if (player->getCar().getLap() > m_lapCount && !hasPlayerFinished(*player)) {
 
 			// calculate timing
 			if (now == 0) {
@@ -171,7 +180,7 @@ void RaceLogicImpl::updatePlayersProgress()
 			m_messageBoard.addMessage(
 					cl_format(
 							"Player '%1' has finished at %2 place (%3:%4:%5)",
-							player.getName(),
+							player->getName(),
 							m_nextPlace++,
 							min, sec, centi
 					)
@@ -197,8 +206,8 @@ std::vector<CL_String> RaceLogic::getPlayerNames() const
 	std::vector<CL_String> names;
 	names.reserve(m_impl->m_playerList.size());
 
-	foreach(const Player &p, m_impl->m_playerList) {
-		names.push_back(p.getName());
+	foreach(const Player *p, m_impl->m_playerList) {
+		names.push_back(p->getName());
 	}
 
 	return names;
@@ -206,9 +215,9 @@ std::vector<CL_String> RaceLogic::getPlayerNames() const
 
 const Player &RaceLogic::getPlayer(const CL_String& p_name) const
 {
-	foreach (const Player &p, m_impl->m_playerList) {
-		if (p.getName() == p_name) {
-			return p;
+	foreach (const Player *p, m_impl->m_playerList) {
+		if (p->getName() == p_name) {
+			return *p;
 		}
 	}
 
@@ -217,9 +226,9 @@ const Player &RaceLogic::getPlayer(const CL_String& p_name) const
 
 Player &RaceLogic::getPlayer(const CL_String& p_name)
 {
-	foreach (Player &p, m_impl->m_playerList) {
-		if (p.getName() == p_name) {
-			return p;
+	foreach (Player *p, m_impl->m_playerList) {
+		if (p->getName() == p_name) {
+			return *p;
 		}
 	}
 
@@ -229,8 +238,8 @@ Player &RaceLogic::getPlayer(const CL_String& p_name)
 bool RaceLogic::hasPlayer(const CL_String &p_name) const
 {
 	// FIXME: duplicate
-	foreach (const Player &p, m_impl->m_playerList) {
-		if (p.getName() == p_name) {
+	foreach (const Player *p, m_impl->m_playerList) {
+		if (p->getName() == p_name) {
 			return true;
 		}
 	}
@@ -240,9 +249,9 @@ bool RaceLogic::hasPlayer(const CL_String &p_name) const
 
 const Player &RaceLogic::getPlayer(const Car& p_car) const
 {
-	foreach (const Player &p, m_impl->m_playerList) {
-		if (p.getCar() == p_car) {
-			return p;
+	foreach (const Player *p, m_impl->m_playerList) {
+		if (p->getCar() == p_car) {
+			return *p;
 		}
 	}
 
@@ -339,8 +348,8 @@ Level &RaceLogic::getLevel()
 
 bool RaceLogicImpl::hasPlayerFinished(const Player &p_player) const
 {
-	foreach (const Player &p, m_playersFinished) {
-		if (p_player == p) {
+	foreach (const Player *p, m_playersFinished) {
+		if (&p_player == p) {
 			return true;
 		}
 	}
@@ -353,21 +362,22 @@ void RaceLogic::display(const CL_String &p_message)
 	m_impl->m_messageBoard.addMessage(p_message);
 }
 
-void RaceLogic::addPlayer(const Player &p_player)
+void RaceLogic::addPlayer(Player &p_player)
 {
-	m_impl->m_playerList.push_back(p_player);
+	m_impl->m_playerList.push_back(&p_player);
+	m_impl->m_progress.addCar(p_player.getCar());
 }
 
 const Player &RaceLogic::getPlayer(int p_index) const
 {
 	G_ASSERT(p_index >= 0 && p_index < getPlayerCount());
-	return m_impl->m_playerList[p_index];
+	return *m_impl->m_playerList[p_index];
 }
 
 Player &RaceLogic::getPlayer(int p_index)
 {
 	G_ASSERT(p_index >= 0 && p_index < getPlayerCount());
-	return m_impl->m_playerList[p_index];
+	return *m_impl->m_playerList[p_index];
 }
 
 int RaceLogic::getPlayerCount() const
@@ -378,16 +388,25 @@ int RaceLogic::getPlayerCount() const
 void RaceLogic::removePlayer(const Player &p_player)
 {
 	RaceLogicImpl::TPlayerList::iterator itor;
+
 	for (
 			itor = m_impl->m_playerList.begin();
 			itor != m_impl->m_playerList.end();
 			++itor
-		) {
-		if (p_player == *itor) {
+	) {
+		if (*itor == &p_player) {
 			m_impl->m_playerList.erase(itor);
-			break;
+			m_impl->m_progress.removeCar(p_player.getCar());
+			return;
 		}
 	}
+
+	G_ASSERT(0 && "player not found");
+}
+
+Progress &RaceLogic::getProgress()
+{
+	return m_impl->m_progress;
 }
 
 } // namespace

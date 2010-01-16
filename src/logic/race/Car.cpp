@@ -62,9 +62,7 @@ Car::Car() :
 	m_inputLocked(false),
 	m_inputChanged(false),
 	m_phySpeedDelta(0.0f),
-	m_phyWheelsTurn(0.0f),
-	m_greatestCheckpointId(0),
-	m_currentCheckpoint(NULL)
+	m_phyWheelsTurn(0.0f)
 {
 #ifndef SERVER
 	// build car contour for collision check
@@ -421,40 +419,9 @@ bool Car::isDrifting() const {
 	return false;
 }
 
-void Car::updateCurrentCheckpoint(const Checkpoint *p_checkpoint)
-{
-	if (p_checkpoint != NULL) {
-		// check if lap is reached
-		if (
-				p_checkpoint->getProgress() == 0.0f &&
-				m_currentCheckpoint->getProgress() == 1.0f &&
-				m_greatestCheckpointId == m_currentCheckpoint->getId()
-		) {
-			++m_lap;
-			cl_log_event("race", "Going for lap %1", m_lap);
-			m_greatestCheckpointId = 0;
-		}
-
-		const int id = p_checkpoint->getId();
-
-		if (id == m_greatestCheckpointId + 1) {
-			++m_greatestCheckpointId;
-		}
-	} else {
-		m_greatestCheckpointId = 0;
-	}
-
-	m_currentCheckpoint = p_checkpoint;
-}
-
 bool Car::isLocked() const
 {
 	return m_inputLocked;
-}
-
-const Checkpoint *Car::getCurrentCheckpoint() const
-{
-	return m_currentCheckpoint;
 }
 
 int Car::getLap() const

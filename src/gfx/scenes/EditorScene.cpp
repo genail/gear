@@ -31,6 +31,7 @@
 #include "EditorScene.h"
 
 #include "common.h"
+#include "gfx/Viewport.h"
 #include "gfx/Stage.h"
 #include "gfx/race/level/Level.h"
 #include "logic/race/level/Level.h"
@@ -57,8 +58,9 @@ class EditorSceneImpl
 public:
 	EditorSceneImpl() : 
 			m_controller(NULL),
+			m_viewport(),
 			m_raceLevel(),
-			m_gfxLevel(m_raceLevel),
+			m_gfxLevel(m_raceLevel, m_viewport),
 			m_track(),
 			m_selectedIndex(-1),
 			m_lightIndex(-1),
@@ -103,6 +105,8 @@ public:
 	Gfx::Level m_gfxLevel;
 
 	Track m_track;
+
+	Viewport m_viewport;
 
 	// input
 
@@ -298,9 +302,9 @@ void EditorSceneImpl::SetToPerpendicular(CL_Vec2f& p_vector2, float p_shift)
 
 CL_Rect EditorSceneImpl::getRadiusRect(int p_index, int p_lineWidth)
 {
-	TrackPoint p_trackPoint = m_track.getPoint(p_index);
+	const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
 
-	CL_Point pos = p_trackPoint.getPosition();
+	const CL_Pointf& pos = p_trackPoint.getPosition();
 	int radiusLine = p_trackPoint.getRadius();
 
 	CL_Point point(pos.x - (p_lineWidth / 2), pos.y - (radiusLine / 2));
@@ -313,9 +317,9 @@ CL_Rect EditorSceneImpl::getRadiusRect(int p_index, int p_lineWidth)
 
 CL_Rect EditorSceneImpl::getRadiusUpRect(int p_index, int p_lineWidth)
 {
-	TrackPoint p_trackPoint = m_track.getPoint(p_index);
+	const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
 
-	CL_Point pos = p_trackPoint.getPosition();
+	const CL_Pointf& pos = p_trackPoint.getPosition();
 	int radiusLine = (p_trackPoint.getRadius()) / 2;
 
 	CL_Point point(pos.x - (p_lineWidth / 2), pos.y - (radiusLine));
@@ -328,9 +332,9 @@ CL_Rect EditorSceneImpl::getRadiusUpRect(int p_index, int p_lineWidth)
 
 CL_Rect EditorSceneImpl::getRadiusDownRect(int p_index, int p_lineWidth)
 {
-	TrackPoint p_trackPoint = m_track.getPoint(p_index);
+	const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
 
-	CL_Point pos = p_trackPoint.getPosition();
+	const CL_Pointf& pos = p_trackPoint.getPosition();
 	int radiusLine = (p_trackPoint.getRadius()) / 2;
 
 	CL_Point point(pos.x - (p_lineWidth / 2), pos.y);
@@ -343,7 +347,7 @@ CL_Rect EditorSceneImpl::getRadiusDownRect(int p_index, int p_lineWidth)
 
 void EditorSceneImpl::getShiftRect(int p_index, int* x1, int* y1, int* x2, int* y2)
 {
-	TrackPoint p_trackPoint = m_track.getPoint(p_index);
+	const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
 
 	CL_Vec2f guide = m_gfxLevel.getTrackTriangulator().getGuide(p_index);
 
@@ -353,7 +357,7 @@ void EditorSceneImpl::getShiftRect(int p_index, int* x1, int* y1, int* x2, int* 
 
 	SetToPerpendicular(guide, p_trackPoint.getShift());
 
-	CL_Point pos = p_trackPoint.getPosition();
+	const CL_Pointf& pos = p_trackPoint.getPosition();
 
 	*x1 = pos.x;
 	*y1 = pos.y;

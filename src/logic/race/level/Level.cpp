@@ -509,7 +509,7 @@ bool Level::isLoaded() const
 
 const Track &Level::getTrack() const
 {
-	G_ASSERT(m_impl->m_loaded);
+	// track is available even if level is not loaded
 	return m_impl->m_track;
 }
 

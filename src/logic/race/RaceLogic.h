@@ -43,6 +43,7 @@ class Player;
 
 namespace Race {
 
+class Progress;
 class RaceLogicImpl;
 
 class RaceLogic {
@@ -124,13 +125,15 @@ class RaceLogic {
 
 		Level &getLevel();
 
-		void addPlayer(const Player &p_player);
+		void addPlayer(Player &p_player);
 
 		void display(const CL_String &p_message);
 
 		Player &getPlayer(int p_index);
 
 		Player &getPlayer(const CL_String& p_name);
+
+		Progress &getProgress();
 
 		void removePlayer(const Player &p_player);
 

@@ -47,11 +47,12 @@ class LevelImpl
 
 		const Viewport m_viewport;
 
-		Race::TrackTriangulator m_triangulator;
+		const Race::TrackTriangulator &m_triangulator;
 
 		LevelImpl(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
 				m_levelLogic(p_levelLogic),
-				m_viewport(p_viewport)
+				m_viewport(p_viewport),
+				m_triangulator(p_levelLogic.getTrackTriangulator())
 		{
 			// empty
 		}
@@ -140,21 +141,11 @@ void LevelImpl::drawTriangle(
 void Level::load(CL_GraphicContext &p_gc)
 {
 	Drawable::load(p_gc);
-
-	// triangulate loaded track
-	const Race::Track &track = m_impl->m_levelLogic.getTrack();
-	const int pointCount = track.getPointCount();
-
-	for (int i = 0; i < pointCount; ++i) {
-		cl_log_event(LOG_DEBUG, "%1", i);
-		m_impl->m_triangulator.triangulate(track, i);
-	}
-
 }
 
 Race::TrackTriangulator &Level::getTrackTriangulator()
 {
-	return m_impl->m_triangulator;
+	return const_cast<Race::TrackTriangulator&>(m_impl->m_triangulator);
 }
 
 } // namespace

@@ -36,6 +36,7 @@ class Block;
 class Bound;
 class Car;
 class Track;
+class TrackTriangulator;
 
 class LevelImpl;
 
@@ -49,14 +50,33 @@ class Level
 		virtual ~Level();
 
 
+		// virtual methods
+
 		virtual void initialize();
 
 		virtual void destroy();
 
 
+		// getters
+
 		bool isLoaded() const;
 
 		const Track &getTrack() const;
+
+		/**
+		 * @return Triangulator object. It if valid only if track was
+		 * loaded from file.
+		 */
+		const TrackTriangulator &getTrackTriangulator() const;
+
+		/**
+		 * @return Triangulator object. It if valid only if track was
+		 * loaded from file.
+		 */
+		TrackTriangulator &getTrackTriangulator();
+
+
+		// operations
 
 		void addCar(Car *p_car);
 
@@ -79,6 +99,13 @@ class Level
 
 		void save(const CL_String &p_filename);
 
+		/**
+		 * Sets the new track. Note that when you set a track, the level
+		 * geometry will not be updated. You should use getTrackTriangulator()
+		 * and rebuild modified segment or whole track.
+		 *
+		 * @param p_track Track to set.
+		 */
 		void setTrack(const Track &p_track);
 
 

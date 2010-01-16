@@ -324,7 +324,9 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 
 		// update triangle points in map
 		m_impl->m_intSegMap[p_segment] =
-				CL_SharedPtr<TrackSegment>(new TrackSegment(triPoints));
+				CL_SharedPtr<TrackSegment>(
+						new TrackSegment(triPoints, curvePoints)
+		);
 
 		// update direction vector
 		m_impl->m_intGuideMap[p_segment] = prevHelper;

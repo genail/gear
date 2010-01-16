@@ -30,28 +30,46 @@
 
 #include <ClanLib/core.h>
 
-namespace Race {
+namespace Race
+{
 
-class CheckpointImpl;
+class Car;
+class Checkpoint;
+class Level;
+class ProgressImpl;
 
-class Checkpoint {
-
+class Progress
+{
 	public:
 
-		Checkpoint(int p_idx, const CL_Pointf &p_pos);
+		Progress(const Level &p_level);
 
-		virtual ~Checkpoint();
+		virtual ~Progress();
 
 
-		// getters
+		// operations
 
-		int getIndex() const;
+		void addCar(const Car &p_car);
 
-		const CL_Pointf &getPosition() const;
+		const Checkpoint &getCheckpoint(const Car &p_car) const;
+
+		const Checkpoint &getCheckpoint(int p_idx) const;
+
+		int getCheckpointCount() const;
+
+		int getLapNumber(const Car &p_car) const;
+
+		void initialize();
+
+		void destroy();
+
+		void removeCar(const Car &p_car);
+
 
 	private:
 
-		CL_SharedPtr<CheckpointImpl> m_impl;
+		CL_SharedPtr<ProgressImpl> m_impl;
 };
 
-} // namespace
+}
+

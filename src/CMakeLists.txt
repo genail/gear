@@ -23,6 +23,12 @@ SET(COMMON_SRCS
 	network/packets/VoteEnd.cpp
 	network/packets/VoteStart.cpp
 	network/packets/VoteTick.cpp
+	logic/race/Block.cpp
+	logic/race/Car.cpp
+	logic/race/MessageBoard.cpp
+	logic/race/Progress.cpp
+	logic/race/RaceLogic.cpp
+	logic/race/ScoreTable.cpp	
 	logic/race/level/Bound.cpp
 	logic/race/level/Checkpoint.cpp
 	logic/race/level/Level.cpp
@@ -31,11 +37,6 @@ SET(COMMON_SRCS
 	logic/race/level/TrackPoint.cpp
 	logic/race/level/TrackSegment.cpp
 	logic/race/level/TrackTriangulator.cpp
-	logic/race/Block.cpp
-	logic/race/Car.cpp
-	logic/race/MessageBoard.cpp
-	logic/race/RaceLogic.cpp
-	logic/race/ScoreTable.cpp	
 	logic/race/resistance/Circle.cpp
 	logic/race/resistance/Geometry.cpp
 	logic/race/resistance/Primitive.cpp

@@ -51,7 +51,6 @@ namespace Gfx {
 namespace Race {
 
 class Bound;
-class Checkpoint;
 class Level;
 
 class Car
@@ -71,8 +70,6 @@ class Car
 		bool isDrifting() const;
 
 		bool isLocked() const;
-
-		const Checkpoint *getCurrentCheckpoint() const;
 
 		int getLap() const;
 
@@ -122,13 +119,6 @@ class Car
 		void setStartPosition(int p_startPosition);
 
 		void update(unsigned int elapsedTime);
-
-		/**
-		 * Sets the new checkpoint and calculates car progress on track.
-		 * If lap is reached, then lap number will increase by one.
-		 */
-		void updateCurrentCheckpoint(const Checkpoint *p_checkpoint);
-
 
 		bool operator==(const Car &p_other) const;
 
@@ -205,16 +195,6 @@ class Car
 #endif // CLIENT
 
 		
-		// checkpoint system
-
-		/** The greatest checkpoint id met on this lap */
-		int m_greatestCheckpointId;
-
-		/** Current checkpoint position */
-		const Checkpoint *m_currentCheckpoint;
-
-
-
 		void update1_60();
 
 		// helpers

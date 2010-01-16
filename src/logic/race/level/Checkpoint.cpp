@@ -30,29 +30,43 @@
 
 namespace Race {
 
-Checkpoint::Checkpoint(int p_id, const CL_Pointf &p_position) :
-	m_id(p_id),
-	m_position(p_position),
-	m_progress(0.0f)
+class CheckpointImpl
 {
+	public:
+
+		// fields
+		int m_idx;
+
+		CL_Pointf m_pos;
+
+
+		// methods
+
+		CheckpointImpl(int p_idx, const CL_Pointf &p_pos) :
+			m_idx(p_idx),
+			m_pos(p_pos)
+		{ /* empty */ }
+};
+
+Checkpoint::Checkpoint(int p_idx, const CL_Pointf &p_pos) :
+	m_impl(new CheckpointImpl(p_idx, p_pos))
+{
+	// empty
 }
 
-Checkpoint::~Checkpoint() {
+Checkpoint::~Checkpoint()
+{
+	// empty
 }
 
-int Checkpoint::getId() const
+int Checkpoint::getIndex() const
 {
-	return m_id;
+	return m_impl->m_idx;
 }
 
 const CL_Pointf &Checkpoint::getPosition() const
 {
-	return m_position;
-}
-
-float Checkpoint::getProgress() const
-{
-	return m_progress;
+	return m_impl->m_pos;
 }
 
 } // namespace

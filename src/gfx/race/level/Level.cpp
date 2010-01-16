@@ -45,7 +45,7 @@ class LevelImpl
 
 		const Race::Level m_levelLogic;
 
-		const Viewport m_viewport;
+		const Viewport &m_viewport;
 
 		const Race::TrackTriangulator &m_triangulator;
 

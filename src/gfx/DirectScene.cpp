@@ -99,7 +99,7 @@ void DirectScene::setActive(bool p_active)
 
 void DirectScene::update(unsigned p_timeElapsed)
 {
-	G_ASSERT(!m_loaded);
+	G_ASSERT(m_loaded);
 }
 
 }

@@ -73,6 +73,14 @@ class ProgressImpl
 			m_level(p_level),
 			m_initd(false)
 		{ /* empty */ }
+
+		~ProgressImpl()
+		{
+			destroy();
+		}
+
+
+		void destroy();
 };
 
 Progress::Progress(const Level &p_level) :
@@ -83,7 +91,7 @@ Progress::Progress(const Level &p_level) :
 
 Progress::~Progress()
 {
-	destroy();
+	// empty
 }
 
 void Progress::addCar(const Car &p_car)
@@ -130,12 +138,19 @@ void Progress::initialize()
 
 void Progress::destroy()
 {
-	if (!m_impl->m_initd) {
+	m_impl->destroy();
+}
+
+void ProgressImpl::destroy()
+{
+	if (!m_initd) {
 		return;
 	}
 
-	m_impl->m_chkpts.clear();
-	m_impl->m_cars.clear();
+	m_chkpts.clear();
+	m_cars.clear();
+
+	m_initd = false;
 }
 
 void Progress::removeCar(const Car &p_car)
@@ -148,6 +163,11 @@ void Progress::removeCar(const Car &p_car)
 	G_ASSERT(itor != m_impl->m_cars.end());
 
 	m_impl->m_cars.erase(itor);
+}
+
+void Progress::update()
+{
+
 }
 
 int Progress::getLapNumber(const Car &p_car) const

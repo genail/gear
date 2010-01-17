@@ -69,6 +69,8 @@ class RaceLogic {
 
 		std::vector<CL_String> getPlayerNames() const;
 
+		const Progress &getProgress() const;
+
 		unsigned getRaceFinishTime() const;
 
 		int getRaceLapCount() const;

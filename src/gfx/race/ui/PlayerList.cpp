@@ -118,6 +118,8 @@ const CL_String &PlayerListImpl::ownerName(const Race::Car &p_car)
 			return player.getName();
 		}
 	}
+
+	G_ASSERT(0 && "owner not found");
 }
 
 } // namespace

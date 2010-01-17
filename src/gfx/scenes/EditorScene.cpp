@@ -69,7 +69,9 @@ public:
 			m_radiusLineColor(CL_Colorf::white),
 			m_shiftLineColor(CL_Colorf::green),
 			m_selectedPointFrameColor(CL_Colorf::red),
+			m_shiftPointColor(CL_Colorf::red),
 			m_lastMousePos(0.0f, 0.0f),
+			m_lookPoint(400.0f, 400.0f),
 			m_pressedState(None),
 			m_isPressed(false),
 			m_isCtrlPressed(false)
@@ -77,6 +79,8 @@ public:
 		setDefaultPoints();
 
 		m_raceLevel.setTrack(m_track);
+
+		m_viewport.attachTo(&m_lookPoint);
 	}
 
 	~EditorSceneImpl()
@@ -85,6 +89,8 @@ public:
 	}
 
 	// help variables
+
+	CL_Pointf m_lookPoint;
 
 	CL_Pointf m_minShiftPoint;
 
@@ -97,6 +103,8 @@ public:
 	CL_Colorf m_selectedPointFrameColor;
 
 	CL_Colorf m_selectedPointColor;
+
+	CL_Colorf m_shiftPointColor;
 
 	CL_Colorf m_pointColor;
 
@@ -157,6 +165,8 @@ public:
 
 	void load(CL_GraphicContext &p_gc);
 
+	void update(unsigned int p_timeElapsed);
+
 	void drawPoints(CL_GraphicContext &p_gc);
 
 	void drawPoint(int p_index, bool &p_isSelected, bool &p_isLight, CL_GraphicContext &p_gc);
@@ -175,7 +185,7 @@ public:
 
 	CL_Rect getPointRect(const CL_Point &p_point);
 
-	void setToPerpendicular(CL_Vec2f& p_vector2, float p_shift);
+	void setToPerpendicular(CL_Vec2f& p_vector2, bool p_isInvert);
 
 	void setMinAndMaxShiftPoint(int p_index);
 
@@ -196,19 +206,23 @@ void EditorSceneImpl::setDefaultPoints()
 
 void EditorSceneImpl::draw(CL_GraphicContext &p_gc)
 {
-	m_viewport.attachTo(&CL_Pointf(400, 400));
-	m_viewport.prepareGC(p_gc);
+	//m_viewport.prepareGC(p_gc);
 
 	m_gfxLevel.draw(p_gc);
 
 	drawPoints(p_gc);
 
-	m_viewport.finalizeGC(p_gc);
+	//m_viewport.finalizeGC(p_gc);
 }
 
 void EditorSceneImpl::load(CL_GraphicContext &p_gc)
 {
 	m_gfxLevel.load(p_gc);
+}
+
+void EditorSceneImpl::update(unsigned int p_timeElapsed)
+{
+	setMinAndMaxShiftPoint(m_selectedIndex);
 }
 
 void EditorSceneImpl::drawPoints(CL_GraphicContext &p_gc)
@@ -227,8 +241,6 @@ void EditorSceneImpl::drawPoint(int p_index, bool &p_isSelected, bool &p_isLight
 
 	if (p_isSelected)
 	{
-		CL_Draw::fill(p_gc, getRadiusRect(p_index, PAINT_LINE_WIDTH), m_radiusLineColor);
-	
 		if (m_isCtrlPressed)
 		{
 			CL_Pen pen;
@@ -243,6 +255,13 @@ void EditorSceneImpl::drawPoint(int p_index, bool &p_isSelected, bool &p_isLight
 
 			pen.set_line_width(1.0f);
 			p_gc.set_pen(pen);
+
+			CL_Draw::fill(p_gc, getPointRect((CL_Point)m_minShiftPoint), CL_Colorf::red);
+			CL_Draw::fill(p_gc, getPointRect((CL_Point)m_maxShiftPoint), CL_Colorf::red);
+		}
+		else
+		{
+			CL_Draw::fill(p_gc, getRadiusRect(p_index, PAINT_LINE_WIDTH), m_radiusLineColor);
 		}
 	}
 
@@ -297,48 +316,47 @@ void EditorSceneImpl::findPointAt(const CL_Point &p_pos, int &p_index, PressedSt
 	}
 }
 
-void EditorSceneImpl::setToPerpendicular(CL_Vec2f& p_vector2, float p_shift)
+void EditorSceneImpl::setToPerpendicular(CL_Vec2f& p_vector2, bool p_isInvert)
 {
-	//if (p_shift > 0)
-	//{
-		if ((p_vector2.x > 0 && p_vector2.y > 0) || (p_vector2.x < 0 && p_vector2.y < 0))
-			p_vector2.x = -p_vector2.x;
-		else 
-			p_vector2.y = -p_vector2.y;
-	/*}
-	else
+	if ((p_vector2.x > 0 && p_vector2.y > 0) || (p_vector2.x < 0 && p_vector2.y < 0))
+		p_vector2.x = -p_vector2.x;
+	else 
+		p_vector2.y = -p_vector2.y;
+
+	if (p_isInvert)
 	{
-		if ((p_vector2.x > 0 && p_vector2.y > 0) || (p_vector2.y < 0 && p_vector2.x < 0))
-			p_vector2.x = -p_vector2.x;
-		else 
-			p_vector2.y = -p_vector2.y;
-	}*/
+		p_vector2.x = -p_vector2.x;
+		p_vector2.y = -p_vector2.y;
+	}
 }
 
 void EditorSceneImpl::setMinAndMaxShiftPoint(int p_index)
 {
-	const TrackPoint& trackPoint = m_track.getPoint(p_index);
+	if (p_index >= 0 && p_index < m_track.getPointCount())
+	{
+		const TrackPoint& trackPoint = m_track.getPoint(p_index);
 
-	float minShift = -1.0f - trackPoint.getShift();
-	float maxShift = 1.0f - trackPoint.getShift();
-	float radius = trackPoint.getRadius();
+		float minShift = -1.0f - trackPoint.getShift();
+		float maxShift = 1.0f - trackPoint.getShift();
+		float radius = trackPoint.getRadius();
 
-	CL_Vec2f guide = m_gfxLevel.getTrackTriangulator().getGuide(p_index);
+		CL_Vec2f guide = m_gfxLevel.getTrackTriangulator().getGuide(p_index);
 
-	guide /= guide.length();
+		guide /= guide.length();
 
-	CL_Vec2f minShiftGuide = guide;
-	minShiftGuide.y = -minShiftGuide.y;
-	minShiftGuide *= radius * minShift;
+		CL_Vec2f minShiftGuide = guide;
+		setToPerpendicular(minShiftGuide, true);
+		minShiftGuide *= radius * minShift;
 
-	CL_Vec2f maxShiftGuide = guide;
-	maxShiftGuide.x = -maxShiftGuide.x;
-	maxShiftGuide *= radius * maxShift;
+		CL_Vec2f maxShiftGuide = guide;
+		setToPerpendicular(maxShiftGuide, true);
+		maxShiftGuide *= radius * maxShift;
 
-	const CL_Pointf& pos = trackPoint.getPosition();
+		const CL_Pointf& pos = trackPoint.getPosition();
 
-	m_minShiftPoint = pos + minShiftGuide;
-	m_maxShiftPoint = pos + maxShiftGuide;
+		m_minShiftPoint = pos + minShiftGuide;
+		m_maxShiftPoint = pos + maxShiftGuide;
+	}
 }
 
 CL_Rect EditorSceneImpl::getRadiusRect(int p_index, int p_lineWidth)
@@ -396,7 +414,7 @@ void EditorSceneImpl::getShiftRect(int p_index, int* x1, int* y1, int* x2, int* 
 	guide *= p_trackPoint.getShift() * p_trackPoint.getRadius();
 	guide /= guideLength;
 
-	setToPerpendicular(guide, p_trackPoint.getShift());
+	setToPerpendicular(guide, false);
 
 	const CL_Pointf& pos = p_trackPoint.getPosition();
 
@@ -484,7 +502,25 @@ void EditorSceneImpl::mouseMoved(const CL_Point &p_pos)
 
 		if (m_isCtrlPressed)
 		{
-			double newShift = trackPoint.getShift() + (deltaPos.y / 100.0f);
+			float lastMaxShiftDeltaLength = m_maxShiftPoint.distance(m_lastMousePos);
+			float lastMinShiftDeltaLength = m_minShiftPoint.distance(m_lastMousePos);
+
+			float nowMaxShiftDeltaLength = m_maxShiftPoint.distance(p_pos);
+			float nowMinShiftDeltaLength = m_minShiftPoint.distance(p_pos);
+
+			float maxShiftDeltaLength = nowMaxShiftDeltaLength - lastMaxShiftDeltaLength;
+			float minShiftDeltaLength = nowMinShiftDeltaLength - lastMinShiftDeltaLength;
+
+			double newShift = trackPoint.getShift();
+
+			if (maxShiftDeltaLength > 0.0f && minShiftDeltaLength < 0.0f)
+				newShift -= maxShiftDeltaLength / 100.0f;
+			else if (maxShiftDeltaLength < 0.0f && minShiftDeltaLength > 0.0f)
+				newShift += minShiftDeltaLength / 100.0f;
+			else if (nowMaxShiftDeltaLength > nowMinShiftDeltaLength)
+				newShift -= maxShiftDeltaLength / 100.0f;
+			else
+				newShift += maxShiftDeltaLength / 100.0f;
 
 			if (newShift >= -1.0f && newShift <= 1.0f)
 				trackPoint.setShift(newShift);
@@ -555,6 +591,11 @@ void EditorScene::load(CL_GraphicContext &p_gc)
 	DirectScene::load(p_gc);
 
 	m_impl->load(p_gc);
+}
+
+void EditorScene::update(unsigned int p_timeElapsed)
+{
+	m_impl->update(p_timeElapsed);
 }
 
 void EditorScene::inputPressed(const CL_InputEvent &p_event)

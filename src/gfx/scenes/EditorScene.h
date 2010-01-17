@@ -46,6 +46,8 @@ class EditorScene : public Gfx::DirectScene
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+		virtual void update(unsigned int p_timeElapsed);
+
 		virtual void inputPressed(const CL_InputEvent &p_event);
 
 		virtual void inputReleased(const CL_InputEvent &p_event);

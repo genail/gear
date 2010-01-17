@@ -88,6 +88,9 @@ SET(CLIENT_SRCS
 	controllers/AuthorsController.cpp
 	controllers/EditorController.cpp
 	debug/RaceSceneKeyBindings.cpp
+	editor/EditorManagement.cpp
+	editor/EditorTrack.cpp
+	editor/EditorPoint.cpp
 	gfx/DebugLayer.cpp
 	gfx/DirectScene.cpp
 	gfx/GameWindow.cpp

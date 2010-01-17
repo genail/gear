@@ -138,7 +138,7 @@ public:
 		Released
 	};
 
-	CL_Point m_lastMousePos;
+	CL_Pointf m_lastMousePos;
 
 	PressedState m_pressedState;
 
@@ -171,7 +171,7 @@ public:
 
 	void drawPoint(int p_index, bool &p_isSelected, bool &p_isLight, CL_GraphicContext &p_gc);
 
-	void findPointAt(const CL_Point &p_pos, int &p_index, PressedState &p_pressedState);
+	void findPointAt(const CL_Pointf &p_pos, int &p_index, PressedState &p_pressedState);
 
 	CL_Rect getRadiusUpRect(int p_index, int p_lineWidth);
 
@@ -183,7 +183,7 @@ public:
 
 	CL_Rect getPointRect(int p_index);
 
-	CL_Rect getPointRect(const CL_Point &p_point);
+	CL_Rect getPointRect(const CL_Pointf &p_point);
 
 	void setToPerpendicular(CL_Vec2f& p_vector2, bool p_isInvert);
 
@@ -206,13 +206,13 @@ void EditorSceneImpl::setDefaultPoints()
 
 void EditorSceneImpl::draw(CL_GraphicContext &p_gc)
 {
-	//m_viewport.prepareGC(p_gc);
+	m_viewport.prepareGC(p_gc);
 
 	m_gfxLevel.draw(p_gc);
 
 	drawPoints(p_gc);
 
-	//m_viewport.finalizeGC(p_gc);
+	m_viewport.finalizeGC(p_gc);
 }
 
 void EditorSceneImpl::load(CL_GraphicContext &p_gc)
@@ -256,8 +256,8 @@ void EditorSceneImpl::drawPoint(int p_index, bool &p_isSelected, bool &p_isLight
 			pen.set_line_width(1.0f);
 			p_gc.set_pen(pen);
 
-			CL_Draw::fill(p_gc, getPointRect((CL_Point)m_minShiftPoint), CL_Colorf::red);
-			CL_Draw::fill(p_gc, getPointRect((CL_Point)m_maxShiftPoint), CL_Colorf::red);
+			CL_Draw::fill(p_gc, getPointRect(m_minShiftPoint), CL_Colorf::red);
+			CL_Draw::fill(p_gc, getPointRect(m_maxShiftPoint), CL_Colorf::red);
 		}
 		else
 		{
@@ -273,7 +273,7 @@ void EditorSceneImpl::drawPoint(int p_index, bool &p_isSelected, bool &p_isLight
 	}
 }
 
-void EditorSceneImpl::findPointAt(const CL_Point &p_pos, int &p_index, PressedState &p_pressedState)
+void EditorSceneImpl::findPointAt(const CL_Pointf &p_pos, int &p_index, PressedState &p_pressedState)
 {
 	if (!m_isPressed && !m_isCtrlPressed)
 	{
@@ -438,7 +438,7 @@ CL_Rect EditorSceneImpl::getPointRect(int p_index)
 	return rect;
 }
 
-CL_Rect EditorSceneImpl::getPointRect(const CL_Point &p_point)
+CL_Rect EditorSceneImpl::getPointRect(const CL_Pointf &p_point)
 {
 	CL_Rect rect;
 
@@ -493,20 +493,22 @@ void EditorSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_eve
 
 void EditorSceneImpl::mouseMoved(const CL_Point &p_pos)
 {
-	findPointAt(p_pos, m_lightIndex, m_pressedState);
+	CL_Pointf mousePos = m_viewport.toWorld((CL_Pointf)p_pos);
+
+	findPointAt(mousePos, m_lightIndex, m_pressedState);
 	
 	if (m_selectedIndex != -1)
 	{
 		TrackPoint trackPoint = m_track.getPoint(m_selectedIndex);
-		CL_Point deltaPos = p_pos - m_lastMousePos;
+		CL_Point deltaPos = mousePos - m_lastMousePos;
 
 		if (m_isCtrlPressed)
 		{
 			float lastMaxShiftDeltaLength = m_maxShiftPoint.distance(m_lastMousePos);
 			float lastMinShiftDeltaLength = m_minShiftPoint.distance(m_lastMousePos);
 
-			float nowMaxShiftDeltaLength = m_maxShiftPoint.distance(p_pos);
-			float nowMinShiftDeltaLength = m_minShiftPoint.distance(p_pos);
+			float nowMaxShiftDeltaLength = m_maxShiftPoint.distance(mousePos);
+			float nowMinShiftDeltaLength = m_minShiftPoint.distance(mousePos);
 
 			float maxShiftDeltaLength = nowMaxShiftDeltaLength - lastMaxShiftDeltaLength;
 			float minShiftDeltaLength = nowMinShiftDeltaLength - lastMinShiftDeltaLength;
@@ -564,7 +566,7 @@ void EditorSceneImpl::mouseMoved(const CL_Point &p_pos)
 		}
 	}
 
-	m_lastMousePos = p_pos;
+	m_lastMousePos = mousePos;
 }
 
 EditorScene::EditorScene() :

@@ -52,6 +52,7 @@ class ProgressImpl
 	public:
 
 		typedef std::map<const Car*, ProgressInfo> TCarProgressMap;
+		typedef std::pair<const Car*, ProgressInfo> TCarProgressPair;
 
 		typedef std::vector<Checkpoint> TCheckpointList;
 
@@ -80,7 +81,16 @@ class ProgressImpl
 		}
 
 
+		const Checkpoint &closestCheckpoint(const CL_Pointf &p_pos) const;
+
 		void destroy();
+
+		float distPow(const CL_Pointf &p_a, const CL_Pointf &p_b) const
+		{
+			const float a = p_b.x - p_a.x;
+			const float b = p_b.y - p_a.y;
+			return a * a + b * b;
+		}
 };
 
 Progress::Progress(const Level &p_level) :
@@ -167,7 +177,41 @@ void Progress::removeCar(const Car &p_car)
 
 void Progress::update()
 {
+	// localize closest checkpoint for each car
+	ProgressImpl::TCarProgressPair pair;
+	foreach (pair, m_impl->m_cars) {
+		const Checkpoint &closeCp =
+				m_impl->closestCheckpoint(pair.first->getPosition());
+		m_impl->m_cars[pair.first].m_checkpoint = closeCp;
+	}
+}
 
+const Checkpoint &ProgressImpl::closestCheckpoint(const CL_Pointf &p_pos) const
+{
+	G_ASSERT(m_chkpts.size() > 0);
+
+	float dist, ndist;
+	const Checkpoint *tcp;
+	bool first = true;
+
+	foreach (const Checkpoint &cp, m_chkpts) {
+
+		ndist = distPow(cp.getPosition(), p_pos);
+
+		if (!first) {
+			if (ndist < dist) {
+				cl_log_event("a", "b");
+				dist = ndist;
+				tcp = &cp;
+			}
+		} else {
+			dist = ndist;
+			tcp = &cp;
+			first = false;
+		}
+	}
+
+	return *tcp;
 }
 
 int Progress::getLapNumber(const Car &p_car) const

@@ -30,6 +30,7 @@
 
 #include "common.h"
 #include "common/Game.h"
+#include "common/Player.h"
 #include "gfx/DebugLayer.h"
 #include "gfx/Stage.h"
 #include "gfx/race/level/Bound.h"
@@ -245,6 +246,7 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 
 	CL_Pen pen;
 	pen.set_point_size(10);
+	pen.set_line_width(5);
 
 	p_gc.set_pen(pen);
 
@@ -253,12 +255,23 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 		CL_Draw::point(p_gc, cp.getPosition(), CL_Colorf::red);
 	}
 
+	// draw car -> checkpoint links
+	const int playerCount = m_logic->getPlayerCount();
+	for (int i = 0; i < playerCount; ++i) {
+		const Player &player = m_logic->getPlayer(i);
+
+		const Race::Car &car = player.getCar();
+		const Race::Checkpoint &cp = progress.getCheckpoint(car);
+
+		CL_Draw::line(
+				p_gc,
+				car.getPosition(), cp.getPosition(),
+				CL_Colorf::aliceblue
+		);
+	}
+
 	// restore old pen
 	p_gc.set_pen(pen);
-
-
-	// draw car -> checkpoint links
-	// TODO
 
 #endif // !NDEBUG && DRAW_CHECKPOINTS
 }

@@ -200,7 +200,6 @@ const Checkpoint &ProgressImpl::closestCheckpoint(const CL_Pointf &p_pos) const
 
 		if (!first) {
 			if (ndist < dist) {
-				cl_log_event("a", "b");
 				dist = ndist;
 				tcp = &cp;
 			}

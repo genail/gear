@@ -91,6 +91,7 @@ SET(CLIENT_SRCS
 	editor/EditorManagement.cpp
 	editor/EditorTrack.cpp
 	editor/EditorPoint.cpp
+	editor/EditorHelper.cpp
 	gfx/DebugLayer.cpp
 	gfx/DirectScene.cpp
 	gfx/GameWindow.cpp

@@ -39,16 +39,11 @@ namespace editor
 		Released
 	};
 
-	class EditorHelperImpl;
-
 	class EditorHelper
 	{
 	public:
-		EditorHelper();
-
-		~EditorHelper();
 		
 	private:
-		CL_SharedPtr<EditorHelperImpl> m_impl;
+		EditorHelper() { };
 	};
 }

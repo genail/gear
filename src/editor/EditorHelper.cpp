@@ -28,22 +28,7 @@
 
 #include "EditorHelper.h"
 
-namespace editor
+namespace Editor
 {
-	class EditorHelperImpl
-	{
-	public:
 
-	};
-
-	EditorHelper::EditorHelper() : 
-		m_impl(new EditorHelperImpl())
-	{
-
-	}
-
-	~EditorHelper::EditorHelper()
-	{
-
-	}
 }

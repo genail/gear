@@ -34,8 +34,14 @@
 
 #include "common.h"
 
-namespace editor
+namespace Editor
 {
+	enum InputState 
+	{
+		Pressed,
+		Released
+	};
+
 	class EditorManagementImpl;
 
 	class EditorManagement
@@ -48,6 +54,8 @@ namespace editor
 		void draw(CL_GraphicContext &p_gc);
 
 		void load(CL_GraphicContext &p_gc);
+
+		void mouseMoved(const CL_Point &p_pos);
 
 		void update(unsigned int p_timeElapsed);
 

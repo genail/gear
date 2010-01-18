@@ -28,16 +28,78 @@
 
 #include "EditorTrack.h"
 
-namespace editor
+using namespace Race;
+using namespace Gfx;
+
+namespace Editor
 {
 	class EditorTrackImpl
 	{
 	public:
+		EditorTrackImpl(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Track& p_track, Viewport& p_viewport) : 
+			m_raceLevel(p_raceLevel),
+			m_track(p_track),
+			m_viewport(p_viewport),
+			m_gfxLevel(p_gfxLevel),
+			m_lookPoint(Gfx::Stage::getWidth() / 2, Gfx::Stage::getHeight() / 2)
+		{
 
+		}
+
+		// help variables
+
+		CL_Pointf m_lookPoint;
+
+		// references
+
+		Race::Level& m_raceLevel;
+		
+		Gfx::Level& m_gfxLevel;
+
+		Track& m_track;
+
+		Viewport& m_viewport;
+
+		// methods
+
+		bool handleInput(bool p_pressed, const CL_InputEvent &p_event);
+
+		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
+
+		void draw(CL_GraphicContext &p_gc);
+
+		void load(CL_GraphicContext &p_gc);
+
+		void update(unsigned int p_timeElapsed);
 	};
 
-	EditorTrack::EditorTrack() : 
-		m_impl(new EditorTrackImpl())
+	void EditorTrackImpl::draw(CL_GraphicContext &p_gc)
+	{
+		m_gfxLevel.draw(p_gc);
+	}
+
+	void EditorTrackImpl::load(CL_GraphicContext &p_gc)
+	{
+		m_gfxLevel.load(p_gc);
+	}
+
+	void EditorTrackImpl::update(unsigned int p_timeElapsed)
+	{
+
+	}
+
+	bool EditorTrackImpl::handleInput(bool p_pressed, const CL_InputEvent &p_event)
+	{
+		return true;
+	}
+
+	void EditorTrackImpl::mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos)
+	{
+		
+	}
+
+	EditorTrack::EditorTrack(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Track& p_track, Viewport& p_viewport) : 
+		m_impl(new EditorTrackImpl(p_raceLevel, p_gfxLevel, p_track, p_viewport))
 	{
 
 	}
@@ -45,5 +107,30 @@ namespace editor
 	EditorTrack::~EditorTrack()
 	{
 
+	}
+
+	void EditorTrack::draw(CL_GraphicContext &p_gc)
+	{
+		m_impl->draw(p_gc);
+	}
+
+	void EditorTrack::load(CL_GraphicContext &p_gc)
+	{
+		m_impl->load(p_gc);
+	}
+
+	void EditorTrack::mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos)
+	{
+		m_impl->mouseMoved(p_mousePos, p_lastMousePos, p_deltaPos);
+	}
+
+	void EditorTrack::update(unsigned int p_timeElapsed)
+	{
+		m_impl->update(p_timeElapsed);
+	}
+
+	bool EditorTrack::handleInput(bool p_pressed, const CL_InputEvent& p_event)
+	{
+		return m_impl->handleInput(p_pressed, p_event);
 	}
 }

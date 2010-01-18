@@ -33,15 +33,19 @@
 #include "EditorHelper.h"
 
 #include "common.h"
+#include "logic/race/level/Track.h"
+#include "logic/race/level/TrackPoint.h"
+#include "logic/race/level/TrackTriangulator.h"
+#include "gfx/race/level/Level.h"
 
-namespace editor
-{
+namespace Editor
+{ 
 	class EditorPointImpl;
 
 	class EditorPoint
 	{
 	public:
-		EditorPoint();
+		EditorPoint(Race::Track& p_track, Gfx::Level& p_gfxLevel);
 
 		~EditorPoint();
 
@@ -49,9 +53,11 @@ namespace editor
 
 		void load(CL_GraphicContext &p_gc);
 
+		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
+
 		void update(unsigned int p_timeElapsed);
 
-		void handleInput(InputState p_state, const CL_InputEvent& p_event);
+		bool handleInput(bool p_pressed, const CL_InputEvent& p_event);
 
 	private:
 

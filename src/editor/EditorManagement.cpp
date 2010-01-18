@@ -28,11 +28,58 @@
 
 #include "EditorManagement.h"
 
-namespace editor
+#include "EditorTrack.h"
+#include "EditorPoint.h"
+
+#include "gfx/Viewport.h"
+#include "gfx/race/level/Level.h"
+#include "logic/race/level/Level.h"
+#include "logic/race/level/Track.h"
+
+using namespace Gfx;
+using namespace Race;
+
+namespace Editor
 {
 	class EditorManagementImpl
 	{
 	public:
+		EditorManagementImpl() : 
+			m_track(),
+			m_viewport(),
+			m_raceLevel(),
+			m_gfxLevel(m_raceLevel, m_viewport),
+			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
+			m_editorPoint(m_track, m_gfxLevel),
+			m_lastMousePos(0.0f, 0.0f)
+		{
+			m_raceLevel.setTrack(m_track);
+		}
+
+		~EditorManagementImpl()
+		{
+			m_raceLevel.destroy();
+		}
+
+		// editor variables
+
+		EditorPoint m_editorPoint;
+
+		EditorTrack m_editorTrack;
+
+		// track
+
+		Viewport m_viewport;
+
+		Gfx::Level m_gfxLevel;
+
+		Race::Level m_raceLevel;
+
+		Track m_track;
+
+		// help variables
+
+		CL_Pointf m_lastMousePos;
 
 	};
 
@@ -44,6 +91,62 @@ namespace editor
 
 	EditorManagement::~EditorManagement()
 	{
+		
+	}
 
+	void EditorManagement::draw(CL_GraphicContext &p_gc)
+	{
+		m_impl->m_viewport.prepareGC(p_gc);
+
+		m_impl->m_editorTrack.draw(p_gc);
+		m_impl->m_editorPoint.draw(p_gc);
+
+		m_impl->m_viewport.finalizeGC(p_gc);
+	}
+
+	void EditorManagement::load(CL_GraphicContext &p_gc)
+	{
+		m_impl->m_editorPoint.load(p_gc);
+		m_impl->m_editorTrack.load(p_gc);
+	}
+
+	void EditorManagement::mouseMoved(const CL_Point &p_pos)
+	{
+		CL_Pointf mousePos = m_impl->m_viewport.toWorld((CL_Pointf)p_pos);
+		CL_Pointf deltaPos = mousePos - m_impl->m_lastMousePos;
+
+		m_impl->m_editorPoint.mouseMoved(mousePos, m_impl->m_lastMousePos, deltaPos);
+		m_impl->m_editorTrack.mouseMoved(mousePos, m_impl->m_lastMousePos, deltaPos);
+	}
+
+	void EditorManagement::update(unsigned int p_timeElapsed)
+	{
+		m_impl->m_editorPoint.update(p_timeElapsed);
+		m_impl->m_editorTrack.update(p_timeElapsed);
+	}
+
+	void EditorManagement::handleInput(InputState p_state, const CL_InputEvent& p_event)
+	{
+		bool pressed;
+
+		switch (p_state) 
+		{
+			case Pressed:
+				pressed = true;
+				break;
+			case Released:
+				pressed = false;
+				break;
+			default:
+				assert(0 && "unknown input state");
+		}
+
+		bool ok = true;
+
+		if (ok)
+			ok = m_impl->m_editorPoint.handleInput(pressed, p_event);
+
+		if (ok)
+			ok = m_impl->m_editorTrack.handleInput(pressed, p_event);
 	}
 }

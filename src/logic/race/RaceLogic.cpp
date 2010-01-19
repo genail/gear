@@ -189,6 +189,9 @@ void RaceLogicImpl::updatePlayersProgress()
 			m_playersFinished.push_back(player);
 		}
 	}
+
+	// update overall progress
+	m_progress.update();
 }
 
 const Race::Level &RaceLogic::getLevel() const
@@ -405,6 +408,11 @@ void RaceLogic::removePlayer(const Player &p_player)
 }
 
 Progress &RaceLogic::getProgress()
+{
+	return m_impl->m_progress;
+}
+
+const Progress &RaceLogic::getProgress() const
 {
 	return m_impl->m_progress;
 }

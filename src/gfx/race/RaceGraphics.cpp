@@ -30,6 +30,7 @@
 
 #include "common.h"
 #include "common/Game.h"
+#include "common/Player.h"
 #include "gfx/DebugLayer.h"
 #include "gfx/Stage.h"
 #include "gfx/race/level/Bound.h"
@@ -40,7 +41,9 @@
 #include "gfx/race/level/Smoke.h"
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
+#include "logic/race/Progress.h"
 #include "logic/race/RaceLogic.h"
+#include "logic/race/level/Checkpoint.h"
 
 namespace Gfx {
 
@@ -61,6 +64,7 @@ RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
 
 RaceGraphics::~RaceGraphics()
 {
+	// empty
 }
 
 void RaceGraphics::draw(CL_GraphicContext &p_gc)
@@ -214,8 +218,7 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 {
 	m_level.draw(p_gc);
 
-
-	const Race::Level &level = m_logic->getLevel();
+//	const Race::Level &level = m_logic->getLevel();
 
 	drawBackBlocks(p_gc);
 
@@ -236,29 +239,39 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 
 #if !defined(NDEBUG) && defined(DRAW_CHECKPOINTS)
 
+	const Race::Progress progress = m_logic->getProgress();
+	const int cpCount = progress.getCheckpointCount();
+
+	CL_Pen prevPen = p_gc.get_pen();
+
+	CL_Pen pen;
+	pen.set_point_size(10);
+	pen.set_line_width(5);
+
+	p_gc.set_pen(pen);
+
+	for (int i = 0; i < cpCount; ++i) {
+		const Race::Checkpoint &cp = progress.getCheckpoint(i);
+		CL_Draw::point(p_gc, cp.getPosition(), CL_Colorf::red);
+	}
+
 	// draw car -> checkpoint links
-	std::vector<CL_String> names = m_logic->getPlayerNames();
+	const int playerCount = m_logic->getPlayerCount();
+	for (int i = 0; i < playerCount; ++i) {
+		const Player &player = m_logic->getPlayer(i);
 
-	foreach (const CL_String &name, names) {
-		const Player &player = m_logic->getPlayer(name);
 		const Race::Car &car = player.getCar();
+		const Race::Checkpoint &cp = progress.getCheckpoint(car);
 
-		const Race::Checkpoint *cp = car.getCurrentCheckpoint();
-
-		if (cp != NULL) {
-			CL_Draw::line(p_gc, car.getPosition(), cp->getPosition(), CL_Colorf::green);
-		}
+		CL_Draw::line(
+				p_gc,
+				car.getPosition(), cp.getPosition(),
+				CL_Colorf::aliceblue
+		);
 	}
 
-	const Race::Track &track = level.getTrack();
-	const unsigned checkpointCount = track.getCheckpointCount();
-
-	for (unsigned i = 0; i < checkpointCount; ++i) {
-		const Race::Checkpoint *checkpoint = track.getCheckpoint(i);
-		const CL_Pointf &point = checkpoint->getPosition();
-
-		CL_Draw::circle(p_gc, point.x, point.y, 5, CL_Colorf::red);
-	}
+	// restore old pen
+	p_gc.set_pen(pen);
 
 #endif // !NDEBUG && DRAW_CHECKPOINTS
 }

@@ -36,12 +36,6 @@
 
 namespace Editor
 {
-	enum InputState 
-	{
-		Pressed,
-		Released
-	};
-
 	class EditorManagementImpl;
 
 	class EditorManagement

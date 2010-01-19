@@ -31,7 +31,7 @@
 
 #include "common.h"
 
-namespace editor
+namespace Editor
 {
 	enum InputState 
 	{

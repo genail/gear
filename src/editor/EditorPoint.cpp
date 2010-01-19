@@ -111,17 +111,17 @@ namespace Editor
 
 		void findPointAt(const CL_Pointf &p_pos, int &p_index, PressedState &p_pressedState);
 
-		CL_Rect& getRadiusUpRect(int p_index, int p_lineWidth);
+		CL_Rect getRadiusUpRect(int p_index, int p_lineWidth);
 
-		CL_Rect& getRadiusDownRect(int p_index, int p_lineWidth);
+		CL_Rect getRadiusDownRect(int p_index, int p_lineWidth);
 
-		CL_Rect& getRadiusRect(int p_index, int p_lineWidth);
+		CL_Rect getRadiusRect(int p_index, int p_lineWidth);
 
 		void getShiftRect(int p_index, int* x1, int* y1, int* x2, int* y2);
 
-		CL_Rect& getPointRect(int p_index);
+		CL_Rect getPointRect(int p_index);
 
-		CL_Rect& getPointRect(const CL_Pointf &p_point);
+		CL_Rect getPointRect(const CL_Pointf &p_point);
 
 		void setToPerpendicular(CL_Vec2f &p_vector2, bool p_isInvert);
 
@@ -289,7 +289,7 @@ namespace Editor
 		}
 	}
 
-	CL_Rect& EditorPointImpl::getRadiusRect(int p_index, int p_lineWidth)
+	CL_Rect EditorPointImpl::getRadiusRect(int p_index, int p_lineWidth)
 	{
 		const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
 
@@ -304,7 +304,7 @@ namespace Editor
 		return rect;
 	}
 
-	CL_Rect& EditorPointImpl::getRadiusUpRect(int p_index, int p_lineWidth)
+	CL_Rect EditorPointImpl::getRadiusUpRect(int p_index, int p_lineWidth)
 	{
 		const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
 
@@ -319,7 +319,7 @@ namespace Editor
 		return rect;
 	}
 
-	CL_Rect& EditorPointImpl::getRadiusDownRect(int p_index, int p_lineWidth)
+	CL_Rect EditorPointImpl::getRadiusDownRect(int p_index, int p_lineWidth)
 	{
 		const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
 
@@ -354,7 +354,7 @@ namespace Editor
 		*y2 = pos.y + guide.y;
 	}
 
-	CL_Rect& EditorPointImpl::getPointRect(int p_index)
+	CL_Rect EditorPointImpl::getPointRect(int p_index)
 	{
 		TrackPoint p_trackPoint = m_track.getPoint(p_index);
 
@@ -368,7 +368,7 @@ namespace Editor
 		return rect;
 	}
 
-	CL_Rect& EditorPointImpl::getPointRect(const CL_Pointf &p_point)
+	CL_Rect EditorPointImpl::getPointRect(const CL_Pointf &p_point)
 	{
 		CL_Rect rect;
 

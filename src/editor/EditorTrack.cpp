@@ -40,10 +40,18 @@ namespace Editor
 			m_raceLevel(p_raceLevel),
 			m_track(p_track),
 			m_viewport(p_viewport),
-			m_gfxLevel(p_gfxLevel),
-			m_lookPoint(Gfx::Stage::getWidth() / 2, Gfx::Stage::getHeight() / 2)
+			m_gfxLevel(p_gfxLevel)
 		{
+			m_raceLevel.setTrack(m_track);
 
+			CL_Pointf m_lookPoint(Gfx::Stage::getWidth() / 2, Gfx::Stage::getHeight() / 2);
+
+			m_viewport.attachTo(&m_lookPoint);
+		}
+
+		~EditorTrackImpl()
+		{
+			m_raceLevel.destroy();
 		}
 
 		// help variables

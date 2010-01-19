@@ -50,15 +50,15 @@ namespace Editor
 			m_raceLevel(),
 			m_gfxLevel(m_raceLevel, m_viewport),
 			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
-			m_editorPoint(m_track, m_gfxLevel),
+			m_editorPoint(m_track, m_gfxLevel)
 			m_lastMousePos(0.0f, 0.0f)
 		{
-			m_raceLevel.setTrack(m_track);
+
 		}
 
 		~EditorManagementImpl()
 		{
-			m_raceLevel.destroy();
+
 		}
 
 		// editor variables

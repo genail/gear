@@ -43,8 +43,11 @@ namespace Race
 
 struct ProgressInfo
 {
+	// current lap
 	int m_lapNum;
-	Checkpoint m_checkpoint;
+
+	// farthest accepted checkpoint on track
+	Checkpoint m_cp;
 };
 
 class ProgressImpl
@@ -55,16 +58,26 @@ class ProgressImpl
 		typedef std::pair<const Car*, ProgressInfo> TCarProgressPair;
 
 		typedef std::vector<Checkpoint> TCheckpointList;
+		typedef std::vector<int> TCheckpointDistances;
 
 
 		// fields
 
+		/** Cars to progress mapping */
 		TCarProgressMap m_cars;
 
+		/** All checkpoints ordered from first to last */
 		TCheckpointList m_chkpts;
+
+		/**
+		 * Checkpoint distances. 0 is distance between 0 and 1, last between
+		 * last checkpoint and 0. Distances held in world units.
+		 */
+		TCheckpointDistances m_dists;
 
 		const Level &m_level;
 
+		/** Initialized flag */
 		bool m_initd;
 
 
@@ -91,6 +104,8 @@ class ProgressImpl
 			const float b = p_b.y - p_a.y;
 			return a * a + b * b;
 		}
+
+		int distance(const Checkpoint &p_from, const Checkpoint &p_to) const;
 };
 
 Progress::Progress(const Level &p_level) :
@@ -120,6 +135,9 @@ void Progress::initialize()
 
 	G_ASSERT(m_impl->m_level.isLoaded() && "level must be loaded first");
 
+	// minimal checkpoint distance
+	static const int MIN_DISTANCE = 50;
+
 
 	// load checkpoints
 	const Track &track = m_impl->m_level.getTrack();
@@ -127,6 +145,8 @@ void Progress::initialize()
 	const int segCount = track.getPointCount();
 
 	int chkPtIdx = 0;
+	CL_Pointf prevPos;
+	float dist;
 
 	for (int i = 0; i < segCount; ++i) {
 		const TrackSegment &seg = triang.getSegment(i);
@@ -136,12 +156,35 @@ void Progress::initialize()
 		const int midCount = midPts.size();
 
 		for (int j = 0; j < midCount; ++j) {
+
+			if (chkPtIdx != 0) {
+
+				dist = prevPos.distance(midPts[j]);
+
+				// skip point if distance is to low
+				if (dist < MIN_DISTANCE) {
+					continue;
+				}
+
+				// save the distance
+				m_impl->m_dists.push_back(static_cast<int>(ceil(dist)));
+			}
+
 			m_impl->m_chkpts.push_back(Checkpoint(chkPtIdx++, midPts[j]));
+			prevPos = m_impl->m_chkpts.back().getPosition();
 		}
 	}
 
 	G_ASSERT(m_impl->m_chkpts.size() > 0 && "no checkpoints loaded");
 
+	// insert distance betwwen first and last
+	dist = m_impl->m_chkpts.back().getPosition().distance(
+			m_impl->m_chkpts.front().getPosition()
+	);
+
+	m_impl->m_dists.push_back(dist);
+
+	// mark initialized
 	m_impl->m_initd = true;
 
 }
@@ -158,6 +201,7 @@ void ProgressImpl::destroy()
 	}
 
 	m_chkpts.clear();
+	m_dists.clear();
 	m_cars.clear();
 
 	m_initd = false;
@@ -177,12 +221,29 @@ void Progress::removeCar(const Car &p_car)
 
 void Progress::update()
 {
+	static const int FAR_LIMIT = 400;
+
 	// localize closest checkpoint for each car
 	ProgressImpl::TCarProgressPair pair;
+
 	foreach (pair, m_impl->m_cars) {
-		const Checkpoint &closeCp =
+		const Checkpoint &nextCp =
 				m_impl->closestCheckpoint(pair.first->getPosition());
-		m_impl->m_cars[pair.first].m_checkpoint = closeCp;
+
+		ProgressInfo &info = m_impl->m_cars[pair.first];
+
+		if (nextCp.getIndex() == info.m_cp.getIndex() + 1) {
+			// accept is this is next checkpoint
+			info.m_cp = nextCp;
+		} else if (nextCp.getIndex() > info.m_cp.getIndex()) {
+			// if this is much further then accept only if its position
+			// is close enough
+
+			if (m_impl->distance(info.m_cp, nextCp) <= FAR_LIMIT) {
+				info.m_cp = nextCp;
+			}
+		}
+
 	}
 }
 
@@ -213,6 +274,28 @@ const Checkpoint &ProgressImpl::closestCheckpoint(const CL_Pointf &p_pos) const
 	return *tcp;
 }
 
+int ProgressImpl::distance(
+		const Checkpoint &p_from,
+		const Checkpoint &p_to
+) const
+{
+	const int fromIdx = p_from.getIndex();
+	const int toIdx = p_to.getIndex();
+
+	int sum = 0;
+	const int distsCount = m_dists.size();
+
+	for (int i = fromIdx; i != toIdx; ++i) {
+		if (i >= distsCount) {
+			i = 0;
+		}
+
+		sum += m_dists[i];
+	}
+
+	return sum;
+}
+
 int Progress::getLapNumber(const Car &p_car) const
 {
 	G_ASSERT(m_impl->m_initd);
@@ -235,7 +318,7 @@ const Checkpoint &Progress::getCheckpoint(const Car &p_car) const
 	G_ASSERT(itor != m_impl->m_cars.end());
 
 
-	return itor->second.m_checkpoint;
+	return itor->second.m_cp;
 }
 
 const Checkpoint &Progress::getCheckpoint(int p_idx) const

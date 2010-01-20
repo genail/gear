@@ -90,11 +90,20 @@ class GameWindow : public CL_GUIComponent {
 
 		// signal handlers
 
-		void onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state);
+		void onKeyDown(
+				const CL_InputEvent &p_event,
+				const CL_InputState &p_state
+		);
 
-		void onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state);
+		void onKeyUp(
+				const CL_InputEvent &p_event,
+				const CL_InputState &p_state
+		);
 
-		void onMouseMove(const CL_InputEvent &p_event, const CL_InputState &p_state);
+		void onMouseMove(
+				const CL_InputEvent &p_event,
+				const CL_InputState &p_state
+		);
 
 };
 

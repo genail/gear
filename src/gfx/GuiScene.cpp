@@ -86,6 +86,11 @@ void GuiScene::mouseMoved(const CL_Point &p_pos)
 	// empty
 }
 
+void GuiScene::mouseScrolled(bool p_up)
+{
+	// empty
+}
+
 void GuiScene::pushed()
 {
 	set_visible(true);

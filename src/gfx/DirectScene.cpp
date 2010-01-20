@@ -82,6 +82,11 @@ void DirectScene::mouseMoved(const CL_Point &p_pos)
 	// empty
 }
 
+void DirectScene::mouseScrolled(bool p_up)
+{
+	// empty
+}
+
 void DirectScene::pushed()
 {
 	// empty

@@ -51,6 +51,8 @@ namespace Editor
 
 		void mouseMoved(const CL_Point &p_pos);
 
+		void mouseScrolled(bool p_up);
+
 		void update(unsigned int p_timeElapsed);
 
 		void handleInput(InputState p_state, const CL_InputEvent& p_event);

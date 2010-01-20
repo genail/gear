@@ -54,6 +54,8 @@ class EditorScene : public Gfx::DirectScene
 
 		virtual void mouseMoved(const CL_Point &p_pos);
 
+		virtual void mouseScrolled(bool p_up);
+
 	private:
 
 		CL_SharedPtr<EditorSceneImpl> m_impl;

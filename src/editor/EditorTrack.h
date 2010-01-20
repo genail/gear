@@ -60,6 +60,8 @@ namespace Editor
 
 		void handleInput(bool p_pressed, const CL_InputEvent& p_event);
 
+		void mouseScrolled(bool p_up);
+
 		bool getHandle() const;
 
 	private:

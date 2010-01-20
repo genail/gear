@@ -50,7 +50,7 @@ namespace Editor
 			m_raceLevel(),
 			m_gfxLevel(m_raceLevel, m_viewport),
 			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
-			m_editorPoint(m_track, m_gfxLevel),
+			m_editorPoint(m_track, m_gfxLevel, m_viewport),
 			m_lastMousePos(0.0f, 0.0f),
 			m_inconditionalLastMousePos(0.0f, 0.0f)
 		{
@@ -119,7 +119,7 @@ namespace Editor
 
 	void EditorManagement::mouseMoved(const CL_Point &p_pos)
 	{
-		CL_Pointf inconditionalDeltaPos = p_pos - m_impl->m_inconditionalLastMousePos;
+		CL_Pointf inconditionalDeltaPos = (CL_Pointf)p_pos - m_impl->m_inconditionalLastMousePos;
 
 		CL_Pointf mousePos = m_impl->m_viewport.toWorld((CL_Pointf)p_pos);
 		CL_Pointf deltaPos = mousePos - m_impl->m_lastMousePos;
@@ -163,5 +163,11 @@ namespace Editor
 			m_impl->m_editorPoint.handleInput(pressed, p_event);
 			m_impl->m_editorTrack.handleInput(pressed, p_event);
 		}
+	}
+
+	void EditorManagement::mouseScrolled(bool p_up)
+	{
+		m_impl->m_editorPoint.mouseScrolled(p_up);
+		m_impl->m_editorTrack.mouseScrolled(p_up);
 	}
 }

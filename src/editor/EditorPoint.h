@@ -33,6 +33,7 @@
 #include "EditorHelper.h"
 
 #include "common.h"
+#include "gfx/Viewport.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackPoint.h"
 #include "logic/race/level/TrackTriangulator.h"
@@ -45,13 +46,15 @@ namespace Editor
 	class EditorPoint
 	{
 	public:
-		EditorPoint(Race::Track& p_track, Gfx::Level& p_gfxLevel);
+		EditorPoint(Race::Track& p_track, Gfx::Level& p_gfxLevel, Gfx::Viewport& p_viewport);
 
 		~EditorPoint();
 
 		void draw(CL_GraphicContext &p_gc);
 
 		void load(CL_GraphicContext &p_gc);
+
+		void mouseScrolled(bool p_up);
 
 		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
 

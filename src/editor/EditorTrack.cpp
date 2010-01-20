@@ -42,7 +42,7 @@ namespace Editor
 			m_viewport(p_viewport),
 			m_gfxLevel(p_gfxLevel),
 			m_pressedId(CL_NONE_PRESSED),
-			m_lookPoint(400.0f, 400.0f)
+			m_lookPoint(400.0f, 300.0f)
 		{
 			m_viewport.attachTo(&m_lookPoint);
 		}
@@ -75,12 +75,16 @@ namespace Editor
 		void handleInput(bool p_pressed, const CL_InputEvent &p_event);
 
 		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
+	
+		void mouseScrolled(bool p_up);
 
 		void draw(CL_GraphicContext &p_gc);
 
 		void load(CL_GraphicContext &p_gc);
 
 		void update(unsigned int p_timeElapsed);
+
+		void setDefaultView();
 
 		bool getHandle() const;
 	};
@@ -110,12 +114,36 @@ namespace Editor
 		{
 			m_pressedId = CL_NONE_PRESSED;
 		}
+
+		if (m_pressedId == CL_KEY_SPACE)
+		{
+			setDefaultView();
+		}
 	}
 
 	void EditorTrackImpl::mouseMoved(const CL_Pointf &p_inconditionalMousePos, const CL_Pointf &p_inconditionalLastMousePos, const CL_Pointf &p_inconditionalDeltaPos)
 	{
 		if (m_pressedId == CL_MOUSE_RIGHT)
 			m_lookPoint -= p_inconditionalDeltaPos;
+	}
+
+	void EditorTrackImpl::mouseScrolled(bool p_up)
+	{
+		if (m_pressedId == CL_NONE_PRESSED)
+		{
+			float set = p_up ? 0.1f : -0.1f;
+
+			float newScale = m_viewport.getScale() + set;
+
+			if (newScale > 0.0f && newScale <= 2.0f)
+				m_viewport.setScale(newScale);
+		}
+	}
+
+	void EditorTrackImpl::setDefaultView()
+	{
+		m_viewport.setScale(1.0f);
+		m_lookPoint = CL_Pointf(400.0f, 300.0f);
 	}
 
 	bool EditorTrackImpl::getHandle() const
@@ -147,6 +175,11 @@ namespace Editor
 	void EditorTrack::mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos)
 	{
 		m_impl->mouseMoved(p_mousePos, p_lastMousePos, p_deltaPos);
+	}
+
+	void EditorTrack::mouseScrolled(bool p_up)
+	{
+		m_impl->mouseScrolled(p_up);
 	}
 
 	void EditorTrack::update(unsigned int p_timeElapsed)

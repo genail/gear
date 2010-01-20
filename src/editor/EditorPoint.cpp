@@ -40,9 +40,10 @@ namespace Editor
 	class EditorPointImpl
 	{
 	public:
-		EditorPointImpl(Track& p_track, Gfx::Level& p_gfxLevel) : 
+		EditorPointImpl(Track& p_track, Gfx::Level& p_gfxLevel, Gfx::Viewport& p_viewport) : 
 			m_track(p_track),
 			m_gfxLevel(p_gfxLevel),
+			m_viewport(p_viewport),
 			m_selectedIndex(-1),
 			m_lightIndex(-1),
 			m_selectedPointColor(CL_Colorf::yellow),
@@ -52,6 +53,7 @@ namespace Editor
 			m_selectedPointFrameColor(CL_Colorf::red),
 			m_shiftPointColor(CL_Colorf::red),
 			m_pressedId(CL_NONE_PRESSED),
+			m_isAltPressed(false),
 			m_state(None)
 		{
 			setDefaultPoints();
@@ -91,17 +93,23 @@ namespace Editor
 
 		State m_state;
 
+		bool m_isAltPressed;
+
 		// references
 
 		Track& m_track;
 
 		Gfx::Level& m_gfxLevel;
 
+		Gfx::Viewport& m_viewport;
+
 		// methods
 
 		void handleInput(bool p_pressed, const CL_InputEvent &p_event);
 
 		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
+
+		void mouseScrolled(bool p_up);
 
 		void draw(CL_GraphicContext &p_gc);
 
@@ -301,10 +309,12 @@ namespace Editor
 
 		CL_Rect rect;
 
-		rect.left = p_trackPoint.getPosition().x - POINT_WIDTH;
-		rect.top = p_trackPoint.getPosition().y - POINT_WIDTH;
-		rect.right = p_trackPoint.getPosition().x + POINT_WIDTH;
-		rect.bottom = p_trackPoint.getPosition().y + POINT_WIDTH;
+		float pointWidth = POINT_WIDTH / m_viewport.getScale();
+
+		rect.left = p_trackPoint.getPosition().x - pointWidth;
+		rect.top = p_trackPoint.getPosition().y - pointWidth;
+		rect.right = p_trackPoint.getPosition().x + pointWidth;
+		rect.bottom = p_trackPoint.getPosition().y + pointWidth;
 
 		return rect;
 	}
@@ -313,10 +323,12 @@ namespace Editor
 	{
 		CL_Rect rect;
 
-		rect.left = p_point.x - POINT_WIDTH;
-		rect.top = p_point.y - POINT_WIDTH;
-		rect.right = p_point.x + POINT_WIDTH;
-		rect.bottom = p_point.y + POINT_WIDTH;
+		float pointWidth = POINT_WIDTH / m_viewport.getScale();
+
+		rect.left = p_point.x - pointWidth;
+		rect.top = p_point.y - pointWidth;
+		rect.right = p_point.x + pointWidth;
+		rect.bottom = p_point.y + pointWidth;
 
 		return rect;
 	}
@@ -336,25 +348,30 @@ namespace Editor
 
 	void EditorPointImpl::triangulate(int p_index)
 	{
-		int segment = p_index - 2;
-		if (p_index < 0)
-			segment = m_track.getPointCount() - segment;
-
-		for (int i = 0; i < 4; ++i)
+		if (p_index >= 0 && p_index < m_track.getPointCount())
 		{
+			int segment = p_index - 2;
 			if (segment < 0)
-				segment = m_track.getPointCount() - 1;
-			else if (segment > m_track.getPointCount() - 1)
-				segment = 0;
+				segment = m_track.getPointCount() - segment;
 
-			m_gfxLevel.getTrackTriangulator().triangulate(m_track, segment);
+			for (int i = 0; i < 4; ++i)
+			{
+				if (segment < 0)
+					segment = m_track.getPointCount() - 1;
+				else if (segment > m_track.getPointCount() - 1)
+					segment = 0;
 
-			++segment;
+				m_gfxLevel.getTrackTriangulator().triangulate(m_track, segment);
+
+				++segment;
+			}
 		}
 	}
 
 	void EditorPointImpl::handleInput(bool p_pressed, const CL_InputEvent& p_event)
 	{
+		m_isAltPressed = p_event.alt;
+		
 		if (p_pressed && m_pressedId == CL_NONE_PRESSED)
 		{
 			m_pressedId = p_event.id;
@@ -362,21 +379,6 @@ namespace Editor
 		else if (!p_pressed && p_event.id == m_pressedId)
 		{
 			m_pressedId = CL_NONE_PRESSED;
-		}
-
-		// bercik: radius set (to change and delete)
-		if (p_pressed)
-		{
-			if (p_event.id == CL_KEY_UP)
-			{
-				setRadius(m_selectedIndex, 1);
-			}
-			else if (p_event.id == CL_KEY_DOWN)
-			{
-				setRadius(m_selectedIndex, -1);
-			}
-
-			triangulate(m_selectedIndex);
 		}
 
 		if (m_pressedId == CL_MOUSE_LEFT)
@@ -435,8 +437,22 @@ namespace Editor
 		}
 	}
 
-	EditorPoint::EditorPoint(Track& p_track, Gfx::Level& p_gfxLevel) : 
-		m_impl(new EditorPointImpl(p_track, p_gfxLevel))
+	void EditorPointImpl::mouseScrolled(bool p_up)
+	{
+		if (m_selectedIndex >= 0 && (m_pressedId == CL_KEY_SHIFT || m_isAltPressed))
+		{
+			int set = p_up ? 1 : -1;
+
+			if (m_isAltPressed)
+				set *= 5;
+
+			setRadius(m_selectedIndex, set);
+			triangulate(m_selectedIndex);
+		}
+	}
+
+	EditorPoint::EditorPoint(Track& p_track, Gfx::Level& p_gfxLevel, Gfx::Viewport& p_viewport) : 
+		m_impl(new EditorPointImpl(p_track, p_gfxLevel, p_viewport))
 	{
 
 	}
@@ -474,5 +490,10 @@ namespace Editor
 	bool EditorPoint::getHandle() const
 	{
 		return m_impl->getHandle();
+	}
+
+	void EditorPoint::mouseScrolled(bool p_up)
+	{
+		m_impl->mouseScrolled(p_up);
 	}
 }

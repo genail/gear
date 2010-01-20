@@ -68,6 +68,8 @@ public:
 
 	void mouseMoved(const CL_Point &p_pos);
 
+	void mouseScrolled(bool p_up);
+
 	void draw(CL_GraphicContext &p_gc);
 
 	void load(CL_GraphicContext &p_gc);
@@ -100,6 +102,11 @@ void EditorSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_eve
 void EditorSceneImpl::mouseMoved(const CL_Point &p_pos)
 {
 	m_editorManagement.mouseMoved(p_pos);
+}
+
+void EditorSceneImpl::mouseScrolled(bool p_up)
+{
+	m_editorManagement.mouseScrolled(p_up);
 }
 
 EditorScene::EditorScene() :
@@ -144,4 +151,9 @@ void EditorScene::inputReleased(const CL_InputEvent &p_event)
 void EditorScene::mouseMoved(const CL_Point &p_pos)
 {
 	m_impl->mouseMoved(p_pos);
+}
+
+void EditorScene::mouseScrolled(bool p_up)
+{
+	m_impl->mouseScrolled(p_up);
 }

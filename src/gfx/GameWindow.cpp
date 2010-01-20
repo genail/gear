@@ -167,9 +167,30 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 	}
 }
 
-void GameWindow::onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state)
+void GameWindow::onKeyDown(
+		const CL_InputEvent &p_event,
+		const CL_InputState &p_state
+)
 {
-	m_events.push_back(p_event);
+	Scene *scene = Gfx::Stage::peekScene();
+
+	switch (p_event.id) {
+		case CL_MOUSE_WHEEL_UP:
+			if (scene != NULL) {
+				scene->mouseScrolled(true);
+			}
+			break;
+
+		case CL_MOUSE_WHEEL_DOWN:
+			if(scene != NULL) {
+				scene->mouseScrolled(false);
+			}
+			break;
+
+		default:
+			m_events.push_back(p_event);
+
+	}
 
 	// uncoment when repeat_count fixed
 //	Scene *scene = Gfx::Stage::peekScene();

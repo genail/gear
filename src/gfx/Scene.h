@@ -62,6 +62,8 @@ class Scene {
 		/** Mouse move action. 0,0 is top left corner of window. */
 		virtual void mouseMoved(const CL_Point &p_pos) = 0;
 
+		virtual void mouseScrolled(bool p_up) = 0;
+
 		virtual void pushed() = 0;
 
 		virtual void poped() = 0;

@@ -50,10 +50,11 @@ namespace Editor
 			m_raceLevel(),
 			m_gfxLevel(m_raceLevel, m_viewport),
 			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
-			m_editorPoint(m_track, m_gfxLevel)
-			m_lastMousePos(0.0f, 0.0f)
+			m_editorPoint(m_track, m_gfxLevel),
+			m_lastMousePos(0.0f, 0.0f),
+			m_inconditionalLastMousePos(0.0f, 0.0f)
 		{
-
+			m_raceLevel.setTrack(m_track);
 		}
 
 		~EditorManagementImpl()
@@ -61,25 +62,27 @@ namespace Editor
 
 		}
 
+		// track
+
+		Track m_track;
+
+		Viewport m_viewport;
+
+		Race::Level m_raceLevel;
+
+		Gfx::Level m_gfxLevel;
+
 		// editor variables
 
 		EditorPoint m_editorPoint;
 
 		EditorTrack m_editorTrack;
 
-		// track
-
-		Viewport m_viewport;
-
-		Gfx::Level m_gfxLevel;
-
-		Race::Level m_raceLevel;
-
-		Track m_track;
-
 		// help variables
 
 		CL_Pointf m_lastMousePos;
+
+		CL_Pointf m_inconditionalLastMousePos;
 
 	};
 
@@ -91,11 +94,13 @@ namespace Editor
 
 	EditorManagement::~EditorManagement()
 	{
-		
+		m_impl->m_raceLevel.destroy();
 	}
 
 	void EditorManagement::draw(CL_GraphicContext &p_gc)
 	{
+		CL_Draw::fill(p_gc, 0.0f, 0.0f, Stage::getWidth(), Stage::getHeight(), CL_Colorf::black);
+
 		m_impl->m_viewport.prepareGC(p_gc);
 
 		m_impl->m_editorTrack.draw(p_gc);
@@ -106,17 +111,24 @@ namespace Editor
 
 	void EditorManagement::load(CL_GraphicContext &p_gc)
 	{
+		m_impl->m_gfxLevel.load(p_gc);
+
 		m_impl->m_editorPoint.load(p_gc);
 		m_impl->m_editorTrack.load(p_gc);
 	}
 
 	void EditorManagement::mouseMoved(const CL_Point &p_pos)
 	{
+		CL_Pointf inconditionalDeltaPos = p_pos - m_impl->m_inconditionalLastMousePos;
+
 		CL_Pointf mousePos = m_impl->m_viewport.toWorld((CL_Pointf)p_pos);
 		CL_Pointf deltaPos = mousePos - m_impl->m_lastMousePos;
 
 		m_impl->m_editorPoint.mouseMoved(mousePos, m_impl->m_lastMousePos, deltaPos);
-		m_impl->m_editorTrack.mouseMoved(mousePos, m_impl->m_lastMousePos, deltaPos);
+		m_impl->m_editorTrack.mouseMoved((CL_Pointf)p_pos, m_impl->m_inconditionalLastMousePos, inconditionalDeltaPos);
+
+		m_impl->m_lastMousePos = mousePos;
+		m_impl->m_inconditionalLastMousePos = (CL_Pointf)p_pos;
 	}
 
 	void EditorManagement::update(unsigned int p_timeElapsed)
@@ -141,12 +153,15 @@ namespace Editor
 				assert(0 && "unknown input state");
 		}
 
-		bool ok = true;
+		if (p_event.id == CL_KEY_ESCAPE)
+			Gfx::Stage::popScene();
 
-		if (ok)
-			ok = m_impl->m_editorPoint.handleInput(pressed, p_event);
+		bool ok = (!m_impl->m_editorTrack.getHandle() && !m_impl->m_editorPoint.getHandle());
 
-		if (ok)
-			ok = m_impl->m_editorTrack.handleInput(pressed, p_event);
+		if (ok || !pressed)
+		{
+			m_impl->m_editorPoint.handleInput(pressed, p_event);
+			m_impl->m_editorTrack.handleInput(pressed, p_event);
+		}
 	}
 }

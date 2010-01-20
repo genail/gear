@@ -40,23 +40,25 @@ namespace Editor
 			m_raceLevel(p_raceLevel),
 			m_track(p_track),
 			m_viewport(p_viewport),
-			m_gfxLevel(p_gfxLevel)
+			m_gfxLevel(p_gfxLevel),
+			m_pressedId(CL_NONE_PRESSED),
+			m_lookPoint(400.0f, 400.0f)
 		{
-			m_raceLevel.setTrack(m_track);
-
-			CL_Pointf m_lookPoint(Gfx::Stage::getWidth() / 2, Gfx::Stage::getHeight() / 2);
-
 			m_viewport.attachTo(&m_lookPoint);
 		}
 
 		~EditorTrackImpl()
 		{
-			m_raceLevel.destroy();
+
 		}
 
 		// help variables
 
 		CL_Pointf m_lookPoint;
+
+		// input
+
+		int m_pressedId;
 
 		// references
 
@@ -70,7 +72,7 @@ namespace Editor
 
 		// methods
 
-		bool handleInput(bool p_pressed, const CL_InputEvent &p_event);
+		void handleInput(bool p_pressed, const CL_InputEvent &p_event);
 
 		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
 
@@ -79,6 +81,8 @@ namespace Editor
 		void load(CL_GraphicContext &p_gc);
 
 		void update(unsigned int p_timeElapsed);
+
+		bool getHandle() const;
 	};
 
 	void EditorTrackImpl::draw(CL_GraphicContext &p_gc)
@@ -88,7 +92,7 @@ namespace Editor
 
 	void EditorTrackImpl::load(CL_GraphicContext &p_gc)
 	{
-		m_gfxLevel.load(p_gc);
+
 	}
 
 	void EditorTrackImpl::update(unsigned int p_timeElapsed)
@@ -96,14 +100,27 @@ namespace Editor
 
 	}
 
-	bool EditorTrackImpl::handleInput(bool p_pressed, const CL_InputEvent &p_event)
+	void EditorTrackImpl::handleInput(bool p_pressed, const CL_InputEvent &p_event)
 	{
-		return true;
+		if (p_pressed && m_pressedId == CL_NONE_PRESSED)
+		{
+			m_pressedId = p_event.id;
+		}
+		else if (!p_pressed && p_event.id == m_pressedId)
+		{
+			m_pressedId = CL_NONE_PRESSED;
+		}
 	}
 
-	void EditorTrackImpl::mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos)
+	void EditorTrackImpl::mouseMoved(const CL_Pointf &p_inconditionalMousePos, const CL_Pointf &p_inconditionalLastMousePos, const CL_Pointf &p_inconditionalDeltaPos)
 	{
-		
+		if (m_pressedId == CL_MOUSE_RIGHT)
+			m_lookPoint -= p_inconditionalDeltaPos;
+	}
+
+	bool EditorTrackImpl::getHandle() const
+	{
+		return false;
 	}
 
 	EditorTrack::EditorTrack(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Track& p_track, Viewport& p_viewport) : 
@@ -137,8 +154,13 @@ namespace Editor
 		m_impl->update(p_timeElapsed);
 	}
 
-	bool EditorTrack::handleInput(bool p_pressed, const CL_InputEvent& p_event)
+	void EditorTrack::handleInput(bool p_pressed, const CL_InputEvent& p_event)
 	{
-		return m_impl->handleInput(p_pressed, p_event);
+		m_impl->handleInput(p_pressed, p_event);
+	}
+
+	bool EditorTrack::getHandle() const
+	{
+		return m_impl->getHandle();
 	}
 }

@@ -57,7 +57,9 @@ namespace Editor
 
 		void update(unsigned int p_timeElapsed);
 
-		bool handleInput(bool p_pressed, const CL_InputEvent& p_event);
+		void handleInput(bool p_pressed, const CL_InputEvent& p_event);
+
+		bool getHandle() const;
 
 	private:
 

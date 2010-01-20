@@ -31,6 +31,8 @@
 
 #include "common.h"
 
+#define CL_NONE_PRESSED -1
+
 namespace Editor
 {
 	enum InputState 

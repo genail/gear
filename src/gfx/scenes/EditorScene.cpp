@@ -79,27 +79,27 @@ public:
 
 void EditorSceneImpl::draw(CL_GraphicContext &p_gc)
 {
-
+	m_editorManagement.draw(p_gc);
 }
 
 void EditorSceneImpl::load(CL_GraphicContext &p_gc)
 {
-
+	m_editorManagement.load(p_gc);
 }
 
 void EditorSceneImpl::update(unsigned int p_timeElapsed)
 {
-
+	m_editorManagement.update(p_timeElapsed);
 }
 
 void EditorSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_event)
 {
-
+	m_editorManagement.handleInput(p_state, p_event);
 }
 
 void EditorSceneImpl::mouseMoved(const CL_Point &p_pos)
 {
-
+	m_editorManagement.mouseMoved(p_pos);
 }
 
 EditorScene::EditorScene() :
@@ -115,8 +115,6 @@ EditorScene::~EditorScene()
 void EditorScene::draw(CL_GraphicContext &p_gc)
 {
 	DirectScene::draw(p_gc);
-
-	CL_Draw::fill(p_gc, 0.0f, 0.0f, Stage::getWidth(), Stage::getHeight(), CL_Colorf::black);
 
 	m_impl->draw(p_gc);
 }

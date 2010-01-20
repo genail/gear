@@ -42,7 +42,17 @@ namespace Editor
 	public:
 		EditorPointImpl(Track& p_track, Gfx::Level& p_gfxLevel) : 
 			m_track(p_track),
-			m_gfxLevel(p_gfxLevel)
+			m_gfxLevel(p_gfxLevel),
+			m_selectedIndex(-1),
+			m_lightIndex(-1),
+			m_selectedPointColor(CL_Colorf::yellow),
+			m_pointColor(CL_Colorf::blue),
+			m_radiusLineColor(CL_Colorf::white),
+			m_shiftLineColor(CL_Colorf::green),
+			m_selectedPointFrameColor(CL_Colorf::red),
+			m_shiftPointColor(CL_Colorf::red),
+			m_pressedId(CL_NONE_PRESSED),
+			m_state(None)
 		{
 			setDefaultPoints();
 		}
@@ -71,19 +81,15 @@ namespace Editor
 
 		// input
 
-		enum PressedState
+		enum State
 		{
 			None,
-			Point,
-			RadiusUp,
-			RadiusDown
+			Point
 		};
 
-		PressedState m_pressedState;
+		int m_pressedId;
 
-		bool m_isPressed;
-
-		bool m_isCtrlPressed;
+		State m_state;
 
 		// references
 
@@ -93,7 +99,7 @@ namespace Editor
 
 		// methods
 
-		bool handleInput(bool p_pressed, const CL_InputEvent &p_event);
+		void handleInput(bool p_pressed, const CL_InputEvent &p_event);
 
 		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
 
@@ -109,13 +115,7 @@ namespace Editor
 
 		void drawPoint(int p_index, bool &p_isSelected, bool &p_isLight, CL_GraphicContext &p_gc);
 
-		void findPointAt(const CL_Pointf &p_pos, int &p_index, PressedState &p_pressedState);
-
-		CL_Rect getRadiusUpRect(int p_index, int p_lineWidth);
-
-		CL_Rect getRadiusDownRect(int p_index, int p_lineWidth);
-
-		CL_Rect getRadiusRect(int p_index, int p_lineWidth);
+		void findPointAt(const CL_Pointf &p_pos, int &p_index);
 
 		void getShiftRect(int p_index, int* x1, int* y1, int* x2, int* y2);
 
@@ -126,6 +126,12 @@ namespace Editor
 		void setToPerpendicular(CL_Vec2f &p_vector2, bool p_isInvert);
 
 		void setMinAndMaxShiftPoint(int p_index);
+
+		void setRadius(int p_index, int p_set);
+
+		void triangulate(int p_index);
+
+		bool getHandle() const;
 	};
 
 	void EditorPointImpl::setDefaultPoints()
@@ -138,6 +144,11 @@ namespace Editor
 		m_track.addPoint(CL_Pointf(200.0f, 450.0f), 40.0f, 0.0f);
 
 		m_gfxLevel.getTrackTriangulator().triangulate(m_track);
+	}
+
+	bool EditorPointImpl::getHandle() const
+	{
+		return (!m_pressedId == CL_NONE_PRESSED);
 	}
 
 	void EditorPointImpl::draw(CL_GraphicContext &p_gc)
@@ -171,7 +182,7 @@ namespace Editor
 
 		if (p_isSelected)
 		{
-			if (m_isCtrlPressed)
+			if (m_pressedId == CL_KEY_CONTROL && m_selectedIndex != -1)
 			{
 				CL_Pen pen;
 
@@ -189,10 +200,6 @@ namespace Editor
 				CL_Draw::fill(p_gc, getPointRect(m_minShiftPoint), CL_Colorf::red);
 				CL_Draw::fill(p_gc, getPointRect(m_maxShiftPoint), CL_Colorf::red);
 			}
-			else
-			{
-				CL_Draw::fill(p_gc, getRadiusRect(p_index, PAINT_LINE_WIDTH), m_radiusLineColor);
-			}
 		}
 
 		CL_Draw::fill(p_gc, getPointRect(p_index), color);
@@ -203,12 +210,12 @@ namespace Editor
 		}
 	}
 
-	void EditorPointImpl::findPointAt(const CL_Pointf &p_pos, int &p_index, PressedState &p_pressedState)
+	void EditorPointImpl::findPointAt(const CL_Pointf &p_pos, int &p_index)
 	{
-		if (!m_isPressed && !m_isCtrlPressed)
+		if (m_pressedId == CL_NONE_PRESSED)
 		{
 			p_index = -1;
-			p_pressedState = None;
+			m_state = None;
 
 			CL_Rect rect = getPointRect(p_pos);
 
@@ -216,29 +223,8 @@ namespace Editor
 			{
 				if (rect.contains(m_track.getPoint(i).getPosition()))
 				{
-					p_pressedState = Point;
+					m_state = Point;
 					p_index = i;
-
-					return;
-				}
-			}
-
-			if (m_selectedIndex != -1)
-			{
-				rect = getRadiusUpRect(m_selectedIndex, DISCOVER_LINE_WIDTH);
-				if (rect.contains(p_pos))
-				{
-					p_pressedState = RadiusUp;
-					p_index = m_selectedIndex;
-
-					return;
-				}
-
-				rect = getRadiusDownRect(m_selectedIndex, DISCOVER_LINE_WIDTH);
-				if (rect.contains(p_pos))
-				{
-					p_pressedState = RadiusDown;
-					p_index = m_selectedIndex;
 
 					return;
 				}
@@ -289,51 +275,6 @@ namespace Editor
 		}
 	}
 
-	CL_Rect EditorPointImpl::getRadiusRect(int p_index, int p_lineWidth)
-	{
-		const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
-
-		const CL_Pointf& pos = p_trackPoint.getPosition();
-		int radiusLine = p_trackPoint.getRadius();
-
-		CL_Point point(pos.x - (p_lineWidth / 2), pos.y - (radiusLine / 2));
-		CL_Size size(p_lineWidth, radiusLine);
-
-		CL_Rect rect(point, size);
-
-		return rect;
-	}
-
-	CL_Rect EditorPointImpl::getRadiusUpRect(int p_index, int p_lineWidth)
-	{
-		const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
-
-		const CL_Pointf& pos = p_trackPoint.getPosition();
-		int radiusLine = (p_trackPoint.getRadius()) / 2;
-
-		CL_Point point(pos.x - (p_lineWidth / 2), pos.y - (radiusLine));
-		CL_Size size(p_lineWidth, radiusLine);
-
-		CL_Rect rect(point, size);
-
-		return rect;
-	}
-
-	CL_Rect EditorPointImpl::getRadiusDownRect(int p_index, int p_lineWidth)
-	{
-		const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
-
-		const CL_Pointf& pos = p_trackPoint.getPosition();
-		int radiusLine = (p_trackPoint.getRadius()) / 2;
-
-		CL_Point point(pos.x - (p_lineWidth / 2), pos.y);
-		CL_Size size(p_lineWidth, radiusLine);
-
-		CL_Rect rect(point, size);
-
-		return rect;
-	}
-
 	void EditorPointImpl::getShiftRect(int p_index, int* x1, int* y1, int* x2, int* y2)
 	{
 		const TrackPoint& p_trackPoint = m_track.getPoint(p_index);
@@ -380,39 +321,87 @@ namespace Editor
 		return rect;
 	}
 
-	bool EditorPointImpl::handleInput(bool p_pressed, const CL_InputEvent& p_event)
+	void EditorPointImpl::setRadius(int p_index, int p_set)
 	{
-		switch (p_event.id) {
-			case CL_MOUSE_LEFT:
-				m_isPressed = p_pressed;
-				break;
-			case CL_KEY_CONTROL:
-				m_isCtrlPressed = p_pressed;
-				break;
-			default:
-				break;
-		}
-
-		if (m_isPressed)
+		if (p_index >= 0 && p_index < m_track.getPointCount())
 		{
-			if (m_pressedState == Point)
-				m_selectedIndex = m_lightIndex;
-			else if (m_pressedState == None)
-				m_selectedIndex = m_lightIndex = -1;
+			TrackPoint& trackPoint = m_track.getPoint(p_index);
+
+			float newRadius = trackPoint.getRadius() + p_set;
+
+			if (newRadius > 40.0f)
+				trackPoint.setRadius(newRadius);
+		}
+	}
+
+	void EditorPointImpl::triangulate(int p_index)
+	{
+		int segment = p_index - 2;
+		if (p_index < 0)
+			segment = m_track.getPointCount() - segment;
+
+		for (int i = 0; i < 4; ++i)
+		{
+			if (segment < 0)
+				segment = m_track.getPointCount() - 1;
+			else if (segment > m_track.getPointCount() - 1)
+				segment = 0;
+
+			m_gfxLevel.getTrackTriangulator().triangulate(m_track, segment);
+
+			++segment;
+		}
+	}
+
+	void EditorPointImpl::handleInput(bool p_pressed, const CL_InputEvent& p_event)
+	{
+		if (p_pressed && m_pressedId == CL_NONE_PRESSED)
+		{
+			m_pressedId = p_event.id;
+		}
+		else if (!p_pressed && p_event.id == m_pressedId)
+		{
+			m_pressedId = CL_NONE_PRESSED;
 		}
 
-		return (!m_isPressed && !m_isCtrlPressed);
+		// bercik: radius set (to change and delete)
+		if (p_pressed)
+		{
+			if (p_event.id == CL_KEY_UP)
+			{
+				setRadius(m_selectedIndex, 1);
+			}
+			else if (p_event.id == CL_KEY_DOWN)
+			{
+				setRadius(m_selectedIndex, -1);
+			}
+
+			triangulate(m_selectedIndex);
+		}
+
+		if (m_pressedId == CL_MOUSE_LEFT)
+		{
+			if (m_state == Point)
+			{
+				m_selectedIndex = m_lightIndex;
+			}
+			else
+			{
+				m_selectedIndex = m_lightIndex = -1;
+			}
+		}
+
 	}
 
 	void EditorPointImpl::mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos)
 	{
-		findPointAt(p_mousePos, m_lightIndex, m_pressedState);
+		findPointAt(p_mousePos, m_lightIndex);
 		
 		if (m_selectedIndex != -1)
 		{
 			TrackPoint trackPoint = m_track.getPoint(m_selectedIndex);
 
-			if (m_isCtrlPressed)
+			if (m_pressedId == CL_KEY_CONTROL)
 			{
 				float lastMaxShiftDeltaLength = m_maxShiftPoint.distance(p_lastMousePos);
 				float lastMinShiftDeltaLength = m_minShiftPoint.distance(p_lastMousePos);
@@ -437,43 +426,12 @@ namespace Editor
 				if (newShift >= -1.0f && newShift <= 1.0f)
 					trackPoint.setShift(newShift);
 			}
-			else if (m_isPressed)
+			else if (m_pressedId == CL_MOUSE_LEFT)
 			{
-				switch (m_pressedState)
-				{
-					float newRadius;
-
-				case Point:
-					trackPoint.setPosition(trackPoint.getPosition() + p_deltaPos);
-					break;
-				case RadiusUp:
-					newRadius = trackPoint.getRadius() - p_deltaPos.y;
-					if (newRadius > 20.0f)
-						trackPoint.setRadius(newRadius);
-					break;
-				case RadiusDown:
-					newRadius = trackPoint.getRadius() + p_deltaPos.y;
-					if (newRadius > 20.0f)
-						trackPoint.setRadius(newRadius);
-					break;
-				}
+				trackPoint.setPosition(trackPoint.getPosition() + p_deltaPos);
 			}
 
-			int segment = m_selectedIndex - 2;
-			if (m_selectedIndex < 0)
-				segment = m_track.getPointCount() - segment;
-
-			for (int i = 0; i < 4; ++i)
-			{
-				if (segment < 0)
-					segment = m_track.getPointCount() - 1;
-				else if (segment > m_track.getPointCount() - 1)
-					segment = 0;
-
-				m_gfxLevel.getTrackTriangulator().triangulate(m_track, segment);
-
-				++segment;
-			}
+			triangulate(m_selectedIndex);
 		}
 	}
 
@@ -508,8 +466,13 @@ namespace Editor
 		m_impl->update(p_timeElapsed);
 	}
 
-	bool EditorPoint::handleInput(bool p_pressed, const CL_InputEvent& p_event)
+	void EditorPoint::handleInput(bool p_pressed, const CL_InputEvent& p_event)
 	{
-		return m_impl->handleInput(p_pressed, p_event);
+		m_impl->handleInput(p_pressed, p_event);
+	}
+
+	bool EditorPoint::getHandle() const
+	{
+		return m_impl->getHandle();
 	}
 }

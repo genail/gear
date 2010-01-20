@@ -14,3 +14,10 @@ src/server
 src/test_suite
 Testing
 gear.cfg
+*.obj
+*.vcproj
+*.user
+*.sln
+*.suo
+*.ncb
+*.db

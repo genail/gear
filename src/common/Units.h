@@ -28,6 +28,7 @@
 
 #pragma once
 
+// TODO: This will be changing according to screen resolution
 const float SCREEN_WORLD_RATIO = 20.0f;
 
 class Units

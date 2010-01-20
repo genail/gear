@@ -28,83 +28,52 @@
 
 #pragma once
 
-#include <list>
+const float SCREEN_WORLD_RATIO = 20.0f;
 
-#include <ClanLib/core.h>
-#include <ClanLib/gui.h>
-
-namespace Gfx {
-class Scene;
-
-class GameWindow : public CL_GUIComponent {
+class Units
+{
 	public:
 
-		GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_winMgr, CL_InputContext *p_ic);
+		virtual ~Units();
 
-		virtual ~GameWindow();
 
-		bool update();
+		/** Converts screen unit to world unit */
+		static float toWorld(float p_scrVal);
 
-		void draw(CL_GraphicContext &p_gc);
+		/** Converts screen unit coord to world unit coord */
+		static CL_Pointf toWorld(const CL_Pointf &p_scrPt);
+
+		/** Converts world unit to screen unit */
+		static float toScreen(float p_worldVal);
+
+		/** Converts world unit coord to screen unit coord */
+		static CL_Pointf toScreen(const CL_Pointf &p_worldPt);
 
 	private:
 
-		CL_GUIWindowManagerTexture *m_winMgr;
-
-		CL_GUIManager *m_guiMgr;
-
-		CL_InputContext *m_ic;
-
-		/** Last update logic time. When 0 then no logic update has been done before. */
-		unsigned m_lastLogicUpdateTime;
-
-		// scene flow
-
-		/** Last scene */
-		Scene *m_lastScene;
-
-		CL_SlotContainer m_slots;
-
-		//
-		// workaround for missing implementation for repead_count of CL_InputEvent
-		// remove this if http://www.rtsoft.com/forums/showthread.php?t=2839 will
-		// be commited to ClanLib release
-		//
-
-		std::list<CL_InputEvent> m_events;
-
-		//
-		// methods
-		//
-
-		void dispatchEvents();
-
-		void renderGui(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
-
-		void repaint();
-
-		void updateLogic(Scene *p_scene);
-
-		void renderScene(CL_GraphicContext &p_gc, Scene *p_scene);
-
-
-		// signal handlers
-
-		void onKeyDown(
-				const CL_InputEvent &p_event,
-				const CL_InputState &p_state
-		);
-
-		void onKeyUp(
-				const CL_InputEvent &p_event,
-				const CL_InputState &p_state
-		);
-
-		void onMouseMove(
-				const CL_InputEvent &p_event,
-				const CL_InputState &p_state
-		);
-
+		Units();
 };
 
-} // namespace
+inline
+float Units::toWorld(float p_scrVal)
+{
+	return p_scrVal / SCREEN_WORLD_RATIO;
+}
+
+inline
+CL_Pointf Units::toWorld(const CL_Pointf &p_scrPt)
+{
+	return CL_Pointf(toWorld(p_scrPt.x), toWorld(p_scrPt.y));
+}
+
+inline
+float Units::toScreen(float p_worldVal)
+{
+	return p_worldVal * SCREEN_WORLD_RATIO;
+}
+
+inline
+CL_Pointf Units::toScreen(const CL_Pointf &p_worldPt)
+{
+	return CL_Pointf(toScreen(p_worldPt.x), toScreen(p_worldPt.y));
+}

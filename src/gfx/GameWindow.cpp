@@ -48,17 +48,17 @@ GameWindow::GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_wi
 	// connect keyboard
 	CL_InputDevice &keyboard = m_ic->get_keyboard();
 
-	m_slotContainer.connect(keyboard.sig_key_down(), this, &GameWindow::onKeyDown);
-	m_slotContainer.connect(keyboard.sig_key_up(), this, &GameWindow::onKeyUp);
+	m_slots.connect(keyboard.sig_key_down(), this, &GameWindow::onKeyDown);
+	m_slots.connect(keyboard.sig_key_up(), this, &GameWindow::onKeyUp);
 
 	// connect mouse buttons
 	CL_InputDevice &mouse = m_ic->get_mouse();
 
-	m_slotContainer.connect(mouse.sig_key_down(), this, &GameWindow::onKeyDown);
-	m_slotContainer.connect(mouse.sig_key_up(), this, &GameWindow::onKeyUp);
+	m_slots.connect(mouse.sig_key_down(), this, &GameWindow::onKeyDown);
+	m_slots.connect(mouse.sig_key_up(), this, &GameWindow::onKeyUp);
 
 	// connect mouse movement
-	m_slotContainer.connect(mouse.sig_pointer_move(), this, &GameWindow::onMouseMove);
+	m_slots.connect(mouse.sig_pointer_move(), this, &GameWindow::onMouseMove);
 }
 
 GameWindow::~GameWindow()

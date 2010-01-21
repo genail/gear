@@ -76,6 +76,16 @@ void Track::addPoint(
 	}
 }
 
+void Track::removePoint(int p_index)
+{
+	G_ASSERT(
+			p_index >= 0
+			&& p_index < static_cast<signed>(m_impl->m_trackPoints.size())
+	);
+
+	m_impl->m_trackPoints.erase(m_impl->m_trackPoints.begin() + p_index);
+}
+
 TrackPoint &Track::getPoint(int p_index)
 {
 	return m_impl->m_trackPoints[p_index];

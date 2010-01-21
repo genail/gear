@@ -65,6 +65,8 @@ class LevelImpl
 				const CL_Pointf& p_a, const CL_Pointf& p_b, const CL_Pointf& p_c
 		);
 
+		void drawStartLine(CL_GraphicContext &p_gc);
+
 };
 
 Level::Level(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
@@ -81,6 +83,7 @@ Level::~Level()
 void Level::draw(CL_GraphicContext &p_gc)
 {
 	m_impl->drawTriangles(p_gc);
+	m_impl->drawStartLine(p_gc);
 }
 
 void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
@@ -136,6 +139,32 @@ void LevelImpl::drawTriangle(
 	CL_Draw::line(p_gc, p_b, p_c, CL_Colorf::purple);
 	CL_Draw::line(p_gc, p_a, p_c, CL_Colorf::purple);
 #endif
+}
+
+void LevelImpl::drawStartLine(CL_GraphicContext &p_gc)
+{
+	const Race::Track &track = m_levelLogic.getTrack();
+	const int pointCount = track.getPointCount();
+
+	G_ASSERT(pointCount >= 1);
+
+	const CL_Pointf &a = m_triangulator.getFirstLeftPoint(0);
+	const CL_Pointf &b = m_triangulator.getFirstRightPoint(0);
+
+	// draw only if visible on screen
+	const CL_Rectf &clip = m_viewport.getWorldClipRect();
+
+	if (clip.contains(a) || clip.contains(b)) {
+		CL_Pen oldPen = p_gc.get_pen();
+
+		CL_Pen pen;
+		pen.set_line_width(10);
+		p_gc.set_pen(pen);
+
+		CL_Draw::line(p_gc, a, b, CL_Colorf::white);
+
+		p_gc.set_pen(oldPen);
+	}
 }
 
 void Level::load(CL_GraphicContext &p_gc)

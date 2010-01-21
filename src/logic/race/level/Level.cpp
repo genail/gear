@@ -30,6 +30,7 @@
 
 #include <assert.h>
 
+#include "common/Units.h"
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
 #include "logic/race/level/Checkpoint.h"
@@ -147,19 +148,6 @@ class LevelImpl
 		// saving
 
 		void saveTrackEl(CL_DomDocument &p_doc, CL_DomNode &p_trackNode);
-
-
-		// helpers
-
-		CL_Pointf real(const CL_Pointf &p_point) const;
-
-		float real(float p_coord) const;
-
-		CL_Pointf ireal(const CL_Pointf &p_point) const;
-
-		float ireal(float p_coord) const;
-
-
 };
 
 Level::Level() :
@@ -260,7 +248,11 @@ void LevelImpl::loadTrackEl(const CL_DomNode &p_trackNode)
 			const float modifier = blockNode.select_float("@shift");
 
 			cl_log_event(LOG_DEBUG, "Loaded track point %1 x %2, rad = %3, mod = %4", x, y, radius, modifier);
-			m_track.addPoint(real(CL_Pointf(x, y)), real(radius), modifier);
+			m_track.addPoint(
+					Units::toScreen(CL_Pointf(x, y)),
+					Units::toScreen(radius),
+					modifier
+			);
 		} else {
 			cl_log_event(LOG_WARN, "Unknown element in <track>: %1", blockNode.get_node_name());
 		}
@@ -273,61 +265,61 @@ CL_SharedPtr<RaceResistance::Geometry> LevelImpl::buildResistanceGeometry(int p_
 	CL_SharedPtr<RaceResistance::Geometry> geom(new RaceResistance::Geometry());
 
 	CL_Pointf p, q;
-	CL_Pointf topLeft = real(CL_Pointf(p_x, p_y));
-	CL_Pointf bottomRight = real(CL_Pointf(p_x + 1, p_y + 1));
+	CL_Pointf topLeft = Units::toScreen(CL_Pointf(p_x, p_y));
+	CL_Pointf bottomRight = Units::toScreen(CL_Pointf(p_x + 1, p_y + 1));
 
 	switch (p_blockType) {
 		case Common::BT_GRASS:
 			break;
 		case Common::BT_STREET_HORIZ:
-			p = real(CL_Pointf(p_x, p_y + 0.1f));
-			q = real(CL_Pointf(p_x + 1, p_y + 0.9f));
+			p = Units::toScreen(CL_Pointf(p_x, p_y + 0.1f));
+			q = Units::toScreen(CL_Pointf(p_x + 1, p_y + 0.9f));
 
 			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
 			break;
 		case Common::BT_STREET_VERT:
-			p = real(CL_Pointf(p_x + 0.1f, p_y));
-			q = real(CL_Pointf(p_x + 0.9f, p_y + 1));
+			p = Units::toScreen(CL_Pointf(p_x + 0.1f, p_y));
+			q = Units::toScreen(CL_Pointf(p_x + 0.9f, p_y + 1));
 
 			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
 			break;
 		case Common::BT_TURN_BOTTOM_RIGHT:
-			p = real(CL_Pointf(p_x + 1, p_y + 1));
+			p = Units::toScreen(CL_Pointf(p_x + 1, p_y + 1));
 
-			geom->addCircle(CL_Circlef(p, real(0.9f)));
-			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+			geom->addCircle(CL_Circlef(p, Units::toScreen(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, Units::toScreen(0.1f)));
 
 			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
 
 			break;
 		case Common::BT_TURN_BOTTOM_LEFT:
-			p = real(CL_Pointf(p_x, p_y + 1));
+			p = Units::toScreen(CL_Pointf(p_x, p_y + 1));
 
-			geom->addCircle(CL_Circlef(p, real(0.9f)));
-			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+			geom->addCircle(CL_Circlef(p, Units::toScreen(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, Units::toScreen(0.1f)));
 
 			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
 
 			break;
 		case Common::BT_TURN_TOP_RIGHT:
-			p = real(CL_Pointf(p_x + 1, p_y));
+			p = Units::toScreen(CL_Pointf(p_x + 1, p_y));
 
-			geom->addCircle(CL_Circlef(p, real(0.9f)));
-			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+			geom->addCircle(CL_Circlef(p, Units::toScreen(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, Units::toScreen(0.1f)));
 
 			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
 			break;
 		case Common::BT_TURN_TOP_LEFT:
-			p = real(CL_Pointf(p_x, p_y));
+			p = Units::toScreen(CL_Pointf(p_x, p_y));
 
-			geom->addCircle(CL_Circlef(p, real(0.9f)));
-			geom->subtractCircle(CL_Circlef(p, real(0.1f)));
+			geom->addCircle(CL_Circlef(p, Units::toScreen(0.9f)));
+			geom->subtractCircle(CL_Circlef(p, Units::toScreen(0.1f)));
 
 			geom->andRect(CL_Rectf(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y));
 			break;
 		case Common::BT_START_LINE_UP:
-			p = real(CL_Pointf(p_x + 0.1f, p_y));
-			q = real(CL_Pointf(p_x + 0.9f, p_y + 1));
+			p = Units::toScreen(CL_Pointf(p_x + 0.1f, p_y));
+			q = Units::toScreen(CL_Pointf(p_x + 0.9f, p_y + 1));
 
 			geom->addRectangle(CL_Rectf(p.x, p.y, q.x, q.y));
 			break;
@@ -417,9 +409,9 @@ void LevelImpl::saveTrackEl(CL_DomDocument &p_doc, CL_DomNode &p_trackNode)
 		pointEl = p_doc.create_element("point");
 		p_trackNode.append_child(pointEl);
 
-		pointEl.set_attribute("x", CL_StringHelp::float_to_local8(ireal(pos.x)));
-		pointEl.set_attribute("y", CL_StringHelp::float_to_local8(ireal(pos.y)));
-		pointEl.set_attribute("radius", CL_StringHelp::float_to_local8(ireal(point.getRadius())));
+		pointEl.set_attribute("x", CL_StringHelp::float_to_local8(Units::toWorld(pos.x)));
+		pointEl.set_attribute("y", CL_StringHelp::float_to_local8(Units::toWorld(pos.y)));
+		pointEl.set_attribute("radius", CL_StringHelp::float_to_local8(Units::toWorld(point.getRadius())));
 		pointEl.set_attribute("shift", CL_StringHelp::float_to_local8(point.getShift()));
 	}
 }
@@ -463,26 +455,6 @@ CL_Pointf Level::getStartPosition(int p_num) const {
 		return CL_Pointf(200, 200);
 	}
 
-}
-
-CL_Pointf LevelImpl::real(const CL_Pointf &p_point) const
-{
-	return CL_Pointf(p_point.x * 20.0f, p_point.y * 20.0f);
-}
-
-float LevelImpl::real(float p_coord) const
-{
-	return p_coord * 20.0f;
-}
-
-CL_Pointf LevelImpl::ireal(const CL_Pointf &p_point) const
-{
-	return CL_Pointf(p_point.x / 20.0f, p_point.y / 20.0f);
-}
-
-float LevelImpl::ireal(float p_coord) const
-{
-	return p_coord / 20.0f;
 }
 
 int Level::getCarCount() const

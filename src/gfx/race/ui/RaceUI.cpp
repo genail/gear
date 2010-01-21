@@ -31,11 +31,12 @@
 #include <map>
 
 #include "common/Game.h"
-#include "logic/race/Car.h"
-#include "logic/race/RaceLogic.h"
-#include "gfx/scenes/RaceScene.h"
 #include "gfx/Stage.h"
 #include "gfx/Viewport.h"
+#include "gfx/scenes/RaceScene.h"
+#include "logic/race/Car.h"
+#include "logic/race/RaceLogic.h"
+#include "logic/race/Progress.h"
 
 namespace Gfx {
 
@@ -166,11 +167,13 @@ void RaceUI::drawMessageBoard(CL_GraphicContext &p_gc)
 void RaceUI::drawLapLabel(CL_GraphicContext &p_gc)
 {
 	const int lapsTotal = m_logic->getRaceLapCount();
-	int lapsCurrent = Game::getInstance().getPlayer().getCar().getLap();
+	int lapsCurrent = m_logic->getProgress().getLapNumber(
+			Game::getInstance().getPlayer().getCar()
+	);
 
-	if (lapsCurrent > lapsTotal) {
-		lapsCurrent = lapsTotal;
-	}
+//	if (lapsCurrent > lapsTotal) {
+//		lapsCurrent = lapsTotal;
+//	}
 
 	m_lapLabel.setText(cl_format(_("Lap %1 / %2"), lapsCurrent, lapsTotal));
 	m_lapLabel.draw(p_gc);

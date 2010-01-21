@@ -196,7 +196,6 @@ IF (CMAKE_COMPILER_IS_GNUCXX)
 
 # -Wuninitialized
 # -Wunreachable-code
-# -Winline
 # -Weffc++
 SET(COMMON_COMPILE_FLAGS
 	"-isystem/usr/local/include/ClanLib-2.1"
@@ -227,6 +226,7 @@ SET(COMMON_COMPILE_FLAGS
 	"-Wlarger-than=1024"
 	"-Wenum-compare"
 	"-Wvolatile-register-var"
+	"-Winline"
 )
 
 SET (GEAR_LINK_FLAGS "-lfontconfig -lXxf86vm ${CMAKE_THREAD_LIBS_INIT}")

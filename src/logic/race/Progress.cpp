@@ -233,13 +233,18 @@ void Progress::update()
 		ProgressInfo &info = m_impl->m_cars[pair.first];
 
 		if (nextCp.getIndex() == info.m_cp.getIndex() + 1) {
-			// accept is this is next checkpoint
+			// accept if this is next checkpoint
 			info.m_cp = nextCp;
-		} else if (nextCp.getIndex() > info.m_cp.getIndex()) {
+		} else {
 			// if this is much further then accept only if its position
 			// is close enough
-
 			if (m_impl->distance(info.m_cp, nextCp) <= FAR_LIMIT) {
+
+				if (nextCp.getIndex() < info.m_cp.getIndex()) {
+					// this means a new lap
+					++info.m_lapNum;
+				}
+
 				info.m_cp = nextCp;
 			}
 		}
@@ -285,12 +290,15 @@ int ProgressImpl::distance(
 	int sum = 0;
 	const int distsCount = m_dists.size();
 
-	for (int i = fromIdx; i != toIdx; ++i) {
-		if (i >= distsCount) {
-			i = 0;
-		}
+	for (int i = fromIdx; i != toIdx;) {
 
 		sum += m_dists[i];
+
+		if (i + 1 < distsCount) {
+			++i;
+		} else {
+			i = 0;
+		}
 	}
 
 	return sum;

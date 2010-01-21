@@ -28,20 +28,27 @@
 
 #pragma once
 
+#include <ClanLib/core.h>
+#include <ClanLib/gui.h>
+
 #include "Scene.h"
 
 namespace Gfx {
 
-class DirectScene: public Scene {
+class DirectSceneImpl;
+
+class DirectScene : public Scene {
 
 	public:
 
-		DirectScene();
+		DirectScene(CL_GUIComponent &p_comp);
 
 		virtual ~DirectScene();
 
 
 		virtual bool isLoaded() const;
+
+		CL_GUIComponent &getParentComponent();
 
 		virtual SceneType getType() const;
 
@@ -74,7 +81,8 @@ class DirectScene: public Scene {
 
 	private:
 
-		bool m_loaded;
+		CL_SharedPtr<DirectSceneImpl> m_impl;
+
 };
 
 }

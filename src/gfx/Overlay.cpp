@@ -26,106 +26,79 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "DirectScene.h"
+#include "Overlay.h"
 
-#include "common.h"
+#include "gfx/DirectScene.h"
 
-namespace Gfx {
+namespace Gfx
+{
 
-class DirectSceneImpl
+class OverlayImpl
 {
 	public:
-		DirectSceneImpl(CL_GUIComponent &p_comp) :
-			m_loaded(false),
-			m_comp(p_comp)
-		{ /* empty */ }
 
+		const DirectScene &m_scene;
+
+		CL_Rect m_geom;
 
 		bool m_loaded;
 
-		CL_GUIComponent &m_comp;
+
+		explicit OverlayImpl(DirectScene &p_scene, const CL_Rect &p_geom) :
+			m_scene(p_scene),
+			m_geom(p_geom),
+			m_loaded(false)
+		{ /* empty */ }
+
+
 };
 
-DirectScene::DirectScene(CL_GUIComponent &p_comp) :
-		m_impl(new DirectSceneImpl(p_comp))
+Overlay::Overlay(DirectScene &p_scene, const CL_Rect &p_geom) :
+	CL_GUIComponent(&p_scene.getParentComponent()),
+	m_impl(new OverlayImpl(p_scene, p_geom))
+{
+	set_geometry(p_geom);
+	func_render().set(this, &Overlay::render);
+}
+
+Overlay::~Overlay()
 {
 	// empty
 }
 
-DirectScene::~DirectScene()
+void Overlay::render(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
 {
-	// empty
+	if (!m_impl->m_loaded) {
+		load(p_gc);
+		m_impl->m_loaded = true;
+	}
+
+	draw(p_gc, p_clip);
 }
 
-bool DirectScene::isLoaded() const
+bool Overlay::isVisible()
 {
-	return m_impl->m_loaded;
+	return is_visible();
 }
 
-CL_GUIComponent &DirectScene::getParentComponent()
+const CL_Rect &Overlay::getGeometry()
 {
-	return m_impl->m_comp;
+	return m_impl->m_geom;
 }
 
-SceneType DirectScene::getType() const
+void Overlay::setVisible(bool p_visible)
 {
-	return ST_DIRECT;
+	set_visible(p_visible);
 }
 
-void DirectScene::setLoaded(bool p_loaded)
+bool Overlay::is_visible()
 {
-	m_impl->m_loaded = p_loaded;
+	return CL_GUIComponent::is_visible();
 }
 
-void DirectScene::draw(CL_GraphicContext &p_gc)
+void Overlay::set_visible(bool p_visible)
 {
-	G_ASSERT(m_impl->m_loaded);
-}
-
-void DirectScene::inputPressed(const CL_InputEvent &p_event)
-{
-	// empty
-}
-
-void DirectScene::inputReleased(const CL_InputEvent &p_event)
-{
-	// empty
-}
-
-void DirectScene::load(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(!m_impl->m_loaded);
-	m_impl->m_loaded = true;
-}
-
-void DirectScene::mouseMoved(const CL_Point &p_pos)
-{
-	// empty
-}
-
-void DirectScene::mouseScrolled(bool p_up)
-{
-	// empty
-}
-
-void DirectScene::pushed()
-{
-	// empty
-}
-
-void DirectScene::poped()
-{
-	// empty
-}
-
-void DirectScene::setActive(bool p_active)
-{
-	// empty
-}
-
-void DirectScene::update(unsigned p_timeElapsed)
-{
-	G_ASSERT(m_impl->m_loaded);
+	CL_GUIComponent::set_visible(p_visible);
 }
 
 }

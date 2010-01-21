@@ -43,24 +43,19 @@
 #include "gfx/race/level/Bound.h"
 #include "debug/RaceSceneKeyBindings.h"
 
-#if defined(RACE_SCENE_ONLY)
 
-RaceScene::RaceScene(CL_GUIComponent *p_guiParent) :
-
-#else // RACE_SCENE_ONLY
-
-RaceScene::RaceScene(CL_GUIComponent *p_parent) :
-#endif // !RACE_SCENE_ONLY
+RaceScene::RaceScene(CL_GUIComponent &p_parent) :
+	DirectScene(p_parent),
 	m_logic(NULL),
 	m_graphics(NULL),
 	m_initialized(false),
 	m_inputLock(false),
 	m_turnLeft(false),
 	m_turnRight(false),
-	m_gameMenu(p_parent),
+	m_gameMenu(*this),
 	m_gameMenuController(&m_logic, &m_gameMenu)
 {
-
+	// empty
 }
 
 RaceScene::~RaceScene() {
@@ -201,11 +196,10 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 	// handle quit request
 	if (pressed && p_event.id == CL_KEY_ESCAPE) {
 
-		if (!m_gameMenu.is_visible()) {
-			m_gameMenu.set_visible(true);
-			m_gameMenu.set_focus(true);
+		if (!m_gameMenu.isVisible()) {
+			m_gameMenu.setVisible(true);
 		} else {
-			m_gameMenu.set_visible(false);
+			m_gameMenu.setVisible(false);
 		}
 	}
 

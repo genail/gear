@@ -33,7 +33,9 @@ using namespace Gfx;
 
 const int POINT_WIDTH = 5;
 const int PAINT_LINE_WIDTH = 2;
-const int DISCOVER_LINE_WIDTH = 12;
+
+const float DEFAULT_RADIUS = 60.0f;
+const float DEFAULT_SHIFT = 0.0f;
 
 namespace Editor
 {
@@ -54,7 +56,8 @@ namespace Editor
 			m_shiftPointColor(CL_Colorf::red),
 			m_pressedId(CL_NONE_PRESSED),
 			m_isAltPressed(false),
-			m_state(None)
+			m_state(None),
+			m_mousePos(0.0f, 0.0f)
 		{
 			setDefaultPoints();
 		}
@@ -80,6 +83,8 @@ namespace Editor
 		CL_Colorf m_radiusLineColor;
 
 		CL_Colorf m_shiftLineColor;
+
+		CL_Pointf m_mousePos;
 
 		// input
 
@@ -146,10 +151,10 @@ namespace Editor
 	{
 		m_track.clear();
 
-		m_track.addPoint(CL_Pointf(150.0f, 150.0f), 50.0f, 0.0f);
-		m_track.addPoint(CL_Pointf(600.0f, 120.0f), 50.0f, 0.0f);
-		m_track.addPoint(CL_Pointf(600.0f, 400.0f), 60.0f, 0.0f);
-		m_track.addPoint(CL_Pointf(200.0f, 450.0f), 40.0f, 0.0f);
+		m_track.addPoint(CL_Pointf(150.0f, 150.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
+		m_track.addPoint(CL_Pointf(600.0f, 120.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
+		m_track.addPoint(CL_Pointf(600.0f, 400.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
+		m_track.addPoint(CL_Pointf(200.0f, 450.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
 
 		m_gfxLevel.getTrackTriangulator().triangulate(m_track);
 	}
@@ -352,13 +357,11 @@ namespace Editor
 		{
 			int segment = p_index - 2;
 			if (segment < 0)
-				segment = m_track.getPointCount() - segment;
+				segment = m_track.getPointCount() - abs(segment);
 
 			for (int i = 0; i < 4; ++i)
 			{
-				if (segment < 0)
-					segment = m_track.getPointCount() - 1;
-				else if (segment > m_track.getPointCount() - 1)
+				if (segment > m_track.getPointCount() - 1)
 					segment = 0;
 
 				m_gfxLevel.getTrackTriangulator().triangulate(m_track, segment);
@@ -392,7 +395,27 @@ namespace Editor
 				m_selectedIndex = m_lightIndex = -1;
 			}
 		}
+		else if (m_pressedId == CL_KEY_DELETE)
+		{
+			if (m_selectedIndex >= 0 && m_track.getPointCount() > 3)
+			{
+				m_track.removePoint(m_selectedIndex);
 
+				m_selectedIndex -= 1;
+				if (m_selectedIndex < 0)
+					m_selectedIndex = m_track.getPointCount() - 1;
+
+				triangulate(m_selectedIndex);
+			}
+		}
+		else if (m_pressedId == CL_MOUSE_MIDDLE)
+		{
+			m_track.addPoint(m_mousePos, DEFAULT_RADIUS, DEFAULT_SHIFT);
+
+			m_selectedIndex = m_track.getPointCount() - 1;
+
+			triangulate(m_selectedIndex);
+		}
 	}
 
 	void EditorPointImpl::mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos)
@@ -435,6 +458,8 @@ namespace Editor
 
 			triangulate(m_selectedIndex);
 		}
+
+		m_mousePos = p_mousePos;
 	}
 
 	void EditorPointImpl::mouseScrolled(bool p_up)

@@ -25,48 +25,58 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #pragma once
 
+#include "boost/utility.hpp"
+
 #include <ClanLib/core.h>
-#include <ClanLib/display.h>
+#include <ClanLib/gui.h>
 
-#include "EditorHelper.h"
-
-#include "common.h"
-#include "gfx/Viewport.h"
-#include "gfx/Stage.h"
-#include "gfx/race/level/Level.h"
-#include "logic/race/level/Level.h"
-#include "logic/race/level/Track.h"
-#include "logic/race/level/TrackPoint.h"
-
-namespace Editor
+namespace Gfx
 {
-	class EditorTrackImpl;
 
-	class EditorTrack
-	{
+class DirectScene;
+class OverlayImpl;
+
+/**
+ * Overlay is gui component on top of Gfx::DirectScene.
+ */
+class Overlay : public CL_GUIComponent
+{
 	public:
-		EditorTrack(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport);
 
-		~EditorTrack();
+		Overlay(DirectScene &p_scene, const CL_Rect &p_geom);
 
-		void draw(CL_GraphicContext &p_gc);
+		virtual ~Overlay();
 
-		void load(CL_GraphicContext &p_gc);
 
-		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
+		virtual void load(CL_GraphicContext &p_gc) = 0;
 
-		void update(unsigned int p_timeElapsed);
+		virtual void draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip) = 0;
 
-		void handleInput(bool p_pressed, const CL_InputEvent& p_event);
 
-		void mouseScrolled(bool p_up);
+		bool isVisible();
 
-		bool getHandle() const;
+		const CL_Rect &getGeometry();
+
+
+		void setVisible(bool p_visible);
+
 
 	private:
 
-		CL_SharedPtr<EditorTrackImpl> m_impl;
-	};
+		CL_SharedPtr<OverlayImpl> m_impl;
+
+
+		bool is_visible();
+
+		CL_Rect get_geometry();
+
+		void render(CL_GraphicContext &p_gc, const CL_Rect &p_clip);
+
+		void set_visible(bool p_visible);
+};
+
 }
+

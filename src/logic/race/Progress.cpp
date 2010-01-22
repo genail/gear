@@ -106,6 +106,8 @@ class ProgressImpl
 		}
 
 		int distance(const Checkpoint &p_from, const Checkpoint &p_to) const;
+
+		bool startLinePassed(const Car *p_car);
 };
 
 Progress::Progress(const Level &p_level) :
@@ -241,11 +243,18 @@ void Progress::update()
 			if (m_impl->distance(info.m_cp, nextCp) <= FAR_LIMIT) {
 
 				if (nextCp.getIndex() < info.m_cp.getIndex()) {
-					// this means a new lap
-					++info.m_lapNum;
-				}
+					// this can be a new lap
+					// check only if start line is passed
+					if (m_impl->startLinePassed(pair.first)) {
+						++info.m_lapNum;
+						info.m_cp = nextCp;
+					}
 
-				info.m_cp = nextCp;
+					// no checkpoint assignment here
+
+				} else {
+					info.m_cp = nextCp;
+				}
 			}
 		}
 
@@ -302,6 +311,22 @@ int ProgressImpl::distance(
 	}
 
 	return sum;
+}
+
+bool ProgressImpl::startLinePassed(const Car *p_car)
+{
+	const Race::TrackTriangulator &tri = m_level.getTrackTriangulator();
+	const CL_Pointf &r = tri.getFirstRightPoint(0);
+	const CL_Pointf &l = tri.getFirstLeftPoint(0);
+
+	const CL_LineSegment2f sline(r, l);
+
+	if (sline.point_right_of_line(p_car->getPosition()) >= 0.0f) {
+		return true;
+	} else {
+		// TODO: do more accurate check
+		return false;
+	}
 }
 
 int Progress::getLapNumber(const Car &p_car) const

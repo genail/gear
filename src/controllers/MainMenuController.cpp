@@ -103,7 +103,7 @@ void MainMenuController::onOptionClicked()
 {
 	m_scene->displayError("");
 
-    Gfx::Stage::pushScene(m_optionScene);
+	Gfx::Stage::pushScene(m_optionScene);
 }
 
 void MainMenuController::onAuthorsClicked()

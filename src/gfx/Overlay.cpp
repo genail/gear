@@ -25,48 +25,80 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#pragma once
 
-#include <ClanLib/core.h>
-#include <ClanLib/display.h>
+#include "Overlay.h"
 
-#include "EditorHelper.h"
+#include "gfx/DirectScene.h"
 
-#include "common.h"
-#include "gfx/Viewport.h"
-#include "gfx/Stage.h"
-#include "gfx/race/level/Level.h"
-#include "logic/race/level/Level.h"
-#include "logic/race/level/Track.h"
-#include "logic/race/level/TrackPoint.h"
-
-namespace Editor
+namespace Gfx
 {
-	class EditorTrackImpl;
 
-	class EditorTrack
-	{
+class OverlayImpl
+{
 	public:
-		EditorTrack(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport);
 
-		~EditorTrack();
+		const DirectScene &m_scene;
 
-		void draw(CL_GraphicContext &p_gc);
+		CL_Rect m_geom;
 
-		void load(CL_GraphicContext &p_gc);
+		bool m_loaded;
 
-		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
 
-		void update(unsigned int p_timeElapsed);
+		explicit OverlayImpl(DirectScene &p_scene, const CL_Rect &p_geom) :
+			m_scene(p_scene),
+			m_geom(p_geom),
+			m_loaded(false)
+		{ /* empty */ }
 
-		void handleInput(bool p_pressed, const CL_InputEvent& p_event);
 
-		void mouseScrolled(bool p_up);
+};
 
-		bool getHandle() const;
+Overlay::Overlay(DirectScene &p_scene, const CL_Rect &p_geom) :
+	CL_GUIComponent(&p_scene.getParentComponent()),
+	m_impl(new OverlayImpl(p_scene, p_geom))
+{
+	set_geometry(p_geom);
+	func_render().set(this, &Overlay::render);
+}
 
-	private:
+Overlay::~Overlay()
+{
+	// empty
+}
 
-		CL_SharedPtr<EditorTrackImpl> m_impl;
-	};
+void Overlay::render(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
+{
+	if (!m_impl->m_loaded) {
+		load(p_gc);
+		m_impl->m_loaded = true;
+	}
+
+	draw(p_gc, p_clip);
+}
+
+bool Overlay::isVisible()
+{
+	return is_visible();
+}
+
+const CL_Rect &Overlay::getGeometry()
+{
+	return m_impl->m_geom;
+}
+
+void Overlay::setVisible(bool p_visible)
+{
+	set_visible(p_visible);
+}
+
+bool Overlay::is_visible()
+{
+	return CL_GUIComponent::is_visible();
+}
+
+void Overlay::set_visible(bool p_visible)
+{
+	CL_GUIComponent::set_visible(p_visible);
+}
+
 }

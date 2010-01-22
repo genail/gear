@@ -99,7 +99,7 @@ namespace Editor
 
 	void EditorManagement::draw(CL_GraphicContext &p_gc)
 	{
-		CL_Draw::fill(p_gc, 0.0f, 0.0f, Stage::getWidth(), Stage::getHeight(), CL_Colorf::black);
+		CL_Draw::fill(p_gc, 0.0f, 0.0f, Stage::getWidth(), Stage::getHeight(), CL_Colorf::green);
 
 		m_impl->m_viewport.prepareGC(p_gc);
 

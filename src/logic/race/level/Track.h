@@ -69,6 +69,8 @@ class Track {
 
 		void clear();
 
+		void removePoint(int p_index);
+
 	private:
 
 		CL_SharedPtr<TrackImpl> m_impl;

@@ -96,6 +96,7 @@ SET(CLIENT_SRCS
 	gfx/DirectScene.cpp
 	gfx/GameWindow.cpp
 	gfx/GuiScene.cpp
+	gfx/Overlay.cpp
 	gfx/Stage.cpp
 	gfx/Viewport.cpp
 	gfx/race/RaceGraphics.cpp

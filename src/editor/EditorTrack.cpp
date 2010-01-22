@@ -143,12 +143,12 @@ namespace Editor
 	void EditorTrackImpl::setDefaultView()
 	{
 		m_viewport.setScale(1.0f);
-		m_lookPoint = CL_Pointf(400.0f, 300.0f);
+		m_lookPoint = m_track.getPoint(0).getPosition();
 	}
 
 	bool EditorTrackImpl::getHandle() const
 	{
-		return false;
+		return (!m_pressedId == CL_NONE_PRESSED);
 	}
 
 	EditorTrack::EditorTrack(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Track& p_track, Viewport& p_viewport) : 

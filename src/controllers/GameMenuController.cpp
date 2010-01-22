@@ -32,27 +32,64 @@
 #include "gfx/race/ui/GameMenu.h"
 #include "logic/race/RaceLogic.h"
 
-
-GameMenuController::GameMenuController(Race::RaceLogic **p_raceLogic, Gfx::GameMenu *p_gameMenu) :
-	m_raceLogic(p_raceLogic),
-	m_gameMenu(p_gameMenu)
+class GameMenuControllerImpl
 {
-	m_gameMenu->func_exit_clicked().set(this, &GameMenuController::onExitClicked);
-	m_gameMenu->func_vote_clicked().set(this, &GameMenuController::onVoteClicked);
+	public:
+
+		Race::RaceLogic **m_raceLogic;
+
+		Gfx::GameMenu *m_gameMenu;
+
+
+		GameMenuControllerImpl(
+				Race::RaceLogic **p_raceLogic,
+				Gfx::GameMenu *p_gameMenu
+		) :
+			m_raceLogic(p_raceLogic),
+			m_gameMenu(p_gameMenu)
+		{
+			m_gameMenu->func_exit_clicked().set(
+					this,
+					&GameMenuControllerImpl::onExitClicked
+			);
+
+			m_gameMenu->func_vote_clicked().set(
+					this,
+					&GameMenuControllerImpl::onVoteClicked
+			);
+		}
+
+
+		void onExitClicked();
+
+		void onVoteClicked();
+
+	private:
+
+};
+
+GameMenuController::GameMenuController(
+		Race::RaceLogic **p_raceLogic,
+		Gfx::GameMenu *p_gameMenu
+) :
+	m_impl(new GameMenuControllerImpl(p_raceLogic, p_gameMenu))
+{
+	// empty
 }
 
 GameMenuController::~GameMenuController()
 {
+	// empty
 }
 
-void GameMenuController::onExitClicked()
+void GameMenuControllerImpl::onExitClicked()
 {
-	m_gameMenu->set_visible(false);
+	m_gameMenu->setVisible(false);
 	Gfx::Stage::popScene();
 }
 
-void GameMenuController::onVoteClicked()
+void GameMenuControllerImpl::onVoteClicked()
 {
-	m_gameMenu->set_visible(false);
+	m_gameMenu->setVisible(false);
 	(*m_raceLogic)->callAVote(VOTE_RESTART_RACE);
 }

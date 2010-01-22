@@ -103,7 +103,8 @@ namespace Editor
 
 		m_impl->m_viewport.prepareGC(p_gc);
 
-		m_impl->m_editorTrack.draw(p_gc);
+		m_impl->m_editorTrack.drawNet(p_gc);
+		m_impl->m_editorTrack.drawTrack(p_gc);
 		m_impl->m_editorPoint.draw(p_gc);
 
 		m_impl->m_viewport.finalizeGC(p_gc);

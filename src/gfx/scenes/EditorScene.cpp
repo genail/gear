@@ -109,7 +109,8 @@ void EditorSceneImpl::mouseScrolled(bool p_up)
 	m_editorManagement.mouseScrolled(p_up);
 }
 
-EditorScene::EditorScene() :
+EditorScene::EditorScene(CL_GUIComponent &p_parent) :
+	DirectScene(p_parent),
 	m_impl(new EditorSceneImpl())
 {
 	m_impl->m_controller = EditorController(this);

@@ -31,6 +31,8 @@
 using namespace Race;
 using namespace Gfx;
 
+const int NET_LINE_MARGIN = 100;
+
 namespace Editor
 {
 	class EditorTrackImpl
@@ -42,7 +44,8 @@ namespace Editor
 			m_viewport(p_viewport),
 			m_gfxLevel(p_gfxLevel),
 			m_pressedId(CL_NONE_PRESSED),
-			m_lookPoint(400.0f, 300.0f)
+			m_lookPoint(400.0f, 300.0f),
+			m_netLineColor(CL_Colorf::white)
 		{
 			m_viewport.attachTo(&m_lookPoint);
 		}
@@ -55,6 +58,8 @@ namespace Editor
 		// help variables
 
 		CL_Pointf m_lookPoint;
+
+		CL_Colorf m_netLineColor;
 
 		// input
 
@@ -78,7 +83,9 @@ namespace Editor
 	
 		void mouseScrolled(bool p_up);
 
-		void draw(CL_GraphicContext &p_gc);
+		void drawTrack(CL_GraphicContext &p_gc);
+
+		void drawNet(CL_GraphicContext &p_gc);
 
 		void load(CL_GraphicContext &p_gc);
 
@@ -89,9 +96,29 @@ namespace Editor
 		bool getHandle() const;
 	};
 
-	void EditorTrackImpl::draw(CL_GraphicContext &p_gc)
+	void EditorTrackImpl::drawTrack(CL_GraphicContext &p_gc)
 	{
 		m_gfxLevel.draw(p_gc);
+	}
+
+	void EditorTrackImpl::drawNet(CL_GraphicContext &p_gc)
+	{
+		const CL_Rect& worldRect = m_viewport.getWorldClipRect();
+
+		int x = worldRect.left - (worldRect.left % NET_LINE_MARGIN);
+		int y = worldRect.top - (worldRect.top % NET_LINE_MARGIN);
+
+		int absolutlyWidth = (worldRect.right - worldRect.left) + x + NET_LINE_MARGIN;
+		int absolutlyHeight = (worldRect.bottom - worldRect.top) + y + NET_LINE_MARGIN;
+
+		for ( ; x <= absolutlyWidth; x += NET_LINE_MARGIN)
+		{
+			CL_Draw::line(p_gc, x, worldRect.top, x, absolutlyHeight, m_netLineColor);
+		}
+		for ( ; y <= absolutlyHeight; y += NET_LINE_MARGIN)
+		{
+			CL_Draw::line(p_gc, worldRect.left, y, absolutlyWidth, y, m_netLineColor);
+		}
 	}
 
 	void EditorTrackImpl::load(CL_GraphicContext &p_gc)
@@ -162,9 +189,14 @@ namespace Editor
 
 	}
 
-	void EditorTrack::draw(CL_GraphicContext &p_gc)
+	void EditorTrack::drawTrack(CL_GraphicContext &p_gc)
 	{
-		m_impl->draw(p_gc);
+		m_impl->drawTrack(p_gc);
+	}
+
+	void EditorTrack::drawNet(CL_GraphicContext &p_gc)
+	{
+		m_impl->drawNet(p_gc);
 	}
 
 	void EditorTrack::load(CL_GraphicContext &p_gc)

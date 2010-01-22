@@ -38,7 +38,7 @@ class EditorSceneImpl;
 class EditorScene : public Gfx::DirectScene
 {
 	public:
-		EditorScene();
+		EditorScene(CL_GUIComponent &p_parent);
 
 		virtual ~EditorScene();
 

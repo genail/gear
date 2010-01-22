@@ -51,7 +51,9 @@ namespace Editor
 
 		~EditorTrack();
 
-		void draw(CL_GraphicContext &p_gc);
+		void drawTrack(CL_GraphicContext &p_gc);
+
+		void drawNet(CL_GraphicContext &p_gc);
 
 		void load(CL_GraphicContext &p_gc);
 

@@ -151,7 +151,10 @@ namespace Editor
 	void EditorTrackImpl::mouseMoved(const CL_Pointf &p_inconditionalMousePos, const CL_Pointf &p_inconditionalLastMousePos, const CL_Pointf &p_inconditionalDeltaPos)
 	{
 		if (m_pressedId == CL_MOUSE_RIGHT)
-			m_lookPoint -= p_inconditionalDeltaPos;
+		{
+			CL_Pointf delta = p_inconditionalDeltaPos / m_viewport.getScale();
+			m_lookPoint -= delta;
+		}
 	}
 
 	void EditorTrackImpl::mouseScrolled(bool p_up)

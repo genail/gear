@@ -30,6 +30,10 @@
 
 #include "EditorTrack.h"
 #include "EditorPoint.h"
+#include "EditorLogic.h"
+
+#include "EditorMenu.h"
+#include "controllers/EditorMenuController.h"
 
 #include "gfx/Viewport.h"
 #include "gfx/race/level/Level.h"
@@ -44,12 +48,15 @@ namespace Editor
 	class EditorManagementImpl
 	{
 	public:
-		EditorManagementImpl() : 
+		EditorManagementImpl(Gfx::DirectScene& p_directScene) : 
 			m_track(),
 			m_viewport(),
 			m_raceLevel(),
 			m_gfxLevel(m_raceLevel, m_viewport),
 			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
+			m_editorLogic(m_raceLevel),
+			m_editorMenu(p_directScene),
+			m_editorMenuController(&m_editorMenu, m_editorLogic),
 			m_editorPoint(m_track, m_gfxLevel, m_viewport),
 			m_lastMousePos(0.0f, 0.0f),
 			m_inconditionalLastMousePos(0.0f, 0.0f)
@@ -78,6 +85,14 @@ namespace Editor
 
 		EditorTrack m_editorTrack;
 
+		EditorLogic m_editorLogic;
+
+		// menu
+
+		Gfx::EditorMenu m_editorMenu;
+
+		EditorMenuController m_editorMenuController;
+
 		// help variables
 
 		CL_Pointf m_lastMousePos;
@@ -87,7 +102,7 @@ namespace Editor
 	};
 
 	EditorManagement::EditorManagement() : 
-		m_impl(new EditorManagementImpl())
+		m_impl(new EditorManagementImpl(this))
 	{
 
 	}
@@ -155,11 +170,18 @@ namespace Editor
 		}
 
 		if (p_event.id == CL_KEY_ESCAPE)
-			Gfx::Stage::popScene();
+		{
+			if (m_impl->m_editorMenu.isVisible())
+				m_impl->m_editorMenu.setVisible(false);
+			else
+				m_impl->m_editorMenu.setVisible(true);
 
-		bool ok = (!m_impl->m_editorTrack.getHandle() && !m_impl->m_editorPoint.getHandle());
+			return;
+		}
 
-		if (ok || !pressed)
+		bool handle = (m_impl->m_editorTrack.getHandle() || m_impl->m_editorPoint.getHandle());
+
+		if (!handle || !pressed)
 		{
 			m_impl->m_editorPoint.handleInput(pressed, p_event);
 			m_impl->m_editorTrack.handleInput(pressed, p_event);

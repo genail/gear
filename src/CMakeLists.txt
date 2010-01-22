@@ -87,11 +87,14 @@ SET(CLIENT_SRCS
 	controllers/OptionsController.cpp
 	controllers/AuthorsController.cpp
 	controllers/EditorController.cpp
+	controllers/EditorMenuController.cpp
 	debug/RaceSceneKeyBindings.cpp
 	editor/EditorManagement.cpp
 	editor/EditorTrack.cpp
 	editor/EditorPoint.cpp
 	editor/EditorHelper.cpp
+	editor/EditorMenu.cpp
+	editor/EditorLogic.cpp
 	gfx/DebugLayer.cpp
 	gfx/DirectScene.cpp
 	gfx/GameWindow.cpp

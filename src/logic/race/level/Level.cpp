@@ -463,7 +463,7 @@ void Level::getStartPosAndRot(
 	// this will be car distance from start line
 	const float cdist = p_num * DIST_MUL;
 
-	float llen, len;
+	float llen = 0, len = 0;
 	CL_Pointf last;
 	CL_LineSegment2f seg;
 	float segPart;
@@ -472,11 +472,10 @@ void Level::getStartPosAndRot(
 
 	for (int i = lastSegIdx; i >= 0; --i) {
 		// get track segment from the end
-		const TrackSegment &s = m_impl->m_trackTriangulator.getSegment(lastSegIdx);
+		const TrackSegment &s = m_impl->m_trackTriangulator.getSegment(i);
 		const std::vector<CL_Pointf> &mids = s.getMidPoints();
 
 		// find segment for car positioning
-		llen = len = 0;
 		found = false;
 		lastMidsIdx = static_cast<signed>(mids.size()) - 1;
 

@@ -410,9 +410,14 @@ namespace Editor
 		}
 		else if (m_pressedId == CL_MOUSE_MIDDLE)
 		{
-			m_track.addPoint(m_mousePos, DEFAULT_RADIUS, DEFAULT_SHIFT);
+			int index = 0;
 
-			m_selectedIndex = m_track.getPointCount() - 1;
+			if (m_selectedIndex >= 0 && m_selectedIndex < m_track.getPointCount())
+				index = ++m_selectedIndex;
+			else
+				index = m_selectedIndex = m_track.getPointCount();
+
+			m_track.addPoint(m_mousePos, DEFAULT_RADIUS, DEFAULT_SHIFT, index);
 
 			triangulate(m_selectedIndex);
 		}

@@ -140,8 +140,11 @@ namespace Editor
 		CL_Pointf mousePos = m_impl->m_viewport.toWorld((CL_Pointf)p_pos);
 		CL_Pointf deltaPos = mousePos - m_impl->m_lastMousePos;
 
-		m_impl->m_editorPoint.mouseMoved(mousePos, m_impl->m_lastMousePos, deltaPos);
-		m_impl->m_editorTrack.mouseMoved((CL_Pointf)p_pos, m_impl->m_inconditionalLastMousePos, inconditionalDeltaPos);
+		if (!m_impl->m_editorMenu.isVisible())
+		{
+			m_impl->m_editorPoint.mouseMoved(mousePos, m_impl->m_lastMousePos, deltaPos);
+			m_impl->m_editorTrack.mouseMoved((CL_Pointf)p_pos, m_impl->m_inconditionalLastMousePos, inconditionalDeltaPos);
+		}
 
 		m_impl->m_lastMousePos = mousePos;
 		m_impl->m_inconditionalLastMousePos = (CL_Pointf)p_pos;
@@ -179,18 +182,24 @@ namespace Editor
 			return;
 		}
 
-		bool handle = (m_impl->m_editorTrack.getHandle() || m_impl->m_editorPoint.getHandle());
-
-		if (!handle || !pressed)
+		if (!m_impl->m_editorMenu.isVisible())
 		{
-			m_impl->m_editorPoint.handleInput(pressed, p_event);
-			m_impl->m_editorTrack.handleInput(pressed, p_event);
+			bool handle = (m_impl->m_editorTrack.getHandle() || m_impl->m_editorPoint.getHandle());
+
+			if (!handle || !pressed)
+			{
+				m_impl->m_editorPoint.handleInput(pressed, p_event);
+				m_impl->m_editorTrack.handleInput(pressed, p_event);
+			}
 		}
 	}
 
 	void EditorManagement::mouseScrolled(bool p_up)
 	{
-		m_impl->m_editorPoint.mouseScrolled(p_up);
-		m_impl->m_editorTrack.mouseScrolled(p_up);
+		if (!m_impl->m_editorMenu.isVisible())
+		{
+			m_impl->m_editorPoint.mouseScrolled(p_up);
+			m_impl->m_editorTrack.mouseScrolled(p_up);
+		}
 	}
 }

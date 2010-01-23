@@ -34,7 +34,7 @@
 namespace Gfx {
 
 const int WINDOW_WIDTH = 200;
-const int WINDOW_HEIGHT = 110;
+const int WINDOW_HEIGHT = 155;
 const float WINDOW_ROUNDNESS = 20.0f;
 const int MARGIN = 20;
 const int BUTTON_HEIGHT = 30;

@@ -26,48 +26,13 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "OfflineRaceLogic.h"
+#pragma once
 
-#include "common.h"
-#include "common/Game.h"
-#include "logic/race/Progress.h"
-
-namespace Race {
-
-OfflineRaceLogic::OfflineRaceLogic(const CL_String &p_levelName) :
-	m_levelName(p_levelName)
+class Limits
 {
-}
+	public:
 
-OfflineRaceLogic::~OfflineRaceLogic()
-{
-	destroy();
-}
+		static const int MAX_PLAYERS;
+};
 
-void OfflineRaceLogic::initialize()
-{
-	Level &level = getLevel();
-
-	level.initialize();
-	level.load(m_levelName);
-
-	// init progress object
-	Progress &prog = getProgress();
-	prog.initialize();
-
-	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-
-	addPlayer(player);
-	level.addCar(&player.getCar());
-
-	player.getCar().setPosition(level.getStartPosition(3));
-}
-
-void OfflineRaceLogic::destroy()
-{
-	getProgress().destroy();
-	getLevel().destroy();
-}
-
-}
+const int Limits::MAX_PLAYERS = 32;

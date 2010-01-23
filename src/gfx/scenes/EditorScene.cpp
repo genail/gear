@@ -39,9 +39,9 @@ using namespace Gfx;
 class EditorSceneImpl
 {
 public:
-	EditorSceneImpl() : 
+	EditorSceneImpl(Gfx::DirectScene& p_directScene) : 
 			m_controller(NULL),
-			m_editorManagement()
+			m_editorManagement(p_directScene)
 	{
 
 	}
@@ -111,7 +111,7 @@ void EditorSceneImpl::mouseScrolled(bool p_up)
 
 EditorScene::EditorScene(CL_GUIComponent &p_parent) :
 	DirectScene(p_parent),
-	m_impl(new EditorSceneImpl())
+	m_impl(new EditorSceneImpl(*this))
 {
 	m_impl->m_controller = EditorController(this);
 }

@@ -101,8 +101,8 @@ namespace Editor
 
 	};
 
-	EditorManagement::EditorManagement() : 
-		m_impl(new EditorManagementImpl(this))
+	EditorManagement::EditorManagement(Gfx::DirectScene& p_directScene) : 
+		m_impl(new EditorManagementImpl(p_directScene))
 	{
 
 	}
@@ -169,7 +169,7 @@ namespace Editor
 				assert(0 && "unknown input state");
 		}
 
-		if (p_event.id == CL_KEY_ESCAPE)
+		if (pressed && p_event.id == CL_KEY_ESCAPE)
 		{
 			if (m_impl->m_editorMenu.isVisible())
 				m_impl->m_editorMenu.setVisible(false);

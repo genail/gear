@@ -34,6 +34,11 @@
 
 #include "common.h"
 
+namespace Gfx
+{
+	class DirectScene;
+}
+
 namespace Editor
 {
 	class EditorManagementImpl;
@@ -41,7 +46,7 @@ namespace Editor
 	class EditorManagement
 	{
 	public:
-		EditorManagement();
+		EditorManagement(Gfx::DirectScene& p_directScene);
 
 		~EditorManagement();
 

@@ -447,7 +447,10 @@ void Level::removeCar(Car *p_car) {
 	p_car->m_level = NULL;
 }
 
-CL_Pointf Level::getStartPosition(int p_num) const
+void Level::getStartPosAndRot(
+		int p_num,
+		CL_Pointf &p_pos, CL_Angle &p_rot
+) const
 {
 	G_ASSERT(p_num >= 1 && "too low position number");
 	G_ASSERT(p_num <= Limits::MAX_PLAYERS);
@@ -504,7 +507,7 @@ CL_Pointf Level::getStartPosition(int p_num) const
 
 	if (!found) {
 		G_ASSERT(p_num > 1 && "track too small?!");
-		return getStartPosition(p_num - 1);
+		getStartPosAndRot(p_num - 1, p_pos, p_rot);
 	}
 
 	// calculate right normal
@@ -534,8 +537,13 @@ CL_Pointf Level::getStartPosition(int p_num) const
 		}
 	}
 
-	// return the position
-	return ap + norm;
+	// save the position and rotation
+	p_pos = ap + norm;
+	p_rot = segVec.angle(CL_Vec2f(1.0f, 0.0f));
+
+	if (segVec.y < 0) {
+		p_rot = CL_Angle(-p_rot.to_radians(), cl_radians);
+	}
 }
 
 

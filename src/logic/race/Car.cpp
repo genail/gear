@@ -385,7 +385,7 @@ void Car::applyCarState(const Net::CarState &p_carState)
 
 void Car::setStartPosition(int p_startPosition) {
 	if (m_level != NULL) {
-		m_position = m_level->getStartPosition(p_startPosition);
+//		m_position = m_level->getStartPosAndRot(p_startPosition);
 	} else {
 		cl_log_event("warning", "Car not on Level.");
 		m_position = CL_Pointf(300, 300);

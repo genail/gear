@@ -455,8 +455,12 @@ void Level::getStartPosAndRot(
 	G_ASSERT(p_num >= 1 && "too low position number");
 	G_ASSERT(p_num <= Limits::MAX_PLAYERS);
 
-	static const int DIST_MUL = static_cast<int>(Units::toScreen(4.0f));
-	static const bool RIGHT_FIRST = true; // is first position on the right?
+	// additional distance from start (per position)
+	static const int DIST_MUL = static_cast<int>(Units::toScreen(3.0f));
+	// distance from center
+	static const int RADIUS = static_cast<int>(Units::toScreen(2.0f));
+	// is first position on the right?
+	static const bool RIGHT_FIRST = true;
 
 	const int lastSegIdx = m_impl->m_track.getPointCount() - 1;
 
@@ -516,7 +520,7 @@ void Level::getStartPosAndRot(
 	CL_Vec2f norm(segVec.y, -segVec.x);
 
 	norm.normalize();
-	norm *= 60.0f; // FIXME: other value
+	norm *= RADIUS;
 
 	// calculate attach point
 	CL_Pointf ap = seg.p;

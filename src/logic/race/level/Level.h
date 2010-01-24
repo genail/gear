@@ -93,7 +93,7 @@ class Level
 		 */
 		void getStartPosAndRot(
 				int p_num,
-				CL_Pointf &p_pos, CL_Angle &p_rot
+				CL_Pointf *p_pos, CL_Angle *p_rot
 		) const;
 
 		void load(const CL_String &p_filename);

@@ -449,7 +449,7 @@ void Level::removeCar(Car *p_car) {
 
 void Level::getStartPosAndRot(
 		int p_num,
-		CL_Pointf &p_pos, CL_Angle &p_rot
+		CL_Pointf *p_pos, CL_Angle *p_rot
 ) const
 {
 	G_ASSERT(p_num >= 1 && "too low position number");
@@ -541,11 +541,11 @@ void Level::getStartPosAndRot(
 	}
 
 	// save the position and rotation
-	p_pos = ap + norm;
-	p_rot = segVec.angle(CL_Vec2f(1.0f, 0.0f));
+	*p_pos = ap + norm;
+	*p_rot = segVec.angle(CL_Vec2f(1.0f, 0.0f));
 
 	if (segVec.y < 0) {
-		p_rot = CL_Angle(-p_rot.to_radians(), cl_radians);
+		*p_rot = CL_Angle(-(*p_rot).to_radians(), cl_radians);
 	}
 }
 

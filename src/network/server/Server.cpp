@@ -510,13 +510,19 @@ void ServerImpl::startRace()
 
 	TConnectionPlayerPair pair;
 
-//	int i = 1;
-//	foreach (pair, m_connections) {
-//
-//	}
+	int i = 1;
+	CL_Pointf pos;
+	CL_Angle rot;
 
-	raceStart.setCarPosition(CL_Pointf(300, 1100));
-	raceStart.setCarRotation(CL_Angle(90, cl_degrees));
+	foreach (pair, m_connections) {
+		m_level.getStartPosAndRot(i, &pos, &rot);
+		raceStart.setCarPosition(pos);
+		raceStart.setCarRotation(rot);
+
+		send(pair.first, raceStart.buildEvent());
+
+		++i;
+	}
 
 	sendToAll(raceStart.buildEvent());
 }

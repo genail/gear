@@ -63,7 +63,7 @@ void OfflineRaceLogic::initialize()
 
 	CL_Pointf carPos;
 	CL_Angle carRot;
-	level.getStartPosAndRot(1, carPos, carRot);
+	level.getStartPosAndRot(1, &carPos, &carRot);
 
 	player.getCar().setPosition(carPos);
 	player.getCar().setRotation(carRot.to_degrees());

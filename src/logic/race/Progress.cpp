@@ -331,7 +331,9 @@ bool ProgressImpl::startLinePassed(const Car *p_car)
 
 int Progress::getLapNumber(const Car &p_car) const
 {
-	G_ASSERT(m_impl->m_initd);
+	if (!m_impl->m_initd) {
+		return 0;
+	}
 
 	ProgressImpl::TCarProgressMap::const_iterator itor =
 			m_impl->m_cars.find(&p_car);

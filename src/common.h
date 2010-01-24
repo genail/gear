@@ -66,6 +66,34 @@
 	private: \
 		CL_Signal_v3<T1, T2, T3> m_sig_##name;
 
+// for interface and implementation
+
+#define DEF_SIGNAL_0(name) \
+	public: \
+		CL_Signal_v0 &sig_##name();
+
+#define IMPL_SIGNAL_0(name) \
+	public: \
+		CL_Signal_v0 m_sig_##name;
+
+#define METH_SIGNAL_0(clazz, name) \
+	CL_Signal_v0 &clazz::sig_##name() { \
+		return m_impl->m_sig_##name; \
+	}
+
+#define DEF_SIGNAL_1(name, T1) \
+	public: \
+		CL_Signal_v1<T1> &sig_##name();
+
+#define IMPL_SIGNAL_1(name, T1) \
+	public: \
+		CL_Signal_v1<T1> m_sig_##name;
+
+#define METH_SIGNAL_1(clazz, name, T1) \
+	CL_Signal_v1<T1> &clazz::sig_##name() { \
+		return m_impl->m_sig_##name; \
+	}
+
 #define INVOKE_0(name) \
 		m_sig_##name.invoke()
 

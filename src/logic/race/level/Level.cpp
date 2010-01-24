@@ -452,6 +452,7 @@ void Level::getStartPosAndRot(
 		CL_Pointf *p_pos, CL_Angle *p_rot
 ) const
 {
+	G_ASSERT(m_impl->m_loaded);
 	G_ASSERT(p_num >= 1 && "too low position number");
 	G_ASSERT(p_num <= Limits::MAX_PLAYERS);
 

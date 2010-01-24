@@ -149,7 +149,13 @@ Server::Server(const ServerConfiguration &p_conf) :
 	const CL_String levPath = cl_format("%1/%2", LEVELS_DIR, p_conf.getLevel());
 
 	if (!CL_FileHelp::file_exists(levPath)) {
-		cl_log_event(LOG_ERROR, "level %1 doesn't exists", levPath);
+		cl_log_event(LOG_ERROR, "level %1 doesn't exists, exiting", levPath);
+		exit(1);
+	}
+
+	m_impl->m_level.load(levPath);
+	if (!m_impl->m_level.isLoaded()) {
+		cl_log_event(LOG_ERROR, "level %1 not loaded, exiting", levPath);
 		exit(1);
 	}
 

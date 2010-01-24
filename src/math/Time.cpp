@@ -37,6 +37,8 @@ class TimeImpl
 
 		unsigned m_milis;
 
+		mutable int m_mil;
+
 		mutable int m_centi;
 
 		mutable int m_sec;
@@ -45,6 +47,7 @@ class TimeImpl
 
 		TimeImpl(unsigned p_milis) :
 			m_milis(p_milis),
+			m_mil(-1),
 			m_centi(-1),
 			m_sec(-1),
 			m_min(-1)
@@ -94,6 +97,15 @@ int Time::getSeconds() const
 	return m_impl->m_sec;
 }
 
+int Time::getMillis() const
+{
+	if (m_impl->m_mil == -1) {
+		m_impl->calc();
+	}
+
+	return m_impl->m_mil;
+}
+
 int Time::getMinutes() const
 {
 	if (m_impl->m_min == -1) {
@@ -117,6 +129,8 @@ void TimeImpl::calc() const
 
 	m_sec = m / SECOND;
 	m -= m_sec * SECOND;
+
+	m_mil = m;
 
 	m_centi = m / CENTISECOND;
 }

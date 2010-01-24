@@ -55,6 +55,7 @@ RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) 
 	m_messageBoardLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 	m_lapLabel(CL_Pointf(Stage::getWidth() - 20, 5), "", Label::F_BOLD, 25),
 	m_lapTimesLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
+	m_lapTimesLabelBold(CL_Pointf(), "", Label::F_BOLD, 14),
 	m_carLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 	m_logic(p_logic),
 	m_viewport(p_viewport)
@@ -185,42 +186,86 @@ void RaceUI::drawLapLabel(CL_GraphicContext &p_gc)
 
 void RaceUI::drawLapTimes(CL_GraphicContext &p_gc)
 {
-	static const int TOP_MARGIN = 50;
+	static const int TOP_MARGIN = 70;
 	static const int RIGHT_MARGIN = 100;
-	static const int Y_DELTA = 20;
-
-	// buffer for time formating
-	static const int BUF_SIZE = 16;
-	static char buf[16];
+	static const int Y_DELTA = 16;
 
 	const Race::Car &car = Game::getInstance().getPlayer().getCar();
 	const Race::Progress &pr = m_logic->getProgress();
 	const int lap = pr.getLapNumber(car);
 
-	const int x = Stage::getWidth() - RIGHT_MARGIN;
+	// find best lap
+	unsigned best = 0, nbest = 0;
 
-	int y = TOP_MARGIN;
-	Math::Time time;
-
-	for (int i = 1; i <= lap; ++i) {
-		time = Math::Time(pr.getLapTime(car, i));
-
-		m_lapTimesLabel.setPosition(CL_Pointf(x, y));
-
-		snprintf(
-				buf, BUF_SIZE,
-				"%d. %03d:%02d:%02d",
-				i,
-				time.getMinutes(), time.getSeconds(), time.getCenti()
-		);
-
-		m_lapTimesLabel.setText(buf);
-
-		m_lapTimesLabel.draw(p_gc);
-
-		y += Y_DELTA;
+	for (int i = 1; i < lap; ++i) {
+		if (i == 1) {
+			best = pr.getLapTime(car, i);
+		} else {
+			nbest = pr.getLapTime(car, i);
+			if (nbest < best) {
+				best = nbest;
+			}
+		}
 	}
 
+	// get current lap time
+	unsigned curr = pr.getLapTime(car, lap);
+
+	// display times
+	const int x = Stage::getWidth() - RIGHT_MARGIN;
+	int y = TOP_MARGIN;
+
+	Math::Time tbest(best);
+	Math::Time tcurr(curr);
+
+	CL_Pointf pos(x, y);
+
+	// Lap Time label
+	m_lapTimesLabelBold.setPosition(pos);
+	m_lapTimesLabelBold.setText("Lap Time");
+	m_lapTimesLabelBold.draw(p_gc);
+
+	// Lap Time
+	pos.y += Y_DELTA;
+	m_lapTimesLabel.setPosition(pos);
+	m_lapTimesLabel.setText(formatTime(tcurr));
+	m_lapTimesLabel.draw(p_gc);
+
+	// Best Time label
+	pos.y += Y_DELTA * 2;
+	m_lapTimesLabelBold.setPosition(pos);
+	m_lapTimesLabelBold.setText("Best Time");
+	m_lapTimesLabelBold.draw(p_gc);
+
+	// Best Time
+
+	pos.y += Y_DELTA;
+	m_lapTimesLabel.setPosition(pos);
+
+	if (best != 0) {
+		m_lapTimesLabel.setText(formatTime(tbest));
+	} else {
+		m_lapTimesLabel.setText("--:--:---");
+	}
+
+	m_lapTimesLabel.draw(p_gc);
+
+
+}
+
+CL_String RaceUI::formatTime(const Math::Time &p_time)
+{
+	// buffer for time formating
+	static const int BUF_SIZE = 16;
+	static char buf[16];
+
+	snprintf(
+			buf, BUF_SIZE,
+			"%02d:%02d:%03d",
+			p_time.getMinutes(), p_time.getSeconds(), p_time.getMillis()
+	);
+
+	return buf;
 }
 
 void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
@@ -257,6 +302,7 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 	m_messageBoardLabel.load(p_gc);
 	m_lapLabel.load(p_gc);
 	m_lapTimesLabel.load(p_gc);
+	m_lapTimesLabelBold.load(p_gc);
 	m_carLabel.load(p_gc);
 
 }

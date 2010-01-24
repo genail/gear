@@ -51,6 +51,8 @@ class Time
 
 		int getSeconds() const;
 
+		int getMillis() const;
+
 		int getMinutes() const;
 
 

@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -28,79 +28,36 @@
 
 #pragma once
 
-#include "Label.h"
-#include "gfx/Drawable.h"
-#include "gfx/race/ui/SpeedMeter.h"
-#include "gfx/race/ui/PlayerList.h"
+#include <ClanLib/core.h>
 
-namespace Race {
-	class RaceLogic;
-}
+namespace Math
+{
 
-namespace Gfx {
+class TimeImpl;
 
-class Viewport;
-
-class RaceUI: public Gfx::Drawable {
-
+class Time
+{
 	public:
 
-		explicit RaceUI(const Race::RaceLogic* p_logic, const Gfx::Viewport *p_viewport);
+		Time();
 
-		virtual ~RaceUI();
+		Time(unsigned p_milis);
 
-		virtual void draw(CL_GraphicContext &p_gc);
+		virtual ~Time();
 
-		virtual void load(CL_GraphicContext &p_gc);
+		unsigned get() const;
 
-		SpeedMeter &getSpeedMeter() { return m_speedMeter; }
+		int getCenti() const;
+
+		int getSeconds() const;
+
+		int getMinutes() const;
+
 
 	private:
 
-		/** Speed control widget */
-		SpeedMeter m_speedMeter;
-
-		/** Player list widget */
-		PlayerList m_playerList;
-
-		/** Vote label */
-		Label m_voteLabel;
-
-		/** Message board label */
-		Label m_messageBoardLabel;
-
-		/** Lap count label */
-		Label m_lapLabel;
-
-		/** Lap times label */
-		Label m_lapTimesLabel;
-
-		/** Player names under cars label */
-		Label m_carLabel;
-
-		// Race logic pointer
-		const Race::RaceLogic *m_logic;
-
-		// Viewport pointer
-		const Gfx::Viewport *m_viewport;
-
-
-		// draw routines
-
-		void drawMeters(CL_GraphicContext &p_gc);
-
-		void drawVote(CL_GraphicContext &p_gc);
-
-		void drawMessageBoard(CL_GraphicContext &p_gc);
-
-		void drawLapLabel(CL_GraphicContext &p_gc);
-
-		void drawCarLabels(CL_GraphicContext &p_gc);
-
-		void drawPlayerList(CL_GraphicContext &p_gc);
-
-		void drawLapTimes(CL_GraphicContext &p_gc);
+		CL_SharedPtr<TimeImpl> m_impl;
 };
 
-} // namespace
+}
 

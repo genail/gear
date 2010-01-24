@@ -29,6 +29,7 @@
 #include "RaceUI.h"
 
 #include <map>
+#include <stdio.h>
 
 #include "common/Game.h"
 #include "gfx/Stage.h"
@@ -37,6 +38,7 @@
 #include "logic/race/Car.h"
 #include "logic/race/RaceLogic.h"
 #include "logic/race/Progress.h"
+#include "math/Time.h"
 
 namespace Gfx {
 
@@ -52,11 +54,12 @@ RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) 
 	m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
 	m_messageBoardLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 	m_lapLabel(CL_Pointf(Stage::getWidth() - 20, 5), "", Label::F_BOLD, 25),
+	m_lapTimesLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 	m_carLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 	m_logic(p_logic),
 	m_viewport(p_viewport)
 {
-	m_playerList.setPosition(CL_Pointf(Stage::getWidth() - 150, 100));
+	m_playerList.setPosition(CL_Pointf(Stage::getWidth() - 200, 100));
 	m_lapLabel.setAttachPoint(Label::AP_RIGHT | Label::AP_TOP);
 	m_carLabel.setAttachPoint(Label::AP_CENTER | Label::AP_TOP);
 }
@@ -71,6 +74,7 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 	drawVote(p_gc);
 	drawMessageBoard(p_gc);
 	drawLapLabel(p_gc);
+	drawLapTimes(p_gc);
 	drawCarLabels(p_gc);
 	drawPlayerList(p_gc);
 }
@@ -179,6 +183,46 @@ void RaceUI::drawLapLabel(CL_GraphicContext &p_gc)
 	m_lapLabel.draw(p_gc);
 }
 
+void RaceUI::drawLapTimes(CL_GraphicContext &p_gc)
+{
+	static const int TOP_MARGIN = 50;
+	static const int RIGHT_MARGIN = 100;
+	static const int Y_DELTA = 20;
+
+	// buffer for time formating
+	static const int BUF_SIZE = 16;
+	static char buf[16];
+
+	const Race::Car &car = Game::getInstance().getPlayer().getCar();
+	const Race::Progress &pr = m_logic->getProgress();
+	const int lap = pr.getLapNumber(car);
+
+	const int x = Stage::getWidth() - RIGHT_MARGIN;
+
+	int y = TOP_MARGIN;
+	Math::Time time;
+
+	for (int i = 1; i <= lap; ++i) {
+		time = Math::Time(pr.getLapTime(car, i));
+
+		m_lapTimesLabel.setPosition(CL_Pointf(x, y));
+
+		snprintf(
+				buf, BUF_SIZE,
+				"%d. %03d:%02d:%02d",
+				i,
+				time.getMinutes(), time.getSeconds(), time.getCenti()
+		);
+
+		m_lapTimesLabel.setText(buf);
+
+		m_lapTimesLabel.draw(p_gc);
+
+		y += Y_DELTA;
+	}
+
+}
+
 void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
 {
 	const Race::Level &level = m_logic->getLevel();
@@ -212,6 +256,7 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 	m_voteLabel.load(p_gc);
 	m_messageBoardLabel.load(p_gc);
 	m_lapLabel.load(p_gc);
+	m_lapTimesLabel.load(p_gc);
 	m_carLabel.load(p_gc);
 
 }

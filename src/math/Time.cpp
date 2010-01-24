@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -26,81 +26,99 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Time.h"
 
-#include "Label.h"
-#include "gfx/Drawable.h"
-#include "gfx/race/ui/SpeedMeter.h"
-#include "gfx/race/ui/PlayerList.h"
+namespace Math
+{
 
-namespace Race {
-	class RaceLogic;
-}
-
-namespace Gfx {
-
-class Viewport;
-
-class RaceUI: public Gfx::Drawable {
-
+class TimeImpl
+{
 	public:
 
-		explicit RaceUI(const Race::RaceLogic* p_logic, const Gfx::Viewport *p_viewport);
+		unsigned m_milis;
 
-		virtual ~RaceUI();
+		mutable int m_centi;
 
-		virtual void draw(CL_GraphicContext &p_gc);
+		mutable int m_sec;
 
-		virtual void load(CL_GraphicContext &p_gc);
+		mutable int m_min;
 
-		SpeedMeter &getSpeedMeter() { return m_speedMeter; }
-
-	private:
-
-		/** Speed control widget */
-		SpeedMeter m_speedMeter;
-
-		/** Player list widget */
-		PlayerList m_playerList;
-
-		/** Vote label */
-		Label m_voteLabel;
-
-		/** Message board label */
-		Label m_messageBoardLabel;
-
-		/** Lap count label */
-		Label m_lapLabel;
-
-		/** Lap times label */
-		Label m_lapTimesLabel;
-
-		/** Player names under cars label */
-		Label m_carLabel;
-
-		// Race logic pointer
-		const Race::RaceLogic *m_logic;
-
-		// Viewport pointer
-		const Gfx::Viewport *m_viewport;
+		TimeImpl(unsigned p_milis) :
+			m_milis(p_milis),
+			m_centi(-1),
+			m_sec(-1),
+			m_min(-1)
+		{ /* empty */ }
 
 
-		// draw routines
-
-		void drawMeters(CL_GraphicContext &p_gc);
-
-		void drawVote(CL_GraphicContext &p_gc);
-
-		void drawMessageBoard(CL_GraphicContext &p_gc);
-
-		void drawLapLabel(CL_GraphicContext &p_gc);
-
-		void drawCarLabels(CL_GraphicContext &p_gc);
-
-		void drawPlayerList(CL_GraphicContext &p_gc);
-
-		void drawLapTimes(CL_GraphicContext &p_gc);
+		void calc() const;
 };
 
-} // namespace
+Time::Time() :
+	m_impl(new TimeImpl(0))
+{
+	// empty
+}
 
+Time::Time(unsigned p_milis) :
+	m_impl(new TimeImpl(p_milis))
+{
+	// empty
+}
+
+Time::~Time()
+{
+	// empty
+}
+
+unsigned Time::get() const
+{
+	return m_impl->m_milis;
+}
+
+int Time::getCenti() const
+{
+	if (m_impl->m_centi == -1) {
+		m_impl->calc();
+	}
+
+	return m_impl->m_centi;
+}
+
+int Time::getSeconds() const
+{
+	if (m_impl->m_sec == -1) {
+		m_impl->calc();
+	}
+
+	return m_impl->m_sec;
+}
+
+int Time::getMinutes() const
+{
+	if (m_impl->m_min == -1) {
+		m_impl->calc();
+	}
+
+	return m_impl->m_min;
+}
+
+void TimeImpl::calc() const
+{
+	static const unsigned MILLISECOND = 1;
+	static const unsigned CENTISECOND = MILLISECOND * 10;
+	static const unsigned SECOND = CENTISECOND * 100;
+	static const unsigned MINUTE = SECOND * 60;
+
+	unsigned m = m_milis;
+
+	m_min = m / MINUTE;
+	m -= m_min * MINUTE;
+
+	m_sec = m / SECOND;
+	m -= m_sec * SECOND;
+
+	m_centi = m / CENTISECOND;
+}
+
+}

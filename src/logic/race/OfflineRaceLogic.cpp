@@ -54,6 +54,7 @@ void OfflineRaceLogic::initialize()
 	// init progress object
 	Progress &prog = getProgress();
 	prog.initialize();
+	prog.resetClock();
 
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();

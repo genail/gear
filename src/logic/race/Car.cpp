@@ -505,7 +505,13 @@ void Car::setPosition(const CL_Pointf &p_position)
 
 void Car::setRotation(float p_rotation)
 {
-	m_rotation.set_degrees(p_rotation);
+	setAngle(CL_Angle::from_degrees(p_rotation));
+}
+
+void Car::setAngle(const CL_Angle &p_angle)
+{
+	m_rotation = p_angle;
+	m_phyMoveRot = m_rotation;
 }
 
 void Car::setHandbrake(bool p_handbrake)
@@ -533,6 +539,11 @@ float Car::limit(float p_value, float p_from, float p_to) const
 void Car::setLocked(bool p_locked)
 {
 	m_inputLocked = p_locked;
+
+	// stop the car
+	if (p_locked) {
+		m_phyMoveVec.x = m_phyMoveVec.y = 0.0f;
+	}
 }
 
 CL_Angle Car::vecToAngle(const CL_Vec2f &p_vec)

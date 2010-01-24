@@ -106,7 +106,16 @@ class Car
 
 		void setPosition(const CL_Pointf &p_position);
 
-		void setRotation(float p_rotation);
+		/** @depretated, use setAngle() instead */
+		DEPRECATED(void setRotation(float p_rotation));
+
+		/**
+		 * Sets the car angle. It should be counter clockwise
+		 * oriented starting from positive X axis.
+		 *
+		 * @param p_angle Angle to set.
+		 */
+		void setAngle(const CL_Angle &p_angle);
 		
 		void setHandbrake(bool p_handbrake);
 

@@ -236,13 +236,12 @@ void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
 
 void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle &p_carRotation)
 {
-	cl_log_event(LOG_RACE, "Race is starting");
+	cl_log_event(LOG_RACE, "race is starting");
 
 	Car &car = Game::getInstance().getPlayer().getCar();
 
 	car.setPosition(p_carPosition);
-	car.setRotation(p_carRotation.to_degrees() - 90); // FIXME: Remove -90 when #16 is resolved
-	car.setLap(1);
+	car.setRotation(p_carRotation.to_degrees());
 
 	car.setLocked(true);
 

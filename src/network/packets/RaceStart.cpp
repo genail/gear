@@ -63,7 +63,7 @@ void RaceStart::parseEvent(const CL_NetGameEvent &p_event)
 	m_carPosition.x = static_cast<float> (p_event.get_argument(i++));
 	m_carPosition.y = static_cast<float> (p_event.get_argument(i++));
 
-	m_carRotation.from_radians(static_cast<float> (p_event.get_argument(i++)));
+	m_carRotation.set_radians(static_cast<float> (p_event.get_argument(i++)));
 }
 
 const CL_Pointf &RaceStart::getCarPosition() const

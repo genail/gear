@@ -513,7 +513,6 @@ void ServerImpl::sendToAll(
 void ServerImpl::startRace()
 {
 	RaceStart raceStart;
-
 	TConnectionPlayerPair pair;
 
 	int i = 1;
@@ -521,6 +520,7 @@ void ServerImpl::startRace()
 	CL_Angle rot;
 
 	foreach (pair, m_connections) {
+
 		m_level.getStartPosAndRot(i, &pos, &rot);
 		raceStart.setCarPosition(pos);
 		raceStart.setCarRotation(rot);
@@ -529,8 +529,6 @@ void ServerImpl::startRace()
 
 		++i;
 	}
-
-	sendToAll(raceStart.buildEvent());
 }
 
 } // namespace

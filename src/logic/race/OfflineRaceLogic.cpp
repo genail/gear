@@ -30,6 +30,7 @@
 
 #include "common.h"
 #include "common/Game.h"
+#include "logic/race/Progress.h"
 
 namespace Race {
 
@@ -45,18 +46,35 @@ OfflineRaceLogic::~OfflineRaceLogic()
 
 void OfflineRaceLogic::initialize()
 {
-	m_level.initialize(m_levelName);
+	Level &level = getLevel();
+
+	level.initialize();
+	level.load(m_levelName);
+
+	// init progress object
+	Progress &prog = getProgress();
+	prog.initialize();
+	prog.resetClock();
 
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 
-	m_playerMap[player.getName()] = &player;
-	m_level.addCar(&player.getCar());
+	addPlayer(player);
+	level.addCar(&player.getCar());
+
+	CL_Pointf carPos;
+	CL_Angle carRot;
+	level.getStartPosAndRot(1, &carPos, &carRot);
+
+	player.getCar().setPosition(carPos);
+	player.getCar().setRotation(carRot.to_degrees());
+
 }
 
 void OfflineRaceLogic::destroy()
 {
-	m_level.destroy();
+	getProgress().destroy();
+	getLevel().destroy();
 }
 
 }

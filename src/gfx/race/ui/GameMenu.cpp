@@ -40,23 +40,30 @@ const int MARGIN = 20;
 const int BUTTON_HEIGHT = 30;
 const int BUTTON_SPACE = 15;
 
-GameMenu::GameMenu(CL_GUIComponent *p_parent) :
-	CL_GUIComponent(p_parent),
-	m_bg(CL_Sizef(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_ROUNDNESS),
-	m_callVoteButton(this),
-	m_exitButton(this)
-{
-	set_geometry(
+GameMenu::GameMenu(DirectScene &p_scene) :
+	Overlay(
+			p_scene,
 			CL_Rect(
 					(int) (Stage::getWidth()  / 2 - WINDOW_WIDTH  / 2),
 					(int) (Stage::getHeight() / 2 - WINDOW_HEIGHT / 2),
 					(int) (Stage::getWidth()  / 2 + WINDOW_WIDTH  / 2),
 					(int) (Stage::getHeight() / 2 + WINDOW_HEIGHT / 2)
-					)
-			);
+			)
+	),
+	m_bg(CL_Sizef(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_ROUNDNESS),
+	m_callVoteButton(this),
+	m_exitButton(this)
+{
+	setVisible(false);
+}
 
-	set_visible(false);
+GameMenu::~GameMenu()
+{
+	// empty
+}
 
+void GameMenu::load(CL_GraphicContext &p_gc)
+{
 	int y = MARGIN;
 
 	m_callVoteButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
@@ -66,22 +73,14 @@ GameMenu::GameMenu(CL_GUIComponent *p_parent) :
 
 	m_exitButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
 	m_exitButton.set_text(_("Exit race"));
-
-	func_render().set(this, &GameMenu::render);
-
 }
 
-GameMenu::~GameMenu()
+void GameMenu::draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
 {
-}
+	static const CL_Colorf FILL_COLOR(1.0f, 1.0f, 1.0f, 0.8f);
+	static const CL_Pointf ZERO_POINT(0, 0);
 
-void GameMenu::render(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect)
-{
-//	CL_RoundedRect rr(CL_Sizef(200, 200), 20);
-	m_bg.fill(p_gc, CL_Pointf(0, 0), CL_Colorf(1.0f, 1.0f, 1.0f, 0.8f));
-
-//	m_callVoteButton.render(p_gc, p_clipRect);
-//	m_exitButton.render(p_gc, p_clipRect);
+	m_bg.fill(p_gc, ZERO_POINT, FILL_COLOR);
 }
 
 CL_Callback_v0 &GameMenu::func_exit_clicked()

@@ -28,8 +28,6 @@
 
 #include "ScoreTable.h"
 
-#include <assert.h>
-
 #include "common.h"
 #include "common/Player.h"
 
@@ -68,7 +66,7 @@ int ScoreTable::getEntriesCount() const
 
 const ScoreTable::Entry &ScoreTable::getEntry(size_t index) const
 {
-	assert(index >= 0 && index < m_entries.size());
+	G_ASSERT(index < m_entries.size());
 
 	size_t i = 0;
 	foreach (const Entry &entry, m_entries) {

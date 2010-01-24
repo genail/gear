@@ -28,40 +28,41 @@
 
 #pragma once
 
-#include <boost/utility.hpp>
+#include <vector>
+
 #include <ClanLib/core.h>
 
-namespace Race {
+namespace Race
+{
 
-class Track;
+class TrackSegmentImpl;
 
-class Checkpoint : public boost::noncopyable {
+class TrackSegment
+{
 
 	public:
 
-		Checkpoint(int p_id, const CL_Pointf &p_position);
+		TrackSegment(
+				const std::vector<CL_Pointf> &p_triPoints,
+				const std::vector<CL_Pointf> &p_midPoints
+		);
 
-		virtual ~Checkpoint();
+		virtual ~TrackSegment();
 
 
-		int getId() const;
+		/** @return bounding rectangle (reverse y) */
+		const CL_Rectf &getBounds() const;
 
-		const CL_Pointf &getPosition() const;
+		/** @return Middle track points from what track was constructed. */
+		const std::vector<CL_Pointf> &getMidPoints() const;
 
-		float getProgress() const;
+		const std::vector<CL_Pointf> &getTrianglePoints() const;
+
 
 	private:
 
-		/** Id of checkpoint. Starts with 1. */
-		int m_id;
-
-		/** Real checkpoint position */
-		CL_Pointf m_position;
-
-		/** Track's progress. 0.0 is start position, 1.0 finish line. */
-		float m_progress;
-
-		friend class Race::Track;
+		CL_SharedPtr<TrackSegmentImpl> m_impl;
 };
 
-} // namespace
+}
+

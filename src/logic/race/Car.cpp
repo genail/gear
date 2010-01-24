@@ -35,9 +35,9 @@
 #include "gfx/Stage.h"
 #include "gfx/DebugLayer.h"
 #include "logic/race/Car.h"
-#include "logic/race/Level.h"
-#include "logic/race/Checkpoint.h"
-#include "logic/race/Bound.h"
+#include "logic/race/level/Level.h"
+#include "logic/race/level/Checkpoint.h"
+#include "logic/race/level/Bound.h"
 #include "network/packets/CarState.h"
 
 namespace Race {
@@ -48,10 +48,8 @@ const int CAR_WIDTH = 18;
 /* Car height in pixels */
 const int CAR_HEIGHT = 24;
 
-Car::Car(const Player *p_owner) :
-	m_owner(p_owner),
+Car::Car() :
 	m_level(NULL),
-	m_lap(0),
 	m_timeFromLastUpdate(0),
 	m_position(300.0f, 300.0f),
 	m_rotation(0, cl_degrees),
@@ -63,9 +61,7 @@ Car::Car(const Player *p_owner) :
 	m_inputLocked(false),
 	m_inputChanged(false),
 	m_phySpeedDelta(0.0f),
-	m_phyWheelsTurn(0.0f),
-	m_greatestCheckpointId(0),
-	m_currentCheckpoint(NULL)
+	m_phyWheelsTurn(0.0f)
 {
 #ifndef SERVER
 	// build car contour for collision check
@@ -142,20 +138,21 @@ void Car::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad)
 
 void Car::update1_60() {
 	
-	static const float BRAKE_POWER = 0.05f;
-	static const float ACCEL_POWER = 0.07f;
+	static const float BRAKE_POWER = 0.1f;
+	static const float ACCEL_POWER = 0.14f;
 	static const float WHEEL_TURN_SPEED = 1.0f / 10.0f;
 	static const float TURN_POWER  = (2 * CL_PI / 360.0f) * 2.5f;
 	static const float MOV_ALIGN_POWER = TURN_POWER / 2.0f;
 	static const float ROT_ALIGN_POWER = TURN_POWER * 0.7f;
-	static const float AIR_RESITANCE = 0.005f; // per one speed unit
+	static const float AIR_RESITANCE = 0.01f; // per one speed unit
+	static const float DRIFT_SPEED_REDUCTION_RATE = 0.1f;
 
 	// speed limit under what physics angle reduction will be more aggressive
-	static const float LOWER_SPEED_ANGLE_REDUCTION = 3.0f;
+	static const float LOWER_SPEED_ANGLE_REDUCTION = 6.0f;
 	// speed limit under what angle difference will be lower than normal
-	static const float LOWER_SPEED_ROTATION_REDUCTION = 3.0f;
+	static const float LOWER_SPEED_ROTATION_REDUCTION = 6.0f;
 	// speed limit under what turn power will decrease
-	static const float LOWER_SPEED_TURN_REDUCTION = 1.0f;
+	static const float LOWER_SPEED_TURN_REDUCTION = 2.0f;
 
 	// don't do anything if car is locked
 	if (m_inputLocked) {
@@ -240,9 +237,9 @@ void Car::update1_60() {
 		CL_Angle diffAngleNorm = diffAngle;
 		normalizeAngle180(diffAngleNorm);
 
-		// 0.0 when goin straight, 1.0 when 90 deg, > 1.0 when more than 90 deg
+		// 0.0 when going straight, 1.0 when 90 deg, > 1.0 when more than 90 deg
 		const float angleRate = fabs(1.0f - (fabs(diffAngleNorm.to_degrees()) - 90.0f) / 90.0f);
-		const float speedReduction = -0.05f * angleRate;
+		const float speedReduction = -DRIFT_SPEED_REDUCTION_RATE * angleRate;
 
 		if (absSpeed > speedReduction) {
 			m_speed += m_speed > 0.0f ? speedReduction : -speedReduction;
@@ -385,27 +382,6 @@ void Car::applyCarState(const Net::CarState &p_carState)
 	m_inputBrake = p_carState.getAcceleration() < 0.0f;
 }
 
-void Car::setStartPosition(int p_startPosition) {
-	if (m_level != NULL) {
-		m_position = m_level->getStartPosition(p_startPosition);
-	} else {
-		cl_log_event("warning", "Car not on Level.");
-		m_position = CL_Pointf(300, 300);
-	}
-
-	// stop the car!
-	m_rotation = CL_Angle::from_degrees(-90);
-	m_inputTurn = 0;
-	m_inputAccel = false;
-	m_inputBrake = false;
-	m_phyMoveVec = CL_Vec2f();
-	m_speed = 0.0f;
-	m_lap = 1;
-
-	// send the status change to other players
-	INVOKE_1(inputChanged, *this);
-}
-
 bool Car::isDrifting() const {
 	static const float DRIFT_LIMIT = 6.0f;
 	static const float ACCEL_LIMIT = 0.05f;
@@ -421,50 +397,9 @@ bool Car::isDrifting() const {
 	return false;
 }
 
-void Car::updateCurrentCheckpoint(const Checkpoint *p_checkpoint)
-{
-	if (p_checkpoint != NULL) {
-		// check if lap is reached
-		if (
-				p_checkpoint->getProgress() == 0.0f &&
-				m_currentCheckpoint->getProgress() == 1.0f &&
-				m_greatestCheckpointId == m_currentCheckpoint->getId()
-		) {
-			++m_lap;
-			cl_log_event("race", "Going for lap %1", m_lap);
-			m_greatestCheckpointId = 0;
-		}
-
-		const int id = p_checkpoint->getId();
-
-		if (id == m_greatestCheckpointId + 1) {
-			++m_greatestCheckpointId;
-		}
-	} else {
-		m_greatestCheckpointId = 0;
-	}
-
-	m_currentCheckpoint = p_checkpoint;
-}
-
 bool Car::isLocked() const
 {
 	return m_inputLocked;
-}
-
-const Checkpoint *Car::getCurrentCheckpoint() const
-{
-	return m_currentCheckpoint;
-}
-
-int Car::getLap() const
-{
-	return m_lap;
-}
-
-const Player *Car::getOwner() const
-{
-	return m_owner;
 }
 
 const CL_Pointf& Car::getPosition() const
@@ -489,14 +424,19 @@ float Car::getSpeed() const
 
 float Car::getSpeedKMS() const
 {
-	// m_speed - pixels per iteration
-	// 4 - length of avarage car in meters
-	// 50 - length of avarage car in pixels
-	// 60 - one second
-	// 60 * 60 - one minute
-	// 60 * 60 * 60 - one hour
-	// / 1000 - to kmh
-	return m_speed * (4 / 50.0f) * 60 * 60 * 60 / 1000;
+//	// m_speed - pixels per iteration
+//	// 4 - length of avarage car in meters
+//	// 25 - length of avarage car in pixels
+//	// 60 - one second
+//	// 60 * 60 - one minute
+//	// 60 * 60 * 60 - one hour
+//	// / 1000 - to kmh
+//	return m_speed * (4 / 25.0f) * 60 * 60 * 60 / 1000;
+
+	const float m_f =  m_speed / 15.0; // m / frame
+	const float m_s = m_f * 60.0f; // m / s
+	const float m_h = m_s * 3600.0; // m / h
+	return m_h / 1000.0; // km / h
 }
 
 void Car::setAcceleration(bool p_value)
@@ -517,11 +457,6 @@ void Car::setBrake(bool p_value)
 	m_inputBrake = p_value;
 }
 
-void Car::setLap(int p_lap)
-{
-	m_lap = p_lap;
-}
-
 void Car::setTurn(float p_value)
 {
 	if (fabs(p_value - m_inputTurn) > 0.1f) {
@@ -538,7 +473,13 @@ void Car::setPosition(const CL_Pointf &p_position)
 
 void Car::setRotation(float p_rotation)
 {
-	m_rotation.set_degrees(p_rotation);
+	setAngle(CL_Angle::from_degrees(p_rotation));
+}
+
+void Car::setAngle(const CL_Angle &p_angle)
+{
+	m_rotation = p_angle;
+	m_phyMoveRot = m_rotation;
 }
 
 void Car::setHandbrake(bool p_handbrake)
@@ -566,6 +507,11 @@ float Car::limit(float p_value, float p_from, float p_to) const
 void Car::setLocked(bool p_locked)
 {
 	m_inputLocked = p_locked;
+
+	// stop the car
+	if (p_locked) {
+		m_phyMoveVec.x = m_phyMoveVec.y = 0.0f;
+	}
 }
 
 CL_Angle Car::vecToAngle(const CL_Vec2f &p_vec)
@@ -597,6 +543,11 @@ void Car::normalizeAngle180(CL_Angle &p_angle)
 {
 	normalizeAngle(p_angle);
 	p_angle.normalize_180();
+}
+
+bool Car::operator==(const Car &p_other) const
+{
+	return this == &p_other;
 }
 
 } // namespace

@@ -45,10 +45,20 @@ GameWindow::GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_wi
 	m_lastLogicUpdateTime(0),
 	m_lastScene(NULL)
 {
+	// connect keyboard
 	CL_InputDevice &keyboard = m_ic->get_keyboard();
 
-	m_slotContainer.connect(keyboard.sig_key_down(), this, &GameWindow::onKeyDown);
-	m_slotContainer.connect(keyboard.sig_key_up(), this, &GameWindow::onKeyUp);
+	m_slots.connect(keyboard.sig_key_down(), this, &GameWindow::onKeyDown);
+	m_slots.connect(keyboard.sig_key_up(), this, &GameWindow::onKeyUp);
+
+	// connect mouse buttons
+	CL_InputDevice &mouse = m_ic->get_mouse();
+
+	m_slots.connect(mouse.sig_key_down(), this, &GameWindow::onKeyDown);
+	m_slots.connect(mouse.sig_key_up(), this, &GameWindow::onKeyUp);
+
+	// connect mouse movement
+	m_slots.connect(mouse.sig_pointer_move(), this, &GameWindow::onMouseMove);
 }
 
 GameWindow::~GameWindow()
@@ -157,9 +167,30 @@ void GameWindow::renderScene(CL_GraphicContext &p_gc, Scene *p_scene)
 	}
 }
 
-void GameWindow::onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state)
+void GameWindow::onKeyDown(
+		const CL_InputEvent &p_event,
+		const CL_InputState &p_state
+)
 {
-	m_events.push_back(p_event);
+	Scene *scene = Gfx::Stage::peekScene();
+
+	switch (p_event.id) {
+		case CL_MOUSE_WHEEL_UP:
+			if (scene != NULL) {
+				scene->mouseScrolled(true);
+			}
+			break;
+
+		case CL_MOUSE_WHEEL_DOWN:
+			if(scene != NULL) {
+				scene->mouseScrolled(false);
+			}
+			break;
+
+		default:
+			m_events.push_back(p_event);
+
+	}
 
 	// uncoment when repeat_count fixed
 //	Scene *scene = Gfx::Stage::peekScene();
@@ -179,6 +210,15 @@ void GameWindow::onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_st
 //	if (scene != NULL) {
 //		scene->inputReleased(p_event);
 //	}
+}
+
+void GameWindow::onMouseMove(const CL_InputEvent &p_event, const CL_InputState &p_state)
+{
+	Scene *scene = Gfx::Stage::peekScene();
+
+	if (scene != NULL) {
+		scene->mouseMoved(p_event.mouse_pos);
+	}
 }
 
 void GameWindow::dispatchEvents()

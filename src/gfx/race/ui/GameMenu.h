@@ -32,15 +32,23 @@
 #include <ClanLib/gui.h>
 #include <ClanLib/display.h>
 
+#include "gfx/Overlay.h"
+
 namespace Gfx {
 
-class GameMenu : public CL_GUIComponent {
+class GameMenu : public Overlay {
 
 	public:
 
-		GameMenu(CL_GUIComponent *p_parent);
+		GameMenu(DirectScene &p_scene);
 
 		virtual ~GameMenu();
+
+
+		virtual void load(CL_GraphicContext &p_gc);
+
+		virtual void draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip);
+
 
 		// callbacks
 
@@ -56,9 +64,6 @@ class GameMenu : public CL_GUIComponent {
 		CL_PushButton m_callVoteButton;
 
 		CL_PushButton m_exitButton;
-
-
-		void render(CL_GraphicContext &p_gc, const CL_Rect &p_clipRect);
 };
 
 }

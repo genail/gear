@@ -28,35 +28,41 @@
 
 #pragma once
 
-#include <map>
-#include "boost/utility.hpp"
+#include <ClanLib/core.h>
 
 #include "Easing.h"
 
+//#include "boost/utility.hpp"
+
 namespace Math {
 
-class Float : public boost::noncopyable {
+class Easing;
 
-		struct Animation {
-				float m_from, m_to;
-				unsigned m_startTime, m_endTime;
-				unsigned m_duration;
-				Easing m_easing;
-		};
+class FloatImpl;
+
+class Float {
 
 	public:
+
+		static bool cmp(float p_a, float p_b, float p_precision);
+
 
 		Float();
 
 		virtual ~Float();
 
 
-		float get() const { return m_value; }
-
-		void set(float p_value) { m_value = p_value; }
+		float get() const;
 
 
-		void animate(float p_startValue, float p_endValue, unsigned p_duration, Easing p_easing = E_NONE, unsigned p_delay = 0);
+		void animate(
+				float p_startValue, float p_endValue,
+				unsigned p_duration,
+				const Easing &p_easing = Easing::NONE,
+				unsigned p_delay = 0
+		);
+
+		void set(float p_value);
 
 		/**
 		 * Changes the object state by next <code>p_timeElapsed</code> time.
@@ -64,27 +70,13 @@ class Float : public boost::noncopyable {
 		 * In other words it pushes the calculations forward by specified
 		 * amount of time.
 		 *
-		 * @param p_timeElapsed Time in miliseconds.
+		 * @param p_timeElapsed Time in milliseconds.
 		 */
 		void update(unsigned p_timeElapsed);
 
 	private:
 
-		/** Current value container */
-		float m_value;
-
-		/** Time registered from the begining */
-		size_t m_timeFromStart;
-
-		/** Animations to do in time. Key is the start time. */
-		typedef std::map<size_t, Animation*> TAnimationMap;
-
-		TAnimationMap m_animationMap;
-
-		/** Currently running animation */
-		Animation *m_currentAnimation;
-
-		void setCurrentAnimation(Animation *p_animation);
+		CL_SharedPtr<FloatImpl> m_impl;
 
 };
 

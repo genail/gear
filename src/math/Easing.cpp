@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009, Piotr Korzuszek, Interactive Pulp, LLC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,24 +28,101 @@
 
 #include "Easing.h"
 
-#include <iostream>
-#include <assert.h>
+#include <math.h>
+
+#include <ClanLib/core.h>
 
 namespace Math {
 
-inline float easingCalculateNone(float p_from, float p_to, Easing p_easing, float p_progress)
+const Easing Easing::NONE(Easing::T_IN, Easing::F_LINEAR);
+
+const Easing Easing::REGULAR_IN(Easing::T_IN, Easing::F_QUADRADIC);
+const Easing Easing::REGULAR_OUT(Easing::T_OUT, Easing::F_QUADRADIC);
+const Easing Easing::REGULAR_IN_OUT(Easing::T_IN_OUT, Easing::F_QUADRADIC);
+
+Easing::Easing(Type p_type, Function p_function) :
+	m_type(p_type),
+	m_function(p_function)
 {
-	return p_from + ((p_to - p_from) * p_progress);
+	// empty
 }
 
-float easingCalculate(float p_from, float p_to, Easing p_easing, float p_progress)
+float Easing::ease(float p_from, float p_to, float p_progress) const
 {
-	switch (p_easing) {
-		case E_NONE:
-			return easingCalculateNone(p_from, p_to, p_easing, p_progress);
+	if (p_progress <= 0.0f) {
+		return p_from;
+	}
+
+	if (p_progress >= 1.0f) {
+		return p_to;
+	}
+
+	float easedT;
+
+	switch (m_type) {
+		case T_IN:
+			easedT = ease(p_progress);
 			break;
+
+		case T_OUT:
+			easedT = 1.0f - ease(1.0f - p_progress);
+			break;
+
+		case T_IN_OUT:
+			if (p_progress < 0.5f) {
+				easedT = ease(2 * p_progress) / 2.0f;
+			} else {
+				easedT = 1.0f - ease(2.0f - 2.0f * p_progress) / 2.0f;
+			}
+
+			break;
+
 		default:
-			assert(0 && "Easing not implemented yet");
+			G_ASSERT(0 && "unknown Type");
+	}
+
+	return p_from + ((p_to - p_from) * easedT);
+}
+
+float Easing::ease(float p_t) const
+{
+	float t2, t3;
+	float scale, wave;
+
+	switch (m_function) {
+		case F_LINEAR:
+			return p_t;
+
+		case F_QUADRADIC:
+			return p_t * p_t;
+
+		case F_CUBIC:
+			return p_t * p_t * p_t;
+
+		case F_QUARTIC:
+			t2 = p_t * p_t;
+			return t2 * t2;
+
+		case F_QUINTIC:
+			t2 = p_t * p_t;
+			return t2 * t2 * p_t;
+
+		case F_BACK:
+			t2 = p_t * p_t;
+			t3 = t2 * p_t;
+			return t3 + t2 - p_t;
+
+		case F_ELASTIC:
+			t2 = p_t * p_t;
+			t3 = t2 * p_t;
+
+			scale = t2 * (2.0f * t3 + t2 - 4.0f * p_t + 2.0f);
+			wave = static_cast<float>(-sin(p_t * 3.5f * CL_PI));
+
+			return scale * wave;
+
+		default:
+			G_ASSERT(0 && "unknown Function");
 	}
 }
 

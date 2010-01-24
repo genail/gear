@@ -1,0 +1,59 @@
+<level format="1.0">
+    <meta>
+        <author>Piotr Korzuszek</author>
+        <email>piotr.korzuszek@gmail.com</email>
+        <home>http://graniec.pl/trac/</home>
+    
+        <name>Demo Level</name>
+        <version>2.0</version>
+        
+    </meta>
+    
+    <content>
+        <!-- Define how track leads to -->
+        <track>
+            <!-- Coordinates are given in meters -->
+            <point x="0.0" y="0.0" radius="8.0" shift="0.0" />
+            <point x="200.0" y="0.0" radius="8.0" shift="-1.0" />
+            <point x="200.0" y="20.0" radius="8.0" shift="0.0" />
+            <point x="150.0" y="40.0" radius="8.0" shift="0.0" />
+            <point x="120.0" y="80.0" radius="5.0" shift="1.0" />
+            <point x="160.0" y="60.0" radius="6.0" shift="-1.0" />
+            <point x="165.0" y="65.0" radius="7.0" shift="-1.0" />
+            <point x="120.0" y="120.0" radius="5.0" shift="0.0" />
+            <point x="100.0" y="100.0" radius="5.0" shift="0.0" />
+            <point x="0.0" y="100.0" radius="7.0" shift="0.0" />
+        </track>
+        
+        <bounds>
+            <!--generate style="thick" /-->
+            <!-- inner -->
+            <bound x1="3.0" y1="2.0" x2="4.0" y2="2.0" />
+            <bound x1="4.0" y1="2.0" x2="4.0" y2="5.0" />
+            <bound x1="4.0" y1="5.0" x2="8.0" y2="5.0" />
+            <bound x1="8.0" y1="5.0" x2="8.0" y2="6.0" />
+            <bound x1="8.0" y1="6.0" x2="5.0" y2="6.0" />
+            <bound x1="5.0" y1="6.0" x2="5.0" y2="8.0" />
+            <bound x1="5.0" y1="8.0" x2="2.0" y2="8.0" />
+            <bound x1="2.0" y1="8.0" x2="2.0" y2="3.0" />
+            <bound x1="2.0" y1="3.0" x2="3.0" y2="2.0" />
+            
+            <!-- outer -->
+            <bound x1="1.0" y1="1.0" x2="5.0" y2="1.0" />
+            <bound x1="5.0" y1="1.0" x2="5.0" y2="4.0" />
+            <bound x1="5.0" y1="4.0" x2="9.0" y2="4.0" />
+            <bound x1="9.0" y1="4.0" x2="9.0" y2="7.0" />
+            <bound x1="9.0" y1="7.0" x2="6.0" y2="7.0" />
+            <bound x1="6.0" y1="7.0" x2="6.0" y2="9.0" />
+            <bound x1="6.0" y1="9.0" x2="1.0" y2="9.0" />
+            <bound x1="1.0" y1="9.0" x2="1.0" y2="1.0" />
+        </bounds>
+        
+        <sand>
+            <group>
+                <circle x="1.1" y="1.1" radius="0.1" />
+                <circle x="1.3" y="1.3" radius="0.2" />
+            </group>
+        </sand>
+    </content>
+</level>

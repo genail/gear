@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009, Piotr Korzuszek, Interactive Pulp, LLC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,52 @@
 
 #pragma once
 
-namespace Math {
-	enum Easing {
-		E_NONE
-	};
+#include "common.h"
 
-	float easingCalculate(float p_from, float p_to, Easing p_easing, float p_progress);
-}
+namespace Math
+{
+
+class Easing : public boost::noncopyable
+{
+	public:
+
+		static const Easing NONE;
+
+		static const Easing REGULAR_IN;
+		static const Easing REGULAR_OUT;
+		static const Easing REGULAR_IN_OUT;
+
+
+		float ease(float p_from, float p_to, float p_progress) const;
+
+	private:
+
+		enum Type {
+			T_IN,
+			T_OUT,
+			T_IN_OUT
+		};
+
+		enum Function {
+			F_LINEAR,
+			F_QUADRADIC,
+			F_CUBIC,
+			F_QUARTIC,
+			F_QUINTIC,
+			F_BACK,
+			F_ELASTIC
+		};
+
+
+		Type m_type;
+
+		Function m_function;
+
+
+		Easing(Type p_type, Function p_function);
+
+		float ease(float p_t) const;
+
+};
+
+} // namespace

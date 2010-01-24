@@ -28,50 +28,32 @@
 
 #pragma once
 
-#include <vector>
 #include <ClanLib/core.h>
 
 namespace Race {
 
-class Checkpoint;
+class CheckpointImpl;
 
-class Track {
+class Checkpoint {
 
 	public:
 
-		Track();
+		Checkpoint();
 
-		virtual ~Track();
+		Checkpoint(int p_idx, const CL_Pointf &p_pos);
 
-
-		void addCheckpointAtPosition(const CL_Pointf &p_position);
-
-		unsigned getCheckpointCount() const;
-
-		const Checkpoint *getCheckpoint(unsigned p_index) const;
-
-		const Checkpoint *getFirst() const;
-
-		void clear();
-
-		/** Closes the track.  */
-		void close();
+		virtual ~Checkpoint();
 
 
-		const Checkpoint *check(const CL_Pointf &p_position, const Checkpoint *p_lastCheckPoint, bool *p_movingForward, bool *p_newLap) const;
+		// getters
+
+		int getIndex() const;
+
+		const CL_Pointf &getPosition() const;
 
 	private:
 
-		/** Registered checkpoints */
-		typedef std::vector<Checkpoint*> TCheckpointVector;
-		TCheckpointVector m_checkpoints;
-
-		/** Closed track cannot get new checkpoints */
-		bool m_closed;
-
-		void getPrevAndNext(const Checkpoint *p_current, Checkpoint **p_before, Checkpoint **p_after) const;
-
+		CL_SharedPtr<CheckpointImpl> m_impl;
 };
 
-}
-
+} // namespace

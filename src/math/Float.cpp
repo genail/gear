@@ -28,16 +28,61 @@
 
 #include "Float.h"
 
-#include <assert.h>
+#include <map>
+#include <math.h>
 
 #include "common.h"
+#include "Easing.h"
 
 namespace Math {
 
+bool Float::cmp(float p_a, float p_b, float p_precision)
+{
+	return fabs(p_a - p_b) <= p_precision;
+}
+
+class Animation {
+
+	public:
+
+		float m_from, m_to;
+
+		unsigned m_stime, m_etime;
+
+		unsigned m_dur;
+
+		const Easing *m_easing;
+};
+
+class FloatImpl
+{
+	public:
+
+		FloatImpl() :
+			m_value(0.0f),
+			m_timeFromStart(0),
+			m_currAnim(NULL)
+		{}
+
+		/** Current value container */
+		float m_value;
+
+		/** Time registered from the beginning */
+		size_t m_timeFromStart;
+
+		/** Animations to do in time. Key is the start time. */
+		typedef std::map<size_t, Animation*> TAnimationMap;
+
+		TAnimationMap m_animMap;
+
+		/** Currently running animation */
+		Animation *m_currAnim;
+
+		void setCurrentAnimation(Animation *p_animation);
+};
+
 Float::Float() :
-	m_value(0.0f),
-	m_timeFromStart(0),
-	m_currentAnimation(NULL)
+	m_impl(new FloatImpl())
 {
 }
 
@@ -45,56 +90,70 @@ Float::~Float()
 {
 }
 
-void Float::animate(float p_startValue, float p_endValue, unsigned p_duration, Easing p_easing, unsigned p_delay)
+float Float::get() const
 {
-	const unsigned startTime = m_timeFromStart + p_delay;
+	return m_impl->m_value;
+}
+
+void Float::set(float p_value)
+{
+	m_impl->m_value = p_value;
+}
+
+void Float::animate(
+		float p_startValue, float p_endValue,
+		unsigned p_duration,
+		const Easing &p_easing,
+		unsigned p_delay
+)
+{
+	const unsigned startTime = m_impl->m_timeFromStart + p_delay;
 
 	Animation *animation = new Animation();
 	animation->m_from = p_startValue;
 	animation->m_to = p_endValue;
-	animation->m_startTime = startTime;
-	animation->m_endTime = startTime + p_duration;
-	animation->m_easing = p_easing;
+	animation->m_stime = startTime;
+	animation->m_etime = startTime + p_duration;
+	animation->m_easing = &p_easing;
 
-	m_animationMap[startTime] = animation;
+	m_impl->m_animMap[startTime] = animation;
 }
 
 void Float::update(unsigned p_timeElapsed)
 {
-	m_timeFromStart += p_timeElapsed;
+	m_impl->m_timeFromStart += p_timeElapsed;
 
 	// look for next animation
-	for (TAnimationMap::iterator itor = m_animationMap.begin(); itor != m_animationMap.end();) {
-		if (itor->first <= m_timeFromStart) {
-			setCurrentAnimation(itor->second);
-			m_animationMap.erase(itor++);
+	for (FloatImpl::TAnimationMap::iterator itor = m_impl->m_animMap.begin(); itor != m_impl->m_animMap.end();) {
+		if (itor->first <= m_impl->m_timeFromStart) {
+			m_impl->setCurrentAnimation(itor->second);
+			m_impl->m_animMap.erase(itor++);
 		} else {
 			++itor;
 		}
 	}
 
-	if (m_currentAnimation != NULL) {
+	if (m_impl->m_currAnim != NULL) {
 
-		if (m_currentAnimation->m_endTime <= m_timeFromStart) {
+		if (m_impl->m_currAnim->m_etime <= m_impl->m_timeFromStart) {
 
 			// check current animation validity
-			delete m_currentAnimation;
-			m_currentAnimation = NULL;
+			delete m_impl->m_currAnim;
+			m_impl->m_currAnim = NULL;
 
 		} else {
 
 			// make progress
 
 			const float progress =
-					(m_timeFromStart - m_currentAnimation->m_startTime) /
-					(float) (m_currentAnimation->m_endTime - m_currentAnimation->m_startTime);
+					(m_impl->m_timeFromStart - m_impl->m_currAnim->m_stime) /
+					(float) (m_impl->m_currAnim->m_etime - m_impl->m_currAnim->m_stime);
 
 			// this should be value between 0.0 and 1.0
 			assert(progress >= 0.0f && progress <= 1.0f);
 
-			m_value = easingCalculate(
-					m_currentAnimation->m_from, m_currentAnimation->m_to,
-					m_currentAnimation->m_easing,
+			m_impl->m_value = m_impl->m_currAnim->m_easing->ease(
+					m_impl->m_currAnim->m_from, m_impl->m_currAnim->m_to,
 					progress
 			);
 
@@ -102,13 +161,13 @@ void Float::update(unsigned p_timeElapsed)
 	}
 }
 
-void Float::setCurrentAnimation(Animation *p_animation)
+void FloatImpl::setCurrentAnimation(Animation *p_animation)
 {
-	if (m_currentAnimation != NULL) {
-		delete m_currentAnimation;
+	if (m_currAnim != NULL) {
+		delete m_currAnim;
 	}
 
-	m_currentAnimation = p_animation;
+	m_currAnim = p_animation;
 }
 
 } // namespace

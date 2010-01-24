@@ -72,6 +72,9 @@ class RaceUI: public Gfx::Drawable {
 		/** Lap count label */
 		Label m_lapLabel;
 
+		/** Lap times label */
+		Label m_lapTimesLabel;
+
 		/** Player names under cars label */
 		Label m_carLabel;
 
@@ -95,6 +98,8 @@ class RaceUI: public Gfx::Drawable {
 		void drawCarLabels(CL_GraphicContext &p_gc);
 
 		void drawPlayerList(CL_GraphicContext &p_gc);
+
+		void drawLapTimes(CL_GraphicContext &p_gc);
 };
 
 } // namespace

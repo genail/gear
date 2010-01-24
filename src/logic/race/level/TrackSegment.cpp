@@ -26,42 +26,92 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "TrackSegment.h"
 
-#define TIRE_TRACK_DEFAULT_ALPHA 0.2f
+#include "common.h"
 
-#include <ClanLib/core.h>
+namespace Race
+{
 
-#include "gfx/Drawable.h"
-
-namespace Gfx {
-
-class TireTrack : public Gfx::Drawable {
-
+class TrackSegmentImpl
+{
 	public:
 
-		TireTrack();
+		std::vector<CL_Pointf> m_triPoints;
 
-		virtual ~TireTrack();
+		std::vector<CL_Pointf> m_midPoints;
 
-
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
+		CL_Rectf m_bounds;
 
 
-		void setFromPoint(const CL_Pointf &p_from, float p_alpha = TIRE_TRACK_DEFAULT_ALPHA);
+		TrackSegmentImpl(
+				const std::vector<CL_Pointf> &p_triPoints,
+				const std::vector<CL_Pointf> &p_midPoints
+		) :
+			m_triPoints(p_triPoints),
+			m_midPoints(p_midPoints)
+		{ /* empty */ }
 
-		void setToPoint(const CL_Pointf &p_to, float p_alpha = TIRE_TRACK_DEFAULT_ALPHA);
 
-	private:
-
-		/** Track line */
-		CL_Pointf m_fromPoint, m_toPoint;
-
-		/** End's alphas */
-		float m_fromAlpha, m_toAlpha;
-
+		void calculateBounds();
 };
+
+TrackSegment::TrackSegment(
+		const std::vector<CL_Pointf> &p_triPoints,
+		const std::vector<CL_Pointf> &p_midPoints
+) :
+	m_impl(new TrackSegmentImpl(p_triPoints, p_midPoints))
+{
+	m_impl->calculateBounds();
+}
+
+TrackSegment::~TrackSegment()
+{
+	// empty
+}
+
+void TrackSegmentImpl::calculateBounds()
+{
+	bool first = true;
+
+	foreach (const CL_Pointf &p, m_triPoints) {
+
+		if (!first) {
+			if (p.x < m_bounds.left) {
+				m_bounds.left = p.x;
+			} else if (p.x > m_bounds.right) {
+				m_bounds.right = p.x;
+			}
+
+			if (p.y < m_bounds.top) {
+				m_bounds.top = p.y;
+			} else if (p.y > m_bounds.bottom) {
+				m_bounds.bottom = p.y;
+			}
+		} else {
+			m_bounds.left = p.x;
+			m_bounds.right = p.x;
+			m_bounds.top = p.y;
+			m_bounds.bottom = p.y;
+
+			first = false;
+		}
+	}
+}
+
+const CL_Rectf &TrackSegment::getBounds() const
+{
+	return m_impl->m_bounds;
+}
+
+const std::vector<CL_Pointf> &TrackSegment::getMidPoints() const
+{
+	return m_impl->m_midPoints;
+}
+
+const std::vector<CL_Pointf> &TrackSegment::getTrianglePoints() const
+{
+	return m_impl->m_triPoints;
+}
 
 }

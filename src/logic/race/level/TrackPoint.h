@@ -26,44 +26,50 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "TireTrack.h"
+#pragma once
 
-namespace Gfx {
+#include <ClanLib/core.h>
 
-TireTrack::TireTrack()
-{
+namespace Race {
+
+class TrackPointImpl;
+
+/**
+ * Control point for track creating.
+ */
+class TrackPoint {
+
+	public:
+
+		/**
+		 * @param p_position Position of track point.
+		 * @param p_radius Radius of track at this point in meters.
+		 * @param p_shift Shift of track ( less than 0 is to the left,
+		 * more than 0 to the right)
+		 * @return
+		 */
+		TrackPoint(const CL_Pointf &p_position, float p_radius, float p_shift);
+
+		virtual ~TrackPoint();
+
+
+		const CL_Pointf &getPosition() const;
+
+		float getRadius() const;
+
+		float getShift() const;
+
+		void setPosition(const CL_Pointf &p_pos);
+
+		void setRadius(float p_radius);
+
+		void setShift(float p_shift);
+
+
+	private:
+
+		CL_SharedPtr<TrackPointImpl> m_impl;
+};
+
 }
 
-TireTrack::~TireTrack()
-{
-}
-
-void TireTrack::draw(CL_GraphicContext &p_gc)
-{
-	CL_Pen pen;
-	pen.set_line_width(3);
-	p_gc.set_pen(pen);
-
-	// TODO: how to make blend?
-	CL_Draw::line(p_gc, m_fromPoint, m_toPoint, CL_Colorf(0.0f, 0.0f, 0.0f, m_fromAlpha));
-}
-
-void TireTrack::load(CL_GraphicContext &p_gc)
-{
-	// nothing to load here
-	Drawable::load(p_gc);
-}
-
-void TireTrack::setFromPoint(const CL_Pointf &p_from, float p_alpha)
-{
-	m_fromPoint = p_from;
-	m_fromAlpha = p_alpha;
-}
-
-void TireTrack::setToPoint(const CL_Pointf &p_to, float p_alpha)
-{
-	m_toPoint = p_to;
-	m_toAlpha = p_alpha;
-}
-
-} // namespace

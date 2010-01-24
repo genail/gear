@@ -36,6 +36,7 @@
 #endif // CLIENT
 
 #include "common.h"
+#include "common/Player.h"
 
 class Player;
 
@@ -50,7 +51,6 @@ namespace Gfx {
 namespace Race {
 
 class Bound;
-class Checkpoint;
 class Level;
 
 class Car
@@ -60,7 +60,7 @@ class Car
 
 	public:
 
-		Car(const Player *p_owner);
+		Car();
 
 		virtual ~Car();
 
@@ -70,12 +70,6 @@ class Car
 		bool isDrifting() const;
 
 		bool isLocked() const;
-
-		const Checkpoint *getCurrentCheckpoint() const;
-
-		int getLap() const;
-
-		const Player *getOwner() const;
 
 		const CL_Pointf& getPosition() const;
 
@@ -99,8 +93,6 @@ class Car
 
 		void setBrake(bool p_value);
 
-		void setLap(int p_lap);
-
 		/**
 		 * Sets if car movement should be locked (car won't move).
 		 */
@@ -110,25 +102,22 @@ class Car
 
 		void setPosition(const CL_Pointf &p_position);
 
-		void setRotation(float p_rotation);
+		/** @depretated, use setAngle() instead */
+		DEPRECATED(void setRotation(float p_rotation));
+
+		/**
+		 * Sets the car angle. It should be counter clockwise
+		 * oriented starting from positive X axis.
+		 *
+		 * @param p_angle Angle to set.
+		 */
+		void setAngle(const CL_Angle &p_angle);
 		
 		void setHandbrake(bool p_handbrake);
 
-		/**
-		 * Sets the car position at selected <code>p_startPosition</code>
-		 * which is a number >= 1.
-		 *
-		 * @param p_startPosition Car start position.
-		 */
-		void setStartPosition(int p_startPosition);
-
 		void update(unsigned int elapsedTime);
 
-		/**
-		 * Sets the new checkpoint and calculates car progress on track.
-		 * If lap is reached, then lap number will increase by one.
-		 */
-		void updateCurrentCheckpoint(const Checkpoint *p_checkpoint);
+		bool operator==(const Car &p_other) const;
 
 #if defined(CLIENT)
 		/** @return Current collision outline based on car position and rotation */
@@ -140,14 +129,8 @@ class Car
 
 	private:
 
-		/** Parent player */
-		const Player *m_owner;
-		
 		/** Parent level */
 		Race::Level *m_level;
-
-		/** Lap number */
-		int m_lap;
 
 		/** This will help to keep 1/60 iteration speed */
 		unsigned m_timeFromLastUpdate;
@@ -206,16 +189,6 @@ class Car
 #endif // CLIENT
 
 		
-		// checkpoint system
-
-		/** The greatest checkpoint id met on this lap */
-		int m_greatestCheckpointId;
-
-		/** Current checkpoint position */
-		const Checkpoint *m_currentCheckpoint;
-
-
-
 		void update1_60();
 
 		// helpers

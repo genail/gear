@@ -29,11 +29,14 @@
 #pragma once
 
 #include <list>
+
 #include <ClanLib/display.h>
 
 #include "common/GroundBlockType.h"
-#include "gfx/race/ui/RaceUI.h"
 #include "gfx/Viewport.h"
+#include "gfx/race/level/Level.h"
+#include "gfx/race/level/TyreStripes.h"
+#include "gfx/race/ui/RaceUI.h"
 
 namespace Race {
 	class Block;
@@ -67,11 +70,14 @@ class RaceGraphics {
 
 		bool m_loaded;
 
+		/** How player sees the scene */
+		Gfx::Viewport m_viewport;
+
 		/** Logic with data for reading only */
 		const Race::RaceLogic *m_logic;
 
-		/** How player sees the scene */
-		Gfx::Viewport m_viewport;
+		/** Level graphics */
+		Gfx::Level m_level;
 
 		/** Race scene interface */
 		Gfx::RaceUI m_raceUI;
@@ -89,6 +95,9 @@ class RaceGraphics {
 		/** Block types to gfx ground blocks */
 		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > TBlockMapping;
 		TBlockMapping m_blockMapping;
+
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
 
 		/** Car smoke clouds */
 		typedef std::list< CL_SharedPtr<Gfx::Smoke> > TSmokeList;
@@ -111,12 +120,16 @@ class RaceGraphics {
 
 		void loadSandPits(CL_GraphicContext &p_gc);
 
+		void loadTyreStripes(CL_GraphicContext &p_gc);
+
 
 		// update routines
 
 		void updateViewport(unsigned p_timeElapsed);
 
 		void updateSmokes(unsigned p_timeElapsed);
+
+		void updateTyreStripes();
 
 
 		// drawing routines
@@ -129,7 +142,7 @@ class RaceGraphics {
 
 		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
 
-		void drawTireTracks(CL_GraphicContext &p_gc);
+		void drawTyreStripes(CL_GraphicContext &p_gc);
 
 		void drawUI(CL_GraphicContext &p_gc);
 

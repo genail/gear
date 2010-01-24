@@ -29,41 +29,26 @@
 #pragma once
 
 #include <ClanLib/core.h>
-#include <ClanLib/network.h>
 
 #include "common.h"
-#include "../packets/CarState.h"
-#include "../packets/GameState.h"
-#include "VoteSystem.h"
+
+class ServerConfiguration;
 
 namespace Net {
 
+class ServerImpl;
+
 class Server {
 
-	SIGNAL_1(playerJoined, const CL_String&);
+	DEF_SIGNAL_1(playerJoined, const CL_String&);
 
-	SIGNAL_1(playerLeaved, const CL_String&);
-
-		struct Player {
-
-				CL_String m_name;
-
-				bool m_gameStateSent;
-
-				CarState m_lastCarState;
-
-				Player() :
-					m_gameStateSent(false)
-				{}
-		};
+	DEF_SIGNAL_1(playerLeaved, const CL_String&);
 
 	public:
 
-		Server();
+		explicit Server(const ServerConfiguration &p_conf);
 
 		virtual ~Server();
-
-		void setBindPort(unsigned short p_port) { m_bindPort = p_port; }
 
 
 		void start();
@@ -72,64 +57,8 @@ class Server {
 
 
 	private:
-		/** Bind port number */
-		unsigned short m_bindPort;
 
-		/** Running state */
-		bool m_running;
-
-		/** List of active connections */
-		typedef std::map<CL_NetGameConnection*, Server::Player> TConnectionPlayerMap;
-		typedef std::pair<CL_NetGameConnection*, Server::Player> TConnectionPlayerPair;
-
-		TConnectionPlayerMap m_connections;
-
-		/** Voting system */
-		VoteSystem m_voteSystem;
-
-		/** ClanLib game server */
-		CL_NetGameServer m_gameServer;
-
-		/** Slots container */
-		CL_SlotContainer m_slots;
-
-
-		// helpers
-
-		void send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL, bool p_ignoreNotFullyConnected = true);
-
-		GameState prepareGameState();
-
-		void startRace();
-
-
-		// network events
-
-		void onClientConnected(CL_NetGameConnection *p_connection);
-
-		void onClientDisconnected(CL_NetGameConnection *p_connection);
-
-		void onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		//
-		// event handlers
-		//
-
-		void onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		void onCarState(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		void onVoteStart(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		void onVoteTick(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
-
-		//
-		// other events
-		//
-
-		void onVoteSystemFinished();
+		CL_SharedPtr<ServerImpl> m_impl;
 };
 
 } // namespace

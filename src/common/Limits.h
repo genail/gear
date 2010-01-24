@@ -28,56 +28,11 @@
 
 #pragma once
 
-#include <list>
-#include <ClanLib/core.h>
-
-namespace Race {
-
-class Car;
-
-class TyreStripes {
-
+class Limits
+{
 	public:
-		class Stripe {
 
-			public:
-
-				float length() const { return m_from.distance(m_to); }
-
-				const CL_Pointf &getFromPoint() const { return m_from; }
-
-				const CL_Pointf &getToPoint() const { return m_to; }
-
-
-			private:
-
-				CL_Pointf m_from, m_to;
-				const Race::Car *m_owner;
-
-				Stripe(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner) :
-					m_from(p_from), m_to(p_to), m_owner(p_owner) {}
-
-				friend class TyreStripes;
-		};
-
-		typedef std::list<Stripe> stripeList_t;
-
-
-		TyreStripes();
-
-		virtual ~TyreStripes();
-
-
-		void add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner);
-
-		void clear();
-
-
-		const stripeList_t &getStripeList() const { return m_stripes; }
-
-	private:
-
-		stripeList_t m_stripes;
+		static const int MAX_PLAYERS;
 };
 
-} // namespace
+const int Limits::MAX_PLAYERS = 32;

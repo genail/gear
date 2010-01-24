@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <ClanLib/display.h>
+#include <ClanLib/core.h>
 
 namespace Gfx {
 	class GameMenu;
@@ -37,6 +37,8 @@ namespace Gfx {
 namespace Race {
 	class RaceLogic;
 }
+
+class GameMenuControllerImpl;
 
 class GameMenuController {
 
@@ -49,13 +51,6 @@ class GameMenuController {
 
 	private:
 
-		Race::RaceLogic **m_raceLogic;
-
-		Gfx::GameMenu *m_gameMenu;
-
-
-		void onExitClicked();
-
-		void onVoteClicked();
+		CL_SharedPtr<GameMenuControllerImpl> m_impl;
 };
 

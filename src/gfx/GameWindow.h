@@ -63,7 +63,7 @@ class GameWindow : public CL_GUIComponent {
 		/** Last scene */
 		Scene *m_lastScene;
 
-		CL_SlotContainer m_slotContainer;
+		CL_SlotContainer m_slots;
 
 		//
 		// workaround for missing implementation for repead_count of CL_InputEvent
@@ -90,9 +90,20 @@ class GameWindow : public CL_GUIComponent {
 
 		// signal handlers
 
-		void onKeyDown(const CL_InputEvent &p_event, const CL_InputState &p_state);
+		void onKeyDown(
+				const CL_InputEvent &p_event,
+				const CL_InputState &p_state
+		);
 
-		void onKeyUp(const CL_InputEvent &p_event, const CL_InputState &p_state);
+		void onKeyUp(
+				const CL_InputEvent &p_event,
+				const CL_InputState &p_state
+		);
+
+		void onMouseMove(
+				const CL_InputEvent &p_event,
+				const CL_InputState &p_state
+		);
 
 };
 

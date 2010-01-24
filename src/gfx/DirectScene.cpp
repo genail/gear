@@ -32,18 +32,39 @@
 
 namespace Gfx {
 
-DirectScene::DirectScene() :
-		m_loaded(false)
+class DirectSceneImpl
 {
+	public:
+		DirectSceneImpl(CL_GUIComponent &p_comp) :
+			m_loaded(false),
+			m_comp(p_comp)
+		{ /* empty */ }
+
+
+		bool m_loaded;
+
+		CL_GUIComponent &m_comp;
+};
+
+DirectScene::DirectScene(CL_GUIComponent &p_comp) :
+		m_impl(new DirectSceneImpl(p_comp))
+{
+	// empty
 }
 
 DirectScene::~DirectScene()
 {
+	// empty
 }
 
 bool DirectScene::isLoaded() const
 {
-	return m_loaded;
+	return m_impl->m_loaded;
+}
+
+CL_GUIComponent &DirectScene::getParentComponent()
+{
+	return m_impl->m_comp;
 }
 
 SceneType DirectScene::getType() const
@@ -53,12 +74,12 @@ SceneType DirectScene::getType() const
 
 void DirectScene::setLoaded(bool p_loaded)
 {
-	m_loaded = p_loaded;
+	m_impl->m_loaded = p_loaded;
 }
 
 void DirectScene::draw(CL_GraphicContext &p_gc)
 {
-	G_ASSERT(m_loaded);
+	G_ASSERT(m_impl->m_loaded);
 }
 
 void DirectScene::inputPressed(const CL_InputEvent &p_event)
@@ -73,8 +94,18 @@ void DirectScene::inputReleased(const CL_InputEvent &p_event)
 
 void DirectScene::load(CL_GraphicContext &p_gc)
 {
-	G_ASSERT(!m_loaded);
-	m_loaded = true;
+	G_ASSERT(!m_impl->m_loaded);
+	m_impl->m_loaded = true;
+}
+
+void DirectScene::mouseMoved(const CL_Point &p_pos)
+{
+	// empty
+}
+
+void DirectScene::mouseScrolled(bool p_up)
+{
+	// empty
 }
 
 void DirectScene::pushed()
@@ -94,7 +125,7 @@ void DirectScene::setActive(bool p_active)
 
 void DirectScene::update(unsigned p_timeElapsed)
 {
-	G_ASSERT(!m_loaded);
+	G_ASSERT(m_impl->m_loaded);
 }
 
 }

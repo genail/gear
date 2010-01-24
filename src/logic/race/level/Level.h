@@ -26,33 +26,96 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Checkpoint.h"
+#pragma once
+
+#include <ClanLib/core.h>
 
 namespace Race {
 
-Checkpoint::Checkpoint(int p_id, const CL_Pointf &p_position) :
-	m_id(p_id),
-	m_position(p_position),
-	m_progress(0.0f)
-{
-}
+class Block;
+class Bound;
+class Car;
+class Track;
+class TrackTriangulator;
 
-Checkpoint::~Checkpoint() {
-}
+class LevelImpl;
 
-int Checkpoint::getId() const
+class Level
 {
-	return m_id;
-}
 
-const CL_Pointf &Checkpoint::getPosition() const
-{
-	return m_position;
-}
+	public:
 
-float Checkpoint::getProgress() const
-{
-	return m_progress;
-}
+		Level();
+
+		virtual ~Level();
+
+
+		// virtual methods
+
+		virtual void initialize();
+
+		virtual void destroy();
+
+
+		// getters
+
+		bool isLoaded() const;
+
+		const Track &getTrack() const;
+
+		/**
+		 * @return Triangulator object. It if valid only if track was
+		 * loaded from file.
+		 */
+		const TrackTriangulator &getTrackTriangulator() const;
+
+		/**
+		 * @return Triangulator object. It if valid only if track was
+		 * loaded from file.
+		 */
+		TrackTriangulator &getTrackTriangulator();
+
+
+		// operations
+
+		void addCar(Car *p_car);
+
+		Car &getCar(int p_index);
+
+		const Car &getCar(int p_index) const;
+
+		int getCarCount() const;
+
+		float getResistance(float p_x, float p_y);
+
+		/**
+		 * @return A start position of <code>p_num</code>
+		 */
+		void getStartPosAndRot(
+				int p_num,
+				CL_Pointf *p_pos, CL_Angle *p_rot
+		) const;
+
+		void load(const CL_String &p_filename);
+
+		void removeCar(Car *p_car);
+
+		void save(const CL_String &p_filename);
+
+		/**
+		 * Sets the new track. Note that when you set a track, the level
+		 * geometry will not be updated. You should use getTrackTriangulator()
+		 * and rebuild modified segment or whole track.
+		 *
+		 * @param p_track Track to set.
+		 */
+		void setTrack(const Track &p_track);
+
+
+	private:
+
+		CL_SharedPtr<LevelImpl> m_impl;
+
+};
 
 } // namespace

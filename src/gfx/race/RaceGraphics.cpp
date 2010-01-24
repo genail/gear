@@ -30,26 +30,30 @@
 
 #include "common.h"
 #include "common/Game.h"
+#include "common/Player.h"
 #include "gfx/DebugLayer.h"
 #include "gfx/Stage.h"
 #include "gfx/race/level/Bound.h"
 #include "gfx/race/level/Car.h"
 #include "gfx/race/level/DecorationSprite.h"
 #include "gfx/race/level/GroundBlock.h"
-#include "gfx/race/level/TireTrack.h"
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
 #include "logic/race/Block.h"
-#include "logic/race/Bound.h"
+#include "logic/race/level/Bound.h"
+#include "logic/race/Progress.h"
 #include "logic/race/RaceLogic.h"
+#include "logic/race/level/Checkpoint.h"
 
 namespace Gfx {
 
 RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
 		m_loaded(false),
-		m_logic(p_logic),
 		m_viewport(),
-		m_raceUI(p_logic, &m_viewport)
+		m_logic(p_logic),
+		m_level(p_logic->getLevel(), m_viewport),
+		m_raceUI(p_logic, &m_viewport),
+		m_tyreStripes(p_logic->getLevel())
 {
 	// attach viewport to player's car
 	Game &game = Game::getInstance();
@@ -60,13 +64,27 @@ RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
 
 RaceGraphics::~RaceGraphics()
 {
+	// empty
 }
 
 void RaceGraphics::draw(CL_GraphicContext &p_gc)
 {
 	G_ASSERT(m_loaded);
 
+	// clear the background
+	CL_Draw::fill(
+			p_gc, 0.0f, 0.0f,
+			Stage::getWidth(), Stage::getHeight(),
+			CL_Colorf::green
+	);
+
 	if (m_logic->getLevel().isLoaded()) {
+
+		// load level graphics when level logic is loaded
+		// FIXME: Maybe I should wait for gamestate in separate scene?
+		if (!m_level.isLoaded()) {
+			m_level.load(p_gc);
+		}
 
 		// initialize player's viewport
 		m_viewport.prepareGC(p_gc);
@@ -75,7 +93,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 		drawLevel(p_gc);
 
 		// on level objects
-		drawTireTracks(p_gc);
+		drawTyreStripes(p_gc);
 		drawCars(p_gc);
 		drawSmokes(p_gc);
 
@@ -98,6 +116,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 void RaceGraphics::load(CL_GraphicContext &p_gc)
 {
 	m_raceUI.load(p_gc);
+	loadTyreStripes(p_gc);
 	loadGroundBlocks(p_gc);
 	loadDecorations(p_gc);
 	loadSandPits(p_gc);
@@ -120,43 +139,48 @@ void RaceGraphics::loadGroundBlocks(CL_GraphicContext &p_gc)
 
 void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
 {
-	// load decorations
-	const Race::Level &level = m_logic->getLevel();
-	const int w = level.getWidth();
-	const int h = level.getHeight();
-
-	for (int x = 0; x < w; ++x) {
-		for (int y = 0; y < h; ++y) {
-
-			for (int i = 0; i < 3; ++i) {
-				CL_SharedPtr<Gfx::DecorationSprite> decoration(new Gfx::DecorationSprite("race/decorations/grass"));
-
-				const CL_Pointf point(x * Race::Block::WIDTH + rand() % Race::Block::WIDTH, y * Race::Block::WIDTH + rand() % Race::Block::WIDTH);
-				decoration->setPosition(point);
-
-				decoration->load(p_gc);
-
-				m_decorations.push_back(decoration);
-			}
-
-		}
-	}
+//	// load decorations
+//	const Race::Level &level = m_logic->getLevel();
+//	const int w = level.getWidth();
+//	const int h = level.getHeight();
+//
+//	for (int x = 0; x < w; ++x) {
+//		for (int y = 0; y < h; ++y) {
+//
+//			for (int i = 0; i < 3; ++i) {
+//				CL_SharedPtr<Gfx::DecorationSprite> decoration(new Gfx::DecorationSprite("race/decorations/grass"));
+//
+//				const CL_Pointf point(x * Race::Block::WIDTH + rand() % Race::Block::WIDTH, y * Race::Block::WIDTH + rand() % Race::Block::WIDTH);
+//				decoration->setPosition(point);
+//
+//				decoration->load(p_gc);
+//
+//				m_decorations.push_back(decoration);
+//			}
+//
+//		}
+//	}
 }
 
 void RaceGraphics::loadSandPits(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-	const unsigned sandpitCount = level.getSandpitCount();
+//	const Race::Level &level = m_logic->getLevel();
+//	const unsigned sandpitCount = level.getSandpitCount();
+//
+//	for (unsigned i = 0; i < sandpitCount; ++i) {
+//		const Race::Sandpit &logicSandpit = level.sandpitAt(i);
+//		CL_SharedPtr<Gfx::Sandpit> gfxSandpit(new Gfx::Sandpit(&logicSandpit));
+//
+//		// load and add to list
+//
+//		gfxSandpit->load(p_gc);
+//		m_sandpits.push_back(gfxSandpit);
+//	}
+}
 
-	for (unsigned i = 0; i < sandpitCount; ++i) {
-		const Race::Sandpit &logicSandpit = level.sandpitAt(i);
-		CL_SharedPtr<Gfx::Sandpit> gfxSandpit(new Gfx::Sandpit(&logicSandpit));
-
-		// load and add to list
-
-		gfxSandpit->load(p_gc);
-		m_sandpits.push_back(gfxSandpit);
-	}
+void RaceGraphics::loadTyreStripes(CL_GraphicContext &p_gc)
+{
+	m_tyreStripes.load(p_gc);
 }
 
 void RaceGraphics::drawSandpits(CL_GraphicContext &p_gc)
@@ -185,25 +209,16 @@ void RaceGraphics::drawUI(CL_GraphicContext &p_gc)
 	m_raceUI.draw(p_gc);
 }
 
-void RaceGraphics::drawTireTracks(CL_GraphicContext &p_gc)
+void RaceGraphics::drawTyreStripes(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-	const Race::TyreStripes &tireStripes = level.getTyreStripes();
-
-	Gfx::TireTrack track;
-
-	foreach (const Race::TyreStripes::Stripe &stripe, tireStripes.getStripeList()) {
-		track.setFromPoint(stripe.getFromPoint());
-		track.setToPoint(stripe.getToPoint());
-
-		track.draw(p_gc);
-	}
-
+	m_tyreStripes.draw(p_gc);
 }
 
 void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
+	m_level.draw(p_gc);
+
+//	const Race::Level &level = m_logic->getLevel();
 
 	drawBackBlocks(p_gc);
 
@@ -211,87 +226,97 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 
 	drawForeBlocks(p_gc);
 
-	// draw bounds
-	const size_t boundCount = level.getBoundCount();
-	Gfx::Bound gfxBound;
-
-	for (size_t i = 0; i < boundCount; ++i) {
-		const Race::Bound &bound = level.getBound(i);
-		gfxBound.setSegment(bound.getSegment());
-
-		gfxBound.draw(p_gc);
-	}
+//	// draw bounds
+//	const size_t boundCount = level.getBoundCount();
+//	Gfx::Bound gfxBound;
+//
+//	for (size_t i = 0; i < boundCount; ++i) {
+//		const Race::Bound &bound = level.getBound(i);
+//		gfxBound.setSegment(bound.getSegment());
+//
+//		gfxBound.draw(p_gc);
+//	}
 
 #if !defined(NDEBUG) && defined(DRAW_CHECKPOINTS)
 
+	const Race::Progress progress = m_logic->getProgress();
+	const int cpCount = progress.getCheckpointCount();
+
+	CL_Pen prevPen = p_gc.get_pen();
+
+	CL_Pen pen;
+	pen.set_point_size(10);
+	pen.set_line_width(5);
+
+	p_gc.set_pen(pen);
+
+	for (int i = 0; i < cpCount; ++i) {
+		const Race::Checkpoint &cp = progress.getCheckpoint(i);
+		CL_Draw::point(p_gc, cp.getPosition(), CL_Colorf::red);
+	}
+
 	// draw car -> checkpoint links
-	std::vector<CL_String> names = m_logic->getPlayerNames();
+	const int playerCount = m_logic->getPlayerCount();
+	for (int i = 0; i < playerCount; ++i) {
+		const Player &player = m_logic->getPlayer(i);
 
-	foreach (const CL_String &name, names) {
-		const Player &player = m_logic->getPlayer(name);
 		const Race::Car &car = player.getCar();
+		const Race::Checkpoint &cp = progress.getCheckpoint(car);
 
-		const Race::Checkpoint *cp = car.getCurrentCheckpoint();
-
-		if (cp != NULL) {
-			CL_Draw::line(p_gc, car.getPosition(), cp->getPosition(), CL_Colorf::green);
-		}
+		CL_Draw::line(
+				p_gc,
+				car.getPosition(), cp.getPosition(),
+				CL_Colorf::aliceblue
+		);
 	}
 
-	const Race::Track &track = level.getTrack();
-	const unsigned checkpointCount = track.getCheckpointCount();
-
-	for (unsigned i = 0; i < checkpointCount; ++i) {
-		const Race::Checkpoint *checkpoint = track.getCheckpoint(i);
-		const CL_Pointf &point = checkpoint->getPosition();
-
-		CL_Draw::circle(p_gc, point.x, point.y, 5, CL_Colorf::red);
-	}
+	// restore old pen
+	p_gc.set_pen(pen);
 
 #endif // !NDEBUG && DRAW_CHECKPOINTS
 }
 
 void RaceGraphics::drawBackBlocks(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-
-	const size_t w = level.getWidth();
-	const size_t h = level.getHeight();
-
-	// draw grass
-	CL_SharedPtr<Gfx::GroundBlock> gfxGrassBlock = m_blockMapping[Common::BT_GRASS];
-
-	for (size_t iw = 0; iw < w; ++iw) {
-		for (size_t ih = 0; ih < h; ++ih) {
-			gfxGrassBlock->setPosition(real(CL_Pointf(iw, ih)));
-			gfxGrassBlock->draw(p_gc);
-
-			// draw grass decoration sprites
-			foreach(CL_SharedPtr<Gfx::DecorationSprite> &decoration, m_decorations) {
-				const CL_Pointf &position = decoration->getPosition();
-
-				if (position.x >= real(iw) && position.x < real(iw) + Race::Block::WIDTH && position.y >= real(ih) && position.y < real(ih) + Race::Block::WIDTH) {
-					decoration->draw(p_gc);
-				}
-			}
-		}
-	}
+//	const Race::Level &level = m_logic->getLevel();
+//
+//	const size_t w = level.getWidth();
+//	const size_t h = level.getHeight();
+//
+//	// draw grass
+//	CL_SharedPtr<Gfx::GroundBlock> gfxGrassBlock = m_blockMapping[Common::BT_GRASS];
+//
+//	for (size_t iw = 0; iw < w; ++iw) {
+//		for (size_t ih = 0; ih < h; ++ih) {
+//			gfxGrassBlock->setPosition(real(CL_Pointf(iw, ih)));
+//			gfxGrassBlock->draw(p_gc);
+//
+//			// draw grass decoration sprites
+//			foreach(CL_SharedPtr<Gfx::DecorationSprite> &decoration, m_decorations) {
+//				const CL_Pointf &position = decoration->getPosition();
+//
+//				if (position.x >= real(iw) && position.x < real(iw) + Race::Block::WIDTH && position.y >= real(ih) && position.y < real(ih) + Race::Block::WIDTH) {
+//					decoration->draw(p_gc);
+//				}
+//			}
+//		}
+//	}
 }
 
 void RaceGraphics::drawForeBlocks(CL_GraphicContext &p_gc)
 {
-	const Race::Level &level = m_logic->getLevel();
-
-	const size_t w = level.getWidth();
-	const size_t h = level.getHeight();
-
-	// draw foreground
-
-	for (size_t iw = 0; iw < w; ++iw) {
-		for (size_t ih = 0; ih < h; ++ih) {
-			drawGroundBlock(p_gc, level.getBlock(iw, ih), real(iw), real(ih));
-		}
-	}
+//	const Race::Level &level = m_logic->getLevel();
+//
+//	const size_t w = level.getWidth();
+//	const size_t h = level.getHeight();
+//
+//	// draw foreground
+//
+//	for (size_t iw = 0; iw < w; ++iw) {
+//		for (size_t ih = 0; ih < h; ++ih) {
+//			drawGroundBlock(p_gc, level.getBlock(iw, ih), real(iw), real(ih));
+//		}
+//	}
 }
 
 void RaceGraphics::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y)
@@ -326,7 +351,7 @@ void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	CL_SharedPtr<Gfx::Car> gfxCar;
 
 	if (itor == m_carMapping.end()) {
-		gfxCar = CL_SharedPtr<Gfx::Car>(cl_new Gfx::Car());
+		gfxCar = CL_SharedPtr<Gfx::Car>(new Gfx::Car());
 		gfxCar->load(p_gc);
 
 		m_carMapping[&p_car] = gfxCar;
@@ -368,6 +393,7 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 	G_ASSERT(m_loaded);
 
 	updateViewport(p_timeElapsed);
+	updateTyreStripes();
 	updateSmokes(p_timeElapsed);
 
 #if !defined(NDEBUG)
@@ -379,26 +405,35 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 
 void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 {
-	static const float ZOOM_SPEED = 0.005f;
-	static const float MAX_SPEED = 500.0f; // FIXME
+	static const float MIN_SCALE = 0.5f;
+	static const float MAX_SCALE = 1.0f;
+	static const float MAX_SPEED = 10.0f;
 
-	float speed = fabs( ceil(Game::getInstance().getPlayer().getCar().getSpeed() * 500.0f ) / 10.0f);
+	float speed = Game::getInstance().getPlayer().getCar().getSpeed();
 
-	float properScale = -( 1.0f / MAX_SPEED ) * speed + 2.0f;
-	properScale = ceil( properScale * 100.0f ) / 100.0f;
-
-	float scale =  m_viewport.getScale();
-
-	if( properScale > scale ) {
-		m_viewport.setScale( scale + ZOOM_SPEED );
-	} else if ( properScale < scale ){
-		m_viewport.setScale( scale - ZOOM_SPEED );
+	if (speed > MAX_SPEED) {
+		speed = MAX_SPEED;
 	}
+
+	const float scale = m_viewport.getScale();
+
+	const float speedT = speed / MAX_SPEED;
+	float targetScale = MAX_SCALE + speedT * (MIN_SCALE - MAX_SCALE);
+
+	const float nextScale = scale + (targetScale - scale) / 100.0f;
+
+	m_viewport.setScale(nextScale);
+
 
 
 #ifndef NDEBUG
 	Gfx::Stage::getDebugLayer()->putMessage("scale",  CL_StringHelp::float_to_local8(scale));
 #endif
+}
+
+void RaceGraphics::updateTyreStripes()
+{
+	m_tyreStripes.update();
 }
 
 void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
@@ -425,7 +460,7 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 
 	timeFromLastSmoke += p_timeElapsed;
 
-	static const int RAND_LIMIT = 10;
+	static const int RAND_LIMIT = 20;
 
 	if (car.isDrifting() && timeFromLastSmoke >= SMOKE_PERIOD) {
 

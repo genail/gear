@@ -60,7 +60,7 @@ class RaceScene: public Gfx::DirectScene
 
 	public:
 
-		RaceScene(CL_GUIComponent *p_parent);
+		RaceScene(CL_GUIComponent &p_parent);
 
 		virtual ~RaceScene();
 

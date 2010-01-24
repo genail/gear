@@ -26,79 +26,64 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "TyreStripes.h"
+#pragma once
 
-#include "common.h"
-#include "Car.h"
+#include <ClanLib/core.h>
 
-namespace Race {
-
-TyreStripes::TyreStripes()
+namespace Race
 {
-}
 
-TyreStripes::~TyreStripes()
+class Car;
+class Checkpoint;
+class Level;
+class ProgressImpl;
+
+class Progress
 {
-}
+	public:
 
-void TyreStripes::add(const CL_Pointf &p_from, const CL_Pointf &p_to, const Race::Car *p_owner)
-{
-	static const unsigned STRIPE_LIMIT = 200;
-	static const unsigned STRIPE_LENGTH_LIMIT = 15;
-	static const unsigned BACK_SEARCH_LIMIT = 4;
+		Progress(const Level &p_level);
 
-	// search for four last stripes of this car and check if I can merge
-	// this stripe to the last one
-	bool merged = false;
-	unsigned foundCount = 0;
+		virtual ~Progress();
 
-	for (
-			stripeList_t::iterator itor = m_stripes.begin();
-			itor != m_stripes.end();
-			++itor
-	) {
-		Stripe s = *itor;
 
-		if (s.m_owner == p_owner) {
+		// operations
 
-			++foundCount;
+		void addCar(const Car &p_car);
 
-			// must end on the same point and length must be below limit
-			if (s.m_to == p_from && s.length() < STRIPE_LENGTH_LIMIT) {
-				Stripe copy = s;
+		void destroy();
 
-				// remove old stripe
-				m_stripes.erase(itor);
+		const Checkpoint &getCheckpoint(const Car &p_car) const;
 
-				// and construct new one
-				m_stripes.push_front(Stripe(copy.m_from, p_to, p_owner));
-				merged = true;
+		const Checkpoint &getCheckpoint(int p_idx) const;
 
-				break;
-			}
+		int getCheckpointCount() const;
 
-			if (foundCount == BACK_SEARCH_LIMIT) {
-				break;
-			}
-		}
-	}
+		int getLapNumber(const Car &p_car) const;
 
-	if (!merged) {
-		// when not merged, then create a new stripe
-		m_stripes.push_front(Stripe(p_from, p_to, p_owner));
-	}
+		/**
+		 * Provides lap time in milliseconds. If lap isn't
+		 * finished yet, then ongoing time is returned.
+		 *
+		 * @return lap time in milliseconds
+		 */
+		int getLapTime(const Car &p_car, int p_lap) const;
 
-	// remove all stripes above the limit
-	if (m_stripes.size() > STRIPE_LIMIT) {
-		m_stripes.pop_back(); // there will be always one stripe to much
-	}
+		void initialize();
+
+		void removeCar(const Car &p_car);
+
+		void reset(const Car &p_car);
+
+		void resetClock();
+
+		void update();
+
+
+	private:
+
+		CL_SharedPtr<ProgressImpl> m_impl;
+};
 
 }
-
-void TyreStripes::clear()
-{
-	m_stripes.clear();
-}
-
-} // namespace
 

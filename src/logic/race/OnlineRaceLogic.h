@@ -81,6 +81,9 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 	private:
 
+		typedef std::vector<Player> TPlayerList;
+
+
 		/** Initialized state */
 		bool m_initialized;
 
@@ -94,7 +97,10 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		Net::Client *m_client;
 
 		/** Local player */
-		Player *m_localPlayer;
+		Player &m_localPlayer;
+
+		/** Network players */
+		TPlayerList m_remotePlayers;
 
 		/** Slots container */
 		CL_SlotContainer m_slots;

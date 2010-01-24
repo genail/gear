@@ -32,6 +32,7 @@
 
 #include "Car.h"
 #include "common/Game.h"
+#include "logic/race/Progress.h"
 #include "network/packets/GameState.h"
 #include "network/packets/CarState.h"
 
@@ -44,6 +45,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_host(p_host),
 	m_port(p_port),
 	m_client(&Game::getInstance().getNetworkConnection()),
+	m_localPlayer(Game::getInstance().getPlayer()),
 	m_voteRunning(false)
 {
 	G_ASSERT(p_port > 0 && p_port <= 0xFFFF);
@@ -52,9 +54,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_client->setServerPort(m_port);
 
 	// connect signal and slots from player's car
-	Game &game = Game::getInstance();
-	m_localPlayer = &game.getPlayer();
-	Car &car = m_localPlayer->getCar();
+	Car &car = m_localPlayer.getCar();
 
 	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogic::onInputChange);
 
@@ -95,21 +95,16 @@ void OnlineRaceLogic::destroy()
 	if (m_initialized) {
 		m_client->disconnect();
 
-		// remove players
-		TPlayerMapPair pair;
-		foreach (pair, m_playerMap) {
-			Player *player = pair.second;
+		// remove cars from level
+		const int playerCount = getPlayerCount();
 
-			// remove car from level
-			m_level.removeCar(&player->getCar());
-
-			// delete player if belongs to me
-			if (player != &Game::getInstance().getPlayer()) {
-				delete player;
-			}
+		for (int i = 0; i < playerCount; ++i) {
+			Player &player = getPlayer(i);
+			getLevel().removeCar(&player.getCar());
 		}
 
-		m_level.destroy();
+		getProgress().destroy();
+		getLevel().destroy();
 	}
 }
 
@@ -120,7 +115,7 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 	RaceLogic::update(p_timeElapsed);
 
 	// make sure that car is not locked when race is started
-	Race::Car &car = m_localPlayer->getCar();
+	Race::Car &car = m_localPlayer.getCar();
 	if (isRaceStarted() && car.isLocked()) {
 		car.setLocked(false);
 
@@ -146,48 +141,56 @@ void OnlineRaceLogic::onGoodbye(GoodbyeReason p_reason, const CL_String &p_messa
 void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 {
 	// check player existence
-	TPlayerMap::iterator itor = m_playerMap.find(p_name);
 
-	if (itor == m_playerMap.end()) {
+	if (!hasPlayer(p_name)) {
 		// create new player
-		Player *player = new Player(p_name);
-		m_playerMap[p_name] = player;
 
-		// add his car to level
-		m_level.addCar(&player->getCar());
+		m_remotePlayers.push_back(Player(p_name));
+
+		Player &player = m_remotePlayers.back();
+		addPlayer(player);
+
+		// add his car to the level
+		getLevel().addCar(&player.getCar());
 
 		display(cl_format(_("Player %1 joined"), p_name));
 	} else {
 		cl_log_event(LOG_ERROR, "Player named '%1' already in list", p_name);
 	}
-
 }
 
 void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 {
 	// get the player
-	TPlayerMap::iterator itor = m_playerMap.find(p_name);
+	Player &player = getPlayer(p_name);
 
-	if (itor != m_playerMap.end()) {
-		Player *player = itor->second;
+	// remove from level
+	getLevel().removeCar(&player.getCar());
 
-		// remove car from level
-		m_level.removeCar(&player->getCar());
+	// remove from game
+	removePlayer(player);
 
-		// remove player
-		delete player;
-
-		display(cl_format("Player %1 leaved", p_name));
-	} else {
-		cl_log_event(LOG_ERROR, "No player named '%1' in list", p_name);
+	TPlayerList::iterator itor;
+	for (itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
+		if (*itor == player) {
+			m_remotePlayers.erase(itor);
+			break;
+		}
 	}
+
+	G_ASSERT(itor != m_remotePlayers.end());
+	display(cl_format("Player %1 leaved", p_name));
 }
 
 void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 {
 	// load level
 	const CL_String &levelName = p_gameState.getLevel();
-	m_level.initialize(levelName);
+	getLevel().initialize();
+	getLevel().load(levelName);
+
+	// initialize progress object
+	getProgress().initialize();
 
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();
@@ -198,22 +201,23 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 	for (unsigned i = 0; i < playerCount; ++i) {
 		const CL_String &playerName = p_gameState.getPlayerName(i);
 
-		if (playerName == m_localPlayer->getName()) {
+		if (playerName == m_localPlayer.getName()) {
 			// this is local player, so it exists now
-			player = m_localPlayer;
+			player = &m_localPlayer;
 		} else {
 			// this is remote player
-			player = new Player(playerName);
+			m_remotePlayers.push_back(Player(playerName));
+			player = &m_remotePlayers.back();
 		}
 
 		// put player to player list
-		m_playerMap[playerName] = player;
+		addPlayer(*player);
 
 		// prepare car and put it to level
 		car = &player->getCar();
 		car->applyCarState(p_gameState.getCarState(i));
 
-		m_level.addCar(car);
+		getLevel().addCar(&player->getCar());
 	}
 
 
@@ -222,32 +226,34 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
 {
 	const CL_String &playerName = p_carState.getName();
-	TPlayerMap::iterator itor = m_playerMap.find(playerName);
 
-	if (itor != m_playerMap.end()) {
-		itor->second->getCar().applyCarState(p_carState);
+	if (hasPlayer(playerName)) {
+		getPlayer(playerName).getCar().applyCarState(p_carState);
 	} else {
 		cl_log_event(LOG_ERROR, "Player %1 do not exists", playerName);
 	}
 }
 
-void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle &p_carRotation)
+void OnlineRaceLogic::onRaceStart(
+		const CL_Pointf &p_carPosition,
+		const CL_Angle &p_carRotation
+)
 {
-	cl_log_event(LOG_RACE, "Race is starting");
+	cl_log_event(LOG_RACE, "race is starting");
 
 	Car &car = Game::getInstance().getPlayer().getCar();
 
 	car.setPosition(p_carPosition);
-	car.setRotation(p_carRotation.to_degrees() - 90); // FIXME: Remove -90 when #16 is resolved
-	car.setLap(1);
+	car.setAngle(p_carRotation);
 
 	car.setLocked(true);
+
+	// reset progress data
+	getProgress().reset(car);
 
 	// send current state
 	const Net::CarState carState = car.prepareCarState();
 	m_client->sendCarState(carState);
-
-	car.updateCurrentCheckpoint(NULL);
 
 	startRace(3, CL_System::get_time() + RACE_START_DELAY);
 }

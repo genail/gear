@@ -65,7 +65,8 @@ void RaceScene::initialize(const CL_String &p_hostname, int p_port)
 {
 	if (!m_initialized) {
 		if (p_hostname == "") {
-			m_logic = new Race::OfflineRaceLogic("resources/level2.0.xml");
+			// FIXME: let user to choose the level
+			m_logic = new Race::OfflineRaceLogic("levels/level2.0.xml");
 		} else {
 			m_logic = new Race::OnlineRaceLogic(p_hostname, p_port);
 		}

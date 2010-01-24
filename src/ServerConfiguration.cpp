@@ -33,24 +33,49 @@
 /* Configuration file location */
 const CL_String CONFIG_FILE = "config.xml";
 
-ServerConfiguration::ServerConfiguration() :
-	m_port(DEFAULT_PORT)
+class ServerConfigurationImpl
 {
-	// try to load server configuration
-	load(CONFIG_FILE);
+	public:
+
+		/** Server port */
+		int m_port;
+
+		/** Level name */
+		CL_String m_level;
+
+
+		ServerConfigurationImpl() :
+			m_port(DEFAULT_PORT)
+		{
+			// try to load server configuration
+			load(CONFIG_FILE);
+		}
+
+
+		void load(const CL_String &p_configFile);
+};
+
+ServerConfiguration::ServerConfiguration() :
+	m_impl(new ServerConfigurationImpl())
+{
+	// empty
 }
 
 ServerConfiguration::~ServerConfiguration()
 {
+	// empty
 }
 
-void ServerConfiguration::load(const CL_String &p_configFile)
+void ServerConfigurationImpl::load(const CL_String &p_configFile)
 {
 	try {
+		cl_log_event(LOG_DEBUG, "loading configuration from %1", p_configFile);
 
-		cl_log_event("config", "Loading configuration from %1", p_configFile);
-
-		CL_File file(p_configFile, CL_File::open_existing, CL_File::access_read);
+		CL_File file(
+				p_configFile,
+				CL_File::open_existing,
+				CL_File::access_read
+		);
 
 
 		CL_DomDocument document(file);
@@ -63,26 +88,45 @@ void ServerConfiguration::load(const CL_String &p_configFile)
 
 		CL_DomElement server = root.named_item("server").to_element();
 
+		m_level = server.select_string("level");
+		m_port = server.select_int("port");
 
-		// read all elements
-		CL_DomNode cur = server.get_first_child();
-		while (cur.is_element()) {
-
-			if (cur.get_node_name() == "port") {
-				m_port = CL_StringHelp::local8_to_int(cur.to_element().get_text());
-				cl_log_event("config", "Port set to %1", m_port);
-			}
-
-			cur = cur.get_next_sibling();
+		if (m_level.length() == 0) {
+			cl_log_event(LOG_ERROR, "%1: level not set", CONFIG_FILE);
+			exit(1);
 		}
+
+		if (m_port <= 0 || m_port > 0xFFFF) {
+			cl_log_event(LOG_ERROR, "%1: invalid port value", CONFIG_FILE);
+			exit(1);
+		}
+
+//		// read all elements
+//		CL_DomNode cur = server.get_first_child();
+//		while (cur.is_element()) {
+//
+//			if (cur.get_node_name() == "port") {
+//				m_port = CL_StringHelp::local8_to_int
+//						(cur.to_element().get_text()
+//				);
+//				cl_log_event(LOG_DEBUG, "Port set to %1", m_port);
+//			}
+//
+//			cur = cur.get_next_sibling();
+//		}
 
 
 	} catch (CL_Exception e) {
-		cl_log_event("exception", e.message);
+		cl_log_event(LOG_ERROR, e.message);
 	}
+}
+
+const CL_String &ServerConfiguration::getLevel() const
+{
+	return m_impl->m_level;
 }
 
 int ServerConfiguration::getPort() const
 {
-	return m_port;
+	return m_impl->m_port;
 }

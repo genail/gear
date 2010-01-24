@@ -41,6 +41,9 @@
 // default connect port
 #define DEFAULT_PORT 2500
 
+// levels directory
+#define LEVELS_DIR "levels"
+
 // signal and slots
 #define SIGNAL_0(name) \
 	public: \
@@ -159,7 +162,8 @@
 
 // log levels
 #define LOG_DEBUG "debug"
-#define LOG_WARN "warning"
-#define LOG_ERROR "error"
-#define LOG_RACE  "race"
 #define LOG_EVENT "event"
+#define LOG_ERROR "error"
+#define LOG_INFO  "info"
+#define LOG_WARN  "warning"
+#define LOG_RACE  "race"

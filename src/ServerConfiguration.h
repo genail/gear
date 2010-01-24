@@ -30,6 +30,8 @@
 
 #include <ClanLib/core.h>
 
+class ServerConfigurationImpl;
+
 class ServerConfiguration {
 
 	public:
@@ -38,13 +40,13 @@ class ServerConfiguration {
 
 		virtual ~ServerConfiguration();
 
+
+		const CL_String &getLevel() const;
+
 		int getPort() const;
 
 	private:
 
-		/** Server port */
-		int m_port;
-
-		void load(const CL_String &p_configFile);
+		CL_SharedPtr<ServerConfigurationImpl> m_impl;
 };
 

@@ -29,6 +29,7 @@
 #include "Server.h"
 
 #include "common.h"
+#include "ServerConfiguration.h"
 #include "logic/race/level/Level.h"
 #include "network/events.h"
 #include "network/version.h"
@@ -70,8 +71,8 @@ class ServerImpl
 			{}
 		};
 
-		/** Bind port number */
-		unsigned short m_bindPort;
+		/** Server configuration */
+		const ServerConfiguration m_conf;
 
 		/** Running state */
 		bool m_running;
@@ -95,8 +96,8 @@ class ServerImpl
 		CL_SlotContainer m_slots;
 
 
-		ServerImpl() :
-			m_bindPort(DEFAULT_PORT),
+		ServerImpl(const ServerConfiguration &p_conf) :
+			m_conf(p_conf), // copy this object
 			m_running(false)
 		{ /* empty */ }
 
@@ -142,9 +143,16 @@ class ServerImpl
 METH_SIGNAL_1(Server, playerJoined, const CL_String&);
 METH_SIGNAL_1(Server, playerLeaved, const CL_String&);
 
-Server::Server() :
-	m_impl(new ServerImpl())
+Server::Server(const ServerConfiguration &p_conf) :
+	m_impl(new ServerImpl(p_conf))
 {
+	const CL_String levPath = cl_format("%1/%2", LEVELS_DIR, p_conf.getLevel());
+
+	if (!CL_FileHelp::file_exists(levPath)) {
+		cl_log_event(LOG_ERROR, "level %1 doesn't exists", levPath);
+		exit(1);
+	}
+
 	m_impl->m_slots.connect(
 			m_impl->m_gameServer.sig_client_connected(),
 			m_impl.get(), &ServerImpl::onClientConnected
@@ -172,21 +180,19 @@ Server::~Server()
 	}
 }
 
-void Server::setBindPort(int p_port)
-{
-	G_ASSERT(p_port > 0 && p_port <= 0xFFFF);
-	m_impl->m_bindPort;
-}
-
 void Server::start()
 {
 	G_ASSERT(!m_impl->m_running);
 
 	try {
 		m_impl->m_gameServer.start(
-				CL_StringHelp::int_to_local8(m_impl->m_bindPort)
+				CL_StringHelp::int_to_local8(m_impl->m_conf.getPort())
 		);
+
 		m_impl->m_running = true;
+
+		cl_log_event(LOG_INFO, "server is up and running");
+
 	} catch (const CL_Exception &e) {
 		cl_log_event(LOG_ERROR, "unable to start the server: %1", e.message);
 	}
@@ -460,7 +466,9 @@ GameState ServerImpl::prepareGameState()
 		gamestate.addPlayer(player.m_name, player.m_lastCarState);
 	}
 
-	gamestate.setLevel("resources/level2.0.xml"); // FIXME: How to choose level?
+
+	const CL_String levPath = cl_format("%1/%2", LEVELS_DIR, m_conf.getLevel());
+	gamestate.setLevel(levPath);
 
 	return gamestate;
 }

@@ -32,6 +32,8 @@
 
 #include "common.h"
 
+class ServerConfiguration;
+
 namespace Net {
 
 class ServerImpl;
@@ -44,11 +46,9 @@ class Server {
 
 	public:
 
-		Server();
+		explicit Server(const ServerConfiguration &p_conf);
 
 		virtual ~Server();
-
-		void setBindPort(int p_port);
 
 
 		void start();

@@ -2,5 +2,6 @@
     <server>
         <!-- Listen port. Default is 2500 -->
         <port>2500</port>
+        <level>level2.0.xml</level>
     </server>
 </config>

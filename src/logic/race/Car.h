@@ -71,8 +71,6 @@ class Car
 
 		bool isLocked() const;
 
-		int getLap() const;
-
 		const CL_Pointf& getPosition() const;
 
 		float getRotation() const;
@@ -94,8 +92,6 @@ class Car
 		void setAcceleration(bool p_value);
 
 		void setBrake(bool p_value);
-
-		void setLap(int p_lap);
 
 		/**
 		 * Sets if car movement should be locked (car won't move).
@@ -119,14 +115,6 @@ class Car
 		
 		void setHandbrake(bool p_handbrake);
 
-		/**
-		 * Sets the car position at selected <code>p_startPosition</code>
-		 * which is a number >= 1.
-		 *
-		 * @param p_startPosition Car start position.
-		 */
-		void setStartPosition(int p_startPosition);
-
 		void update(unsigned int elapsedTime);
 
 		bool operator==(const Car &p_other) const;
@@ -143,9 +131,6 @@ class Car
 
 		/** Parent level */
 		Race::Level *m_level;
-
-		/** Lap number */
-		int m_lap;
 
 		/** This will help to keep 1/60 iteration speed */
 		unsigned m_timeFromLastUpdate;

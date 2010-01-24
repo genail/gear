@@ -161,7 +161,7 @@ void RaceLogicImpl::updatePlayersProgress()
 
 	foreach (const Player *player, m_playerList) {
 
-		if (player->getCar().getLap() > m_lapCount && !hasPlayerFinished(*player)) {
+		if (m_progress.getLapNumber(player->getCar()) > m_lapCount && !hasPlayerFinished(*player)) {
 
 			// calculate timing
 			if (now == 0) {

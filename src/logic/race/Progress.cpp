@@ -125,8 +125,21 @@ void Progress::addCar(const Car &p_car)
 {
 	G_ASSERT(m_impl->m_initd);
 
-	const ProgressInfo pinfo = {0, m_impl->m_chkpts[0]};
+	const ProgressInfo pinfo = {1, m_impl->m_chkpts[0]};
 	m_impl->m_cars[&p_car] = pinfo;
+}
+
+void Progress::reset(const Car &p_car)
+{
+	G_ASSERT(m_impl->m_initd);
+
+	ProgressImpl::TCarProgressMap::iterator itor =
+			m_impl->m_cars.find(&p_car);
+
+	G_ASSERT(itor != m_impl->m_cars.end());
+
+	itor->second.m_lapNum = 1;
+	itor->second.m_cp = m_impl->m_chkpts[0];
 }
 
 void Progress::initialize()

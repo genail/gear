@@ -65,6 +65,8 @@ class Progress
 
 		void removeCar(const Car &p_car);
 
+		void reset(const Car &p_car);
+
 		void update();
 
 

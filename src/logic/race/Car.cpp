@@ -50,7 +50,6 @@ const int CAR_HEIGHT = 24;
 
 Car::Car() :
 	m_level(NULL),
-	m_lap(0),
 	m_timeFromLastUpdate(0),
 	m_position(300.0f, 300.0f),
 	m_rotation(0, cl_degrees),
@@ -383,27 +382,6 @@ void Car::applyCarState(const Net::CarState &p_carState)
 	m_inputBrake = p_carState.getAcceleration() < 0.0f;
 }
 
-void Car::setStartPosition(int p_startPosition) {
-	if (m_level != NULL) {
-//		m_position = m_level->getStartPosAndRot(p_startPosition);
-	} else {
-		cl_log_event("warning", "Car not on Level.");
-		m_position = CL_Pointf(300, 300);
-	}
-
-	// stop the car!
-	m_rotation = CL_Angle::from_degrees(-90);
-	m_inputTurn = 0;
-	m_inputAccel = false;
-	m_inputBrake = false;
-	m_phyMoveVec = CL_Vec2f();
-	m_speed = 0.0f;
-	m_lap = 1;
-
-	// send the status change to other players
-	INVOKE_1(inputChanged, *this);
-}
-
 bool Car::isDrifting() const {
 	static const float DRIFT_LIMIT = 6.0f;
 	static const float ACCEL_LIMIT = 0.05f;
@@ -422,11 +400,6 @@ bool Car::isDrifting() const {
 bool Car::isLocked() const
 {
 	return m_inputLocked;
-}
-
-int Car::getLap() const
-{
-	return m_lap;
 }
 
 const CL_Pointf& Car::getPosition() const
@@ -482,11 +455,6 @@ void Car::setBrake(bool p_value)
 	}
 
 	m_inputBrake = p_value;
-}
-
-void Car::setLap(int p_lap)
-{
-	m_lap = p_lap;
 }
 
 void Car::setTurn(float p_value)

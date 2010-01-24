@@ -234,16 +234,22 @@ void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
 	}
 }
 
-void OnlineRaceLogic::onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle &p_carRotation)
+void OnlineRaceLogic::onRaceStart(
+		const CL_Pointf &p_carPosition,
+		const CL_Angle &p_carRotation
+)
 {
 	cl_log_event(LOG_RACE, "race is starting");
 
 	Car &car = Game::getInstance().getPlayer().getCar();
 
 	car.setPosition(p_carPosition);
-	car.setRotation(p_carRotation.to_degrees());
+	car.setAngle(p_carRotation);
 
 	car.setLocked(true);
+
+	// reset progress data
+	getProgress().reset(car);
 
 	// send current state
 	const Net::CarState carState = car.prepareCarState();

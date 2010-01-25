@@ -259,7 +259,7 @@ CL_String RaceUI::formatTime(const Math::Time &p_time)
 	static const int BUF_SIZE = 16;
 	static char buf[BUF_SIZE];
 
-#if defined(WIN32)
+#if !defined(WIN32)
 	snprintf(
 			buf, BUF_SIZE,
 			"%02d:%02d:%03d",

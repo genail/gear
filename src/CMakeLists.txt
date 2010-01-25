@@ -12,6 +12,7 @@ SET(COMMON_SRCS
 	common/Game.cpp
 	common/Player.cpp
 	common/Properties.cpp
+    math/Time.cpp
 	network/client/Client.cpp
 	network/packets/CarState.cpp
 	network/packets/ClientInfo.cpp

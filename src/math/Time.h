@@ -30,35 +30,36 @@
 
 #include <ClanLib/core.h>
 
-#include "common.h"
+namespace Math
+{
 
-class ServerConfiguration;
+class TimeImpl;
 
-namespace Net {
-
-class ServerImpl;
-
-class Server {
-
-	DEF_SIGNAL_1(playerJoined, const CL_String&);
-
-	DEF_SIGNAL_1(playerLeaved, const CL_String&);
-
+class Time
+{
 	public:
 
-		explicit Server(const ServerConfiguration &p_conf);
+		Time();
 
-		virtual ~Server();
+		Time(unsigned p_milis);
 
+		virtual ~Time();
 
-		void start();
+		unsigned get() const;
 
-		void stop();
+		int getCenti() const;
+
+		int getSeconds() const;
+
+		int getMillis() const;
+
+		int getMinutes() const;
 
 
 	private:
 
-		CL_SharedPtr<ServerImpl> m_impl;
+		CL_SharedPtr<TimeImpl> m_impl;
 };
 
-} // namespace
+}
+

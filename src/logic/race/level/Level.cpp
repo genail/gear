@@ -30,6 +30,7 @@
 
 #include <assert.h>
 
+#include "common/Limits.h"
 #include "common/Units.h"
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
@@ -38,6 +39,7 @@
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackTriangulator.h"
 #include "logic/race/level/TrackPoint.h"
+#include "logic/race/level/TrackSegment.h"
 #include "logic/race/resistance/Geometry.h"
 #include "logic/race/resistance/ResistanceMap.h"
 
@@ -445,17 +447,109 @@ void Level::removeCar(Car *p_car) {
 	p_car->m_level = NULL;
 }
 
-CL_Pointf Level::getStartPosition(int p_num) const {
+void Level::getStartPosAndRot(
+		int p_num,
+		CL_Pointf *p_pos, CL_Angle *p_rot
+) const
+{
+	G_ASSERT(m_impl->m_loaded);
+	G_ASSERT(p_num >= 1 && "too low position number");
+	G_ASSERT(p_num <= Limits::MAX_PLAYERS);
 
-	std::map<int, CL_Pointf>::const_iterator startPositionItor = m_impl->m_startPositions.find(p_num);
+	// additional distance from start (per position)
+	static const int DIST_MUL = static_cast<int>(Units::toScreen(3.0f));
+	// distance from center
+	static const int RADIUS = static_cast<int>(Units::toScreen(2.0f));
+	// is first position on the right?
+	static const bool RIGHT_FIRST = true;
 
-	if (startPositionItor != m_impl->m_startPositions.end()) {
-		return startPositionItor->second;
-	} else {
-		return CL_Pointf(200, 200);
+	const int lastSegIdx = m_impl->m_track.getPointCount() - 1;
+
+	// this will be car distance from start line
+	const float cdist = p_num * DIST_MUL;
+
+	float llen = 0, len = 0;
+	CL_Pointf last;
+	CL_LineSegment2f seg;
+	float segPart;
+	bool found;
+	int lastMidsIdx;
+
+	for (int i = lastSegIdx; i >= 0; --i) {
+		// get track segment from the end
+		const TrackSegment &s = m_impl->m_trackTriangulator.getSegment(i);
+		const std::vector<CL_Pointf> &mids = s.getMidPoints();
+
+		// find segment for car positioning
+		found = false;
+		lastMidsIdx = static_cast<signed>(mids.size()) - 1;
+
+		for (int j = lastMidsIdx; j >= 0; --j) {
+			const CL_Pointf &curr = mids[j];
+
+			if (j != lastMidsIdx) {
+				len += last.distance(curr);
+			}
+
+			if (cdist <= len) {
+				// found segment
+				seg.p = curr;
+				seg.q = last;
+				segPart = (len - cdist) / (len - llen);
+				found = true;
+				break;
+			}
+
+			last = curr;
+			llen = len;
+		}
+
+		if (found) {
+			break;
+		}
 	}
 
+	if (!found) {
+		G_ASSERT(p_num > 1 && "track too small?!");
+		getStartPosAndRot(p_num - 1, p_pos, p_rot);
+	}
+
+	// calculate right normal
+	// y, -x
+
+	const CL_Vec2f segVec = seg.q - seg.p;
+	CL_Vec2f norm(segVec.y, -segVec.x);
+
+	norm.normalize();
+	norm *= RADIUS;
+
+	// calculate attach point
+	CL_Pointf ap = seg.p;
+	ap.x += (seg.q.x - seg.p.x) * segPart;
+	ap.y += (seg.q.y - seg.p.y) * segPart;
+
+
+	// put normal on proper side
+	// (remember that y is reversed)
+	if (p_num % 2 == 1) {
+		if (RIGHT_FIRST) {
+			norm *= -1;
+		}
+	} else {
+		if (!RIGHT_FIRST) {
+			norm *= -1;
+		}
+	}
+
+	// save the position and rotation
+	*p_pos = ap + norm;
+	*p_rot = segVec.angle(CL_Vec2f(1.0f, 0.0f));
+
+	if (segVec.y < 0) {
+		*p_rot = CL_Angle(-(*p_rot).to_radians(), cl_radians);
+	}
 }
+
 
 int Level::getCarCount() const
 {

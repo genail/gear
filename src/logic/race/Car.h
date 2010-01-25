@@ -71,8 +71,6 @@ class Car
 
 		bool isLocked() const;
 
-		int getLap() const;
-
 		const CL_Pointf& getPosition() const;
 
 		float getRotation() const;
@@ -95,8 +93,6 @@ class Car
 
 		void setBrake(bool p_value);
 
-		void setLap(int p_lap);
-
 		/**
 		 * Sets if car movement should be locked (car won't move).
 		 */
@@ -106,17 +102,18 @@ class Car
 
 		void setPosition(const CL_Pointf &p_position);
 
-		void setRotation(float p_rotation);
-		
-		void setHandbrake(bool p_handbrake);
+		/** @depretated, use setAngle() instead */
+		DEPRECATED(void setRotation(float p_rotation));
 
 		/**
-		 * Sets the car position at selected <code>p_startPosition</code>
-		 * which is a number >= 1.
+		 * Sets the car angle. It should be counter clockwise
+		 * oriented starting from positive X axis.
 		 *
-		 * @param p_startPosition Car start position.
+		 * @param p_angle Angle to set.
 		 */
-		void setStartPosition(int p_startPosition);
+		void setAngle(const CL_Angle &p_angle);
+		
+		void setHandbrake(bool p_handbrake);
 
 		void update(unsigned int elapsedTime);
 
@@ -134,9 +131,6 @@ class Car
 
 		/** Parent level */
 		Race::Level *m_level;
-
-		/** Lap number */
-		int m_lap;
 
 		/** This will help to keep 1/60 iteration speed */
 		unsigned m_timeFromLastUpdate;

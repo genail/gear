@@ -46,8 +46,7 @@ int ServerApplication::main(const std::vector<CL_String> &args)
 		// load the server configuration
 		ServerConfiguration config;
 
-		Net::Server server;
-		server.setBindPort(config.getPort());
+		Net::Server server(config);
 
 		server.start();
 
@@ -56,7 +55,7 @@ int ServerApplication::main(const std::vector<CL_String> &args)
 			CL_System::sleep(2);
 		}
 	} catch (CL_Exception e) {
-		CL_Console::write_line("Exception thrown: %1", e.message);
+		CL_Console::write_line("exception thrown: %1", e.message);
 	}
 
 	return 0;

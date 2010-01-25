@@ -28,9 +28,15 @@
 
 #pragma once
 
-// TODO: This will be changing according to screen resolution
 const float SCREEN_WORLD_RATIO = 20.0f;
 
+/**
+ * Units convertion class.
+ * <p>
+ * About screen units: these units are real screen pixels when using 800x600
+ * resolution. At bigger resolutions these values are stretched
+ * over more than one pixel.
+ */
 class Units
 {
 	public:

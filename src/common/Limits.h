@@ -28,37 +28,11 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-
-#include "common.h"
-
-class ServerConfiguration;
-
-namespace Net {
-
-class ServerImpl;
-
-class Server {
-
-	DEF_SIGNAL_1(playerJoined, const CL_String&);
-
-	DEF_SIGNAL_1(playerLeaved, const CL_String&);
-
+class Limits
+{
 	public:
 
-		explicit Server(const ServerConfiguration &p_conf);
-
-		virtual ~Server();
-
-
-		void start();
-
-		void stop();
-
-
-	private:
-
-		CL_SharedPtr<ServerImpl> m_impl;
+		static const int MAX_PLAYERS;
 };
 
-} // namespace
+const int Limits::MAX_PLAYERS = 32;

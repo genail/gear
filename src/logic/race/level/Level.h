@@ -91,7 +91,10 @@ class Level
 		/**
 		 * @return A start position of <code>p_num</code>
 		 */
-		CL_Pointf getStartPosition(int p_num) const;
+		void getStartPosAndRot(
+				int p_num,
+				CL_Pointf *p_pos, CL_Angle *p_rot
+		) const;
 
 		void load(const CL_String &p_filename);
 

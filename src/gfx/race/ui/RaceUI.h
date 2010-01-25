@@ -33,6 +33,10 @@
 #include "gfx/race/ui/SpeedMeter.h"
 #include "gfx/race/ui/PlayerList.h"
 
+namespace Math {
+	class Time;
+}
+
 namespace Race {
 	class RaceLogic;
 }
@@ -72,6 +76,12 @@ class RaceUI: public Gfx::Drawable {
 		/** Lap count label */
 		Label m_lapLabel;
 
+		/** Lap times label */
+		Label m_lapTimesLabel;
+
+		/** Lap times label */
+		Label m_lapTimesLabelBold;
+
 		/** Player names under cars label */
 		Label m_carLabel;
 
@@ -81,6 +91,8 @@ class RaceUI: public Gfx::Drawable {
 		// Viewport pointer
 		const Gfx::Viewport *m_viewport;
 
+
+		CL_String formatTime(const Math::Time &p_time);
 
 		// draw routines
 
@@ -95,6 +107,8 @@ class RaceUI: public Gfx::Drawable {
 		void drawCarLabels(CL_GraphicContext &p_gc);
 
 		void drawPlayerList(CL_GraphicContext &p_gc);
+
+		void drawLapTimes(CL_GraphicContext &p_gc);
 };
 
 } // namespace

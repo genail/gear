@@ -28,70 +28,197 @@
 
 #include "Server.h"
 
-#include <assert.h>
-
 #include "common.h"
+#include "ServerConfiguration.h"
+#include "logic/race/level/Level.h"
 #include "network/events.h"
 #include "network/version.h"
-#include "../packets/Goodbye.h"
-#include "../packets/GameState.h"
-#include "../packets/ClientInfo.h"
-#include "../packets/PlayerJoined.h"
-#include "../packets/PlayerLeaved.h"
-#include "../packets/VoteStart.h"
-#include "../packets/VoteEnd.h"
-#include "../packets/VoteTick.h"
-#include "../packets/RaceStart.h"
+#include "network/packets/CarState.h"
+#include "network/packets/ClientInfo.h"
+#include "network/packets/Goodbye.h"
+#include "network/packets/GameState.h"
+#include "network/packets/PlayerJoined.h"
+#include "network/packets/PlayerLeaved.h"
+#include "network/packets/RaceStart.h"
+#include "network/packets/VoteStart.h"
+#include "network/packets/VoteEnd.h"
+#include "network/packets/VoteTick.h"
+#include "network/server/VoteSystem.h"
 
 namespace Net {
 
 const int VOTE_TIME_LIMIT_SEC = 30;
 
-Server::Server() :
-	m_bindPort(DEFAULT_PORT),
-	m_running(false)
-{
-	m_slots.connect(m_gameServer.sig_client_connected(), this, &Server::onClientConnected);
-	m_slots.connect(m_gameServer.sig_client_disconnected(), this, &Server::onClientDisconnected);
-	m_slots.connect(m_gameServer.sig_event_received(), this, &Server::onEventArrived);
 
-	m_voteSystem.func_finished().set(this, &Server::onVoteSystemFinished);
+class ServerImpl
+{
+	public:
+
+		IMPL_SIGNAL_1(playerJoined, const CL_String&);
+
+		IMPL_SIGNAL_1(playerLeaved, const CL_String&);
+
+		struct Player {
+
+			CL_String m_name;
+
+			bool m_gameStateSent;
+
+			CarState m_lastCarState;
+
+			Player() :
+				m_gameStateSent(false)
+			{}
+		};
+
+		/** Server configuration */
+		const ServerConfiguration m_conf;
+
+		/** Running state */
+		bool m_running;
+
+		/** List of active connections */
+		typedef std::map<CL_NetGameConnection*, Player> TConnectionPlayerMap;
+		typedef std::pair<CL_NetGameConnection*, Player> TConnectionPlayerPair;
+
+		TConnectionPlayerMap m_connections;
+
+		/** The level */
+		Race::Level m_level;
+
+		/** Voting system */
+		VoteSystem m_voteSystem;
+
+		/** ClanLib game server */
+		CL_NetGameServer m_gameServer;
+
+		/** Slots container */
+		CL_SlotContainer m_slots;
+
+
+		ServerImpl(const ServerConfiguration &p_conf) :
+			m_conf(p_conf), // copy this object
+			m_running(false)
+		{ /* empty */ }
+
+
+		// helpers
+
+		void send(CL_NetGameConnection *p_con, const CL_NetGameEvent &p_event);
+
+		void sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore = NULL, bool p_ignoreNotFullyConnected = true);
+
+		GameState prepareGameState();
+
+		void startRace();
+
+
+		// network events
+
+		void onClientConnected(CL_NetGameConnection *p_connection);
+
+		void onClientDisconnected(CL_NetGameConnection *p_connection);
+
+		void onEventArrived(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
+
+		//
+		// event handlers
+		//
+
+		void onClientInfo(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+
+		void onCarState(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event);
+
+		void onVoteStart(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
+
+		void onVoteTick(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
+
+		//
+		// other events
+		//
+
+		void onVoteSystemFinished();
+};
+
+METH_SIGNAL_1(Server, playerJoined, const CL_String&);
+METH_SIGNAL_1(Server, playerLeaved, const CL_String&);
+
+Server::Server(const ServerConfiguration &p_conf) :
+	m_impl(new ServerImpl(p_conf))
+{
+	const CL_String levPath = cl_format("%1/%2", LEVELS_DIR, p_conf.getLevel());
+
+	if (!CL_FileHelp::file_exists(levPath)) {
+		cl_log_event(LOG_ERROR, "level %1 doesn't exists, exiting", levPath);
+		exit(1);
+	}
+
+	m_impl->m_level.load(levPath);
+	if (!m_impl->m_level.isLoaded()) {
+		cl_log_event(LOG_ERROR, "level %1 not loaded, exiting", levPath);
+		exit(1);
+	}
+
+	m_impl->m_slots.connect(
+			m_impl->m_gameServer.sig_client_connected(),
+			m_impl.get(), &ServerImpl::onClientConnected
+	);
+
+	m_impl->m_slots.connect(
+			m_impl->m_gameServer.sig_client_disconnected(),
+			m_impl.get(), &ServerImpl::onClientDisconnected
+	);
+
+	m_impl->m_slots.connect(
+			m_impl->m_gameServer.sig_event_received(),
+			m_impl.get(), &ServerImpl::onEventArrived
+	);
+
+	m_impl->m_voteSystem.func_finished().set(
+			m_impl.get(), &ServerImpl::onVoteSystemFinished
+	);
 }
 
 Server::~Server()
 {
-	if (m_running) {
+	if (m_impl->m_running) {
 		stop();
 	}
 }
 
 void Server::start()
 {
-	assert(!m_running);
+	G_ASSERT(!m_impl->m_running);
 
 	try {
-		m_gameServer.start(CL_StringHelp::int_to_local8(m_bindPort));
-		m_running = true;
+		m_impl->m_gameServer.start(
+				CL_StringHelp::int_to_local8(m_impl->m_conf.getPort())
+		);
+
+		m_impl->m_running = true;
+
+		cl_log_event(LOG_INFO, "server is up and running");
+
 	} catch (const CL_Exception &e) {
-		cl_log_event("runtime", "Unable to start the server: %1", e.message);
+		cl_log_event(LOG_ERROR, "unable to start the server: %1", e.message);
 	}
 }
 
 void Server::stop()
 {
-	assert(m_running);
+	G_ASSERT(m_impl->m_running);
 
 	try {
-		m_gameServer.stop();
-		m_running = false;
+		m_impl->m_gameServer.stop();
+		m_impl->m_running = false;
 	} catch (const CL_Exception &e) {
-		cl_log_event("runtime", "Unable to stop the server: %1", e.message);
+		cl_log_event(LOG_ERROR, "unable to stop the server: %1", e.message);
 	}
 }
 
-void Server::onClientConnected(CL_NetGameConnection *p_conn)
+void ServerImpl::onClientConnected(CL_NetGameConnection *p_conn)
 {
-	cl_log_event("network", "Player %1 is connected", (unsigned) p_conn);
+	cl_log_event(LOG_EVENT, "player %1 is connected", (unsigned) p_conn);
 
 	Player player;
 
@@ -102,11 +229,18 @@ void Server::onClientConnected(CL_NetGameConnection *p_conn)
 	// no signal invoke yet
 }
 
-void Server::onClientDisconnected(CL_NetGameConnection *p_netGameConnection)
+void ServerImpl::onClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 {
-	cl_log_event("network", "Player %1 disconnects", m_connections[p_netGameConnection].m_name.empty() ? CL_StringHelp::uint_to_local8((unsigned) p_netGameConnection) : m_connections[p_netGameConnection].m_name);
+	cl_log_event(
+			LOG_EVENT,
+			"player %1 disconnects",
+			m_connections[p_netGameConnection].m_name.empty()
+				? CL_StringHelp::uint_to_local8((unsigned) p_netGameConnection)
+				: m_connections[p_netGameConnection].m_name
+	);
 
-	std::map<CL_NetGameConnection*, Player>::iterator itor = m_connections.find(p_netGameConnection);
+	std::map<CL_NetGameConnection*, Player>::iterator itor =
+			m_connections.find(p_netGameConnection);
 
 	if (itor != m_connections.end()) {
 
@@ -128,9 +262,12 @@ void Server::onClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 	}
 }
 
-void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+void ServerImpl::onEventArrived(
+		CL_NetGameConnection *p_conn,
+		const CL_NetGameEvent &p_event
+)
 {
-	cl_log_event("event", "Event %1 arrived", p_event.to_string());
+	cl_log_event(LOG_EVENT, "event %1 arrived", p_event.to_string());
 
 	try {
 		bool unhandled = false;
@@ -139,17 +276,17 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 		// connection initialize events
 
 		if (eventName == EVENT_CLIENT_INFO) {
-			onClientInfo(p_connection, p_event);
+			onClientInfo(p_conn, p_event);
 		}
 
 		// race events
 
 		else if (eventName == EVENT_CAR_STATE) {
-			onCarState(p_connection, p_event);
+			onCarState(p_conn, p_event);
 		} else if (eventName == EVENT_VOTE_START) {
-			onVoteStart(p_connection, p_event);
+			onVoteStart(p_conn, p_event);
 		} else if (eventName == EVENT_VOTE_TICK) {
-			onVoteTick(p_connection, p_event);
+			onVoteTick(p_conn, p_event);
 		}
 
 		// unknown events remains unhandled
@@ -160,22 +297,34 @@ void Server::onEventArrived(CL_NetGameConnection *p_connection, const CL_NetGame
 
 
 		if (unhandled) {
-			cl_log_event("event", "Event %1 remains unhandled", p_event.to_string());
+			cl_log_event(
+					LOG_EVENT,
+					"event %1 remains unhandled",
+					p_event.to_string()
+			);
 		}
 	} catch (CL_Exception e) {
-		cl_log_event("exception", e.message);
+		cl_log_event(LOG_ERROR, e.message);
 	}
 
 }
 
-void Server::onVoteStart(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+void ServerImpl::onVoteStart(
+		CL_NetGameConnection *p_conn,
+		const CL_NetGameEvent &p_event
+)
 {
 	VoteStart voteStart;
 	voteStart.parseEvent(p_event);
 
 	if (!m_voteSystem.isRunning()) {
-		cl_log_event(LOG_EVENT, "Starting new vote");
-		m_voteSystem.start(voteStart.getType(), m_connections.size(), VOTE_TIME_LIMIT_SEC * 1000);
+		cl_log_event(LOG_EVENT, "starting a new vote");
+
+		m_voteSystem.start(
+				voteStart.getType(),
+				m_connections.size(),
+				VOTE_TIME_LIMIT_SEC * 1000
+		);
 
 		// set the time limit
 		voteStart.setTimeLimit(VOTE_TIME_LIMIT_SEC);
@@ -185,13 +334,17 @@ void Server::onVoteStart(CL_NetGameConnection *p_connection, const CL_NetGameEve
 	}
 }
 
-void Server::onVoteTick(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
+void ServerImpl::onVoteTick(
+		CL_NetGameConnection *p_conn,
+		const CL_NetGameEvent &p_event
+)
 {
 	VoteTick voteTick;
 	voteTick.parseEvent(p_event);
 
 	if (!m_voteSystem.isFinished()) {
-		const bool accepted = m_voteSystem.addVote(voteTick.getOption(), (int) p_connection);
+		const bool accepted =
+				m_voteSystem.addVote(voteTick.getOption(), (int) p_conn);
 
 		if (accepted && !m_voteSystem.isFinished()) {
 			// send this vote over network
@@ -200,115 +353,7 @@ void Server::onVoteTick(CL_NetGameConnection *p_connection, const CL_NetGameEven
 	}
 }
 
-void Server::onCarState(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
-{
-	// register last car state
-	Player &player = m_connections[p_connection];
-	player.m_lastCarState.parseEvent(p_event);
-
-	// set players name (client may not set it to his nickname)
-	player.m_lastCarState.setName(player.m_name);
-
-	// send it all over
-	sendToAll(player.m_lastCarState.buildEvent(), p_connection);
-}
-
-void Server::onClientInfo(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
-{
-	ClientInfo clientInfo;
-	clientInfo.parseEvent(p_event);
-
-	// check the version
-	if (clientInfo.getProtocolVersion().getMajor() != PROTOCOL_VERSION_MAJOR) {
-		cl_log_event("event", "Unsupported protocol version for player '%2'", (unsigned) p_conn);
-
-		// send goodbye
-		Net::Goodbye goodbye;
-		goodbye.setGoodbyeReason(GR_UNSUPPORTED_PROTOCOL_VERSION);
-
-		send(p_conn, goodbye.buildEvent());
-		return;
-	}
-
-	// check name availability
-	// check name availability
-	bool nameAvailable = true;
-	std::pair<CL_NetGameConnection*, Server::Player> pair;
-	foreach (pair, m_connections) {
-		if (pair.second.m_name == clientInfo.getName()) {
-			nameAvailable = false;
-		}
-	}
-
-	if (!nameAvailable) {
-		cl_log_event("event", "Name '%1' already in use for player '%2'", clientInfo.getName(), (unsigned) p_conn);
-
-		// send goodbye
-		Goodbye goodbye;
-		goodbye.setGoodbyeReason(GR_NAME_ALREADY_IN_USE);
-
-		send(p_conn, goodbye.buildEvent());
-		return;
-	}
-
-	// set the name and inform all
-	m_connections[p_conn].m_name = clientInfo.getName();
-
-	cl_log_event("event", "'%1' is now known as '%2', sending gamestate...", (unsigned) p_conn, clientInfo.getName());
-
-	PlayerJoined playerJoined;
-	playerJoined.setName(clientInfo.getName());
-
-	sendToAll(playerJoined.buildEvent(), p_conn);
-
-	// send the gamestate
-	const GameState gamestate = prepareGameState();
-	send(p_conn, gamestate.buildEvent());
-
-	m_connections[p_conn].m_gameStateSent = true;
-}
-
-GameState Server::prepareGameState()
-{
-	GameState gamestate;
-
-	std::pair<CL_NetGameConnection*, Server::Player> pair;
-
-	foreach (pair, m_connections) {
-		const Server::Player &player = pair.second;
-		gamestate.addPlayer(player.m_name, player.m_lastCarState);
-	}
-
-	gamestate.setLevel("resources/level2.0.xml"); // FIXME: How to choose level?
-
-	return gamestate;
-}
-
-
-void Server::send(CL_NetGameConnection *p_connection, const CL_NetGameEvent &p_event)
-{
-	p_connection->send_event(p_event);
-}
-
-void Server::sendToAll(const CL_NetGameEvent &p_event, const CL_NetGameConnection* p_ignore, bool p_ignoreNotFullyConnected)
-{
-	std::pair<CL_NetGameConnection*, Server::Player> pair;
-
-	foreach(pair, m_connections) {
-
-		if (pair.first == p_ignore) {
-			continue;
-		}
-
-		if (p_ignoreNotFullyConnected && !pair.second.m_gameStateSent) {
-			continue;
-		}
-
-		pair.first->send_event(p_event);
-	}
-}
-
-void Server::onVoteSystemFinished()
+void ServerImpl::onVoteSystemFinished()
 {
 	// voting finished, send event
 	VoteEnd voteEnd;
@@ -329,14 +374,161 @@ void Server::onVoteSystemFinished()
 	}
 }
 
-void Server::startRace()
+void ServerImpl::onCarState(
+		CL_NetGameConnection *p_conn,
+		const CL_NetGameEvent &p_event)
+{
+	// register last car state
+	Player &player = m_connections[p_conn];
+	player.m_lastCarState.parseEvent(p_event);
+
+	// set players name (client may not set it to his nickname)
+	player.m_lastCarState.setName(player.m_name);
+
+	// send it all over
+	sendToAll(player.m_lastCarState.buildEvent(), p_conn);
+}
+
+void ServerImpl::onClientInfo(
+		CL_NetGameConnection *p_conn,
+		const CL_NetGameEvent &p_event
+)
+{
+	ClientInfo clientInfo;
+	clientInfo.parseEvent(p_event);
+
+	// check the version
+	if (clientInfo.getProtocolVersion().getMajor() != PROTOCOL_VERSION_MAJOR) {
+		cl_log_event(
+				LOG_EVENT,
+				"unsupported protocol version for player '%2'",
+				reinterpret_cast<unsigned>(p_conn)
+		);
+
+		// send goodbye
+		Net::Goodbye goodbye;
+		goodbye.setGoodbyeReason(GR_UNSUPPORTED_PROTOCOL_VERSION);
+
+		send(p_conn, goodbye.buildEvent());
+		return;
+	}
+
+	// check name availability
+	// check name availability
+	bool nameAvailable = true;
+	TConnectionPlayerPair pair;
+	foreach (pair, m_connections) {
+		if (pair.second.m_name == clientInfo.getName()) {
+			nameAvailable = false;
+		}
+	}
+
+	if (!nameAvailable) {
+		cl_log_event(
+				LOG_EVENT,
+				"name '%1' already in use for player '%2'",
+				clientInfo.getName(),
+				reinterpret_cast<unsigned>(p_conn)
+		);
+
+		// send goodbye
+		Goodbye goodbye;
+		goodbye.setGoodbyeReason(GR_NAME_ALREADY_IN_USE);
+
+		send(p_conn, goodbye.buildEvent());
+		return;
+	}
+
+	// set the name and inform all
+	m_connections[p_conn].m_name = clientInfo.getName();
+
+	cl_log_event(
+			LOG_EVENT,
+			"'%1' is now known as '%2', sending gamestate...",
+			reinterpret_cast<unsigned>(p_conn),
+			clientInfo.getName()
+	);
+
+	PlayerJoined playerJoined;
+	playerJoined.setName(clientInfo.getName());
+
+	sendToAll(playerJoined.buildEvent(), p_conn);
+
+	// send the gamestate
+	const GameState gamestate = prepareGameState();
+	send(p_conn, gamestate.buildEvent());
+
+	m_connections[p_conn].m_gameStateSent = true;
+}
+
+GameState ServerImpl::prepareGameState()
+{
+	GameState gamestate;
+
+	TConnectionPlayerPair pair;
+
+	foreach (pair, m_connections) {
+		const ServerImpl::Player &player = pair.second;
+		gamestate.addPlayer(player.m_name, player.m_lastCarState);
+	}
+
+
+	const CL_String levPath = cl_format("%1/%2", LEVELS_DIR, m_conf.getLevel());
+	gamestate.setLevel(levPath);
+
+	return gamestate;
+}
+
+
+void ServerImpl::send(
+		CL_NetGameConnection *p_con,
+		const CL_NetGameEvent &p_event
+)
+{
+	p_con->send_event(p_event);
+}
+
+void ServerImpl::sendToAll(
+		const CL_NetGameEvent &p_event,
+		const CL_NetGameConnection* p_ignore,
+		bool p_ignoreNotFullyConnected
+)
+{
+	TConnectionPlayerPair pair;
+
+	foreach(pair, m_connections) {
+
+		if (pair.first == p_ignore) {
+			continue;
+		}
+
+		if (p_ignoreNotFullyConnected && !pair.second.m_gameStateSent) {
+			continue;
+		}
+
+		pair.first->send_event(p_event);
+	}
+}
+
+void ServerImpl::startRace()
 {
 	RaceStart raceStart;
+	TConnectionPlayerPair pair;
 
-	raceStart.setCarPosition(CL_Pointf(300, 1100));
-	raceStart.setCarRotation(CL_Angle(90, cl_degrees));
+	int i = 1;
+	CL_Pointf pos;
+	CL_Angle rot;
 
-	sendToAll(raceStart.buildEvent());
+	foreach (pair, m_connections) {
+
+		m_level.getStartPosAndRot(i, &pos, &rot);
+		raceStart.setCarPosition(pos);
+		raceStart.setCarRotation(rot);
+
+		send(pair.first, raceStart.buildEvent());
+
+		++i;
+	}
 }
 
 } // namespace

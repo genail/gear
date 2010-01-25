@@ -54,12 +54,21 @@ void OfflineRaceLogic::initialize()
 	// init progress object
 	Progress &prog = getProgress();
 	prog.initialize();
+	prog.resetClock();
 
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 
 	addPlayer(player);
 	level.addCar(&player.getCar());
+
+	CL_Pointf carPos;
+	CL_Angle carRot;
+	level.getStartPosAndRot(1, &carPos, &carRot);
+
+	player.getCar().setPosition(carPos);
+	player.getCar().setRotation(carRot.to_degrees());
+
 }
 
 void OfflineRaceLogic::destroy()

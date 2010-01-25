@@ -41,27 +41,40 @@
 namespace Race
 {
 
-struct ProgressInfo
+class ProgressInfo
 {
-	// current lap
-	int m_lapNum;
+	public:
+		ProgressInfo(const Checkpoint &p_cp) :
+			m_lapNum(1),
+			m_cp(p_cp)
+		{ /* empty */ }
 
-	// farthest accepted checkpoint on track
-	Checkpoint m_cp;
+		void reset(const Checkpoint &p_cp) {
+			m_lapNum = 1;
+			m_cp = p_cp;
+			m_times.clear();
+		}
+
+		// current lap
+		int m_lapNum;
+
+		// farthest accepted checkpoint on track
+		Checkpoint m_cp;
+
+		// lap times
+		std::vector<unsigned> m_times;
 };
 
 class ProgressImpl
 {
 	public:
 
-		typedef std::map<const Car*, ProgressInfo> TCarProgressMap;
-		typedef std::pair<const Car*, ProgressInfo> TCarProgressPair;
+		typedef std::map<const Car*, ProgressInfo*> TCarProgressMap;
+		typedef std::pair<const Car*, ProgressInfo*> TCarProgressPair;
 
 		typedef std::vector<Checkpoint> TCheckpointList;
 		typedef std::vector<int> TCheckpointDistances;
 
-
-		// fields
 
 		/** Cars to progress mapping */
 		TCarProgressMap m_cars;
@@ -77,6 +90,8 @@ class ProgressImpl
 
 		const Level &m_level;
 
+		unsigned m_clock;
+
 		/** Initialized flag */
 		bool m_initd;
 
@@ -85,7 +100,8 @@ class ProgressImpl
 
 		ProgressImpl(const Level &p_level) :
 			m_level(p_level),
-			m_initd(false)
+			m_initd(false),
+			m_clock(0)
 		{ /* empty */ }
 
 		~ProgressImpl()
@@ -124,9 +140,25 @@ Progress::~Progress()
 void Progress::addCar(const Car &p_car)
 {
 	G_ASSERT(m_impl->m_initd);
+	m_impl->m_cars[&p_car] = new ProgressInfo(m_impl->m_chkpts[0]);
+}
 
-	const ProgressInfo pinfo = {0, m_impl->m_chkpts[0]};
-	m_impl->m_cars[&p_car] = pinfo;
+void Progress::reset(const Car &p_car)
+{
+	G_ASSERT(m_impl->m_initd);
+
+	ProgressImpl::TCarProgressMap::iterator itor =
+			m_impl->m_cars.find(&p_car);
+
+	G_ASSERT(itor != m_impl->m_cars.end());
+
+	itor->second->reset(m_impl->m_chkpts[0]);
+}
+
+void Progress::resetClock()
+{
+	G_ASSERT(m_impl->m_initd);
+	m_impl->m_clock = CL_System::get_time();
 }
 
 void Progress::initialize()
@@ -202,6 +234,11 @@ void ProgressImpl::destroy()
 		return;
 	}
 
+	TCarProgressPair pair;
+	foreach (pair, m_cars) {
+		delete pair.second;
+	}
+
 	m_chkpts.clear();
 	m_dists.clear();
 	m_cars.clear();
@@ -218,6 +255,7 @@ void Progress::removeCar(const Car &p_car)
 
 	G_ASSERT(itor != m_impl->m_cars.end());
 
+	delete itor->second;
 	m_impl->m_cars.erase(itor);
 }
 
@@ -232,7 +270,7 @@ void Progress::update()
 		const Checkpoint &nextCp =
 				m_impl->closestCheckpoint(pair.first->getPosition());
 
-		ProgressInfo &info = m_impl->m_cars[pair.first];
+		ProgressInfo &info = *m_impl->m_cars[pair.first];
 
 		if (nextCp.getIndex() == info.m_cp.getIndex() + 1) {
 			// accept if this is next checkpoint
@@ -247,6 +285,7 @@ void Progress::update()
 					// check only if start line is passed
 					if (m_impl->startLinePassed(pair.first)) {
 						++info.m_lapNum;
+						info.m_times.push_back(CL_System::get_time());
 						info.m_cp = nextCp;
 					}
 
@@ -331,14 +370,51 @@ bool ProgressImpl::startLinePassed(const Car *p_car)
 
 int Progress::getLapNumber(const Car &p_car) const
 {
-	G_ASSERT(m_impl->m_initd);
+	if (!m_impl->m_initd) {
+		return 0;
+	}
 
 	ProgressImpl::TCarProgressMap::const_iterator itor =
 			m_impl->m_cars.find(&p_car);
 
 	G_ASSERT(itor != m_impl->m_cars.end());
 
-	return itor->second.m_lapNum;
+	return itor->second->m_lapNum;
+}
+
+int Progress::getLapTime(const Car &p_car, int p_lap) const
+{
+	G_ASSERT(p_lap >= 1);
+
+	if (!m_impl->m_initd) {
+		return 0;
+	}
+
+	// get progress info
+	ProgressImpl::TCarProgressMap::const_iterator itor =
+			m_impl->m_cars.find(&p_car);
+	G_ASSERT(itor != m_impl->m_cars.end());
+
+	const ProgressInfo &info = *itor->second;
+
+	// get lap time
+	G_ASSERT(info.m_lapNum >= p_lap && "lap not reached yet");
+
+	unsigned from, to;
+
+	if (p_lap != info.m_lapNum) {
+		to = info.m_times[p_lap - 1];
+	} else {
+		to = CL_System::get_time();
+	}
+
+	if (p_lap != 1) {
+		from = info.m_times[p_lap - 2];
+	} else {
+		from = m_impl->m_clock;
+	}
+
+	return static_cast<signed>(to - from);
 }
 
 const Checkpoint &Progress::getCheckpoint(const Car &p_car) const
@@ -351,7 +427,7 @@ const Checkpoint &Progress::getCheckpoint(const Car &p_car) const
 	G_ASSERT(itor != m_impl->m_cars.end());
 
 
-	return itor->second.m_cp;
+	return itor->second->m_cp;
 }
 
 const Checkpoint &Progress::getCheckpoint(int p_idx) const

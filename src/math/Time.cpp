@@ -26,39 +26,113 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Time.h"
 
-#include <ClanLib/core.h>
+namespace Math
+{
 
-#include "common.h"
-
-class ServerConfiguration;
-
-namespace Net {
-
-class ServerImpl;
-
-class Server {
-
-	DEF_SIGNAL_1(playerJoined, const CL_String&);
-
-	DEF_SIGNAL_1(playerLeaved, const CL_String&);
-
+class TimeImpl
+{
 	public:
 
-		explicit Server(const ServerConfiguration &p_conf);
+		unsigned m_milis;
 
-		virtual ~Server();
+		mutable int m_mil;
+
+		mutable int m_centi;
+
+		mutable int m_sec;
+
+		mutable int m_min;
+
+		TimeImpl(unsigned p_milis) :
+			m_milis(p_milis),
+			m_mil(-1),
+			m_centi(-1),
+			m_sec(-1),
+			m_min(-1)
+		{ /* empty */ }
 
 
-		void start();
-
-		void stop();
-
-
-	private:
-
-		CL_SharedPtr<ServerImpl> m_impl;
+		void calc() const;
 };
 
-} // namespace
+Time::Time() :
+	m_impl(new TimeImpl(0))
+{
+	// empty
+}
+
+Time::Time(unsigned p_milis) :
+	m_impl(new TimeImpl(p_milis))
+{
+	// empty
+}
+
+Time::~Time()
+{
+	// empty
+}
+
+unsigned Time::get() const
+{
+	return m_impl->m_milis;
+}
+
+int Time::getCenti() const
+{
+	if (m_impl->m_centi == -1) {
+		m_impl->calc();
+	}
+
+	return m_impl->m_centi;
+}
+
+int Time::getSeconds() const
+{
+	if (m_impl->m_sec == -1) {
+		m_impl->calc();
+	}
+
+	return m_impl->m_sec;
+}
+
+int Time::getMillis() const
+{
+	if (m_impl->m_mil == -1) {
+		m_impl->calc();
+	}
+
+	return m_impl->m_mil;
+}
+
+int Time::getMinutes() const
+{
+	if (m_impl->m_min == -1) {
+		m_impl->calc();
+	}
+
+	return m_impl->m_min;
+}
+
+void TimeImpl::calc() const
+{
+	static const unsigned MILLISECOND = 1;
+	static const unsigned CENTISECOND = MILLISECOND * 10;
+	static const unsigned SECOND = CENTISECOND * 100;
+	static const unsigned MINUTE = SECOND * 60;
+
+	unsigned m = m_milis;
+
+	m_min = m / MINUTE;
+	m -= m_min * MINUTE;
+
+	m_sec = m / SECOND;
+	m -= m_sec * SECOND;
+
+	m_mil = m;
+
+	m_centi = m / CENTISECOND;
+}
+
+}

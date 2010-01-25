@@ -257,13 +257,22 @@ CL_String RaceUI::formatTime(const Math::Time &p_time)
 {
 	// buffer for time formating
 	static const int BUF_SIZE = 16;
-	static char buf[16];
+	static char buf[BUF_SIZE];
 
+#if !defined(WIN32)
 	snprintf(
 			buf, BUF_SIZE,
 			"%02d:%02d:%03d",
 			p_time.getMinutes(), p_time.getSeconds(), p_time.getMillis()
 	);
+
+#else // WIN32
+	sprintf(
+			buf,
+			"%02d:%02d:%03d",
+			p_time.getMinutes(), p_time.getSeconds(), p_time.getMillis()
+	);
+#endif // WIN32
 
 	return buf;
 }

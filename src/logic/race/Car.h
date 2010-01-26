@@ -83,9 +83,9 @@ class Car
 		
 		// operations
 
-		void deserialize(const CL_NetGameEvent &p_event);
+		void deserialize(const CL_NetGameEvent &p_data);
 
-		void serialize(CL_NetGameEvent *p_event) const;
+		virtual void serialize(CL_NetGameEvent *p_data) const;
 
 		void setAcceleration(bool p_value);
 
@@ -117,6 +117,12 @@ class Car
 #endif // CLIENT
 
 	protected:
+
+		bool isAcceleration() const;
+
+		bool isBrake() const;
+
+		float getTurn() const;
 
 		void setMovement(const CL_Vec2f &p_movement);
 

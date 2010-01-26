@@ -31,6 +31,8 @@
 namespace Net
 {
 
+const int PASS_TIME = 250;
+
 class RemoteCarImpl
 {
 	public:
@@ -46,6 +48,10 @@ class RemoteCarImpl
 		Race::Car m_oldCar;
 
 		Race::Car m_newCar;
+
+		// Smooth pass float
+		// 0.0 is old car, 1.0 is new car
+		Math::Float m_passFloat;
 };
 
 RemoteCar::RemoteCar() :
@@ -61,26 +67,55 @@ RemoteCar::~RemoteCar()
 
 void RemoteCar::update(unsigned int p_elapsedMS)
 {
+	m_impl->m_passFloat.update(p_elapsedMS);
 
+	const float oldCarRatio = 1.0f - m_impl->m_passFloat.get();
+	const float newCarRatio = m_impl->m_passFloat.get();
+
+	Race::Car &oldCar = m_impl->m_oldCar;
+	Race::Car &newCar = m_impl->m_newCar;
+
+	if (newCarRatio != 1.0f) {
+
+		{
+			// position
+			const CL_Point2f &oldPos = oldCar.getPosition();
+			const CL_Point2f &newPos = newCar.getPosition();
+			const CL_Vec2f oldToNew = (newPos - oldPos) * newCarRatio;
+
+			setPosition(oldPos + oldToNew);
+		}
+
+		{
+			// rotation
+			const CL_Angle &oldRot = oldCar.getCorpseAngle();
+			const CL_Angle &newRot = newCar.getCorpseAngle();
+			const CL_Angle oldToNew =
+					(newRot - oldRot).to_radians() * newCarRatio;
+
+			setAngle(oldRot + oldToNew);
+		}
+	} else {
+		setPosition(newCar.getPosition());
+		setAngle(newCar.getCorpseAngle());
+	}
 }
 
-void RemoteCar::applyCarState(const Net::CarState &p_state)
+void RemoteCar::deserialize(const CL_NetGameState &p_data)
 {
 	Race::Car &o = m_impl->m_oldCar;
 	Race::Car &n = m_impl->m_newCar;
 
-	n.setPosition(p_state.getPosition());
-	n.setRotation(p_state.getRotation());
-	n.setSpeed(p_state.getSpeed());
-	n.setMovement(p_state.getMovement());
+	// deserialize to new car
+	n.deserialize(p_data);
 
-	n.setAcceleration(p_state.getAcceleration() > 0.0f);
-	o.setAcceleration(p_state.getAcceleration() > 0.0f);
-	n.setBrake(p_state.getAcceleration() < 0.0f);
-	o.setBrake(p_state.getAcceleration() < 0.0f);
-	n.setTurn(p_state.getTurn());
-	o.setTurn(p_state.getTurn());
+	// set non sensitive data to old one
+	o.setAcceleration(n.isAcceleration());
+	o.setBrake(n.isBrake());
+	o.setTurn(n.getTurn());
 
+	// start passing
+	m_impl->m_passFloat.animate(0.0f, 1.0f, PASS_TIME);
 }
 
 }

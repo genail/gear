@@ -58,32 +58,44 @@ class FloatImpl
 {
 	public:
 
-		FloatImpl() :
-			m_value(0.0f),
-			m_timeFromStart(0),
-			m_currAnim(NULL)
-		{}
+		typedef std::map<size_t, Animation*> TAnimationMap;
+
 
 		/** Current value container */
 		float m_value;
 
-		/** Time registered from the beginning */
+		/** Time registered from the beginning object life */
 		size_t m_timeFromStart;
 
 		/** Animations to do in time. Key is the start time. */
-		typedef std::map<size_t, Animation*> TAnimationMap;
-
 		TAnimationMap m_animMap;
 
 		/** Currently running animation */
 		Animation *m_currAnim;
 
+
+		FloatImpl(float p_val) :
+			m_value(p_val),
+			m_timeFromStart(0),
+			m_currAnim(NULL)
+		{ /* empty */ }
+
+
 		void setCurrentAnimation(Animation *p_animation);
+
+		void update(unsigned p_timeElapsed);
 };
 
 Float::Float() :
-	m_impl(new FloatImpl())
+	m_impl(new FloatImpl(0.0f))
 {
+	// empty
+}
+
+Float::Float(float p_val) :
+	m_impl(new FloatImpl(p_val))
+{
+	// empty
 }
 
 Float::~Float()
@@ -121,39 +133,49 @@ void Float::animate(
 
 void Float::update(unsigned p_timeElapsed)
 {
-	m_impl->m_timeFromStart += p_timeElapsed;
+	m_impl->update(p_timeElapsed);
+}
 
-	// look for next animation
-	for (FloatImpl::TAnimationMap::iterator itor = m_impl->m_animMap.begin(); itor != m_impl->m_animMap.end();) {
-		if (itor->first <= m_impl->m_timeFromStart) {
-			m_impl->setCurrentAnimation(itor->second);
-			m_impl->m_animMap.erase(itor++);
-		} else {
-			++itor;
+void FloatImpl::update(unsigned p_timeElapsed)
+{
+	m_timeFromStart += p_timeElapsed;
+
+	// look for the next animation
+	if (!m_animMap.empty()) {
+		FloatImpl::TAnimationMap::iterator itor;
+		for (itor = m_animMap.begin(); itor != m_animMap.end();) {
+			if (itor->first <= m_timeFromStart) {
+				setCurrentAnimation(itor->second);
+				m_animMap.erase(itor++);
+			} else {
+				++itor;
+			}
 		}
 	}
 
-	if (m_impl->m_currAnim != NULL) {
+	if (m_currAnim != NULL) {
 
-		if (m_impl->m_currAnim->m_etime <= m_impl->m_timeFromStart) {
+		if (m_currAnim->m_etime <= m_timeFromStart) {
+			// animation should end now
+			m_value = m_currAnim->m_to;
 
-			// check current animation validity
-			delete m_impl->m_currAnim;
-			m_impl->m_currAnim = NULL;
+			delete m_currAnim;
+			m_currAnim = NULL;
 
 		} else {
 
 			// make progress
-
 			const float progress =
-					(m_impl->m_timeFromStart - m_impl->m_currAnim->m_stime) /
-					(float) (m_impl->m_currAnim->m_etime - m_impl->m_currAnim->m_stime);
+					(m_timeFromStart - m_currAnim->m_stime) /
+					static_cast<float> (
+							m_currAnim->m_etime - m_currAnim->m_stime
+					);
 
 			// this should be value between 0.0 and 1.0
-			assert(progress >= 0.0f && progress <= 1.0f);
+			G_ASSERT(progress >= 0.0f && progress <= 1.0f);
 
-			m_impl->m_value = m_impl->m_currAnim->m_easing->ease(
-					m_impl->m_currAnim->m_from, m_impl->m_currAnim->m_to,
+			m_value = m_currAnim->m_easing->ease(
+					m_currAnim->m_from, m_currAnim->m_to,
 					progress
 			);
 

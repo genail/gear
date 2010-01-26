@@ -46,7 +46,7 @@ class RemoteCar : public Race::Car
 		virtual ~RemoteCar();
 
 
-		virtual void applyCarState(const Net::CarState &p_state);
+		virtual void deserialize(const CL_NetGameState &p_data);
 
 		virtual void update(unsigned int p_elapsedMS);
 

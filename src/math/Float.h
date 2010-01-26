@@ -49,6 +49,8 @@ class Float {
 
 		Float();
 
+		Float(float p_val);
+
 		virtual ~Float();
 
 

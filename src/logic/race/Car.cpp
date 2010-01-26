@@ -555,4 +555,19 @@ const CL_Angle &Car::getCorpseAngle() const
 	return m_rotation;
 }
 
+bool Car::isAcceleration() const
+{
+	return m_inputAccel;
+}
+
+bool Car::isBrake() const
+{
+	return m_inputBrake;
+}
+
+float Car::getTurn() const
+{
+	return m_inputTurn;
+}
+
 } // namespace

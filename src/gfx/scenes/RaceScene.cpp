@@ -177,9 +177,6 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 		case CL_KEY_DOWN:
 			car.setBrake(pressed);
 			break;
-		case CL_KEY_SPACE:
-			car.setHandbrake(pressed);
-			break;
 		case CL_KEY_F1:
 			if (pressed && m_logic->isVoteRunning()) {
 				m_logic->voteYes();

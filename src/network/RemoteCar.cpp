@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,41 +26,61 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "RemoteCar.h"
 
-#include <ClanLib/core.h>
+namespace Net
+{
 
-#include "Packet.h"
-
-namespace Net {
-
-class CarState : public Net::Packet {
-
+class RemoteCarImpl
+{
 	public:
 
-		CarState();
+		// To preserve lags, there are two car instances.
+		// The old one is car physics situated when car position didn't change.
+		// The new one is car physics forced by remote player.
+		//
+		// When new packet is received only the new car is positioned at new
+		// place and moving from one position to another is made step by step
+		// to make things smooth.
 
-		virtual ~CarState() {}
+		Race::Car m_oldCar;
 
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
-
-
-		void setName(const CL_String &p_name);
-
-		void setSerializedData(const CL_NetGameEvent &p_data);
-
-	private:
-
-		CL_String m_name;
-
-		CL_NetGameEvent m_serialData;
+		Race::Car m_newCar;
 };
+
+RemoteCar::RemoteCar() :
+	m_impl(new RemoteCarImpl())
+{
+	// empty
+}
+
+RemoteCar::~RemoteCar()
+{
+	// empty
+}
+
+void RemoteCar::update(unsigned int p_elapsedMS)
+{
+
+}
+
+void RemoteCar::applyCarState(const Net::CarState &p_state)
+{
+	Race::Car &o = m_impl->m_oldCar;
+	Race::Car &n = m_impl->m_newCar;
+
+	n.setPosition(p_state.getPosition());
+	n.setRotation(p_state.getRotation());
+	n.setSpeed(p_state.getSpeed());
+	n.setMovement(p_state.getMovement());
+
+	n.setAcceleration(p_state.getAcceleration() > 0.0f);
+	o.setAcceleration(p_state.getAcceleration() > 0.0f);
+	n.setBrake(p_state.getAcceleration() < 0.0f);
+	o.setBrake(p_state.getAcceleration() < 0.0f);
+	n.setTurn(p_state.getTurn());
+	o.setTurn(p_state.getTurn());
+
+}
 
 }

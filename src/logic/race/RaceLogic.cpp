@@ -253,7 +253,7 @@ bool RaceLogic::hasPlayer(const CL_String &p_name) const
 const Player &RaceLogic::getPlayer(const Car& p_car) const
 {
 	foreach (const Player *p, m_impl->m_playerList) {
-		if (p->getCar() == p_car) {
+		if (&p->getCar() == &p_car) {
 			return *p;
 		}
 	}

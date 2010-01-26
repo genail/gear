@@ -194,6 +194,10 @@ void RaceUI::drawLapTimes(CL_GraphicContext &p_gc)
 	const Race::Progress &pr = m_logic->getProgress();
 	const int lap = pr.getLapNumber(car);
 
+	if (lap == 0) {
+		return;
+	}
+
 	// find best lap
 	unsigned best = 0, nbest = 0;
 

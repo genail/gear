@@ -229,7 +229,7 @@ void TyreStripesImpl::add4WheelStripe(
 	const CL_Pointf carPos = p_car.getPosition();
 	const CL_Vec2f posDelta = carPos - p_from;
 
-	CL_Angle angle(p_car.getRotationRad(), cl_radians);
+	CL_Angle angle = p_car.getCorpseAngle();
 
 	CL_Vec2f v;
 	float rad;

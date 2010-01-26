@@ -56,7 +56,6 @@ Car::Car() :
 	m_speed(0.0f),
 	m_inputAccel(false),
 	m_inputBrake(false),
-	m_inputHandbrake(false),
 	m_inputTurn(0.0f),
 	m_inputLocked(false),
 	m_inputChanged(false),
@@ -253,6 +252,7 @@ void Car::update1_60() {
 
 	// calculate next move vector
 	const float m_rotationRad = m_phyMoveRot.to_radians();
+
 	m_phyMoveVec.x = cos(m_rotationRad);
 	m_phyMoveVec.y = sin(m_rotationRad);
 
@@ -350,36 +350,55 @@ void Car::performBoundCollision(const Bound &p_bound)
 }
 #endif // CLIENT
 
-Net::CarState Car::prepareCarState() const
+void Car::serialize(CL_NetGameEvent *p_event) const
 {
-	Net::CarState state;
+	// save inputs
+	p_event->add_argument(m_inputAccel);
+	p_event->add_argument(m_inputBrake);
+	p_event->add_argument(m_inputTurn);
 
-	state.setPosition(m_position);
-	state.setRotation(m_rotation);
-	state.setMovement(m_phyMoveVec);
-	state.setSpeed(m_speed);
-	state.setTurn(m_inputTurn);
+	// corpse state
+	p_event->add_argument(m_position.x);
+	p_event->add_argument(m_position.y);
+	p_event->add_argument(m_rotation.to_radians());
+	p_event->add_argument(m_speed);
 
-	if (m_inputAccel && !m_inputBrake) {
-		state.setAcceleration(1.0f);
-	} else if (!m_inputAccel && m_inputBrake) {
-		state.setAcceleration(-1.0f);
-	} else {
-		state.setAcceleration(0.0f);
-	}
-
-	return state;
+	// physics parameters
+	p_event->add_argument(m_phyMoveRot.to_radians());
+	p_event->add_argument(m_phyMoveVec.x);
+	p_event->add_argument(m_phyMoveVec.y);
+	p_event->add_argument(m_phySpeedDelta);
+	p_event->add_argument(m_phyWheelsTurn);
 }
 
-void Car::applyCarState(const Net::CarState &p_carState)
+void Car::deserialize(const CL_NetGameEvent &p_event)
 {
-	m_position = p_carState.getPosition();
-	m_rotation = p_carState.getRotation();
-	m_phyMoveVec = p_carState.getMovement();
-	m_speed = p_carState.getSpeed();
-	m_inputTurn = p_carState.getTurn();
-	m_inputAccel = p_carState.getAcceleration() > 0.0f;
-	m_inputBrake = p_carState.getAcceleration() < 0.0f;
+	static const unsigned ARGUMENT_COUNT = 12;
+
+	if (p_event.get_argument_count() != ARGUMENT_COUNT) {
+		// when serialize data is invalid don't do anything
+		return;
+	}
+
+	int idx = 0;
+
+	// save inputs
+	m_inputAccel = p_event.get_argument(idx++);
+	m_inputBrake = p_event.get_argument(idx++);
+	m_inputTurn = p_event.get_argument(idx++);
+
+	// corpse state
+	m_position.x = p_event.get_argument(idx++);
+	m_position.y = p_event.get_argument(idx++);
+	m_rotation.from_radians(p_event.get_argument(idx++));
+	m_speed = p_event.get_argument(idx++);
+
+	// physics parameters
+	m_phyMoveRot.from_radians(p_event.get_argument(idx++));
+	m_phyMoveVec.x = p_event.get_argument(idx++);
+	m_phyMoveVec.y = p_event.get_argument(idx++);
+	m_phySpeedDelta = p_event.get_argument(idx++);
+	m_phyWheelsTurn = p_event.get_argument(idx++);
 }
 
 bool Car::isDrifting() const {
@@ -405,16 +424,6 @@ bool Car::isLocked() const
 const CL_Pointf& Car::getPosition() const
 {
 	return m_position;
-}
-
-float Car::getRotation() const
-{
-	return m_rotation.to_degrees();
-}
-
-float Car::getRotationRad() const
-{
-	return m_rotation.to_radians();
 }
 
 float Car::getSpeed() const
@@ -471,24 +480,10 @@ void Car::setPosition(const CL_Pointf &p_position)
 	m_position = p_position;
 }
 
-void Car::setRotation(float p_rotation)
-{
-	setAngle(CL_Angle::from_degrees(p_rotation));
-}
-
 void Car::setAngle(const CL_Angle &p_angle)
 {
 	m_rotation = p_angle;
 	m_phyMoveRot = m_rotation;
-}
-
-void Car::setHandbrake(bool p_handbrake)
-{
-	if (m_inputHandbrake != p_handbrake) {
-		m_inputChanged = true;
-	}
-
-	m_inputHandbrake = p_handbrake;
 }
 
 float Car::limit(float p_value, float p_from, float p_to) const
@@ -545,9 +540,19 @@ void Car::normalizeAngle180(CL_Angle &p_angle)
 	p_angle.normalize_180();
 }
 
-bool Car::operator==(const Car &p_other) const
+void Car::setSpeed(float p_speed)
 {
-	return this == &p_other;
+	m_speed = p_speed;
+}
+
+void Car::setMovement(const CL_Vec2f &p_movement)
+{
+	m_phyMoveVec = p_movement;
+}
+
+const CL_Angle &Car::getCorpseAngle() const
+{
+	return m_rotation;
 }
 
 } // namespace

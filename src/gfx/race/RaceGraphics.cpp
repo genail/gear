@@ -360,7 +360,7 @@ void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	}
 
 	gfxCar->setPosition(p_car.getPosition());
-	gfxCar->setRotation(CL_Angle(p_car.getRotationRad(), cl_radians));
+	gfxCar->setRotation(p_car.getCorpseAngle());
 
 	gfxCar->draw(p_gc);
 	

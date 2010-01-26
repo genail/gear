@@ -73,9 +73,7 @@ class Car
 
 		const CL_Pointf& getPosition() const;
 
-		float getRotation() const;
-		
-		float getRotationRad() const;
+		const CL_Angle &getCorpseAngle() const;
 
 		float getSpeed() const;
 
@@ -85,25 +83,11 @@ class Car
 		
 		// operations
 
-		void applyCarState(const Net::CarState &p_carState);
+		void deserialize(const CL_NetGameEvent &p_event);
 
-		Net::CarState prepareCarState() const;
+		void serialize(CL_NetGameEvent *p_event) const;
 
 		void setAcceleration(bool p_value);
-
-		void setBrake(bool p_value);
-
-		/**
-		 * Sets if car movement should be locked (car won't move).
-		 */
-		void setLocked(bool p_locked);
-
-		void setTurn(float p_value);
-
-		void setPosition(const CL_Pointf &p_position);
-
-		/** @depretated, use setAngle() instead */
-		DEPRECATED(void setRotation(float p_rotation));
 
 		/**
 		 * Sets the car angle. It should be counter clockwise
@@ -112,12 +96,17 @@ class Car
 		 * @param p_angle Angle to set.
 		 */
 		void setAngle(const CL_Angle &p_angle);
+
+		void setBrake(bool p_value);
+
+		void setLocked(bool p_locked);
+
+		void setPosition(const CL_Pointf &p_position);
+
+		void setTurn(float p_value);
 		
-		void setHandbrake(bool p_handbrake);
+		virtual void update(unsigned int elapsedTime);
 
-		void update(unsigned int elapsedTime);
-
-		bool operator==(const Car &p_other) const;
 
 #if defined(CLIENT)
 		/** @return Current collision outline based on car position and rotation */
@@ -126,6 +115,12 @@ class Car
 		/** Invoked when collision with bound has occurred */
 		void performBoundCollision(const Bound &p_bound);
 #endif // CLIENT
+
+	protected:
+
+		void setMovement(const CL_Vec2f &p_movement);
+
+		void setSpeed(float p_speed);
 
 	private:
 
@@ -156,9 +151,6 @@ class Car
 		/** Brake switch */
 		bool m_inputBrake;
 		
-		/** Handbrake switch */
-		bool m_inputHandbrake;
-
 		/** Current turn. -1 is maximum left, 0 is center and 1 is maximum right */
 		float m_inputTurn;
 
@@ -171,11 +163,11 @@ class Car
 
 		// physics
 
-		/** Move vector for next frame */
-		CL_Vec2f m_phyMoveVec;
-
 		/** Car movement rotation */
 		CL_Angle m_phyMoveRot;
+
+		/** Car movement vector (created from movement rotation) */
+		CL_Vec2f m_phyMoveVec;
 
 		/** Speed delta (for isDrifting()) */
 		float m_phySpeedDelta;

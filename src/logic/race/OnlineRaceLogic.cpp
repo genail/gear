@@ -215,7 +215,7 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 
 		// prepare car and put it to level
 		car = &player->getCar();
-		car->applyCarState(p_gameState.getCarState(i));
+		car->deserialize(p_gameState.getCarState(i).getSerializedData());
 
 		getLevel().addCar(&player->getCar());
 	}
@@ -228,7 +228,8 @@ void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
 	const CL_String &playerName = p_carState.getName();
 
 	if (hasPlayer(playerName)) {
-		getPlayer(playerName).getCar().applyCarState(p_carState);
+		const CL_NetGameEvent serialData = p_carState.getSerializedData();
+		getPlayer(playerName).getCar().deserialize(serialData);
 	} else {
 		cl_log_event(LOG_ERROR, "Player %1 do not exists", playerName);
 	}
@@ -252,7 +253,12 @@ void OnlineRaceLogic::onRaceStart(
 	getProgress().reset(car);
 
 	// send current state
-	const Net::CarState carState = car.prepareCarState();
+	CL_NetGameEvent serialData("");
+	car.serialize(&serialData);
+
+	Net::CarState carState;
+	carState.setSerializedData(serialData);
+
 	m_client->sendCarState(carState);
 
 	startRace(3, CL_System::get_time() + RACE_START_DELAY);
@@ -261,7 +267,12 @@ void OnlineRaceLogic::onRaceStart(
 void OnlineRaceLogic::onInputChange(const Car &p_car)
 {
 	if (!p_car.isLocked()) { // ignore when should be locked
-		const Net::CarState carState = p_car.prepareCarState();
+		CL_NetGameEvent serialData("");
+		p_car.serialize(&serialData);
+
+		Net::CarState carState;
+		carState.setSerializedData(serialData);
+
 		m_client->sendCarState(carState);
 	}
 }

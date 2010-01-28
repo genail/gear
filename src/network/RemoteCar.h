@@ -47,6 +47,11 @@ class RemoteCar : public Race::Car
 		virtual ~RemoteCar();
 
 
+		virtual const CL_Pointf& getPosition() const;
+
+		virtual const CL_Angle &getCorpseAngle() const;
+
+
 		virtual void deserialize(const CL_NetGameEvent &p_data);
 
 		virtual void update(unsigned int p_elapsedMS);

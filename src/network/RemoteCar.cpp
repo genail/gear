@@ -47,13 +47,15 @@ class RemoteCarImpl
 		// place and moving from one position to another is made step by step
 		// to make things smooth.
 
-		Race::Car m_oldCar;
-
-		Race::Car m_newCar;
+		Race::Car m_phantomCar;
 
 		// Smooth pass float
 		// 0.0 is old car, 1.0 is new car
 		Math::Float m_passFloat;
+
+		mutable CL_Pointf m_pos;
+
+		mutable CL_Angle m_rot;
 };
 
 RemoteCar::RemoteCar() :
@@ -69,61 +71,62 @@ RemoteCar::~RemoteCar()
 
 void RemoteCar::update(unsigned int p_elapsedMS)
 {
-	m_impl->m_passFloat.update(p_elapsedMS);
+	Car::update(p_elapsedMS);
 
+	m_impl->m_passFloat.update(p_elapsedMS);
 	const float newCarRatio = m_impl->m_passFloat.get();
 
-	Race::Car &oldCar = m_impl->m_oldCar;
-	Race::Car &newCar = m_impl->m_newCar;
-
-	newCar.update(p_elapsedMS);
-	oldCar.update(p_elapsedMS);
-
-	if (fabs(newCarRatio - 1.0f) > 0.01f) {
-
-		{
-			// position
-			const CL_Pointf &oldPos = oldCar.getPosition();
-			const CL_Pointf &newPos = newCar.getPosition();
-			const CL_Vec2f oldToNew = (newPos - oldPos) * newCarRatio;
-
-			setPosition(oldPos + oldToNew);
-		}
-
-		{
-			// rotation
-			const CL_Angle &oldRot = oldCar.getCorpseAngle();
-			const CL_Angle &newRot = newCar.getCorpseAngle();
-			const CL_Angle oldToNew = (newRot - oldRot) * newCarRatio;
-
-			setAngle(oldRot + oldToNew);
-		}
-	} else {
-		setPosition(newCar.getPosition());
-		setAngle(newCar.getCorpseAngle());
+	if (fabs(newCarRatio - 1.0f) > 0.01) {
+		m_impl->m_phantomCar.update(p_elapsedMS);
 	}
 }
 
 void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
 {
-	Race::Car &o = m_impl->m_oldCar;
-	Race::Car &n = m_impl->m_newCar;
-
-	// set current position and angle to old car
 	CL_NetGameEvent ev("");
-	n.serialize(&ev);
-	o.deserialize(ev);
+	serialize(&ev);
+	m_impl->m_phantomCar.deserialize(ev);
 
-	// deserialize to new car
-	n.deserialize(p_data);
-
-	// set non sensitive data to old one
-	o.setAcceleration(n.isAcceleration());
-	o.setBrake(n.isBrake());
-	o.setTurn(n.getTurn());
+	Car::deserialize(p_data);
 
 	// start passing
 	m_impl->m_passFloat.animate(0.0f, 1.0f, PASS_TIME);
+}
+
+const CL_Pointf& RemoteCar::getPosition() const
+{
+	const CL_Pointf &thisPos = Car::getPosition();
+
+	const float newCarRatio = m_impl->m_passFloat.get();
+
+	if (fabs(newCarRatio - 1.0f) > 0.01) {
+		const CL_Pointf &phanPos = m_impl->m_phantomCar.getPosition();
+
+		const CL_Vec2f delta = (thisPos - phanPos) * newCarRatio;
+		m_impl->m_pos = phanPos + delta;
+
+		return m_impl->m_pos;
+	}
+
+	return thisPos;
+}
+
+const CL_Angle &RemoteCar::getCorpseAngle() const
+{
+	const CL_Angle &thisAngle = Car::getCorpseAngle();
+
+//	const float newCarRatio = m_impl->m_passFloat.get();
+//
+//	if (fabs(newCarRatio - 1.0f) > 0.01) {
+//		const CL_Angle &phanAngle = m_impl->m_phantomCar.getCorpseAngle();
+//
+//		const CL_Angle delta = (thisAngle - phanAngle) * newCarRatio;
+//		m_impl->m_rot = phanAngle + delta;
+//
+//		return m_impl->m_rot;
+//	}
+
+	return thisAngle;
 }
 
 }

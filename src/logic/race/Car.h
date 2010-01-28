@@ -72,9 +72,9 @@ class Car
 
 		bool isLocked() const;
 
-		const CL_Pointf& getPosition() const;
+		virtual const CL_Pointf& getPosition() const;
 
-		const CL_Angle &getCorpseAngle() const;
+		virtual const CL_Angle &getCorpseAngle() const;
 
 		float getSpeed() const;
 

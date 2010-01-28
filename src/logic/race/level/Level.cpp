@@ -420,7 +420,8 @@ void LevelImpl::saveTrackEl(CL_DomDocument &p_doc, CL_DomNode &p_trackNode)
 
 float Level::getResistance(float p_realX, float p_realY)
 {
-	return m_impl->m_resistanceMap.resistance(CL_Pointf(p_realX, p_realY));
+//	return m_impl->m_resistanceMap.resistance(CL_Pointf(p_realX, p_realY));
+	return 0.0f;
 }
 
 void Level::addCar(Car *p_car) {

@@ -76,7 +76,12 @@ void RemoteCar::update(unsigned int p_elapsedMS)
 	Race::Car &oldCar = m_impl->m_oldCar;
 	Race::Car &newCar = m_impl->m_newCar;
 
-	if (newCarRatio != 1.0f) {
+	newCar.update(p_elapsedMS);
+	oldCar.update(p_elapsedMS);
+
+	if (fabs(newCarRatio - 1.0f) <= 0.01f) {
+
+		cl_log_event("debug", "aa");
 
 		{
 			// position
@@ -105,6 +110,10 @@ void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
 {
 	Race::Car &o = m_impl->m_oldCar;
 	Race::Car &n = m_impl->m_newCar;
+
+	// set current position and angle to old car
+	o.setPosition(getPosition());
+	o.setAngle(getCorpseAngle());
 
 	// deserialize to new car
 	n.deserialize(p_data);

@@ -27,6 +27,9 @@
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Suites
+//#define BOOST_TEST_MODULE Suites
+
+#define BOOST_TEST_MODULE example
 #include <boost/test/unit_test.hpp>
+
 

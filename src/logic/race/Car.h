@@ -84,7 +84,7 @@ class Car
 		
 		// operations
 
-		void deserialize(const CL_NetGameEvent &p_data);
+		virtual void deserialize(const CL_NetGameEvent &p_data);
 
 		virtual void serialize(CL_NetGameEvent *p_data) const;
 

@@ -26,38 +26,62 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RemotePlayer.h"
+#include <unistd.h>
+#include <boost/test/unit_test.hpp>
 
-#include "network/RemoteCar.h"
-#include "logic/race/Car.h"
+#include "math/Float.h"
 
-class RemotePlayerImpl
+/*
+ * Minimal testing facility:
+ *
+ * BOOST_CHECK( predicate )
+ * BOOST_REQUIRE( predicate )
+ * BOOST_ERROR( message )
+ * BOOST_FAIL( message )
+ *
+ * Test tools:
+ * http://www.boost.org/doc/libs/1_34_0/libs/test/doc/components/test_tools/index.html
+ */
+
+BOOST_AUTO_TEST_SUITE(FloatTest)
+
+BOOST_AUTO_TEST_CASE(EasingNone)
 {
-	public:
+	Math::Float f;
+	f.animate(0.0f, 1.0f, 1000, Math::Easing::NONE);
 
-		Net::RemoteCar m_remoteCar;
-//		Race::Car m_remoteCar;
+	BOOST_CHECK(f.get() == 0.0f);
 
-};
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 0.5f, 0.01f);
 
-RemotePlayer::RemotePlayer(const CL_String8 &p_name) :
-	Player(p_name),
-	m_impl(new RemotePlayerImpl())
-{
-	// empty
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 1.0f, 0.01f);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 1.0f, 0.01f);
 }
 
-RemotePlayer::~RemotePlayer()
+BOOST_AUTO_TEST_CASE(EasingNoneLoop)
 {
-	// empty
+	Math::Float f;
+	f.animate(0.0f, 1.0f, 1000, Math::Easing::NONE);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 0.5f, 0.01f);
+
+	f.animate(0.0f, 1.0f, 1000, Math::Easing::NONE);
+
+	BOOST_CHECK(f.get() == 0.0f);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 0.5f, 0.01f);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 1.0f, 0.01f);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 1.0f, 0.01f);
 }
 
-Race::Car &RemotePlayer::getCar()
-{
-	return m_impl->m_remoteCar;
-}
-
-const Race::Car &RemotePlayer::getCar() const
-{
-	return m_impl->m_remoteCar;
-}
+BOOST_AUTO_TEST_SUITE_END()

@@ -96,10 +96,13 @@ SET(SERVER_SRCS
 
 SET(TEST_SRCS
 	# tested classes
+	math/Easing.cpp
+	math/Float.cpp
 	network/server/VoteSystem.cpp
 	
 	# test code
 	tests/suite.cpp
+	tests/math/FloatTest.cpp
 	tests/network/server/VoteSystemTest.cpp
 )
 
@@ -140,6 +143,12 @@ SET(GEAR_LIBS ${LIBS}
 
 SET(SERVER_LIBS ${LIBS}
 	${ClanLib_App_LIBRARY}
+	${ClanLib_Core_LIBRARY}
+	${ClanLib_Network_LIBRARY}
+	${ZLIB_LIBRARY}
+)
+
+SET(TEST_LIBS ${LIBS}
 	${ClanLib_Core_LIBRARY}
 	${ClanLib_Network_LIBRARY}
 	${ZLIB_LIBRARY}
@@ -306,7 +315,7 @@ SET_TARGET_PROPERTIES(
 # Test configuration
 
 ADD_EXECUTABLE(test_suite ${TEST_SRCS})
-TARGET_LINK_LIBRARIES(test_suite ${GEAR_LIBS} ${SERVER_LIBS})
+TARGET_LINK_LIBRARIES(test_suite ${TEST_LIBS})
 
 SET_TARGET_PROPERTIES(
 	test_suite PROPERTIES
@@ -317,7 +326,7 @@ SET_TARGET_PROPERTIES(
 SET_TARGET_PROPERTIES(
 	test_suite PROPERTIES
 	COMPILE_FLAGS
-	"-Wall -DCLIENT $ENV{CXXFLAGS}  ${COMMON_COMPILE_FLAGS}"
+	"-Wall -DTEST $ENV{CXXFLAGS}  ${COMMON_COMPILE_FLAGS}"
 )
 
 ENABLE_TESTING()

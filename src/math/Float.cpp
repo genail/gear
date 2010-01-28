@@ -130,6 +130,11 @@ void Float::animate(
 	animation->m_easing = &p_easing;
 
 	m_impl->m_animMap[startTime] = animation;
+
+	// set start value if animation should start now
+	if (p_delay == 0) {
+		m_impl->m_value = p_startValue;
+	}
 }
 
 void Float::update(unsigned p_timeElapsed)

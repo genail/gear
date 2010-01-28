@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,57 +26,31 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include <ClanLib/core.h>
+
 #include "Player.h"
 
-#include "logic/race/Car.h"
+class RemotePlayerImpl;
 
-class PlayerImpl
+class RemotePlayer: public Player
 {
 	public:
 
-		bool m_initialized;
+		RemotePlayer(const CL_String8 &p_name = "");
 
-		/** Nickname of this player */
-		CL_String8 m_name;
-
-		/** The car */
-		Race::Car m_car;
+		virtual ~RemotePlayer();
 
 
-		PlayerImpl(const CL_String &p_name = "") :
-			m_initialized(false),
-			m_name(p_name)
-		{ /* empty */ }
+		virtual Race::Car &getCar();
+
+		virtual const Race::Car &getCar() const;
+
+
+	private:
+
+		CL_SharedPtr<RemotePlayerImpl> m_impl;
 
 };
 
-Player::Player(const CL_String8& p_name) :
-	m_impl(new PlayerImpl(p_name))
-{
-	// empty
-}
-
-Player::~Player()
-{
-	// empty
-}
-
-Race::Car &Player::getCar()
-{
-	return m_impl->m_car;
-}
-
-const Race::Car &Player::getCar() const
-{
-	return m_impl->m_car;
-}
-
-const CL_String &Player::getName() const
-{
-	return m_impl->m_name;
-}
-
-void Player::setName(const CL_String &p_name)
-{
-	m_impl->m_name = p_name;
-}

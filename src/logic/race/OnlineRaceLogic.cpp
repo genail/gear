@@ -145,9 +145,11 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 	if (!hasPlayer(p_name)) {
 		// create new player
 
-		m_remotePlayers.push_back(Player(p_name));
+		m_remotePlayers.push_back(
+				CL_SharedPtr<RemotePlayer>(new RemotePlayer(p_name))
+		);
 
-		Player &player = m_remotePlayers.back();
+		RemotePlayer &player = *m_remotePlayers.back();
 		addPlayer(player);
 
 		// add his car to the level
@@ -172,7 +174,7 @@ void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 
 	TPlayerList::iterator itor;
 	for (itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
-		if (*itor == player) {
+		if (itor->get() == &player) {
 			m_remotePlayers.erase(itor);
 			break;
 		}
@@ -206,8 +208,11 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 			player = &m_localPlayer;
 		} else {
 			// this is remote player
-			m_remotePlayers.push_back(Player(playerName));
-			player = &m_remotePlayers.back();
+			m_remotePlayers.push_back(
+					CL_SharedPtr<RemotePlayer>(new RemotePlayer(playerName))
+			);
+
+			player = m_remotePlayers.back();
 		}
 
 		// put player to player list

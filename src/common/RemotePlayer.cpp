@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,57 +26,38 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Player.h"
+#include "RemotePlayer.h"
 
+#include "network/RemoteCar.h"
 #include "logic/race/Car.h"
 
-class PlayerImpl
+class RemotePlayerImpl
 {
 	public:
 
-		bool m_initialized;
-
-		/** Nickname of this player */
-		CL_String8 m_name;
-
-		/** The car */
-		Race::Car m_car;
-
-
-		PlayerImpl(const CL_String &p_name = "") :
-			m_initialized(false),
-			m_name(p_name)
-		{ /* empty */ }
+//		Net::RemoteCar m_remoteCar;
+		Race::Car m_remoteCar;
 
 };
 
-Player::Player(const CL_String8& p_name) :
-	m_impl(new PlayerImpl(p_name))
+RemotePlayer::RemotePlayer(const CL_String8 &p_name) :
+	Player(p_name),
+	m_impl(new RemotePlayerImpl())
 {
 	// empty
 }
 
-Player::~Player()
+RemotePlayer::~RemotePlayer()
 {
 	// empty
 }
 
-Race::Car &Player::getCar()
+Race::Car &RemotePlayer::getCar()
 {
-	return m_impl->m_car;
+	return m_impl->m_remoteCar;
 }
 
-const Race::Car &Player::getCar() const
+const Race::Car &RemotePlayer::getCar() const
 {
-	return m_impl->m_car;
-}
-
-const CL_String &Player::getName() const
-{
-	return m_impl->m_name;
-}
-
-void Player::setName(const CL_String &p_name)
-{
-	m_impl->m_name = p_name;
+	return m_impl->m_remoteCar;
 }

@@ -353,8 +353,8 @@ void Car::performBoundCollision(const Bound &p_bound)
 void Car::serialize(CL_NetGameEvent *p_event) const
 {
 	// save inputs
-	p_event->add_argument(m_inputAccel);
-	p_event->add_argument(m_inputBrake);
+	p_event->add_argument(CL_NetGameEventValue(m_inputAccel));
+	p_event->add_argument(CL_NetGameEventValue(m_inputBrake));
 	p_event->add_argument(m_inputTurn);
 
 	// corpse state
@@ -377,6 +377,12 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 
 	if (p_event.get_argument_count() != ARGUMENT_COUNT) {
 		// when serialize data is invalid don't do anything
+		cl_log_event(
+				LOG_DEBUG,
+				"invalid serialize data count: %1",
+				p_event.get_argument_count()
+		);
+
 		return;
 	}
 

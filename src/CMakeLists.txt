@@ -12,7 +12,9 @@ SET(COMMON_SRCS
 	common/Game.cpp
 	common/Player.cpp
 	common/Properties.cpp
+    common/RemotePlayer.cpp
     math/Time.cpp
+	network/RemoteCar.cpp
 	network/client/Client.cpp
 	network/packets/CarState.cpp
 	network/packets/ClientInfo.cpp
@@ -43,6 +45,8 @@ SET(COMMON_SRCS
 	logic/race/resistance/Primitive.cpp
 	logic/race/resistance/Rectangle.cpp
 	logic/race/resistance/ResistanceMap.cpp
+    math/Float.cpp
+    math/Easing.cpp
 )
 
 # Game client sources
@@ -79,8 +83,6 @@ SET(CLIENT_SRCS
 	gfx/scenes/OptionsScene.cpp
 	logic/race/OfflineRaceLogic.cpp
 	logic/race/OnlineRaceLogic.cpp
-	math/Easing.cpp
-	math/Float.cpp
 )
 
 # Server sources

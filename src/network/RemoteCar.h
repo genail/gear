@@ -29,6 +29,7 @@
 #pragma once
 
 #include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
 #include "logic/race/Car.h"
 
@@ -46,7 +47,7 @@ class RemoteCar : public Race::Car
 		virtual ~RemoteCar();
 
 
-		virtual void deserialize(const CL_NetGameState &p_data);
+		virtual void deserialize(const CL_NetGameEvent &p_data);
 
 		virtual void update(unsigned int p_elapsedMS);
 

@@ -100,6 +100,7 @@ Float::Float(float p_val) :
 
 Float::~Float()
 {
+	// empty
 }
 
 float Float::get() const

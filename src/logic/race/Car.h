@@ -42,6 +42,7 @@ class Player;
 
 namespace Net {
 	class CarState;
+	class RemoteCar;
 }
 
 namespace Gfx {
@@ -205,6 +206,7 @@ class Car
 
 
 		friend class Race::Level;
+		friend class Net::RemoteCar;
 
 #if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
 friend class Gfx::RaceGraphics;

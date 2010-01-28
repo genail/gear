@@ -64,7 +64,7 @@ void CarState::parseEvent(const CL_NetGameEvent &p_event)
 
 	const int argCount = static_cast<signed>(p_event.get_argument_count());
 
-	for (int i = 0; i < argCount; ++i) {
+	for (int i = 1; i < argCount; ++i) {
 		m_serialData.add_argument(p_event.get_argument(i));
 	}
 }

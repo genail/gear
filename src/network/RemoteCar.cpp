@@ -28,6 +28,8 @@
 
 #include "RemoteCar.h"
 
+#include "math/Float.h"
+
 namespace Net
 {
 
@@ -69,7 +71,6 @@ void RemoteCar::update(unsigned int p_elapsedMS)
 {
 	m_impl->m_passFloat.update(p_elapsedMS);
 
-	const float oldCarRatio = 1.0f - m_impl->m_passFloat.get();
 	const float newCarRatio = m_impl->m_passFloat.get();
 
 	Race::Car &oldCar = m_impl->m_oldCar;
@@ -79,8 +80,8 @@ void RemoteCar::update(unsigned int p_elapsedMS)
 
 		{
 			// position
-			const CL_Point2f &oldPos = oldCar.getPosition();
-			const CL_Point2f &newPos = newCar.getPosition();
+			const CL_Pointf &oldPos = oldCar.getPosition();
+			const CL_Pointf &newPos = newCar.getPosition();
 			const CL_Vec2f oldToNew = (newPos - oldPos) * newCarRatio;
 
 			setPosition(oldPos + oldToNew);
@@ -90,8 +91,7 @@ void RemoteCar::update(unsigned int p_elapsedMS)
 			// rotation
 			const CL_Angle &oldRot = oldCar.getCorpseAngle();
 			const CL_Angle &newRot = newCar.getCorpseAngle();
-			const CL_Angle oldToNew =
-					(newRot - oldRot).to_radians() * newCarRatio;
+			const CL_Angle oldToNew = (newRot - oldRot) * newCarRatio;
 
 			setAngle(oldRot + oldToNew);
 		}
@@ -101,7 +101,7 @@ void RemoteCar::update(unsigned int p_elapsedMS)
 	}
 }
 
-void RemoteCar::deserialize(const CL_NetGameState &p_data)
+void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
 {
 	Race::Car &o = m_impl->m_oldCar;
 	Race::Car &n = m_impl->m_newCar;

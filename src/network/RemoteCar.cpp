@@ -33,7 +33,7 @@
 namespace Net
 {
 
-const int PASS_TIME = 250;
+const int PASS_TIME = 500;
 
 class RemoteCarImpl
 {
@@ -79,9 +79,7 @@ void RemoteCar::update(unsigned int p_elapsedMS)
 	newCar.update(p_elapsedMS);
 	oldCar.update(p_elapsedMS);
 
-	if (fabs(newCarRatio - 1.0f) <= 0.01f) {
-
-		cl_log_event("debug", "aa");
+	if (fabs(newCarRatio - 1.0f) > 0.01f) {
 
 		{
 			// position
@@ -112,8 +110,9 @@ void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
 	Race::Car &n = m_impl->m_newCar;
 
 	// set current position and angle to old car
-	o.setPosition(getPosition());
-	o.setAngle(getCorpseAngle());
+	CL_NetGameEvent ev("");
+	n.serialize(&ev);
+	o.deserialize(ev);
 
 	// deserialize to new car
 	n.deserialize(p_data);

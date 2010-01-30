@@ -36,7 +36,6 @@
 #endif // CLIENT
 
 #include "common.h"
-#include "common/Player.h"
 
 class Player;
 
@@ -101,6 +100,8 @@ class Car : boost::noncopyable
 		void setTurn(float p_value);
 
 
+		// state setters
+
 		/**
 		 * Sets the car angle. It should be counter clockwise
 		 * oriented starting from positive X axis.
@@ -111,7 +112,17 @@ class Car : boost::noncopyable
 
 		void setPosition(const CL_Pointf &p_position);
 
+
+		// other operations
+
 		virtual void update(unsigned int elapsedTime);
+
+
+		// operators
+
+		bool operator==(const Car &p_other) const;
+
+		bool operator!=(const Car &p_other) const;
 
 
 #if defined(CLIENT)

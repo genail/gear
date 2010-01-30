@@ -96,12 +96,17 @@ SET(SERVER_SRCS
 
 SET(TEST_SRCS
 	# tested classes
+	gfx/DebugLayer.cpp
+	gfx/Stage.cpp
+	gfx/race/ui/Label.cpp
+	logic/race/Car.cpp
 	math/Easing.cpp
 	math/Float.cpp
 	network/server/VoteSystem.cpp
 	
 	# test code
 	tests/suite.cpp
+	tests/logic/race/CarTest.cpp
 	tests/math/FloatTest.cpp
 	tests/network/server/VoteSystemTest.cpp
 )
@@ -150,6 +155,7 @@ SET(SERVER_LIBS ${LIBS}
 
 SET(TEST_LIBS ${LIBS}
 	${ClanLib_Core_LIBRARY}
+	${ClanLib_Display_LIBRARY}
 	${ClanLib_Network_LIBRARY}
 	${ZLIB_LIBRARY}
 )

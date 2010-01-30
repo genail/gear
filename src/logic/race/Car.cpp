@@ -28,17 +28,13 @@
 
 #include <ClanLib/core.h>
 
+#include "Car.h"
+
 #include "common.h"
-#include "common/Game.h"
-#include "common/Player.h"
-#include "common/Properties.h"
 #include "gfx/Stage.h"
 #include "gfx/DebugLayer.h"
-#include "logic/race/Car.h"
 #include "logic/race/level/Level.h"
-#include "logic/race/level/Checkpoint.h"
 #include "logic/race/level/Bound.h"
-#include "network/packets/CarState.h"
 
 namespace Race {
 
@@ -56,9 +52,6 @@ class CarImpl
 
 		/** Base object */
 		const Car *const m_base;
-
-		/** Parent level */
-		Race::Level *m_level;
 
 		/** This will help to keep 1/60 iteration speed */
 		unsigned m_timeFromLastUpdate;
@@ -116,7 +109,6 @@ class CarImpl
 
 		CarImpl(const Car *p_base) :
 			m_base(p_base),
-			m_level(NULL),
 			m_timeFromLastUpdate(0),
 			m_position(300.0f, 300.0f),
 			m_rotation(0, cl_degrees),
@@ -153,7 +145,7 @@ METH_SIGNAL_1(Car, inputChanged, const Car&)
 Car::Car() :
 	m_impl(new CarImpl(this))
 {
-#ifndef SERVER
+#if defined(CLIENT)
 	// build car contour for collision check
 	CL_Contour contour;
 
@@ -170,7 +162,7 @@ Car::Car() :
 
 	m_impl->m_phyCollisionOutline.calculate_radius();
 	m_impl->m_phyCollisionOutline.calculate_smallest_enclosing_discs();
-#endif // !SERVER
+#endif // CLIENT
 }
 
 Car::~Car()
@@ -372,10 +364,10 @@ void CarImpl::update1_60() {
 	DebugLayer *dbgl = Gfx::Stage::getDebugLayer();
 
 	dbgl->putMessage("speed", cl_format("%1", m_speed));
-	if (!m_level) {
-		const float resistance = m_level->getResistance(m_position.x, m_position.y);
-		dbgl->putMessage("resist", cl_format("%1", resistance));
-	}
+//	if (!m_level) {
+//		const float resistance = m_level->getResistance(m_position.x, m_position.y);
+//		dbgl->putMessage("resist", cl_format("%1", resistance));
+//	}
 #endif // NDEBUG
 #endif // CLIENT
 }
@@ -449,6 +441,7 @@ void Car::serialize(CL_NetGameEvent *p_event) const
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputAccel));
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputBrake));
 	p_event->add_argument(m_impl->m_inputTurn);
+	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputLocked));
 
 	// corpse state
 	p_event->add_argument(m_impl->m_position.x);
@@ -466,7 +459,7 @@ void Car::serialize(CL_NetGameEvent *p_event) const
 
 void Car::deserialize(const CL_NetGameEvent &p_event)
 {
-	static const unsigned ARGUMENT_COUNT = 12;
+	static const unsigned ARGUMENT_COUNT = 13;
 
 	if (p_event.get_argument_count() != ARGUMENT_COUNT) {
 		// when serialize data is invalid don't do anything
@@ -485,15 +478,16 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 	m_impl->m_inputAccel = p_event.get_argument(idx++);
 	m_impl->m_inputBrake = p_event.get_argument(idx++);
 	m_impl->m_inputTurn = p_event.get_argument(idx++);
+	m_impl->m_inputLocked = p_event.get_argument(idx++);
 
 	// corpse state
 	m_impl->m_position.x = p_event.get_argument(idx++);
 	m_impl->m_position.y = p_event.get_argument(idx++);
-	m_impl->m_rotation.from_radians(p_event.get_argument(idx++));
+	m_impl->m_rotation.set_radians(p_event.get_argument(idx++));
 	m_impl->m_speed = p_event.get_argument(idx++);
 
 	// physics parameters
-	m_impl->m_phyMoveRot.from_radians(p_event.get_argument(idx++));
+	m_impl->m_phyMoveRot.set_radians(p_event.get_argument(idx++));
 	m_impl->m_phyMoveVec.x = p_event.get_argument(idx++);
 	m_impl->m_phyMoveVec.y = p_event.get_argument(idx++);
 	m_impl->m_phySpeedDelta = p_event.get_argument(idx++);
@@ -667,6 +661,33 @@ bool Car::isBrake() const
 float Car::getTurn() const
 {
 	return m_impl->m_inputTurn;
+}
+
+bool Car::operator==(const Car &p_other) const
+{
+	if (&p_other == this) {
+		return true;
+	}
+
+	bool r = true;
+	r &= m_impl->m_position == p_other.m_impl->m_position;
+	r &= m_impl->m_rotation == p_other.m_impl->m_rotation;
+	r &= m_impl->m_speed == p_other.m_impl->m_speed;
+	r &= m_impl->m_inputAccel == p_other.m_impl->m_inputAccel;
+	r &= m_impl->m_inputBrake == p_other.m_impl->m_inputBrake;
+	r &= m_impl->m_inputTurn == p_other.m_impl->m_inputTurn;
+	r &= m_impl->m_inputLocked == p_other.m_impl->m_inputLocked;
+	r &= m_impl->m_phyMoveRot == p_other.m_impl->m_phyMoveRot;
+	r &= m_impl->m_phyMoveVec == p_other.m_impl->m_phyMoveVec;
+	r &= m_impl->m_phySpeedDelta == p_other.m_impl->m_phySpeedDelta;
+	r &= m_impl->m_phyWheelsTurn == p_other.m_impl->m_phyWheelsTurn;
+
+	return r;
+}
+
+bool Car::operator!=(const Car &p_other) const
+{
+	return !(*this == p_other);
 }
 
 } // namespace

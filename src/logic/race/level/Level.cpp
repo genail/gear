@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -426,10 +426,7 @@ float Level::getResistance(float p_realX, float p_realY)
 
 void Level::addCar(Car *p_car) {
 
-	assert(m_impl->m_loaded && "Level is not loaded");
-
-	p_car->m_level = this;
-
+	G_ASSERT(m_impl->m_loaded && "Level is not loaded");
 	m_impl->m_cars.push_back(p_car);
 }
 
@@ -444,8 +441,6 @@ void Level::removeCar(Car *p_car) {
 			break;
 		}
 	}
-
-	p_car->m_level = NULL;
 }
 
 void Level::getStartPosAndRot(

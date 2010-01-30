@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -150,7 +150,7 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 		);
 
 		RemotePlayer &player = *m_remotePlayers.back();
-		addPlayer(player);
+		addPlayer(&player);
 
 		// add his car to the level
 		getLevel().addCar(&player.getCar());
@@ -173,14 +173,18 @@ void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 	removePlayer(player);
 
 	TPlayerList::iterator itor;
+	bool found = false;
+
 	for (itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
-		if (itor->get() == &player) {
+
+		if (reinterpret_cast<unsigned> (itor->get()) == reinterpret_cast<unsigned> (&player)) {
 			m_remotePlayers.erase(itor);
+			found = true;
 			break;
 		}
 	}
 
-	G_ASSERT(itor != m_remotePlayers.end());
+	G_ASSERT(found);
 	display(cl_format("Player %1 leaved", p_name));
 }
 
@@ -216,7 +220,7 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 		}
 
 		// put player to player list
-		addPlayer(*player);
+		addPlayer(player);
 
 		// prepare car and put it to level
 		car = &player->getCar();

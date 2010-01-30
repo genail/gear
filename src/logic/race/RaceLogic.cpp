@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -365,10 +365,10 @@ void RaceLogic::display(const CL_String &p_message)
 	m_impl->m_messageBoard.addMessage(p_message);
 }
 
-void RaceLogic::addPlayer(Player &p_player)
+void RaceLogic::addPlayer(Player *p_player)
 {
-	m_impl->m_playerList.push_back(&p_player);
-	m_impl->m_progress.addCar(p_player.getCar());
+	m_impl->m_playerList.push_back(p_player);
+	m_impl->m_progress.addCar(p_player->getCar());
 }
 
 const Player &RaceLogic::getPlayer(int p_index) const

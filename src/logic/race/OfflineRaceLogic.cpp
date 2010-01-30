@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,7 @@ void OfflineRaceLogic::initialize()
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 
-	addPlayer(player);
+	addPlayer(&player);
 	level.addCar(&player.getCar());
 
 	CL_Pointf carPos;

@@ -33,7 +33,7 @@
 namespace Net
 {
 
-const int PASS_TIME = 500;
+const int PASS_TIME = 250;
 
 class RemoteCarImpl
 {
@@ -72,13 +72,8 @@ RemoteCar::~RemoteCar()
 void RemoteCar::update(unsigned int p_elapsedMS)
 {
 	Car::update(p_elapsedMS);
-
+	m_impl->m_phantomCar.update(p_elapsedMS);
 	m_impl->m_passFloat.update(p_elapsedMS);
-	const float newCarRatio = m_impl->m_passFloat.get();
-
-	if (fabs(newCarRatio - 1.0f) > 0.01) {
-		m_impl->m_phantomCar.update(p_elapsedMS);
-	}
 }
 
 void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
@@ -115,16 +110,16 @@ const CL_Angle &RemoteCar::getCorpseAngle() const
 {
 	const CL_Angle &thisAngle = Car::getCorpseAngle();
 
-//	const float newCarRatio = m_impl->m_passFloat.get();
-//
-//	if (fabs(newCarRatio - 1.0f) > 0.01) {
-//		const CL_Angle &phanAngle = m_impl->m_phantomCar.getCorpseAngle();
-//
-//		const CL_Angle delta = (thisAngle - phanAngle) * newCarRatio;
-//		m_impl->m_rot = phanAngle + delta;
-//
-//		return m_impl->m_rot;
-//	}
+	const float newCarRatio = m_impl->m_passFloat.get();
+
+	if (fabs(newCarRatio - 1.0f) > 0.01) {
+		const CL_Angle &phanAngle = m_impl->m_phantomCar.getCorpseAngle();
+
+		const CL_Angle delta = (thisAngle - phanAngle) * newCarRatio;
+		m_impl->m_rot = phanAngle + delta;
+
+		return m_impl->m_rot;
+	}
 
 	return thisAngle;
 }

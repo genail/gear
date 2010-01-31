@@ -45,8 +45,18 @@
             <image file="start_line.png" />
         </sprite>
         
-        <sprite name="smoke">
-            <image file="smoke.png" />
+        <sprite name="smoke1">
+            <image file="smoke1.png" />
+            <translation origin="center" />
+        </sprite>
+        
+        <sprite name="smoke2">
+            <image file="smoke2.png" />
+            <translation origin="center" />
+        </sprite>
+        
+        <sprite name="smoke3">
+            <image file="smoke3.png" />
             <translation origin="center" />
         </sprite>
         

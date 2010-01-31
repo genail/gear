@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,8 +52,11 @@ class Smoke: public Gfx::Animation {
 
 	private:
 
-		/** The sprite */
-		CL_Sprite m_smokeSprite;
+		// smoke sprites
+		static CL_Sprite m_smokeSprites[];
+
+		/** Index of this smoke sprite */
+		int m_spriteIdx;
 
 		/** The position */
 		CL_Pointf m_position;

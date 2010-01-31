@@ -36,7 +36,6 @@
 #include "gfx/race/level/Bound.h"
 #include "gfx/race/level/Car.h"
 #include "gfx/race/level/DecorationSprite.h"
-#include "gfx/race/level/GroundBlock.h"
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
 #include "logic/race/Block.h"
@@ -117,24 +116,10 @@ void RaceGraphics::load(CL_GraphicContext &p_gc)
 {
 	m_raceUI.load(p_gc);
 	loadTyreStripes(p_gc);
-	loadGroundBlocks(p_gc);
 	loadDecorations(p_gc);
 	loadSandPits(p_gc);
 
 	m_loaded = true;
-}
-
-void RaceGraphics::loadGroundBlocks(CL_GraphicContext &p_gc)
-{
-	const int first = Common::BT_GRASS;
-	const int last = Common::BT_START_LINE_UP; // FIXME: this is dangerous
-
-	for (int i = first; i <= last; ++i) {
-		CL_SharedPtr<Gfx::GroundBlock> gfxBlock(new Gfx::GroundBlock((Common::GroundBlockType) i));
-		gfxBlock->load(p_gc);
-
-		m_blockMapping[(Common::GroundBlockType) i] = gfxBlock;
-	}
 }
 
 void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
@@ -319,20 +304,6 @@ void RaceGraphics::drawForeBlocks(CL_GraphicContext &p_gc)
 //			drawGroundBlock(p_gc, level.getBlock(iw, ih), real(iw), real(ih));
 //		}
 //	}
-}
-
-void RaceGraphics::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y)
-{
-	assert(m_blockMapping.find(p_block.getType()) != m_blockMapping.end() && "not loaded block type");
-
-	// then draw selected block
-	if (p_block.getType() != Common::BT_GRASS) {
-		CL_SharedPtr<Gfx::GroundBlock> gfxBlock = m_blockMapping[p_block.getType()];
-		gfxBlock->setPosition(CL_Pointf(x, y));
-
-		gfxBlock->draw(p_gc);
-	}
-
 }
 
 void RaceGraphics::drawCars(CL_GraphicContext &p_gc)

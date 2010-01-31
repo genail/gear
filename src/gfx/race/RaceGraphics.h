@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@
 
 #include <ClanLib/display.h>
 
-#include "common/GroundBlockType.h"
 #include "gfx/Viewport.h"
 #include "gfx/race/level/Level.h"
 #include "gfx/race/level/TyreStripes.h"
@@ -92,10 +91,6 @@ class RaceGraphics {
 		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMapping;
 		TCarMapping m_carMapping;
 
-		/** Block types to gfx ground blocks */
-		typedef std::map<Common::GroundBlockType, CL_SharedPtr<Gfx::GroundBlock> > TBlockMapping;
-		TBlockMapping m_blockMapping;
-
 		/** Tyre stripes */
 		TyreStripes m_tyreStripes;
 
@@ -113,8 +108,6 @@ class RaceGraphics {
 
 
 		// initialize routines
-
-		void loadGroundBlocks(CL_GraphicContext &p_gc);
 
 		void loadDecorations(CL_GraphicContext &p_gc);
 
@@ -139,8 +132,6 @@ class RaceGraphics {
 		void drawBackBlocks(CL_GraphicContext &p_gc);
 
 		void drawForeBlocks(CL_GraphicContext &p_gc);
-
-		void drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y);
 
 		void drawTyreStripes(CL_GraphicContext &p_gc);
 

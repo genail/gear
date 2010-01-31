@@ -31,6 +31,7 @@
 #include "Car.h"
 
 #include "common.h"
+#include "common/workarounds.h"
 #include "gfx/Stage.h"
 #include "gfx/DebugLayer.h"
 #include "logic/race/level/Level.h"
@@ -131,12 +132,6 @@ class CarImpl
 
 		float limit(float p_value, float p_from, float p_to) const;
 
-		/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
-		void normalizeAngle(CL_Angle &p_angle);
-
-		/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
-		void normalizeAngle180(CL_Angle &p_angle);
-
 		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
 };
 
@@ -188,8 +183,8 @@ void CarImpl::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_step
 	CL_Angle normWhat(p_what);
 	CL_Angle normTo(p_to);
 
-	normalizeAngle(normWhat);
-	normalizeAngle(normTo);
+	Workarounds::clAngleNormalize(&normWhat);
+	Workarounds::clAngleNormalize(&normTo);
 
 	const CL_Angle diffAngle = normWhat - normTo;
 
@@ -302,14 +297,14 @@ void CarImpl::update1_60() {
 
 		// normalize rotations only when equal
 		if (m_rotation == m_phyMoveRot) {
-			normalizeAngle(m_rotation);
-			normalizeAngle(m_phyMoveRot);
+			Workarounds::clAngleNormalize(&m_rotation);
+			Workarounds::clAngleNormalize(&m_phyMoveRot);
 		}
 
 	}
 
-	normalizeAngle(m_phyMoveRot);
-	normalizeAngle(m_rotation);
+	Workarounds::clAngleNormalize(&m_phyMoveRot);
+	Workarounds::clAngleNormalize(&m_rotation);
 
 
 	// reduce speed
@@ -319,7 +314,7 @@ void CarImpl::update1_60() {
 	if (diffDegAbs > 0.1f) {
 
 		CL_Angle diffAngleNorm = diffAngle;
-		normalizeAngle180(diffAngleNorm);
+		Workarounds::clAngleNormalize180(&diffAngleNorm);
 
 		// 0.0 when going straight, 1.0 when 90 deg, > 1.0 when more than 90 deg
 		const float angleRate = fabs(1.0f - (fabs(diffAngleNorm.to_degrees()) - 90.0f) / 90.0f);
@@ -407,7 +402,7 @@ void Car::performBoundCollision(const Bound &p_bound)
 
 	// calculate collision angle to estaminate speed reduction
 	CL_Angle angleDiff(m_impl->m_phyMoveRot - m_impl->vecToAngle(fnormal));
-	m_impl->normalizeAngle180(angleDiff);
+	Workarounds::clAngleNormalize180(&angleDiff);
 
 	const float colAngleDeg = fabs(angleDiff.to_degrees()) - 90.0f;
 	const float reduction = fabs(1.0f - fabs(colAngleDeg - 90.0f) / 90.0f);
@@ -615,24 +610,6 @@ CL_Angle CarImpl::vecToAngle(const CL_Vec2f &p_vec)
 
 }
 
-void CarImpl::normalizeAngle(CL_Angle &p_angle)
-{
-#if CL_CURRENT_VERSION <= CL_VERSION(2,1,1)
-	p_angle.normalize();
-	if (p_angle.to_radians() < 0) {
-		p_angle += CL_Angle(2 * CL_PI, cl_radians);
-	}
-#else
-	p_angle.normalize();
-#endif
-}
-
-void CarImpl::normalizeAngle180(CL_Angle &p_angle)
-{
-	normalizeAngle(p_angle);
-	p_angle.normalize_180();
-}
-
 void Car::setSpeed(float p_speed)
 {
 	m_impl->m_speed = p_speed;
@@ -661,6 +638,21 @@ bool Car::isBrake() const
 float Car::getTurn() const
 {
 	return m_impl->m_inputTurn;
+}
+
+void Car::clone(const Car &p_car)
+{
+	m_impl->m_position = p_car.m_impl->m_position;
+	m_impl->m_rotation = p_car.m_impl->m_rotation;
+	m_impl->m_speed = p_car.m_impl->m_speed;
+	m_impl->m_inputAccel = p_car.m_impl->m_inputAccel;
+	m_impl->m_inputBrake = p_car.m_impl->m_inputBrake;
+	m_impl->m_inputTurn = p_car.m_impl->m_inputTurn;
+	m_impl->m_inputLocked = p_car.m_impl->m_inputLocked;
+	m_impl->m_phyMoveRot = p_car.m_impl->m_phyMoveRot;
+	m_impl->m_phyMoveVec = p_car.m_impl->m_phyMoveVec;
+	m_impl->m_phySpeedDelta = p_car.m_impl->m_phySpeedDelta;
+	m_impl->m_phyWheelsTurn = p_car.m_impl->m_phyWheelsTurn;
 }
 
 bool Car::operator==(const Car &p_other) const

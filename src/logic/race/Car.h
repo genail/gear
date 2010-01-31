@@ -115,6 +115,9 @@ class Car : boost::noncopyable
 
 		// other operations
 
+		/** Clones all given car attributes to this one */
+		void clone(const Car &p_car);
+
 		virtual void update(unsigned int elapsedTime);
 
 
@@ -140,6 +143,7 @@ class Car : boost::noncopyable
 		bool isBrake() const;
 
 		float getTurn() const;
+
 
 		void setMovement(const CL_Vec2f &p_movement);
 

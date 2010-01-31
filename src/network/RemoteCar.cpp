@@ -28,6 +28,7 @@
 
 #include "RemoteCar.h"
 
+#include "common/workarounds.h"
 #include "math/Float.h"
 
 namespace Net
@@ -39,11 +40,11 @@ class RemoteCarImpl
 {
 	public:
 
-		// To preserve lags, there are two car instances.
-		// The old one is car physics situated when car position didn't change.
-		// The new one is car physics forced by remote player.
+		// To preserve lags, there are two car instances: phantom and current.
+		// The phantom is car physics situated when car position didn't change.
+		// The current is car physics forced by remote player.
 		//
-		// When new packet is received only the new car is positioned at new
+		// When new packet is received only the current is positioned at new
 		// place and moving from one position to another is made step by step
 		// to make things smooth.
 
@@ -78,10 +79,10 @@ void RemoteCar::update(unsigned int p_elapsedMS)
 
 void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
 {
-	CL_NetGameEvent ev("");
-	serialize(&ev);
-	m_impl->m_phantomCar.deserialize(ev);
+	// clone this car properties to phantom
+	m_impl->m_phantomCar.clone(*this);
 
+	// deserialize incoming data to current
 	Car::deserialize(p_data);
 
 	// start passing
@@ -91,6 +92,9 @@ void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
 const CL_Pointf& RemoteCar::getPosition() const
 {
 	const CL_Pointf &thisPos = Car::getPosition();
+
+	// when passing phantom to current calculate the position
+	// based on current passing ratio
 
 	const float newCarRatio = m_impl->m_passFloat.get();
 
@@ -110,12 +114,18 @@ const CL_Angle &RemoteCar::getCorpseAngle() const
 {
 	const CL_Angle &thisAngle = Car::getCorpseAngle();
 
+	// when passing phantom to current calculate the rotation
+	// based on current passing ratio
+
 	const float newCarRatio = m_impl->m_passFloat.get();
 
 	if (fabs(newCarRatio - 1.0f) > 0.01) {
 		const CL_Angle &phanAngle = m_impl->m_phantomCar.getCorpseAngle();
 
-		const CL_Angle delta = (thisAngle - phanAngle) * newCarRatio;
+		CL_Angle delta = (thisAngle - phanAngle) * newCarRatio;
+		Workarounds::clAngleNormalize180(&delta);
+		delta += CL_Angle(CL_PI, cl_radians);
+
 		m_impl->m_rot = phanAngle + delta;
 
 		return m_impl->m_rot;

@@ -106,6 +106,7 @@ SET(TEST_SRCS
 	
 	# test code
 	tests/suite.cpp
+	tests/common/WorkaroundsTest.cpp
 	tests/logic/race/CarTest.cpp
 	tests/math/FloatTest.cpp
 	tests/network/server/VoteSystemTest.cpp

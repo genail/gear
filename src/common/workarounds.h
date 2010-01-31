@@ -26,70 +26,39 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <boost/test/unit_test.hpp>
+#pragma once
 
-#include "logic/race/Car.h"
+#include <ClanLib/core.h>
 
-/*
- * Minimal testing facility:
- *
- * BOOST_CHECK( predicate )
- * BOOST_REQUIRE( predicate )
- * BOOST_ERROR( message )
- * BOOST_FAIL( message )
- *
- * Test tools:
- * http://www.boost.org/doc/libs/1_34_0/libs/test/doc/components/test_tools/index.html
- */
+// this file contains workarounds to known problems in used libraries
 
-BOOST_AUTO_TEST_SUITE(CarTest)
-
-BOOST_AUTO_TEST_CASE(SerializeTest)
+namespace Workarounds
 {
-	Race::Car car1, car2;
+	/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
+	inline void clAngleNormalize(CL_Angle *p_angle)
+	{
+		#if CL_CURRENT_VERSION <= CL_VERSION(2,1,1)
+		p_angle->normalize();
+		if (p_angle->to_radians() < 0) {
+			*p_angle += CL_Angle(2 * CL_PI, cl_radians);
+		}
+		#else
+			p_angle->normalize();
+		#endif
+	}
 
-	BOOST_REQUIRE(car1 == car2);
+	/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
+	inline void clAngleNormalize180(CL_Angle *p_angle)
+	{
+		#if CL_CURRENT_VERSION <= CL_VERSION(2,1,1)
 
-	// move car a little
-	car1.setAcceleration(true);
-	car1.setTurn(0.5f);
+		clAngleNormalize(p_angle);
+		p_angle->set_radians(p_angle->to_radians() - CL_PI);
 
-	car1.update(500);
+		#else
 
-	BOOST_REQUIRE(car1 != car2);
+		p_angle->normalize_180();
 
-	// serialize
-	CL_NetGameEvent ev("");
-	car1.serialize(&ev);
-
-	// deserialize
-	car2.deserialize(ev);
-
-	// check
-	BOOST_CHECK(car1 == car2);
-
-}
-
-BOOST_AUTO_TEST_CASE(CloneTest)
-{
-	Race::Car car1, car2, car3;
-
-	BOOST_REQUIRE(car1 == car2);
-
-	// move car a little
-	car1.setAcceleration(true);
-	car1.setTurn(0.5f);
-
-	car1.update(500);
-
-	BOOST_REQUIRE(car1 != car2);
-
-	// clone
-	car3.clone(car1);
-
-	BOOST_CHECK(car3 == car1);
-	BOOST_CHECK(car3 != car2);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+		#endif
+	}
+} // namespace

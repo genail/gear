@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -192,6 +192,7 @@ void RaceGraphics::drawSandpits(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawSmokes(CL_GraphicContext &p_gc)
 {
+#if !defined(NO_SMOKES)
 	foreach(CL_SharedPtr<Gfx::Smoke> &smoke, m_smokes) {
 		if (!smoke->isLoaded()) {
 			smoke->load(p_gc);
@@ -199,6 +200,7 @@ void RaceGraphics::drawSmokes(CL_GraphicContext &p_gc)
 
 		smoke->draw(p_gc);
 	}
+#endif // !NO_SMOKES
 }
 
 void RaceGraphics::drawUI(CL_GraphicContext &p_gc)

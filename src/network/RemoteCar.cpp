@@ -85,6 +85,11 @@ void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
 	// deserialize incoming data to current
 	Car::deserialize(p_data);
 
+	// set new inputs also to phantom
+	m_impl->m_phantomCar.setAcceleration(isAcceleration());
+	m_impl->m_phantomCar.setBrake(isBrake());
+	m_impl->m_phantomCar.setTurn(getTurn());
+
 	// start passing
 	m_impl->m_passFloat.animate(0.0f, 1.0f, PASS_TIME);
 }
@@ -122,9 +127,16 @@ const CL_Angle &RemoteCar::getCorpseAngle() const
 	if (fabs(newCarRatio - 1.0f) > 0.01) {
 		const CL_Angle &phanAngle = m_impl->m_phantomCar.getCorpseAngle();
 
-		CL_Angle delta = (thisAngle - phanAngle) * newCarRatio;
-		Workarounds::clAngleNormalize180(&delta);
-		delta += CL_Angle(CL_PI, cl_radians);
+		CL_Angle delta = thisAngle - phanAngle;
+
+		// make the angle the lowest value to rotate
+		Workarounds::clAngleNormalize(&delta);
+
+		if (delta.to_radians() > CL_PI) {
+			delta.set_radians(delta.to_radians() - 2 * CL_PI);
+		}
+
+		delta.set_radians(delta.to_radians() * newCarRatio);
 
 		m_impl->m_rot = phanAngle + delta;
 

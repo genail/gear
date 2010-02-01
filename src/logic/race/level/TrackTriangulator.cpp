@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "common.h"
+#include "common/LoopVector.h"
 #include "math/Integer.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackPoint.h"
@@ -72,30 +73,6 @@ class TrackTriangulatorImpl
 				float p_prevRadius, float p_nextRadius,
 				float p_prevShift, float p_nextShift
 		);
-};
-
-template <typename T>
-class LoopVector : public std::vector<T>
-{
-	public:
-
-		T &operator[] (int p_index) {
-			return std::vector<T>::operator[](norm(p_index));
-		}
-
-		const T &operator[] (int p_index) const {
-			return std::vector<T>::operator[](norm(p_index));
-		}
-
-	private:
-
-		int norm(int p_index) const {
-			return Math::Integer::clamp(
-					p_index,
-					0,
-					static_cast<signed> (std::vector<T>::size()) - 1
-			);
-		}
 };
 
 TrackTriangulator::TrackTriangulator() :

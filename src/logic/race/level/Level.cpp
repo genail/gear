@@ -31,6 +31,7 @@
 #include <assert.h>
 
 #include "common/Limits.h"
+#include "common/LoopVector.h"
 #include "common/Units.h"
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
@@ -45,38 +46,6 @@
 #include "logic/race/resistance/ResistanceMap.h"
 
 namespace Race {
-
-template <typename T>
-class LoopVector : public std::vector<T>
-{
-	public:
-
-		T &operator[] (int p_index) {
-			return std::vector<T>::operator[](clamp(p_index));
-		}
-
-		const T &operator[] (int p_index) const {
-			return std::vector<T>::operator[](clamp(p_index));
-		}
-
-	private:
-
-		int clamp(int p_index) const {
-			const int s = static_cast<signed> (std::vector<T>::size());
-
-			if (p_index >= 0 && p_index < s) {
-				return p_index;
-			}
-
-			p_index = p_index % s;
-
-			if (p_index < 0) {
-				p_index += s;
-			}
-
-			return p_index;
-		}
-};
 
 class RoadPoint : public CL_Pointf
 {

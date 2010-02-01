@@ -35,6 +35,7 @@ SET(COMMON_SRCS
 	logic/race/level/Bound.cpp
 	logic/race/level/Checkpoint.cpp
 	logic/race/level/Level.cpp
+	logic/race/level/Object.cpp
 	logic/race/level/Sandpit.cpp
 	logic/race/level/Track.cpp
 	logic/race/level/TrackPoint.cpp
@@ -149,32 +150,38 @@ SET(GEAR_LIBS ${LIBS}
 SET(SERVER_LIBS ${LIBS}
 	${ClanLib_App_LIBRARY}
 	${ClanLib_Core_LIBRARY}
+	${ClanLib_Display_LIBRARY}
 	${ClanLib_Network_LIBRARY}
 	${ZLIB_LIBRARY}
+	${X11_LIBRARY}
 )
+
+MESSAGE(${GEAR_LIBS})
 
 SET(TEST_LIBS ${LIBS}
 	${ClanLib_Core_LIBRARY}
 	${ClanLib_Display_LIBRARY}
 	${ClanLib_Network_LIBRARY}
 	${ZLIB_LIBRARY}
+	${X11_LIBRARY}
 )
 
-# Platform specifics
-SET(COMMON_COMPILE_FLAGS " ")
+######################
+# Platform specifics #
+######################
 
-SET(GEAR_COMPILE_FLAGS " ")
-SET(GEAR_LINK_FLAGS " ")
-
-SET(SERVER_COMPILE_FLAGS " ")
-SET(SERVER_LINK_FLAGS " ")
+SET(COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} $ENV{CXXFLAGS}")
+SET(COMMON_LINK_FLAGS "${COMMON_LINK_FLAGS} -lfontconfig -lXxf86vm")
 
 IF (CMAKE_COMPILER_IS_GNUCXX)
+
+# GCC warnings configuration
 
 # -Wuninitialized
 # -Wunreachable-code
 # -Weffc++
 SET(COMMON_COMPILE_FLAGS
+	"${COMMON_COMPILE_FLAGS}"
 	"-isystem/usr/local/include/ClanLib-2.1"
 	"-Woverloaded-virtual"
 	"-Wsign-promo"
@@ -206,8 +213,8 @@ SET(COMMON_COMPILE_FLAGS
 	"-Winline"
 )
 
-SET (GEAR_LINK_FLAGS "-lfontconfig -lXxf86vm ${CMAKE_THREAD_LIBS_INIT}")
-SET (SERVER_LINK_FLAGS "-lfontconfig ${CMAKE_THREAD_LIBS_INIT}")
+SET (GEAR_LINK_FLAGS "${GEAR_LINK_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
+SET (SERVER_LINK_FLAGS "${SERVER_LINK_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
 
 ELSEIF (MSVC) # Microsoft Visual Studio
 
@@ -253,6 +260,19 @@ ELSE (UNIX)
 ENDIF (UNIX)
 
 
+SET(GEAR_LINK_FLAGS "${GEAR_LINK_FLAGS} ${COMMON_LINK_FLAGS}")
+SET(SERVER_LINK_FLAGS "${SERVER_LINK_FLAGS} ${COMMON_LINK_FLAGS}")
+SET(TEST_LINK_FLAGS "${TEST_LINK_FLAGS} -lboost_unit_test_framework-mt ${COMMON_LINK_FLAGS}")
+
+SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DCLIENT ${COMMON_COMPILE_FLAGS}")
+SET(SERVER_COMPILE_FLAGS "${SERVER_COMPILE_FLAGS} -DSERVER ${COMMON_COMPILE_FLAGS}")
+SET(TEST_COMPILE_FLAGS "${TEST_COMPILE_FLAGS} -DTEST ${COMMON_COMPILE_FLAGS}")
+
+
+#######################
+# Configure variables #
+#######################
+
 # Game client configuration
 IF (USE_GL2)
 	SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DGL2")
@@ -291,6 +311,13 @@ IF (RACE_SCENE_ONLY)
 	SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DRACE_SCENE_ONLY")
 ENDIF(RACE_SCENE_ONLY)
 
+
+#########################
+# Target configurations #
+#########################
+
+# game configuration
+
 ADD_EXECUTABLE(game WIN32 ${CLIENT_SRCS})
 TARGET_LINK_LIBRARIES(game ${GEAR_LIBS})
 
@@ -303,7 +330,7 @@ SET_TARGET_PROPERTIES(
 SET_TARGET_PROPERTIES(
 	game PROPERTIES
 	COMPILE_FLAGS
-	"-DCLIENT ${GEAR_COMPILE_FLAGS} $ENV{CXXFLAGS} ${COMMON_COMPILE_FLAGS}"
+	"${GEAR_COMPILE_FLAGS}"
 )
 
 
@@ -320,7 +347,7 @@ SET_TARGET_PROPERTIES(
 SET_TARGET_PROPERTIES(
 	server PROPERTIES
 	COMPILE_FLAGS
-	"-DSERVER $ENV{CXXFLAGS} ${COMMON_COMPILE_FLAGS} ${SERVER_COMPILE_FLAGS}"
+	"${SERVER_COMPILE_FLAGS}"
 )
 
 # Test configuration
@@ -331,13 +358,13 @@ TARGET_LINK_LIBRARIES(test_suite ${TEST_LIBS})
 SET_TARGET_PROPERTIES(
 	test_suite PROPERTIES
 	LINK_FLAGS
-	"-lfontconfig -lXxf86vm -lboost_unit_test_framework-mt"
+	${TEST_LINK_FLAGS}
 )
 
 SET_TARGET_PROPERTIES(
 	test_suite PROPERTIES
 	COMPILE_FLAGS
-	"-Wall -DTEST $ENV{CXXFLAGS}  ${COMMON_COMPILE_FLAGS}"
+	"${TEST_COMPILE_FLAGS}"
 )
 
 ENABLE_TESTING()

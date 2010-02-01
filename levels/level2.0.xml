@@ -25,6 +25,23 @@
             <point x="0.0" y="100.0" radius="7.0" shift="0.0" />
         </track>
         
+        <objects>
+        	<object name="rect1">
+        		<bounds>
+        			<vertex x="0.0" y="0.0" />
+        			<vertex x="2.0" y="0.0" />
+        			<vertex x="2.0" y="1.0" />
+        			<vertex x="0.0" y="1.0" />
+        		</bounds>
+        		
+        		<refs>
+        			<ref>
+        				<position x="0.0" y="0.0" />
+        			</ref>
+        		</refs>
+        	</object>
+        </objects>
+        
         <bounds>
             <!--generate style="thick" /-->
             <!-- inner -->

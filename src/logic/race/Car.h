@@ -72,6 +72,7 @@ class Car : boost::noncopyable
 
 		bool isLocked() const;
 
+		/** @return corpse angle starting from positive X axis CW */
 		virtual const CL_Angle &getCorpseAngle() const;
 
 		virtual const CL_Pointf& getPosition() const;
@@ -103,7 +104,7 @@ class Car : boost::noncopyable
 		// state setters
 
 		/**
-		 * Sets the car angle. It should be counter clockwise
+		 * Sets the car angle. It should be clockwise
 		 * oriented starting from positive X axis.
 		 *
 		 * @param p_angle Angle to set.

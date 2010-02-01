@@ -269,7 +269,6 @@ void CarImpl::update1_60() {
 			turnAngle.set_radians(turnAngle.to_radians() * (absSpeed / LOWER_SPEED_TURN_REDUCTION));
 		}
 
-		// make backwards turning reverse
 		if (m_speed > 0.0f) {
 			m_rotation += turnAngle;
 		} else {

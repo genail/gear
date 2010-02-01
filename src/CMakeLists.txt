@@ -100,6 +100,7 @@ SET(TEST_SRCS
 	gfx/Stage.cpp
 	gfx/race/ui/Label.cpp
 	logic/race/Car.cpp
+	logic/race/level/Object.cpp
 	math/Easing.cpp
 	math/Float.cpp
 	network/server/VoteSystem.cpp
@@ -108,6 +109,7 @@ SET(TEST_SRCS
 	tests/suite.cpp
 	tests/common/WorkaroundsTest.cpp
 	tests/logic/race/CarTest.cpp
+	tests/logic/race/level/ObjectTest.cpp
 	tests/math/FloatTest.cpp
 	tests/network/server/VoteSystemTest.cpp
 )

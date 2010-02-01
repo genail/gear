@@ -31,15 +31,73 @@
 namespace Race
 {
 
-Object::Object()
+class ObjectImpl
 {
-	// TODO Auto-generated constructor stub
+	public:
 
+		CL_CollisionOutline m_outline;
+
+		std::vector<CL_Pointf> *m_pts;
+
+
+		ObjectImpl(const CL_Pointf p_points[], int p_count)
+		{
+			CL_Contour contour;
+			m_pts = &contour.get_points();
+
+			for (int i = 0; i < p_count; ++i) {
+				m_pts->push_back(p_points[i]);
+			}
+
+			m_outline.get_contours().push_back(contour);
+			m_outline.set_inside_test(true);
+			m_outline.calculate_radius();
+			m_outline.calculate_sub_circles();
+			m_outline.enable_collision_info(true, false, true);
+		}
+
+};
+
+const std::vector<CL_CollidingContours> EMPTY_CONTOURS;
+
+Object::Object(const CL_Pointf p_points[], int p_count) :
+	m_impl(new ObjectImpl(p_points, p_count))
+{
+	// empty
 }
 
 Object::~Object()
 {
-	// TODO Auto-generated destructor stub
+	// empty
+}
+
+const std::vector<CL_CollidingContours> &Object::collide(
+		const CL_CollisionOutline &p_outline
+)
+{
+	if (m_impl->m_outline.collide(p_outline)) {
+		return m_impl->m_outline.get_collision_info();
+	} else {
+		return EMPTY_CONTOURS;
+	}
+}
+
+const CL_CollisionOutline &Object::getCollisionOutline() const
+{
+	return m_impl->m_outline;
+}
+
+const CL_Pointf &Object::getPoint(int p_idx) const
+{
+	G_ASSERT(p_idx >=0 && p_idx <= getPointCount());
+	return (*m_impl->m_pts)[p_idx];
+}
+
+int Object::getPointCount() const
+{
+	return static_cast<signed>(
+			m_impl->m_pts->size()
+	);
 }
 
 }

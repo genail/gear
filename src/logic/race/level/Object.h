@@ -28,16 +28,48 @@
 
 #pragma once
 
+#include <ClanLib/core.h>
+#include <ClanLib/display.h>
+
+#include "common.h"
+
 namespace Race
 {
+
+class ObjectImpl;
 
 class Object
 {
 	public:
 
-		Object();
+		/**
+		 * Build level object from <code>p_points</code>.
+		 * <p>
+		 * Points must be ordered in counter-clockwise order.
+		 *
+		 * @param p_points Points to build from.
+		 * @param p_count Number of points to read.
+		 */
+		Object(const CL_Pointf p_points[], int p_count);
 
 		virtual ~Object();
+
+
+		const CL_CollisionOutline &getCollisionOutline() const;
+
+		const CL_Pointf &getPoint(int p_idx) const;
+
+		int getPointCount() const;
+
+
+		const std::vector<CL_CollidingContours> &collide(
+				const CL_CollisionOutline &p_outline
+		);
+
+
+	private:
+
+		CL_SharedPtr<ObjectImpl> m_impl;
 };
 
 }

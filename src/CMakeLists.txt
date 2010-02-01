@@ -13,6 +13,7 @@ SET(COMMON_SRCS
 	common/Player.cpp
 	common/Properties.cpp
     common/RemotePlayer.cpp
+    math/Integer.cpp
     math/Time.cpp
 	network/RemoteCar.cpp
 	network/client/Client.cpp
@@ -103,6 +104,7 @@ SET(TEST_SRCS
 	logic/race/level/Object.cpp
 	math/Easing.cpp
 	math/Float.cpp
+	math/Integer.cpp
 	network/server/VoteSystem.cpp
 	
 	# test code
@@ -111,6 +113,7 @@ SET(TEST_SRCS
 	tests/logic/race/CarTest.cpp
 	tests/logic/race/level/ObjectTest.cpp
 	tests/math/FloatTest.cpp
+	tests/math/IntegerTest.cpp
 	tests/network/server/VoteSystemTest.cpp
 )
 
@@ -157,8 +160,6 @@ SET(SERVER_LIBS ${LIBS}
 	${ZLIB_LIBRARY}
 	${X11_LIBRARY}
 )
-
-MESSAGE(${GEAR_LIBS})
 
 SET(TEST_LIBS ${LIBS}
 	${ClanLib_Core_LIBRARY}

@@ -30,10 +30,7 @@
 
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
-
-#if defined(CLIENT)
 #include <ClanLib/display.h>
-#endif // CLIENT
 
 #include "common.h"
 
@@ -119,6 +116,11 @@ class Car : boost::noncopyable
 		/** Clones all given car attributes to this one */
 		void clone(const Car &p_car);
 
+		/** @return Current outline based on car position and rotation */
+		CL_CollisionOutline getCollisionOutline() const;
+
+		void applyCollision(const CL_LineSegment2f &p_seg);
+
 		virtual void update(unsigned int elapsedTime);
 
 
@@ -128,14 +130,6 @@ class Car : boost::noncopyable
 
 		bool operator!=(const Car &p_other) const;
 
-
-#if defined(CLIENT)
-		/** @return Current collision outline based on car position and rotation */
-		CL_CollisionOutline calculateCurrentCollisionOutline() const;
-
-		/** Invoked when collision with bound has occurred */
-		void performBoundCollision(const Bound &p_bound);
-#endif // CLIENT
 
 	protected:
 

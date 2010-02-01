@@ -102,10 +102,8 @@ class CarImpl
 		/** Wheels turn. -1.0 is max left, 1.0 is max right */
 		float m_phyWheelsTurn;
 
-#if defined(CLIENT)
 		/** Body outline for collision check */
 		CL_CollisionOutline m_phyCollisionOutline;
-#endif // CLIENT
 
 
 		CarImpl(const Car *p_base) :
@@ -140,7 +138,6 @@ METH_SIGNAL_1(Car, inputChanged, const Car&)
 Car::Car() :
 	m_impl(new CarImpl(this))
 {
-#if defined(CLIENT)
 	// build car contour for collision check
 	CL_Contour contour;
 
@@ -157,7 +154,6 @@ Car::Car() :
 
 	m_impl->m_phyCollisionOutline.calculate_radius();
 	m_impl->m_phyCollisionOutline.calculate_smallest_enclosing_discs();
-#endif // CLIENT
 }
 
 Car::~Car()
@@ -366,8 +362,7 @@ void CarImpl::update1_60() {
 #endif // CLIENT
 }
 
-#if defined(CLIENT)
-CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
+CL_CollisionOutline Car::getCollisionOutline() const
 {
 	CL_CollisionOutline outline(m_impl->m_phyCollisionOutline);
 
@@ -381,12 +376,11 @@ CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
 	return outline;
 }
 
-void Car::performBoundCollision(const Bound &p_bound)
+void Car::applyCollision(const CL_LineSegment2f &p_seg)
 {
-	const CL_LineSegment2f &seg = p_bound.getSegment();
-	const float side = -seg.point_right_of_line(m_impl->m_position);
+	const float side = -p_seg.point_right_of_line(m_impl->m_position);
 
-	const CL_Vec2f segVec = seg.q - seg.p;
+	const CL_Vec2f segVec = p_seg.q - p_seg.p;
 
 	// need front normal (crash side)
 	CL_Vec2f fnormal(segVec.y, -segVec.x); // right side normal
@@ -427,7 +421,6 @@ void Car::performBoundCollision(const Bound &p_bound)
 	}
 
 }
-#endif // CLIENT
 
 void Car::serialize(CL_NetGameEvent *p_event) const
 {

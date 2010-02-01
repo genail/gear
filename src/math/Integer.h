@@ -28,110 +28,21 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-
-namespace Race {
-
-class Block;
-class Bound;
-class Car;
-class Object;
-class Track;
-class TrackTriangulator;
-
-class LevelImpl;
-
-class Level
+namespace Math
 {
 
+class Integer
+{
 	public:
 
-		Level();
-
-		virtual ~Level();
-
-
-		// virtual methods
-
-		virtual void initialize();
-
-		virtual void destroy();
-
-
-		// loading and saving
-
-		bool isLoaded() const;
-
-		void load(const CL_String &p_filename);
-
-		void save(const CL_String &p_filename);
-
-
-		// car management
-
-		void addCar(Car *p_car);
-
-		int getCarCount() const;
-
-		Car &getCar(int p_idx);
-
-		const Car &getCar(int p_idx) const;
-
-		const Track &getTrack() const;
-
-		void removeCar(Car *p_car);
-
-
-		// objects management
-
-		int getObjectCount() const;
-
-		const Race::Object &getObject(int p_idx) const;
-
-
-		// track routines
-
-		/**
-		 * @return Triangulator object. It if valid only if track was
-		 * loaded from file.
-		 */
-		const TrackTriangulator &getTrackTriangulator() const;
-
-		/**
-		 * @return Triangulator object. It if valid only if track was
-		 * loaded from file.
-		 */
-		TrackTriangulator &getTrackTriangulator();
-
-		/**
-		 * Sets the new track. Note that when you set a track, the level
-		 * geometry will not be updated. You should use getTrackTriangulator()
-		 * and rebuild modified segment or whole track.
-		 *
-		 * @param p_track Track to set.
-		 */
-		void setTrack(const Track &p_track);
-
-
-		// other
-
-		float getResistance(float p_x, float p_y);
-
-		/**
-		 * @return A start position of <code>p_num</code>
-		 */
-		void getStartPosAndRot(
-				int p_num,
-				CL_Pointf *p_pos, CL_Angle *p_rot
-		) const;
-
-
-
+		static int clamp(int p_val, int p_min, int p_max);
 
 	private:
 
-		CL_SharedPtr<LevelImpl> m_impl;
+		Integer();
 
+		virtual ~Integer();
 };
 
-} // namespace
+}
+

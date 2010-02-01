@@ -35,6 +35,7 @@
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
 #include "logic/race/level/Checkpoint.h"
+#include "logic/race/level/Object.h"
 #include "logic/race/Car.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackTriangulator.h"
@@ -116,6 +117,9 @@ class LevelImpl
 
 		/** All cars */
 		std::vector<Car*> m_cars;
+
+		/** Level objects */
+		std::vector<Object> m_objects;
 
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
@@ -588,6 +592,17 @@ const TrackTriangulator &Level::getTrackTriangulator() const
 TrackTriangulator &Level::getTrackTriangulator()
 {
 	return m_impl->m_trackTriangulator;
+}
+
+int Level::getObjectCount() const
+{
+	return static_cast<signed>(m_impl->m_objects.size());
+}
+
+const Race::Object &Level::getObject(int p_idx) const
+{
+	G_ASSERT(p_idx >= 0 && p_idx < getObjectCount());
+	return m_impl->m_objects[p_idx];
 }
 
 } // namespace

@@ -88,6 +88,7 @@ void Level::draw(CL_GraphicContext &p_gc)
 {
 	m_impl->drawTriangles(p_gc);
 	m_impl->drawStartLine(p_gc);
+	m_impl->drawObjects(p_gc);
 }
 
 void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
@@ -176,7 +177,7 @@ void LevelImpl::drawObjects(CL_GraphicContext &p_gc)
 	CL_Pen oldPen = p_gc.get_pen();
 
 	CL_Pen pen;
-	pen.set_line_width(10);
+	pen.set_line_width(5);
 	p_gc.set_pen(pen);
 	const int objCount = m_levelLogic.getObjectCount();
 

@@ -35,7 +35,7 @@ class ObjectImpl
 {
 	public:
 
-		CL_CollisionOutline m_outline;
+		mutable CL_CollisionOutline m_outline;
 
 		std::vector<CL_Pointf> *m_pts;
 
@@ -73,7 +73,7 @@ Object::~Object()
 
 const std::vector<CL_CollidingContours> &Object::collide(
 		const CL_CollisionOutline &p_outline
-)
+) const
 {
 	if (m_impl->m_outline.collide(p_outline)) {
 		return m_impl->m_outline.get_collision_info();

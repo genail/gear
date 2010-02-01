@@ -64,7 +64,7 @@ class Object
 
 		const std::vector<CL_CollidingContours> &collide(
 				const CL_CollisionOutline &p_outline
-		);
+		) const;
 
 
 	private:

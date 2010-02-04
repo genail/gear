@@ -177,7 +177,7 @@ void LevelImpl::drawObjects(CL_GraphicContext &p_gc)
 	CL_Pen oldPen = p_gc.get_pen();
 
 	CL_Pen pen;
-	pen.set_line_width(5);
+	pen.set_line_width(3);
 	p_gc.set_pen(pen);
 	const int objCount = m_levelLogic.getObjectCount();
 

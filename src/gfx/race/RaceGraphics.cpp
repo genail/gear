@@ -31,6 +31,7 @@
 #include "common.h"
 #include "common/Game.h"
 #include "common/Player.h"
+#include "common/Units.h"
 #include "gfx/DebugLayer.h"
 #include "gfx/Stage.h"
 #include "gfx/race/level/Bound.h"
@@ -373,6 +374,16 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 	const CL_Pointf &carPos = Game::getInstance().getPlayer().getCar().getPosition();
 	Gfx::Stage::getDebugLayer()->putMessage("car x",  cl_format("%1", carPos.x));
 	Gfx::Stage::getDebugLayer()->putMessage("car y",  cl_format("%1", carPos.y));
+
+	Gfx::Stage::getDebugLayer()->putMessage(
+			"car world x",
+			cl_format("%1", Units::toWorld(carPos.x))
+	);
+
+	Gfx::Stage::getDebugLayer()->putMessage(
+			"car world y",
+			cl_format("%1", Units::toWorld(carPos.y))
+	);
 #endif // !NDEBUG
 }
 

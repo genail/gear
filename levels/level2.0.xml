@@ -28,16 +28,121 @@
         <objects>
         	<object name="rect1">
         		<geometry>
-        			<vertex x="0.0" y="0.0" />
-        			<vertex x="2.0" y="0.0" />
-        			<vertex x="2.0" y="-1.0" />
-        			<vertex x="0.0" y="-1.0" />
+        		
+        			<vertex x="-0.5" y="0.0" />
+        			<vertex x="-0.35" y="0.35" />
+        			<vertex x="0.0" y="0.5" />
+        			<vertex x="0.35" y="0.35" />
+        			<vertex x="0.5" y="0.0" />
+        			<vertex x="0.35" y="-0.35" />
+        			<vertex x="0.0" y="-0.5" />
+        			<vertex x="-0.35" y="-0.35" />
         		</geometry>
         		
         		<refs>
         			<ref>
-        				<position x="10.0" y="0.0" />
+        				<position x="200.8" y="2.5" />
         			</ref>
+        			<ref>
+        				<position x="158.5" y="45.6" />
+        			</ref>
+        			<ref>
+        				<position x="154.9" y="47.6" />
+        			</ref>
+        			<ref>
+        				<position x="151.3" y="49.6" />
+        			</ref>
+        			<ref>
+        				<position x="147.7" y="51.6" />
+        			</ref>
+        			<ref>
+        				<position x="144.1" y="53.6" />
+        			</ref>
+        			<ref>
+        				<position x="140.5" y="55.6" />
+        			</ref>
+					<ref>
+						<position x="107.973" y="67.1386" />
+					</ref>
+					<ref>
+						<position x="106.844" y="72.6064" />
+					</ref>
+					<ref>
+						<position x="107.126" y="78.047" />
+					</ref>
+					<ref>
+						<position x="108.831" y="83.9951" />
+					</ref>
+					<ref>
+						<position x="111.498" y="88.7709" />
+					</ref>
+					<ref>
+						<position x="116.029" y="91.9593" />
+					</ref>
+					<ref>
+						<position x="121.277" y="93.8866" />
+					</ref>
+					<ref>
+						<position x="127.025" y="93.6804" />
+					</ref>
+					<ref>
+						<position x="133.633" y="91.9874" />
+					</ref>
+					<ref>
+						<position x="210.02" y="-14.901" />
+					</ref>
+					<ref>
+						<position x="213.403" y="-12.6158" />
+					</ref>
+					<ref>
+						<position x="215.811" y="-9.39671" />
+					</ref>
+					<ref>
+						<position x="217.904" y="-5.60961" />
+					</ref>
+					<ref>
+						<position x="219.388" y="-1.97138" />
+					</ref>
+					<ref>
+						<position x="219.602" y="2.37906" />
+					</ref>
+					<ref>
+						<position x="218.889" y="7.35297" />
+					</ref>
+					<ref>
+						<position x="217.887" y="10.7991" />
+					</ref>
+					<ref>
+						<position x="122.498" y="80.3694" />
+					</ref>
+					<ref>
+						<position x="160.725" y="60.9585" />
+					</ref>
+					<ref>
+						<position x="164.009" y="64.1709" />
+					</ref>
+					<ref>
+						<position x="126.73" y="107.715" />
+					</ref>
+					<ref>
+						<position x="124.135" y="109.675" />
+					</ref>
+					<ref>
+						<position x="121.416" y="111.728" />
+					</ref>
+					<ref>
+						<position x="118.891" y="113.634" />
+					</ref>
+					<ref>
+						<position x="101.909" y="110.128" />
+					</ref>
+					<ref>
+						<position x="100.486" y="108.17" />
+					</ref>
+					<ref>
+						<position x="99.1548" y="106.339" />
+					</ref>
+					
         		</refs>
         	</object>
         </objects>

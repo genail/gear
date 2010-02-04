@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "common/Game.h"
 #include "common.h"
+#include "common/Game.h"
+#include "common/Units.h"
 #include "logic/race/Block.h"
 #include "logic/race/OfflineRaceLogic.h"
 #include "logic/race/OnlineRaceLogic.h"
@@ -187,6 +188,16 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 				m_logic->voteNo();
 			}
 			break;
+#if !defined(NDEBUG)
+		case CL_KEY_R:
+			if (!pressed) {
+				std::cout << "<ref>\n\t<position x=\""
+						<< Units::toWorld(car.getPosition().x)
+						<< "\" y=\""
+						<< Units::toWorld(car.getPosition().y)
+						<< "\" />\n</ref>" << std::endl;
+			}
+#endif // NDEBUG
 		default:
 			break;
 	}

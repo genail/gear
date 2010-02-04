@@ -36,6 +36,7 @@
 #include "gfx/DebugLayer.h"
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Bound.h"
+#include "math/Float.h"
 
 namespace Race {
 
@@ -68,6 +69,12 @@ class CarImpl
 
 		/** Current speed in map pixels per frame */
 		float m_speed;
+
+		/** Damage factor. 0.0 - 1.0 from new to damaged */
+		float m_damage;
+
+		/** If currently chocking */
+		bool m_chocking;
 
 
 		// input state
@@ -112,6 +119,8 @@ class CarImpl
 			m_position(300.0f, 300.0f),
 			m_rotation(0, cl_degrees),
 			m_speed(0.0f),
+			m_damage(0.0f),
+			m_chocking(false),
 			m_inputAccel(false),
 			m_inputBrake(false),
 			m_inputTurn(0.0f),
@@ -129,6 +138,9 @@ class CarImpl
 		void alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad);
 
 		float limit(float p_value, float p_from, float p_to) const;
+
+		/** Checks if car should choke at the moment */
+		bool isChoking();
 
 		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
 };
@@ -214,12 +226,13 @@ void CarImpl::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_step
 void CarImpl::update1_60() {
 	
 	static const float BRAKE_POWER = 0.1f;
-	static const float ACCEL_POWER = 0.14f;
+	static const float ACCEL_POWER = 0.014f;
+	static const float SPEED_LIMIT = 15.0f;
 	static const float WHEEL_TURN_SPEED = 1.0f / 10.0f;
 	static const float TURN_POWER  = (2 * CL_PI / 360.0f) * 2.5f;
 	static const float MOV_ALIGN_POWER = TURN_POWER / 2.0f;
 	static const float ROT_ALIGN_POWER = TURN_POWER * 0.7f;
-	static const float AIR_RESITANCE = 0.01f; // per one speed unit
+	static const float AIR_RESITANCE = 0.003f; // per one speed unit
 	static const float DRIFT_SPEED_REDUCTION_RATE = 0.1f;
 
 	// speed limit under what physics angle reduction will be more aggressive
@@ -240,7 +253,13 @@ void CarImpl::update1_60() {
 	if (m_inputBrake) {
 		m_speed -= BRAKE_POWER;
 	} else if (m_inputAccel) {
-		m_speed += ACCEL_POWER;
+		// only if not choking
+		if (!isChoking()) {
+			m_chocking = false;
+			m_speed += (SPEED_LIMIT - m_speed) * ACCEL_POWER;
+		} else {
+			m_chocking = true;
+		}
 	}
 	
 	// rotate steering wheels
@@ -378,6 +397,8 @@ CL_CollisionOutline Car::getCollisionOutline() const
 
 void Car::applyCollision(const CL_LineSegment2f &p_seg)
 {
+	static const float DAMAGE_MULT = 0.2f;
+
 	const float side = -p_seg.point_right_of_line(m_impl->m_position);
 
 	const CL_Vec2f segVec = p_seg.q - p_seg.p;
@@ -400,6 +421,14 @@ void Car::applyCollision(const CL_LineSegment2f &p_seg)
 	const float colAngleDeg = fabs(angleDiff.to_degrees()) - 90.0f;
 	const float reduction = fabs(1.0f - fabs(colAngleDeg - 90.0f) / 90.0f);
 
+	// calculate and apply damage
+	const float damage = m_impl->m_speed * reduction * DAMAGE_MULT;
+	m_impl->m_damage =
+			Math::Float::reduce(m_impl->m_damage + damage, 0.0f, 1.0f);
+
+	cl_log_event(LOG_DEBUG, "damage: %1, total: %2", damage, m_impl->m_damage);
+
+	// reduce speed
 	m_impl->m_speed -= m_impl->m_speed * reduction;
 
 	// bounce movement vector and angle away
@@ -481,6 +510,33 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 	m_impl->m_phyWheelsTurn = p_event.get_argument(idx++);
 }
 
+bool CarImpl::isChoking()
+{
+	if (m_damage < 1.0f) {
+		return false;
+	}
+
+	const unsigned time = CL_System::get_time();
+	if (1 << 12 & time && 1 << 9 & time) { // 0.5s every 4s
+		return true;
+	}
+
+	if (1 << 11 & time && 1 << 8 & time) { // 0.25s every 2s
+		return true;
+	}
+
+	if (1 << 10 & time && 1 << 7 & time) { // 0.1s every 1s
+		return true;
+	}
+
+	return false;
+}
+
+bool Car::isChoking() const
+{
+	return m_impl->m_chocking;
+}
+
 bool Car::isDrifting() const {
 	static const float DRIFT_LIMIT = 6.0f;
 	static const float ACCEL_LIMIT = 0.05f;
@@ -489,7 +545,10 @@ bool Car::isDrifting() const {
 		return true;
 	}
 
-	if (fabs(m_impl->m_phySpeedDelta) >= ACCEL_LIMIT) {
+	if (
+			(m_impl->m_inputAccel || m_impl->m_inputBrake)
+			&& fabs(m_impl->m_phySpeedDelta) >= ACCEL_LIMIT)
+	{
 		return true;
 	}
 

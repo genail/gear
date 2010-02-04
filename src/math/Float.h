@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,8 @@ class Float {
 	public:
 
 		static bool cmp(float p_a, float p_b, float p_precision);
+
+		static float reduce(float p_val, float p_min, float p_max);
 
 
 		Float();

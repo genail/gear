@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,17 @@ namespace Math {
 bool Float::cmp(float p_a, float p_b, float p_precision)
 {
 	return fabs(p_a - p_b) <= p_precision;
+}
+
+float Float::reduce(float p_val, float p_min, float p_max)
+{
+	if (p_val > p_max) {
+		return p_max;
+	} else if (p_val < p_min) {
+		return p_min;
+	}
+
+	return p_val;
 }
 
 class Animation {

@@ -65,6 +65,8 @@ class Car : boost::noncopyable
 
 		// attributes
 
+		bool isChoking() const;
+
 		bool isDrifting() const;
 
 		bool isLocked() const;

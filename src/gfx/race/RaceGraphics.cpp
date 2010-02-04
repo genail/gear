@@ -446,7 +446,10 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 
 	static const int RAND_LIMIT = 20;
 
-	if (car.isDrifting() && timeFromLastSmoke >= SMOKE_PERIOD) {
+	if (
+			(car.isDrifting() || car.isChoking())
+			&& timeFromLastSmoke >= SMOKE_PERIOD
+		) {
 
 		CL_Pointf smokePosition = car.getPosition();
 		smokePosition.x += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);

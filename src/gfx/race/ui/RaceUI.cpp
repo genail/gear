@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -213,7 +213,14 @@ void RaceUI::drawLapTimes(CL_GraphicContext &p_gc)
 	}
 
 	// get current lap time
-	unsigned curr = pr.getLapTime(car, lap);
+	unsigned curr;
+
+	// display 0 time until race is started
+	if (m_logic->isRaceStarted()) {
+		curr = pr.getLapTime(car, lap);
+	} else {
+		curr = 0;
+	}
 
 	// display times
 	const int x = Stage::getWidth() - RIGHT_MARGIN;

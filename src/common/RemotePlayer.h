@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,37 +30,27 @@
 
 #include <ClanLib/core.h>
 
-#include "Packet.h"
+#include "Player.h"
 
-namespace Net {
+class RemotePlayerImpl;
 
-class CarState : public Net::Packet {
-
+class RemotePlayer: public Player
+{
 	public:
 
-		CarState();
+		RemotePlayer(const CL_String8 &p_name = "");
 
-		virtual ~CarState() {}
-
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
+		virtual ~RemotePlayer();
 
 
-		void setName(const CL_String &p_name);
+		virtual Race::Car &getCar();
 
-		void setSerializedData(const CL_NetGameEvent &p_data);
+		virtual const Race::Car &getCar() const;
+
 
 	private:
 
-		CL_String m_name;
+		CL_SharedPtr<RemotePlayerImpl> m_impl;
 
-		CL_NetGameEvent m_serialData;
 };
 
-}

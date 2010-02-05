@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ namespace Race {
 class Block;
 class Bound;
 class Car;
+class Object;
 class Track;
 class TrackTriangulator;
 
@@ -57,11 +58,38 @@ class Level
 		virtual void destroy();
 
 
-		// getters
+		// loading and saving
 
 		bool isLoaded() const;
 
+		void load(const CL_String &p_filename);
+
+		void save(const CL_String &p_filename);
+
+
+		// car management
+
+		void addCar(Car *p_car);
+
+		int getCarCount() const;
+
+		Car &getCar(int p_idx);
+
+		const Car &getCar(int p_idx) const;
+
 		const Track &getTrack() const;
+
+		void removeCar(Car *p_car);
+
+
+		// objects management
+
+		int getObjectCount() const;
+
+		const Race::Object &getObject(int p_idx) const;
+
+
+		// track routines
 
 		/**
 		 * @return Triangulator object. It if valid only if track was
@@ -75,16 +103,17 @@ class Level
 		 */
 		TrackTriangulator &getTrackTriangulator();
 
+		/**
+		 * Sets the new track. Note that when you set a track, the level
+		 * geometry will not be updated. You should use getTrackTriangulator()
+		 * and rebuild modified segment or whole track.
+		 *
+		 * @param p_track Track to set.
+		 */
+		void setTrack(const Track &p_track);
 
-		// operations
 
-		void addCar(Car *p_car);
-
-		Car &getCar(int p_index);
-
-		const Car &getCar(int p_index) const;
-
-		int getCarCount() const;
+		// other
 
 		float getResistance(float p_x, float p_y);
 
@@ -96,20 +125,7 @@ class Level
 				CL_Pointf *p_pos, CL_Angle *p_rot
 		) const;
 
-		void load(const CL_String &p_filename);
 
-		void removeCar(Car *p_car);
-
-		void save(const CL_String &p_filename);
-
-		/**
-		 * Sets the new track. Note that when you set a track, the level
-		 * geometry will not be updated. You should use getTrackTriangulator()
-		 * and rebuild modified segment or whole track.
-		 *
-		 * @param p_track Track to set.
-		 */
-		void setTrack(const Track &p_track);
 
 
 	private:

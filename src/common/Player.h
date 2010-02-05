@@ -30,13 +30,15 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
+
 namespace Race {
 	class Car;
 }
 
 class PlayerImpl;
 
-class Player {
+class Player : boost::noncopyable {
 
 	public:
 
@@ -44,16 +46,13 @@ class Player {
 
 		virtual ~Player();
 
-		Race::Car &getCar();
+		virtual Race::Car &getCar();
 
-		const Race::Car &getCar() const;
+		virtual const Race::Car &getCar() const;
 
 		const CL_String &getName() const;
 
 		void setName(const CL_String &p_name);
-
-
-		bool operator==(const Player &other) const;
 
 	private:
 

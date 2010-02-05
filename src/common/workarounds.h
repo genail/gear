@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,37 +30,35 @@
 
 #include <ClanLib/core.h>
 
-#include "Packet.h"
+// this file contains workarounds to known problems in used libraries
 
-namespace Net {
+namespace Workarounds
+{
+	/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
+	inline void clAngleNormalize(CL_Angle *p_angle)
+	{
+		#if CL_CURRENT_VERSION <= CL_VERSION(2,1,1)
+		p_angle->normalize();
+		if (p_angle->to_radians() < 0) {
+			*p_angle += CL_Angle(2 * CL_PI, cl_radians);
+		}
+		#else
+			p_angle->normalize();
+		#endif
+	}
 
-class CarState : public Net::Packet {
+	/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
+	inline void clAngleNormalize180(CL_Angle *p_angle)
+	{
+		#if CL_CURRENT_VERSION <= CL_VERSION(2,1,1)
 
-	public:
+		clAngleNormalize(p_angle);
+		p_angle->set_radians(p_angle->to_radians() - CL_PI);
 
-		CarState();
+		#else
 
-		virtual ~CarState() {}
+		p_angle->normalize_180();
 
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
-
-
-		void setName(const CL_String &p_name);
-
-		void setSerializedData(const CL_NetGameEvent &p_data);
-
-	private:
-
-		CL_String m_name;
-
-		CL_NetGameEvent m_serialData;
-};
-
-}
+		#endif
+	}
+} // namespace

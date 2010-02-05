@@ -26,55 +26,51 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "OfflineRaceLogic.h"
+#include <unistd.h>
+#include <boost/test/unit_test.hpp>
 
-#include "common.h"
-#include "common/Game.h"
-#include "logic/race/Progress.h"
+#include "math/Integer.h"
 
-namespace Race {
+/*
+ * Minimal testing facility:
+ *
+ * BOOST_CHECK( predicate )
+ * BOOST_REQUIRE( predicate )
+ * BOOST_ERROR( message )
+ * BOOST_FAIL( message )
+ *
+ * Test tools:
+ * http://www.boost.org/doc/libs/1_34_0/libs/test/doc/components/test_tools/index.html
+ */
 
-OfflineRaceLogic::OfflineRaceLogic(const CL_String &p_levelName) :
-	m_levelName(p_levelName)
+BOOST_AUTO_TEST_SUITE(IntegerTest)
+
+BOOST_AUTO_TEST_CASE(clamp)
 {
+	BOOST_CHECK(Math::Integer::clamp(-2, 0, 0) == 0);
+	BOOST_CHECK(Math::Integer::clamp(-1, 0, 0) == 0);
+	BOOST_CHECK(Math::Integer::clamp(0, 0, 0) == 0);
+	BOOST_CHECK(Math::Integer::clamp(1, 0, 0) == 0);
+	BOOST_CHECK(Math::Integer::clamp(2, 0, 0) == 0);
+
+	BOOST_CHECK(Math::Integer::clamp(-3, 0, 1) == 1);
+	BOOST_CHECK(Math::Integer::clamp(-2, 0, 1) == 0);
+	BOOST_CHECK(Math::Integer::clamp(-1, 0, 1) == 1);
+	BOOST_CHECK(Math::Integer::clamp(0, 0, 1) == 0);
+	BOOST_CHECK(Math::Integer::clamp(1, 0, 1) == 1);
+	BOOST_CHECK(Math::Integer::clamp(2, 0, 1) == 0);
+	BOOST_CHECK(Math::Integer::clamp(3, 0, 1) == 1);
+	BOOST_CHECK(Math::Integer::clamp(4, 0, 1) == 0);
+
+	BOOST_CHECK(Math::Integer::clamp(-4, 0, 2) == 2);
+	BOOST_CHECK(Math::Integer::clamp(-3, 0, 0) == 0);
+	BOOST_CHECK(Math::Integer::clamp(-2, 0, 2) == 1);
+	BOOST_CHECK(Math::Integer::clamp(-1, 0, 2) == 2);
+	BOOST_CHECK(Math::Integer::clamp(0, 0, 2) == 0);
+	BOOST_CHECK(Math::Integer::clamp(1, 0, 2) == 1);
+	BOOST_CHECK(Math::Integer::clamp(2, 0, 2) == 2);
+	BOOST_CHECK(Math::Integer::clamp(3, 0, 2) == 0);
+	BOOST_CHECK(Math::Integer::clamp(4, 0, 2) == 1);
 }
 
-OfflineRaceLogic::~OfflineRaceLogic()
-{
-	destroy();
-}
-
-void OfflineRaceLogic::initialize()
-{
-	Level &level = getLevel();
-
-	level.initialize();
-	level.load(m_levelName);
-
-	// init progress object
-	Progress &prog = getProgress();
-	prog.initialize();
-	prog.resetClock();
-
-	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-
-	addPlayer(&player);
-	level.addCar(&player.getCar());
-
-	CL_Pointf carPos;
-	CL_Angle carRot;
-	level.getStartPosAndRot(1, &carPos, &carRot);
-
-	player.getCar().setPosition(carPos);
-	player.getCar().setAngle(carRot);
-
-}
-
-void OfflineRaceLogic::destroy()
-{
-	getProgress().destroy();
-	getLevel().destroy();
-}
-
-}
+BOOST_AUTO_TEST_SUITE_END()

@@ -221,9 +221,6 @@ void ServerImpl::onClientConnected(CL_NetGameConnection *p_conn)
 	cl_log_event(LOG_EVENT, "player %1 is connected", (unsigned) p_conn);
 
 	Player player;
-
-	player.m_lastCarState.setPosition(CL_Pointf(250, 250));
-
 	m_connections[p_conn] = player;
 
 	// no signal invoke yet

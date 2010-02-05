@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,41 +26,62 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <unistd.h>
+#include <boost/test/unit_test.hpp>
 
-#include <ClanLib/core.h>
+#include "math/Float.h"
 
-#include "Packet.h"
+/*
+ * Minimal testing facility:
+ *
+ * BOOST_CHECK( predicate )
+ * BOOST_REQUIRE( predicate )
+ * BOOST_ERROR( message )
+ * BOOST_FAIL( message )
+ *
+ * Test tools:
+ * http://www.boost.org/doc/libs/1_34_0/libs/test/doc/components/test_tools/index.html
+ */
 
-namespace Net {
+BOOST_AUTO_TEST_SUITE(FloatTest)
 
-class CarState : public Net::Packet {
+BOOST_AUTO_TEST_CASE(EasingNone)
+{
+	Math::Float f;
+	f.animate(0.0f, 1.0f, 1000, Math::Easing::NONE);
 
-	public:
+	BOOST_CHECK(f.get() == 0.0f);
 
-		CarState();
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 0.5f, 0.01f);
 
-		virtual ~CarState() {}
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 1.0f, 0.01f);
 
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
-
-
-		void setName(const CL_String &p_name);
-
-		void setSerializedData(const CL_NetGameEvent &p_data);
-
-	private:
-
-		CL_String m_name;
-
-		CL_NetGameEvent m_serialData;
-};
-
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 1.0f, 0.01f);
 }
+
+BOOST_AUTO_TEST_CASE(EasingNoneLoop)
+{
+	Math::Float f;
+	f.animate(0.0f, 1.0f, 1000, Math::Easing::NONE);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 0.5f, 0.01f);
+
+	f.animate(0.0f, 1.0f, 1000, Math::Easing::NONE);
+
+	BOOST_CHECK(f.get() == 0.0f);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 0.5f, 0.01f);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 1.0f, 0.01f);
+
+	f.update(500);
+	BOOST_CHECK_CLOSE(f.get(), 1.0f, 0.01f);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

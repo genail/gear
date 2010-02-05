@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,39 +28,30 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include <vector>
 
-#include "Packet.h"
+#include "math/Integer.h"
 
-namespace Net {
-
-class CarState : public Net::Packet {
-
+template <typename T>
+class LoopVector : public std::vector<T>
+{
 	public:
 
-		CarState();
+		T &operator[] (int p_index) {
+			return std::vector<T>::operator[](norm(p_index));
+		}
 
-		virtual ~CarState() {}
-
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
-
-
-		void setName(const CL_String &p_name);
-
-		void setSerializedData(const CL_NetGameEvent &p_data);
+		const T &operator[] (int p_index) const {
+			return std::vector<T>::operator[](norm(p_index));
+		}
 
 	private:
 
-		CL_String m_name;
-
-		CL_NetGameEvent m_serialData;
+		inline int norm(int p_index) const {
+			return Math::Integer::clamp(
+					p_index,
+					0,
+					static_cast<signed> (std::vector<T>::size()) - 1
+			);
+		}
 };
-
-}

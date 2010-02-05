@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,12 @@
 #include <ClanLib/display.h>
 #include <ClanLib/application.h>
 
+#include <ClanLib/gl.h>
+
 #if defined(GL1)
 #include <ClanLib/gl1.h>
 #elif defined(GL2)
-#include <ClanLib/gl.h>
+// empty
 #else
 #error must define GL1 or GL2
 #endif // GL1 || GL2
@@ -138,20 +140,23 @@ int Application::main(const std::vector<CL_String> &args)
 #if defined(GL1)
 		cl_log_event("init", "initializing OpenGL 1.x");
 		CL_SetupGL1     setup_gl;
-
-		CL_DisplayWindow displayWindow("Gear", Gfx::Stage::m_width, Gfx::Stage::m_height);
 #elif defined(GL2)
 		cl_log_event("init", "initializing OpenGL 2.x");
 		CL_SetupGL     setup_gl;
-
-		CL_OpenGLWindowDescription displayWindowDescription;
-
-		displayWindowDescription.set_title("Gear");
-		displayWindowDescription.set_size(CL_Size(Gfx::Stage::m_width, Gfx::Stage::m_height), true);
-//		displayWindowDescription.set_multisampling(4);
-
-		CL_DisplayWindow displayWindow(displayWindowDescription);
 #endif // GL1 || GL2
+
+		CL_OpenGLWindowDescription winDesc;
+
+		winDesc.set_title("Gear");
+		winDesc.set_size(
+				CL_Size(Gfx::Stage::m_width, Gfx::Stage::m_height),
+				true
+		);
+
+		// triple buffering
+		winDesc.set_flipping_buffers(3);
+
+		CL_DisplayWindow displayWindow(winDesc);
 
 		// window close action
 		slots.connect_functor(displayWindow.sig_window_close(), &Application::onWindowClose);

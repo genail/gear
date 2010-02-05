@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -145,10 +145,12 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 	if (!hasPlayer(p_name)) {
 		// create new player
 
-		m_remotePlayers.push_back(Player(p_name));
+		m_remotePlayers.push_back(
+				CL_SharedPtr<RemotePlayer>(new RemotePlayer(p_name))
+		);
 
-		Player &player = m_remotePlayers.back();
-		addPlayer(player);
+		RemotePlayer &player = *m_remotePlayers.back();
+		addPlayer(&player);
 
 		// add his car to the level
 		getLevel().addCar(&player.getCar());
@@ -171,14 +173,18 @@ void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 	removePlayer(player);
 
 	TPlayerList::iterator itor;
+	bool found = false;
+
 	for (itor = m_remotePlayers.begin(); itor != m_remotePlayers.end(); ++itor) {
-		if (*itor == player) {
+
+		if (reinterpret_cast<unsigned> (itor->get()) == reinterpret_cast<unsigned> (&player)) {
 			m_remotePlayers.erase(itor);
+			found = true;
 			break;
 		}
 	}
 
-	G_ASSERT(itor != m_remotePlayers.end());
+	G_ASSERT(found);
 	display(cl_format("Player %1 leaved", p_name));
 }
 
@@ -206,16 +212,19 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 			player = &m_localPlayer;
 		} else {
 			// this is remote player
-			m_remotePlayers.push_back(Player(playerName));
-			player = &m_remotePlayers.back();
+			m_remotePlayers.push_back(
+					CL_SharedPtr<RemotePlayer>(new RemotePlayer(playerName))
+			);
+
+			player = m_remotePlayers.back();
 		}
 
 		// put player to player list
-		addPlayer(*player);
+		addPlayer(player);
 
 		// prepare car and put it to level
 		car = &player->getCar();
-		car->applyCarState(p_gameState.getCarState(i));
+		car->deserialize(p_gameState.getCarState(i).getSerializedData());
 
 		getLevel().addCar(&player->getCar());
 	}
@@ -228,7 +237,8 @@ void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
 	const CL_String &playerName = p_carState.getName();
 
 	if (hasPlayer(playerName)) {
-		getPlayer(playerName).getCar().applyCarState(p_carState);
+		const CL_NetGameEvent serialData = p_carState.getSerializedData();
+		getPlayer(playerName).getCar().deserialize(serialData);
 	} else {
 		cl_log_event(LOG_ERROR, "Player %1 do not exists", playerName);
 	}
@@ -252,7 +262,12 @@ void OnlineRaceLogic::onRaceStart(
 	getProgress().reset(car);
 
 	// send current state
-	const Net::CarState carState = car.prepareCarState();
+	CL_NetGameEvent serialData("");
+	car.serialize(&serialData);
+
+	Net::CarState carState;
+	carState.setSerializedData(serialData);
+
 	m_client->sendCarState(carState);
 
 	startRace(3, CL_System::get_time() + RACE_START_DELAY);
@@ -261,7 +276,12 @@ void OnlineRaceLogic::onRaceStart(
 void OnlineRaceLogic::onInputChange(const Car &p_car)
 {
 	if (!p_car.isLocked()) { // ignore when should be locked
-		const Net::CarState carState = p_car.prepareCarState();
+		CL_NetGameEvent serialData("");
+		p_car.serialize(&serialData);
+
+		Net::CarState carState;
+		carState.setSerializedData(serialData);
+
 		m_client->sendCarState(carState);
 	}
 }

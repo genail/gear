@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -127,7 +127,7 @@ class RaceLogic {
 
 		Level &getLevel();
 
-		void addPlayer(Player &p_player);
+		void addPlayer(Player *p_player);
 
 		void display(const CL_String &p_message);
 

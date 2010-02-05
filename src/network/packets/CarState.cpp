@@ -35,11 +35,9 @@
 namespace Net {
 
 CarState::CarState() :
-		m_speed(0.0f),
-		m_accel(0.0f),
-		m_turn(0.0f)
+	m_serialData("")
 {
-
+	// empty
 }
 
 CL_NetGameEvent CarState::buildEvent() const
@@ -48,17 +46,11 @@ CL_NetGameEvent CarState::buildEvent() const
 
 	event.add_argument(m_name);
 
-	event.add_argument(m_position.x);
-	event.add_argument(m_position.y);
+	const int argCount = static_cast<signed>(m_serialData.get_argument_count());
 
-	event.add_argument(m_rotation.to_radians());
-
-	event.add_argument(m_movement.x);
-	event.add_argument(m_movement.y);
-
-	event.add_argument(m_speed);
-	event.add_argument(m_accel);
-	event.add_argument(m_turn);
+	for (int i = 0; i < argCount; ++i) {
+		event.add_argument(m_serialData.get_argument(i));
+	}
 
 	return event;
 }
@@ -67,21 +59,34 @@ void CarState::parseEvent(const CL_NetGameEvent &p_event)
 {
 	assert(p_event.get_name() == EVENT_CAR_STATE);
 
-	int arg = 0;
+	m_name = p_event.get_argument(0);
+	m_serialData = CL_NetGameEvent("");
 
-	m_name = p_event.get_argument(arg++);
+	const int argCount = static_cast<signed>(p_event.get_argument_count());
 
-	m_position.x = p_event.get_argument(arg++);
-	m_position.y = p_event.get_argument(arg++);
+	for (int i = 1; i < argCount; ++i) {
+		m_serialData.add_argument(p_event.get_argument(i));
+	}
+}
 
-	m_rotation = CL_Angle::from_radians(p_event.get_argument(arg++));
+const CL_String &CarState::getName() const
+{
+	return m_name;
+}
 
-	m_movement.x = p_event.get_argument(arg++);
-	m_movement.y = p_event.get_argument(arg++);
+CL_NetGameEvent CarState::getSerializedData() const
+{
+	return m_serialData;
+}
 
-	m_speed = p_event.get_argument(arg++);
-	m_accel = p_event.get_argument(arg++);
-	m_turn = p_event.get_argument(arg++);
+void CarState::setName(const CL_String &p_name)
+{
+	m_name = p_name;
+}
+
+void CarState::setSerializedData(const CL_NetGameEvent &p_data)
+{
+	m_serialData = p_data;
 }
 
 } // namespace

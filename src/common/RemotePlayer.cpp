@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,45 +26,38 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "RemotePlayer.h"
 
-#include <boost/utility.hpp>
+#include "network/RemoteCar.h"
+#include "logic/race/Car.h"
 
-#include <ClanLib/core.h>
-
-#include "gfx/Drawable.h"
-#include "common/GroundBlockType.h"
-
-namespace Gfx {
-
-class GroundBlock : public Gfx::Drawable {
-
+class RemotePlayerImpl
+{
 	public:
 
-		GroundBlock(Common::GroundBlockType p_type);
-
-		virtual ~GroundBlock();
-
-
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-
-
-		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
-
-	private:
-
-		/** This block type (what is displays) */
-		Common::GroundBlockType m_type;
-
-		/** This block sprite */
-		CL_Sprite m_sprite;
-
-		/** Draw position. Where top left point should lay. */
-		CL_Pointf m_position;
+		Net::RemoteCar m_remoteCar;
+//		Race::Car m_remoteCar;
 
 };
 
-} // namespace
+RemotePlayer::RemotePlayer(const CL_String8 &p_name) :
+	Player(p_name),
+	m_impl(new RemotePlayerImpl())
+{
+	// empty
+}
 
+RemotePlayer::~RemotePlayer()
+{
+	// empty
+}
+
+Race::Car &RemotePlayer::getCar()
+{
+	return m_impl->m_remoteCar;
+}
+
+const Race::Car &RemotePlayer::getCar() const
+{
+	return m_impl->m_remoteCar;
+}

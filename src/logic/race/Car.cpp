@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek, Paweł Rybarczyk
+ * Copyright (c) 2009-2010, Piotr Korzuszek, Paweł Rybarczyk
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,17 +28,15 @@
 
 #include <ClanLib/core.h>
 
+#include "Car.h"
+
 #include "common.h"
-#include "common/Game.h"
-#include "common/Player.h"
-#include "common/Properties.h"
+#include "common/workarounds.h"
 #include "gfx/Stage.h"
 #include "gfx/DebugLayer.h"
-#include "logic/race/Car.h"
 #include "logic/race/level/Level.h"
-#include "logic/race/level/Checkpoint.h"
 #include "logic/race/level/Bound.h"
-#include "network/packets/CarState.h"
+#include "math/Float.h"
 
 namespace Race {
 
@@ -48,22 +46,110 @@ const int CAR_WIDTH = 18;
 /* Car height in pixels */
 const int CAR_HEIGHT = 24;
 
-Car::Car() :
-	m_level(NULL),
-	m_timeFromLastUpdate(0),
-	m_position(300.0f, 300.0f),
-	m_rotation(0, cl_degrees),
-	m_speed(0.0f),
-	m_inputAccel(false),
-	m_inputBrake(false),
-	m_inputHandbrake(false),
-	m_inputTurn(0.0f),
-	m_inputLocked(false),
-	m_inputChanged(false),
-	m_phySpeedDelta(0.0f),
-	m_phyWheelsTurn(0.0f)
+class CarImpl
 {
-#ifndef SERVER
+	IMPL_SIGNAL_1(inputChanged, const Car&)
+
+	public:
+
+		/** Base object */
+		const Car *const m_base;
+
+		/** This will help to keep 1/60 iteration speed */
+		unsigned m_timeFromLastUpdate;
+
+
+		// current vehicle state
+
+		/** Central position on map */
+		CL_Pointf m_position;
+
+		/** CW rotation from positive X axis */
+		CL_Angle m_rotation;
+
+		/** Current speed in map pixels per frame */
+		float m_speed;
+
+		/** Damage factor. 0.0 - 1.0 from new to damaged */
+		float m_damage;
+
+		/** If currently chocking */
+		bool m_chocking;
+
+
+		// input state
+
+		/** Acceleration switch */
+		bool m_inputAccel;
+
+		/** Brake switch */
+		bool m_inputBrake;
+
+		/** Current turn. -1 is maximum left, 0 is center and 1 is maximum right */
+		float m_inputTurn;
+
+		/** Locked state. If true then car shoudn't move. */
+		bool m_inputLocked;
+
+		/** True if input changed from last time */
+		bool m_inputChanged;
+
+
+		// physics
+
+		/** Car movement rotation */
+		CL_Angle m_phyMoveRot;
+
+		/** Car movement vector (created from movement rotation) */
+		CL_Vec2f m_phyMoveVec;
+
+		/** Speed delta (for isDrifting()) */
+		float m_phySpeedDelta;
+
+		/** Wheels turn. -1.0 is max left, 1.0 is max right */
+		float m_phyWheelsTurn;
+
+		/** Body outline for collision check */
+		CL_CollisionOutline m_phyCollisionOutline;
+
+
+		CarImpl(const Car *p_base) :
+			m_base(p_base),
+			m_timeFromLastUpdate(0),
+			m_position(300.0f, 300.0f),
+			m_rotation(0, cl_degrees),
+			m_speed(0.0f),
+			m_damage(0.0f),
+			m_chocking(false),
+			m_inputAccel(false),
+			m_inputBrake(false),
+			m_inputTurn(0.0f),
+			m_inputLocked(false),
+			m_inputChanged(false),
+			m_phySpeedDelta(0.0f),
+			m_phyWheelsTurn(0.0f)
+		{ /* empty */ }
+
+
+		void update1_60();
+
+		// helpers
+
+		void alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad);
+
+		float limit(float p_value, float p_from, float p_to) const;
+
+		/** Checks if car should choke at the moment */
+		bool isChoking();
+
+		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
+};
+
+METH_SIGNAL_1(Car, inputChanged, const Car&)
+
+Car::Car() :
+	m_impl(new CarImpl(this))
+{
 	// build car contour for collision check
 	CL_Contour contour;
 
@@ -74,38 +160,39 @@ Car::Car() :
 	contour.get_points().push_back(CL_Pointf(halfWidth, -halfHeight));
 	contour.get_points().push_back(CL_Pointf(-halfWidth, -halfHeight));
 
-	m_phyCollisionOutline.get_contours().push_back(contour);
+	m_impl->m_phyCollisionOutline.get_contours().push_back(contour);
 
-	m_phyCollisionOutline.set_inside_test(true);
+	m_impl->m_phyCollisionOutline.set_inside_test(true);
 
-	m_phyCollisionOutline.calculate_radius();
-	m_phyCollisionOutline.calculate_smallest_enclosing_discs();
-#endif // !SERVER
+	m_impl->m_phyCollisionOutline.calculate_radius();
+	m_impl->m_phyCollisionOutline.calculate_smallest_enclosing_discs();
 }
 
-Car::~Car() {
+Car::~Car()
+{
+	// empty
 }
 
 void Car::update(unsigned p_timeElapsed)
 {
-	m_timeFromLastUpdate += p_timeElapsed;
+	m_impl->m_timeFromLastUpdate += p_timeElapsed;
 
 	static const unsigned breakPoint = 1000 / 60;
 
-	while (m_timeFromLastUpdate >= breakPoint) {
-		update1_60();
-		m_timeFromLastUpdate -= breakPoint;
+	while (m_impl->m_timeFromLastUpdate >= breakPoint) {
+		m_impl->update1_60();
+		m_impl->m_timeFromLastUpdate -= breakPoint;
 	}
 }
 
-void Car::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad)
+void CarImpl::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad)
 {
 	// works only on normalized values
 	CL_Angle normWhat(p_what);
 	CL_Angle normTo(p_to);
 
-	normalizeAngle(normWhat);
-	normalizeAngle(normTo);
+	Workarounds::clAngleNormalize(&normWhat);
+	Workarounds::clAngleNormalize(&normTo);
 
 	const CL_Angle diffAngle = normWhat - normTo;
 
@@ -136,15 +223,16 @@ void Car::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad)
 	}
 }
 
-void Car::update1_60() {
+void CarImpl::update1_60() {
 	
 	static const float BRAKE_POWER = 0.1f;
-	static const float ACCEL_POWER = 0.14f;
+	static const float ACCEL_POWER = 0.014f;
+	static const float SPEED_LIMIT = 15.0f;
 	static const float WHEEL_TURN_SPEED = 1.0f / 10.0f;
 	static const float TURN_POWER  = (2 * CL_PI / 360.0f) * 2.5f;
 	static const float MOV_ALIGN_POWER = TURN_POWER / 2.0f;
 	static const float ROT_ALIGN_POWER = TURN_POWER * 0.7f;
-	static const float AIR_RESITANCE = 0.01f; // per one speed unit
+	static const float AIR_RESITANCE = 0.003f; // per one speed unit
 	static const float DRIFT_SPEED_REDUCTION_RATE = 0.1f;
 
 	// speed limit under what physics angle reduction will be more aggressive
@@ -165,7 +253,13 @@ void Car::update1_60() {
 	if (m_inputBrake) {
 		m_speed -= BRAKE_POWER;
 	} else if (m_inputAccel) {
-		m_speed += ACCEL_POWER;
+		// only if not choking
+		if (!isChoking()) {
+			m_chocking = false;
+			m_speed += (SPEED_LIMIT - m_speed) * ACCEL_POWER;
+		} else {
+			m_chocking = true;
+		}
 	}
 	
 	// rotate steering wheels
@@ -190,7 +284,6 @@ void Car::update1_60() {
 			turnAngle.set_radians(turnAngle.to_radians() * (absSpeed / LOWER_SPEED_TURN_REDUCTION));
 		}
 
-		// make backwards turning reverse
 		if (m_speed > 0.0f) {
 			m_rotation += turnAngle;
 		} else {
@@ -218,14 +311,14 @@ void Car::update1_60() {
 
 		// normalize rotations only when equal
 		if (m_rotation == m_phyMoveRot) {
-			normalizeAngle(m_rotation);
-			normalizeAngle(m_phyMoveRot);
+			Workarounds::clAngleNormalize(&m_rotation);
+			Workarounds::clAngleNormalize(&m_phyMoveRot);
 		}
 
 	}
 
-	normalizeAngle(m_phyMoveRot);
-	normalizeAngle(m_rotation);
+	Workarounds::clAngleNormalize(&m_phyMoveRot);
+	Workarounds::clAngleNormalize(&m_rotation);
 
 
 	// reduce speed
@@ -235,7 +328,7 @@ void Car::update1_60() {
 	if (diffDegAbs > 0.1f) {
 
 		CL_Angle diffAngleNorm = diffAngle;
-		normalizeAngle180(diffAngleNorm);
+		Workarounds::clAngleNormalize180(&diffAngleNorm);
 
 		// 0.0 when going straight, 1.0 when 90 deg, > 1.0 when more than 90 deg
 		const float angleRate = fabs(1.0f - (fabs(diffAngleNorm.to_degrees()) - 90.0f) / 90.0f);
@@ -253,6 +346,7 @@ void Car::update1_60() {
 
 	// calculate next move vector
 	const float m_rotationRad = m_phyMoveRot.to_radians();
+
 	m_phyMoveVec.x = cos(m_rotationRad);
 	m_phyMoveVec.y = sin(m_rotationRad);
 
@@ -269,7 +363,7 @@ void Car::update1_60() {
 
 	// act to input changes
 	if (m_inputChanged) {
-		INVOKE_1(inputChanged, *this);
+		INVOKE_1(inputChanged, *m_base);
 		m_inputChanged = false;
 	}
 
@@ -279,35 +373,35 @@ void Car::update1_60() {
 	DebugLayer *dbgl = Gfx::Stage::getDebugLayer();
 
 	dbgl->putMessage("speed", cl_format("%1", m_speed));
-	if (!m_level) {
-		const float resistance = m_level->getResistance(m_position.x, m_position.y);
-		dbgl->putMessage("resist", cl_format("%1", resistance));
-	}
+//	if (!m_level) {
+//		const float resistance = m_level->getResistance(m_position.x, m_position.y);
+//		dbgl->putMessage("resist", cl_format("%1", resistance));
+//	}
 #endif // NDEBUG
 #endif // CLIENT
 }
 
-#if defined(CLIENT)
-CL_CollisionOutline Car::calculateCurrentCollisionOutline() const
+CL_CollisionOutline Car::getCollisionOutline() const
 {
-	CL_CollisionOutline outline(m_phyCollisionOutline);
+	CL_CollisionOutline outline(m_impl->m_phyCollisionOutline);
 
 	// transform the outline
 	CL_Angle angle(90, cl_degrees);
-	angle += m_rotation;
+	angle += m_impl->m_rotation;
 
 	outline.set_angle(angle);
-	outline.set_translation(m_position.x, m_position.y);
+	outline.set_translation(m_impl->m_position.x, m_impl->m_position.y);
 
 	return outline;
 }
 
-void Car::performBoundCollision(const Bound &p_bound)
+void Car::applyCollision(const CL_LineSegment2f &p_seg)
 {
-	const CL_LineSegment2f &seg = p_bound.getSegment();
-	const float side = -seg.point_right_of_line(m_position);
+	static const float DAMAGE_MULT = 0.2f;
 
-	const CL_Vec2f segVec = seg.q - seg.p;
+	const float side = -p_seg.point_right_of_line(m_impl->m_position);
+
+	const CL_Vec2f segVec = p_seg.q - p_seg.p;
 
 	// need front normal (crash side)
 	CL_Vec2f fnormal(segVec.y, -segVec.x); // right side normal
@@ -318,79 +412,143 @@ void Car::performBoundCollision(const Bound &p_bound)
 	}
 
 	// move away
-	m_position += (fnormal * fabs(m_speed));
+	m_impl->m_position += (fnormal * fabs(m_impl->m_speed));
 
 	// calculate collision angle to estaminate speed reduction
-	CL_Angle angleDiff(m_phyMoveRot - vecToAngle(fnormal));
-	normalizeAngle180(angleDiff);
+	CL_Angle angleDiff(m_impl->m_phyMoveRot - m_impl->vecToAngle(fnormal));
+	Workarounds::clAngleNormalize180(&angleDiff);
 
 	const float colAngleDeg = fabs(angleDiff.to_degrees()) - 90.0f;
 	const float reduction = fabs(1.0f - fabs(colAngleDeg - 90.0f) / 90.0f);
 
-	m_speed -= m_speed * reduction;
+	// calculate and apply damage
+	const float damage = m_impl->m_speed * reduction * DAMAGE_MULT;
+	m_impl->m_damage =
+			Math::Float::reduce(m_impl->m_damage + damage, 0.0f, 1.0f);
+
+	cl_log_event(LOG_DEBUG, "damage: %1, total: %2", damage, m_impl->m_damage);
+
+	// reduce speed
+	m_impl->m_speed -= m_impl->m_speed * reduction;
 
 	// bounce movement vector and angle away
 
 	// get mirror point
-	if (m_phyMoveVec.length() > 0.01f) {
-		m_phyMoveVec.normalize();
+	if (m_impl->m_phyMoveVec.length() > 0.01f) {
+		m_impl->m_phyMoveVec.normalize();
 
-		const float lengthProj = m_phyMoveVec.length() * cos(segVec.angle(m_phyMoveVec).to_radians());
+		const float lengthProj = m_impl->m_phyMoveVec.length() * cos(segVec.angle(m_impl->m_phyMoveVec).to_radians());
 		const CL_Vec2f mirrorPoint(segVec * (lengthProj / segVec.length()));
 
 		// invert move vector by mirror point
-		const CL_Vec2f mirrorVec = (m_phyMoveVec - mirrorPoint) * -1;
-		m_phyMoveVec = mirrorPoint + mirrorVec;
+		const CL_Vec2f mirrorVec = (m_impl->m_phyMoveVec - mirrorPoint) * -1;
+		m_impl->m_phyMoveVec = mirrorPoint + mirrorVec;
 
 		// update physics angle
-		m_phyMoveRot = vecToAngle(m_phyMoveVec);
+		m_impl->m_phyMoveRot = m_impl->vecToAngle(m_impl->m_phyMoveVec);
 
 	}
 
 }
-#endif // CLIENT
 
-Net::CarState Car::prepareCarState() const
+void Car::serialize(CL_NetGameEvent *p_event) const
 {
-	Net::CarState state;
+	// save inputs
+	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputAccel));
+	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputBrake));
+	p_event->add_argument(m_impl->m_inputTurn);
+	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputLocked));
 
-	state.setPosition(m_position);
-	state.setRotation(m_rotation);
-	state.setMovement(m_phyMoveVec);
-	state.setSpeed(m_speed);
-	state.setTurn(m_inputTurn);
+	// corpse state
+	p_event->add_argument(m_impl->m_position.x);
+	p_event->add_argument(m_impl->m_position.y);
+	p_event->add_argument(m_impl->m_rotation.to_radians());
+	p_event->add_argument(m_impl->m_speed);
 
-	if (m_inputAccel && !m_inputBrake) {
-		state.setAcceleration(1.0f);
-	} else if (!m_inputAccel && m_inputBrake) {
-		state.setAcceleration(-1.0f);
-	} else {
-		state.setAcceleration(0.0f);
-	}
-
-	return state;
+	// physics parameters
+	p_event->add_argument(m_impl->m_phyMoveRot.to_radians());
+	p_event->add_argument(m_impl->m_phyMoveVec.x);
+	p_event->add_argument(m_impl->m_phyMoveVec.y);
+	p_event->add_argument(m_impl->m_phySpeedDelta);
+	p_event->add_argument(m_impl->m_phyWheelsTurn);
 }
 
-void Car::applyCarState(const Net::CarState &p_carState)
+void Car::deserialize(const CL_NetGameEvent &p_event)
 {
-	m_position = p_carState.getPosition();
-	m_rotation = p_carState.getRotation();
-	m_phyMoveVec = p_carState.getMovement();
-	m_speed = p_carState.getSpeed();
-	m_inputTurn = p_carState.getTurn();
-	m_inputAccel = p_carState.getAcceleration() > 0.0f;
-	m_inputBrake = p_carState.getAcceleration() < 0.0f;
+	static const unsigned ARGUMENT_COUNT = 13;
+
+	if (p_event.get_argument_count() != ARGUMENT_COUNT) {
+		// when serialize data is invalid don't do anything
+		cl_log_event(
+				LOG_DEBUG,
+				"invalid serialize data count: %1",
+				p_event.get_argument_count()
+		);
+
+		return;
+	}
+
+	int idx = 0;
+
+	// save inputs
+	m_impl->m_inputAccel = p_event.get_argument(idx++);
+	m_impl->m_inputBrake = p_event.get_argument(idx++);
+	m_impl->m_inputTurn = p_event.get_argument(idx++);
+	m_impl->m_inputLocked = p_event.get_argument(idx++);
+
+	// corpse state
+	m_impl->m_position.x = p_event.get_argument(idx++);
+	m_impl->m_position.y = p_event.get_argument(idx++);
+	m_impl->m_rotation.set_radians(p_event.get_argument(idx++));
+	m_impl->m_speed = p_event.get_argument(idx++);
+
+	// physics parameters
+	m_impl->m_phyMoveRot.set_radians(p_event.get_argument(idx++));
+	m_impl->m_phyMoveVec.x = p_event.get_argument(idx++);
+	m_impl->m_phyMoveVec.y = p_event.get_argument(idx++);
+	m_impl->m_phySpeedDelta = p_event.get_argument(idx++);
+	m_impl->m_phyWheelsTurn = p_event.get_argument(idx++);
+}
+
+bool CarImpl::isChoking()
+{
+	if (m_damage < 1.0f) {
+		return false;
+	}
+
+	const unsigned time = CL_System::get_time();
+	if (1 << 12 & time && 1 << 9 & time) { // 0.5s every 4s
+		return true;
+	}
+
+	if (1 << 11 & time && 1 << 8 & time) { // 0.25s every 2s
+		return true;
+	}
+
+	if (1 << 10 & time && 1 << 7 & time) { // 0.1s every 1s
+		return true;
+	}
+
+	return false;
+}
+
+bool Car::isChoking() const
+{
+	return m_impl->m_chocking;
 }
 
 bool Car::isDrifting() const {
 	static const float DRIFT_LIMIT = 6.0f;
 	static const float ACCEL_LIMIT = 0.05f;
 
-	if (fabs((m_rotation - m_phyMoveRot).to_degrees()) >= DRIFT_LIMIT) {
+	if (fabs((m_impl->m_rotation - m_impl->m_phyMoveRot).to_degrees()) >= DRIFT_LIMIT) {
 		return true;
 	}
 
-	if (fabs(m_phySpeedDelta) >= ACCEL_LIMIT) {
+	if (
+			(m_impl->m_inputAccel || m_impl->m_inputBrake)
+			&& fabs(m_impl->m_phySpeedDelta) >= ACCEL_LIMIT)
+	{
 		return true;
 	}
 
@@ -399,27 +557,17 @@ bool Car::isDrifting() const {
 
 bool Car::isLocked() const
 {
-	return m_inputLocked;
+	return m_impl->m_inputLocked;
 }
 
 const CL_Pointf& Car::getPosition() const
 {
-	return m_position;
-}
-
-float Car::getRotation() const
-{
-	return m_rotation.to_degrees();
-}
-
-float Car::getRotationRad() const
-{
-	return m_rotation.to_radians();
+	return m_impl->m_position;
 }
 
 float Car::getSpeed() const
 {
-	return m_speed;
+	return m_impl->m_speed;
 }
 
 float Car::getSpeedKMS() const
@@ -433,7 +581,7 @@ float Car::getSpeedKMS() const
 //	// / 1000 - to kmh
 //	return m_speed * (4 / 25.0f) * 60 * 60 * 60 / 1000;
 
-	const float m_f =  m_speed / 15.0; // m / frame
+	const float m_f =  m_impl->m_speed / 15.0; // m / frame
 	const float m_s = m_f * 60.0f; // m / s
 	const float m_h = m_s * 3600.0; // m / h
 	return m_h / 1000.0; // km / h
@@ -441,57 +589,43 @@ float Car::getSpeedKMS() const
 
 void Car::setAcceleration(bool p_value)
 {
-	if (m_inputAccel != p_value) {
-		m_inputChanged = true;
+	if (m_impl->m_inputAccel != p_value) {
+		m_impl->m_inputChanged = true;
 	}
 
-	m_inputAccel = p_value;
+	m_impl->m_inputAccel = p_value;
 }
 
 void Car::setBrake(bool p_value)
 {
-	if (m_inputBrake != p_value) {
-		m_inputChanged = true;
+	if (m_impl->m_inputBrake != p_value) {
+		m_impl->m_inputChanged = true;
 	}
 
-	m_inputBrake = p_value;
+	m_impl->m_inputBrake = p_value;
 }
 
 void Car::setTurn(float p_value)
 {
-	if (fabs(p_value - m_inputTurn) > 0.1f) {
-		m_inputChanged = true;
+	if (fabs(p_value - m_impl->m_inputTurn) > 0.1f) {
+		m_impl->m_inputChanged = true;
 	}
 
-	m_inputTurn = limit(p_value, -1.0f, 1.0f);
+	m_impl->m_inputTurn = m_impl->limit(p_value, -1.0f, 1.0f);
 }
 
 void Car::setPosition(const CL_Pointf &p_position)
 {
-	m_position = p_position;
-}
-
-void Car::setRotation(float p_rotation)
-{
-	setAngle(CL_Angle::from_degrees(p_rotation));
+	m_impl->m_position = p_position;
 }
 
 void Car::setAngle(const CL_Angle &p_angle)
 {
-	m_rotation = p_angle;
-	m_phyMoveRot = m_rotation;
+	m_impl->m_rotation = p_angle;
+	m_impl->m_phyMoveRot = m_impl->m_rotation;
 }
 
-void Car::setHandbrake(bool p_handbrake)
-{
-	if (m_inputHandbrake != p_handbrake) {
-		m_inputChanged = true;
-	}
-
-	m_inputHandbrake = p_handbrake;
-}
-
-float Car::limit(float p_value, float p_from, float p_to) const
+float CarImpl::limit(float p_value, float p_from, float p_to) const
 {
 	if (p_value < p_from) {
 		return p_from;
@@ -506,15 +640,15 @@ float Car::limit(float p_value, float p_from, float p_to) const
 
 void Car::setLocked(bool p_locked)
 {
-	m_inputLocked = p_locked;
+	m_impl->m_inputLocked = p_locked;
 
 	// stop the car
 	if (p_locked) {
-		m_phyMoveVec.x = m_phyMoveVec.y = 0.0f;
+		m_impl->m_phyMoveVec.x = m_impl->m_phyMoveVec.y = 0.0f;
 	}
 }
 
-CL_Angle Car::vecToAngle(const CL_Vec2f &p_vec)
+CL_Angle CarImpl::vecToAngle(const CL_Vec2f &p_vec)
 {
 	const static CL_Vec2f ANGLE_ZERO(1.0f, 0.0f);
 	CL_Angle angle = p_vec.angle(ANGLE_ZERO);
@@ -527,27 +661,76 @@ CL_Angle Car::vecToAngle(const CL_Vec2f &p_vec)
 
 }
 
-void Car::normalizeAngle(CL_Angle &p_angle)
+void Car::setSpeed(float p_speed)
 {
-#if CL_CURRENT_VERSION <= CL_VERSION(2,1,1)
-	p_angle.normalize();
-	if (p_angle.to_radians() < 0) {
-		p_angle += CL_Angle(2 * CL_PI, cl_radians);
-	}
-#else
-	p_angle.normalize();
-#endif
+	m_impl->m_speed = p_speed;
 }
 
-void Car::normalizeAngle180(CL_Angle &p_angle)
+void Car::setMovement(const CL_Vec2f &p_movement)
 {
-	normalizeAngle(p_angle);
-	p_angle.normalize_180();
+	m_impl->m_phyMoveVec = p_movement;
+}
+
+const CL_Angle &Car::getCorpseAngle() const
+{
+	return m_impl->m_rotation;
+}
+
+bool Car::isAcceleration() const
+{
+	return m_impl->m_inputAccel;
+}
+
+bool Car::isBrake() const
+{
+	return m_impl->m_inputBrake;
+}
+
+float Car::getTurn() const
+{
+	return m_impl->m_inputTurn;
+}
+
+void Car::clone(const Car &p_car)
+{
+	m_impl->m_position = p_car.m_impl->m_position;
+	m_impl->m_rotation = p_car.m_impl->m_rotation;
+	m_impl->m_speed = p_car.m_impl->m_speed;
+	m_impl->m_inputAccel = p_car.m_impl->m_inputAccel;
+	m_impl->m_inputBrake = p_car.m_impl->m_inputBrake;
+	m_impl->m_inputTurn = p_car.m_impl->m_inputTurn;
+	m_impl->m_inputLocked = p_car.m_impl->m_inputLocked;
+	m_impl->m_phyMoveRot = p_car.m_impl->m_phyMoveRot;
+	m_impl->m_phyMoveVec = p_car.m_impl->m_phyMoveVec;
+	m_impl->m_phySpeedDelta = p_car.m_impl->m_phySpeedDelta;
+	m_impl->m_phyWheelsTurn = p_car.m_impl->m_phyWheelsTurn;
 }
 
 bool Car::operator==(const Car &p_other) const
 {
-	return this == &p_other;
+	if (&p_other == this) {
+		return true;
+	}
+
+	bool r = true;
+	r &= m_impl->m_position == p_other.m_impl->m_position;
+	r &= m_impl->m_rotation == p_other.m_impl->m_rotation;
+	r &= m_impl->m_speed == p_other.m_impl->m_speed;
+	r &= m_impl->m_inputAccel == p_other.m_impl->m_inputAccel;
+	r &= m_impl->m_inputBrake == p_other.m_impl->m_inputBrake;
+	r &= m_impl->m_inputTurn == p_other.m_impl->m_inputTurn;
+	r &= m_impl->m_inputLocked == p_other.m_impl->m_inputLocked;
+	r &= m_impl->m_phyMoveRot == p_other.m_impl->m_phyMoveRot;
+	r &= m_impl->m_phyMoveVec == p_other.m_impl->m_phyMoveVec;
+	r &= m_impl->m_phySpeedDelta == p_other.m_impl->m_phySpeedDelta;
+	r &= m_impl->m_phyWheelsTurn == p_other.m_impl->m_phyWheelsTurn;
+
+	return r;
+}
+
+bool Car::operator!=(const Car &p_other) const
+{
+	return !(*this == p_other);
 }
 
 } // namespace

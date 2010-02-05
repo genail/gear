@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,12 +31,12 @@
 #include "common.h"
 #include "common/Game.h"
 #include "common/Player.h"
+#include "common/Units.h"
 #include "gfx/DebugLayer.h"
 #include "gfx/Stage.h"
 #include "gfx/race/level/Bound.h"
 #include "gfx/race/level/Car.h"
 #include "gfx/race/level/DecorationSprite.h"
-#include "gfx/race/level/GroundBlock.h"
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
 #include "logic/race/Block.h"
@@ -117,24 +117,10 @@ void RaceGraphics::load(CL_GraphicContext &p_gc)
 {
 	m_raceUI.load(p_gc);
 	loadTyreStripes(p_gc);
-	loadGroundBlocks(p_gc);
 	loadDecorations(p_gc);
 	loadSandPits(p_gc);
 
 	m_loaded = true;
-}
-
-void RaceGraphics::loadGroundBlocks(CL_GraphicContext &p_gc)
-{
-	const int first = Common::BT_GRASS;
-	const int last = Common::BT_START_LINE_UP; // FIXME: this is dangerous
-
-	for (int i = first; i <= last; ++i) {
-		CL_SharedPtr<Gfx::GroundBlock> gfxBlock(new Gfx::GroundBlock((Common::GroundBlockType) i));
-		gfxBlock->load(p_gc);
-
-		m_blockMapping[(Common::GroundBlockType) i] = gfxBlock;
-	}
 }
 
 void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
@@ -192,6 +178,7 @@ void RaceGraphics::drawSandpits(CL_GraphicContext &p_gc)
 
 void RaceGraphics::drawSmokes(CL_GraphicContext &p_gc)
 {
+#if !defined(NO_SMOKES)
 	foreach(CL_SharedPtr<Gfx::Smoke> &smoke, m_smokes) {
 		if (!smoke->isLoaded()) {
 			smoke->load(p_gc);
@@ -199,6 +186,7 @@ void RaceGraphics::drawSmokes(CL_GraphicContext &p_gc)
 
 		smoke->draw(p_gc);
 	}
+#endif // !NO_SMOKES
 }
 
 void RaceGraphics::drawUI(CL_GraphicContext &p_gc)
@@ -319,20 +307,6 @@ void RaceGraphics::drawForeBlocks(CL_GraphicContext &p_gc)
 //	}
 }
 
-void RaceGraphics::drawGroundBlock(CL_GraphicContext &p_gc, const Race::Block& p_block, size_t x, size_t y)
-{
-	assert(m_blockMapping.find(p_block.getType()) != m_blockMapping.end() && "not loaded block type");
-
-	// then draw selected block
-	if (p_block.getType() != Common::BT_GRASS) {
-		CL_SharedPtr<Gfx::GroundBlock> gfxBlock = m_blockMapping[p_block.getType()];
-		gfxBlock->setPosition(CL_Pointf(x, y));
-
-		gfxBlock->draw(p_gc);
-	}
-
-}
-
 void RaceGraphics::drawCars(CL_GraphicContext &p_gc)
 {
 	const Race::Level &level = m_logic->getLevel();
@@ -360,7 +334,7 @@ void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	}
 
 	gfxCar->setPosition(p_car.getPosition());
-	gfxCar->setRotation(CL_Angle(p_car.getRotationRad(), cl_radians));
+	gfxCar->setRotation(p_car.getCorpseAngle());
 
 	gfxCar->draw(p_gc);
 	
@@ -400,6 +374,16 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 	const CL_Pointf &carPos = Game::getInstance().getPlayer().getCar().getPosition();
 	Gfx::Stage::getDebugLayer()->putMessage("car x",  cl_format("%1", carPos.x));
 	Gfx::Stage::getDebugLayer()->putMessage("car y",  cl_format("%1", carPos.y));
+
+	Gfx::Stage::getDebugLayer()->putMessage(
+			"car world x",
+			cl_format("%1", Units::toWorld(carPos.x))
+	);
+
+	Gfx::Stage::getDebugLayer()->putMessage(
+			"car world y",
+			cl_format("%1", Units::toWorld(carPos.y))
+	);
 #endif // !NDEBUG
 }
 
@@ -462,7 +446,10 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 
 	static const int RAND_LIMIT = 20;
 
-	if (car.isDrifting() && timeFromLastSmoke >= SMOKE_PERIOD) {
+	if (
+			(car.isDrifting() || car.isChoking())
+			&& timeFromLastSmoke >= SMOKE_PERIOD
+		) {
 
 		CL_Pointf smokePosition = car.getPosition();
 		smokePosition.x += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);

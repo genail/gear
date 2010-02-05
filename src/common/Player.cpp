@@ -53,6 +53,7 @@ class PlayerImpl
 Player::Player(const CL_String8& p_name) :
 	m_impl(new PlayerImpl(p_name))
 {
+	// empty
 }
 
 Player::~Player()
@@ -78,9 +79,4 @@ const CL_String &Player::getName() const
 void Player::setName(const CL_String &p_name)
 {
 	m_impl->m_name = p_name;
-}
-
-bool Player::operator==(const Player &other) const
-{
-	return &(*m_impl) == &(*other.m_impl);
 }

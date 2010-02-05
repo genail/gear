@@ -114,7 +114,7 @@ const CL_String &PlayerListImpl::ownerName(const Race::Car &p_car)
 	for (int i = 0; i < playerCount; ++i) {
 		const Player &player = m_logic->getPlayer(i);
 
-		if (player.getCar() == p_car) {
+		if (&player.getCar() == &p_car) {
 			return player.getName();
 		}
 	}

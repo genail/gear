@@ -11,42 +11,21 @@
             <rotation origin="center" />
             <scale x="0.2" y="0.2" />
         </sprite>
-        <sprite name="block">
-            <image file="block.png" />
-            <rotation origin="center" />
-        </sprite>
-        <sprite name="street_vert">
-            <image file="street_straight.png" />
-        </sprite>
-        <sprite name="street_horiz" base_angle="90">
-            <image file="street_straight.png" />
-        </sprite>
-        
-        <!-- Turns -->
-        <sprite name="turn_bottom_right">
-            <image file="street_turn.png" />
-            <rotation origin="center" />
-        </sprite>
-        <sprite name="turn_top_right" base_angle="90">
-            <image file="street_turn.png"/>
-            <rotation origin="center" />
-        </sprite>
-        <sprite name="turn_top_left" base_angle="180">
-            <image file="street_turn.png"/>
-            <rotation origin="center" />
-        </sprite>
-        <sprite name="turn_bottom_left" base_angle="270">
-        <image file="street_turn.png"/>
-            <rotation origin="center" />
-        </sprite>
+
         
         <!-- Special -->
-        <sprite name="start_line_up">
-            <image file="start_line.png" />
+        <sprite name="smoke1">
+            <image file="smoke1.png" />
+            <translation origin="center" />
         </sprite>
         
-        <sprite name="smoke">
-            <image file="smoke.png" />
+        <sprite name="smoke2">
+            <image file="smoke2.png" />
+            <translation origin="center" />
+        </sprite>
+        
+        <sprite name="smoke3">
+            <image file="smoke3.png" />
             <translation origin="center" />
         </sprite>
         

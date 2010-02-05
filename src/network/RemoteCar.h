@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,38 +29,37 @@
 #pragma once
 
 #include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
-#include "Packet.h"
+#include "logic/race/Car.h"
 
-namespace Net {
+namespace Net
+{
 
-class CarState : public Net::Packet {
+class RemoteCarImpl;
 
+class RemoteCar : public Race::Car
+{
 	public:
 
-		CarState();
+		RemoteCar();
 
-		virtual ~CarState() {}
-
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
+		virtual ~RemoteCar();
 
 
-		void setName(const CL_String &p_name);
+		virtual const CL_Pointf& getPosition() const;
 
-		void setSerializedData(const CL_NetGameEvent &p_data);
+		virtual const CL_Angle &getCorpseAngle() const;
+
+
+		virtual void deserialize(const CL_NetGameEvent &p_data);
+
+		virtual void update(unsigned int p_elapsedMS);
 
 	private:
 
-		CL_String m_name;
-
-		CL_NetGameEvent m_serialData;
+		CL_SharedPtr<RemoteCarImpl> m_impl;
 };
 
 }
+

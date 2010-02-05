@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,69 +26,36 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GroundBlock.h"
+#include "Integer.h"
 
-#include <assert.h>
+#include "common.h"
 
-#include <gfx/Stage.h>
+namespace Math
+{
 
-namespace Gfx {
-
-GroundBlock::GroundBlock(Common::GroundBlockType p_type) :
-	m_type(p_type)
+Integer::Integer()
 {
 }
 
-GroundBlock::~GroundBlock()
+Integer::~Integer()
 {
 }
 
-void GroundBlock::draw(CL_GraphicContext &p_gc)
+int Integer::clamp(int p_val, int p_min, int p_max)
 {
-	CL_Rect rect(
-			m_position.x, m_position.y,
-			m_position.x + 200, m_position.y + 200
-	);
-	m_sprite.draw(p_gc, rect);
-}
+	G_ASSERT(p_max >= p_min);
 
-void GroundBlock::load(CL_GraphicContext &p_gc)
-{
-	CL_String spriteName;
-
-//	cl_log_event("debug", "block type: %1", m_type);
-
-	switch (m_type) {
-		case Common::BT_GRASS:
-			spriteName = "race/block";
-			break;
-		case Common::BT_STREET_VERT:
-			spriteName = "race/street_vert";
-			break;
-		case Common::BT_STREET_HORIZ:
-			spriteName = "race/street_horiz";
-			break;
-		case Common::BT_TURN_BOTTOM_RIGHT:
-			spriteName = "race/turn_bottom_right";
-			break;
-		case Common::BT_TURN_BOTTOM_LEFT:
-			spriteName = "race/turn_bottom_left";
-			break;
-		case Common::BT_TURN_TOP_RIGHT:
-			spriteName = "race/turn_top_right";
-			break;
-		case Common::BT_TURN_TOP_LEFT:
-			spriteName = "race/turn_top_left";
-			break;
-		case Common::BT_START_LINE_UP:
-			spriteName = "race/start_line_up";
-			break;
-		default:
-			assert(0 && "unknown block type");
+	if (p_val >= p_min && p_val <= p_max) {
+		return p_val;
 	}
 
-	m_sprite = CL_Sprite(p_gc, spriteName, Gfx::Stage::getResourceManager());
+	p_val = p_val % (p_max + 1);
 
+	if (p_val < p_min) {
+		p_val += (p_max + 1);
+	}
+
+	return p_val;
 }
 
-} // namespace
+}

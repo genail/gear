@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 #include "common/Game.h"
 #include "common/Player.h"
 #include "logic/race/Progress.h"
+#include "logic/race/level/Object.h"
 
 namespace Race {
 
@@ -85,6 +86,8 @@ class RaceLogicImpl
 
 		// update routines
 
+		void updateCollisions();
+
 		void updateCarPhysics(unsigned p_timeElapsed);
 
 		void updateCheckpoints();
@@ -106,15 +109,62 @@ RaceLogic::~RaceLogic()
 
 void RaceLogic::update(unsigned p_timeElapsed)
 {
+	m_impl->updateCollisions();
 	m_impl->updateCarPhysics(p_timeElapsed);
 	m_impl->updateCheckpoints();
 	m_impl->updatePlayersProgress();
 }
 
+void RaceLogicImpl::updateCollisions()
+{
+	const int objCount = m_level.getObjectCount();
+	const int carCount = m_level.getCarCount();
+
+	for (int carIdx = 0; carIdx < carCount; ++carIdx) {
+		Race::Car &car = m_level.getCar(carIdx);
+
+		// FIXME: can this be given by reference?
+		const CL_CollisionOutline carOutline = car.getCollisionOutline();
+
+		for (int objIdx = 0; objIdx < objCount; ++objIdx) {
+			const Race::Object &obj = m_level.getObject(objIdx);
+
+			// check collision with car
+			const std::vector<CL_CollidingContours> &cont =
+					obj.collide(carOutline);
+
+			// if there are collisions then proceed the segments
+			const int contCount = cont.size();
+			for (int contIdx = 0; contIdx < contCount; ++contIdx) {
+
+				const CL_CollidingContours &cc = cont[contIdx];
+
+				const int ccCount = static_cast<signed>(cc.points.size());
+				for (int ccIdx = 0; ccIdx < ccCount; ++ccIdx) {
+					const CL_CollisionPoint &pt = cc.points[ccIdx];
+
+					const std::vector<CL_Pointf> &c1pts =
+							cc.contour1->get_points();
+
+					CL_LineSegment2f seg(
+							c1pts[pt.contour1_line_start],
+							c1pts[pt.contour1_line_end]
+					);
+
+					car.applyCollision(seg);
+
+				}
+
+
+			}
+		}
+	}
+}
+
 void RaceLogicImpl::updateCarPhysics(unsigned p_timeElapsed)
 {
-	const unsigned carCount = m_level.getCarCount();
-	for (unsigned i = 0; i < carCount; ++i) {
+	const int carCount = m_level.getCarCount();
+	for (int i = 0; i < carCount; ++i) {
 		Race::Car &car = m_level.getCar(i);
 		car.update(p_timeElapsed);
 	}
@@ -253,7 +303,7 @@ bool RaceLogic::hasPlayer(const CL_String &p_name) const
 const Player &RaceLogic::getPlayer(const Car& p_car) const
 {
 	foreach (const Player *p, m_impl->m_playerList) {
-		if (p->getCar() == p_car) {
+		if (&p->getCar() == &p_car) {
 			return *p;
 		}
 	}
@@ -365,10 +415,10 @@ void RaceLogic::display(const CL_String &p_message)
 	m_impl->m_messageBoard.addMessage(p_message);
 }
 
-void RaceLogic::addPlayer(Player &p_player)
+void RaceLogic::addPlayer(Player *p_player)
 {
-	m_impl->m_playerList.push_back(&p_player);
-	m_impl->m_progress.addCar(p_player.getCar());
+	m_impl->m_playerList.push_back(p_player);
+	m_impl->m_progress.addCar(p_player->getCar());
 }
 
 const Player &RaceLogic::getPlayer(int p_index) const

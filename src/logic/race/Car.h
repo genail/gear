@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek, Paweł Rybarczyk
+ * Copyright (c) 2009-2010, Piotr Korzuszek, Paweł Rybarczyk
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,18 +30,15 @@
 
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
-
-#if defined(CLIENT)
 #include <ClanLib/display.h>
-#endif // CLIENT
 
 #include "common.h"
-#include "common/Player.h"
 
 class Player;
 
 namespace Net {
 	class CarState;
+	class RemoteCar;
 }
 
 namespace Gfx {
@@ -50,13 +47,14 @@ namespace Gfx {
 
 namespace Race {
 
+class CarImpl;
 class Bound;
 class Level;
 
-class Car
+class Car : boost::noncopyable
 {
 
-	SIGNAL_1(inputChanged, const Car&);
+	DEF_SIGNAL_1(inputChanged, const Car&);
 
 	public:
 
@@ -67,15 +65,16 @@ class Car
 
 		// attributes
 
+		bool isChoking() const;
+
 		bool isDrifting() const;
 
 		bool isLocked() const;
 
-		const CL_Pointf& getPosition() const;
+		/** @return corpse angle starting from positive X axis CW */
+		virtual const CL_Angle &getCorpseAngle() const;
 
-		float getRotation() const;
-		
-		float getRotationRad() const;
+		virtual const CL_Pointf& getPosition() const;
 
 		float getSpeed() const;
 
@@ -83,130 +82,77 @@ class Car
 		float getSpeedKMS() const;
 
 		
-		// operations
+		// implementation data serialization (for network)
 
-		void applyCarState(const Net::CarState &p_carState);
+		virtual void deserialize(const CL_NetGameEvent &p_data);
 
-		Net::CarState prepareCarState() const;
+		virtual void serialize(CL_NetGameEvent *p_data) const;
+
+
+		// input setters
 
 		void setAcceleration(bool p_value);
 
 		void setBrake(bool p_value);
 
-		/**
-		 * Sets if car movement should be locked (car won't move).
-		 */
 		void setLocked(bool p_locked);
 
 		void setTurn(float p_value);
 
-		void setPosition(const CL_Pointf &p_position);
 
-		/** @depretated, use setAngle() instead */
-		DEPRECATED(void setRotation(float p_rotation));
+		// state setters
 
 		/**
-		 * Sets the car angle. It should be counter clockwise
+		 * Sets the car angle. It should be clockwise
 		 * oriented starting from positive X axis.
 		 *
 		 * @param p_angle Angle to set.
 		 */
 		void setAngle(const CL_Angle &p_angle);
-		
-		void setHandbrake(bool p_handbrake);
 
-		void update(unsigned int elapsedTime);
+		void setPosition(const CL_Pointf &p_position);
+
+
+		// other operations
+
+		/** Clones all given car attributes to this one */
+		void clone(const Car &p_car);
+
+		/** @return Current outline based on car position and rotation */
+		CL_CollisionOutline getCollisionOutline() const;
+
+		void applyCollision(const CL_LineSegment2f &p_seg);
+
+		virtual void update(unsigned int elapsedTime);
+
+
+		// operators
 
 		bool operator==(const Car &p_other) const;
 
-#if defined(CLIENT)
-		/** @return Current collision outline based on car position and rotation */
-		CL_CollisionOutline calculateCurrentCollisionOutline() const;
+		bool operator!=(const Car &p_other) const;
 
-		/** Invoked when collision with bound has occurred */
-		void performBoundCollision(const Bound &p_bound);
-#endif // CLIENT
+
+	protected:
+
+		bool isAcceleration() const;
+
+		bool isBrake() const;
+
+		float getTurn() const;
+
+
+		void setMovement(const CL_Vec2f &p_movement);
+
+		void setSpeed(float p_speed);
 
 	private:
 
-		/** Parent level */
-		Race::Level *m_level;
-
-		/** This will help to keep 1/60 iteration speed */
-		unsigned m_timeFromLastUpdate;
-
-
-		// current vehicle state
-
-		/** Central position on map */
-		CL_Pointf m_position;
-
-		/** CW rotation from positive X axis */
-		CL_Angle m_rotation;
-
-		/** Current speed in map pixels per frame */
-		float m_speed;
-
-
-		// input state
-
-		/** Acceleration switch */
-		bool m_inputAccel;
-
-		/** Brake switch */
-		bool m_inputBrake;
-		
-		/** Handbrake switch */
-		bool m_inputHandbrake;
-
-		/** Current turn. -1 is maximum left, 0 is center and 1 is maximum right */
-		float m_inputTurn;
-
-		/** Locked state. If true then car shoudn't move. */
-		bool m_inputLocked;
-
-		/** True if input changed from last time */
-		bool m_inputChanged;
-
-
-		// physics
-
-		/** Move vector for next frame */
-		CL_Vec2f m_phyMoveVec;
-
-		/** Car movement rotation */
-		CL_Angle m_phyMoveRot;
-
-		/** Speed delta (for isDrifting()) */
-		float m_phySpeedDelta;
-
-		/** Wheels turn. -1.0 is max left, 1.0 is max right */
-		float m_phyWheelsTurn;
-
-#if defined(CLIENT)
-		/** Body outline for collision check */
-		CL_CollisionOutline m_phyCollisionOutline;
-#endif // CLIENT
-
-		
-		void update1_60();
-
-		// helpers
-
-		void alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad);
-
-		float limit(float p_value, float p_from, float p_to) const;
-
-		/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
-		void normalizeAngle(CL_Angle &p_angle);
-
-		/** Clanlib <= 2.1.1 fix. Use this to normalize angles. */
-		void normalizeAngle180(CL_Angle &p_angle);
-
-		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
+		CL_SharedPtr<CarImpl> m_impl;
 
 
 		friend class Race::Level;
+		friend class Net::RemoteCar;
 
 #if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
 friend class Gfx::RaceGraphics;

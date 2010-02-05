@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,41 +26,78 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Object.h"
 
-#include <ClanLib/core.h>
+namespace Race
+{
 
-#include "Packet.h"
-
-namespace Net {
-
-class CarState : public Net::Packet {
-
+class ObjectImpl
+{
 	public:
 
-		CarState();
+		mutable CL_CollisionOutline m_outline;
 
-		virtual ~CarState() {}
-
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
+		std::vector<CL_Pointf> *m_pts;
 
 
-		void setName(const CL_String &p_name);
+		ObjectImpl(const CL_Pointf p_points[], int p_count)
+		{
+			CL_Contour contour;
+			m_pts = &contour.get_points();
 
-		void setSerializedData(const CL_NetGameEvent &p_data);
+			for (int i = 0; i < p_count; ++i) {
+				m_pts->push_back(p_points[i]);
+			}
 
-	private:
+			m_outline.get_contours().push_back(contour);
+			m_outline.set_inside_test(true);
+			m_outline.calculate_radius();
+			m_outline.calculate_sub_circles();
+			m_outline.enable_collision_info(true, false, true);
+		}
 
-		CL_String m_name;
-
-		CL_NetGameEvent m_serialData;
 };
+
+const std::vector<CL_CollidingContours> EMPTY_CONTOURS;
+
+Object::Object(const CL_Pointf p_points[], int p_count) :
+	m_impl(new ObjectImpl(p_points, p_count))
+{
+	// empty
+}
+
+Object::~Object()
+{
+	// empty
+}
+
+const std::vector<CL_CollidingContours> &Object::collide(
+		const CL_CollisionOutline &p_outline
+) const
+{
+	if (m_impl->m_outline.collide(p_outline)) {
+		return m_impl->m_outline.get_collision_info();
+	} else {
+		return EMPTY_CONTOURS;
+	}
+}
+
+const CL_CollisionOutline &Object::getCollisionOutline() const
+{
+	return m_impl->m_outline;
+}
+
+const CL_Pointf &Object::getPoint(int p_idx) const
+{
+	G_ASSERT(p_idx >=0 && p_idx <= getPointCount());
+	return (*m_impl->m_pts)[p_idx];
+}
+
+int Object::getPointCount() const
+{
+	return static_cast<signed>(
+			m_impl->m_pts->size()
+	);
+}
 
 }

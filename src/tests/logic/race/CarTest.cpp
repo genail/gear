@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,41 +26,70 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <unistd.h>
+#include <boost/test/unit_test.hpp>
 
-#include <ClanLib/core.h>
+#include "logic/race/Car.h"
 
-#include "Packet.h"
+/*
+ * Minimal testing facility:
+ *
+ * BOOST_CHECK( predicate )
+ * BOOST_REQUIRE( predicate )
+ * BOOST_ERROR( message )
+ * BOOST_FAIL( message )
+ *
+ * Test tools:
+ * http://www.boost.org/doc/libs/1_34_0/libs/test/doc/components/test_tools/index.html
+ */
 
-namespace Net {
+BOOST_AUTO_TEST_SUITE(CarTest)
 
-class CarState : public Net::Packet {
+BOOST_AUTO_TEST_CASE(SerializeTest)
+{
+	Race::Car car1, car2;
 
-	public:
+	BOOST_REQUIRE(car1 == car2);
 
-		CarState();
+	// move car a little
+	car1.setAcceleration(true);
+	car1.setTurn(0.5f);
 
-		virtual ~CarState() {}
+	car1.update(500);
 
+	BOOST_REQUIRE(car1 != car2);
 
-		virtual CL_NetGameEvent buildEvent() const;
+	// serialize
+	CL_NetGameEvent ev("");
+	car1.serialize(&ev);
 
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
+	// deserialize
+	car2.deserialize(ev);
 
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
-
-
-		void setName(const CL_String &p_name);
-
-		void setSerializedData(const CL_NetGameEvent &p_data);
-
-	private:
-
-		CL_String m_name;
-
-		CL_NetGameEvent m_serialData;
-};
+	// check
+	BOOST_CHECK(car1 == car2);
 
 }
+
+BOOST_AUTO_TEST_CASE(CloneTest)
+{
+	Race::Car car1, car2, car3;
+
+	BOOST_REQUIRE(car1 == car2);
+
+	// move car a little
+	car1.setAcceleration(true);
+	car1.setTurn(0.5f);
+
+	car1.update(500);
+
+	BOOST_REQUIRE(car1 != car2);
+
+	// clone
+	car3.clone(car1);
+
+	BOOST_CHECK(car3 == car1);
+	BOOST_CHECK(car3 != car2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

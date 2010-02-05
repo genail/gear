@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,8 @@
 #include <vector>
 
 #include "common.h"
+#include "common/LoopVector.h"
+#include "math/Integer.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackPoint.h"
 #include "logic/race/level/TrackSegment.h"
@@ -60,10 +62,6 @@ class TrackTriangulatorImpl
 
 		TIntGuideMap m_intGuideMap;
 
-
-		static int clamp(int p_index, int p_size);
-
-
 		CL_Vec2f helper(const Track &p_track, int p_index, Side p_side) const;
 
 		float interpolate(float p_pos, float p_prev, float p_next);
@@ -77,29 +75,6 @@ class TrackTriangulatorImpl
 		);
 };
 
-template <typename T>
-class LoopVector : public std::vector<T>
-{
-    public:
-
-        T &operator[] (int p_index) {
-            return std::vector<T>::operator[](norm(p_index));
-        }
-
-        const T &operator[] (int p_index) const {
-            return std::vector<T>::operator[](norm(p_index));
-        }
-
-    private:
-
-        int norm(int p_index) const {
-        	return TrackTriangulatorImpl::clamp(
-        			p_index,
-        			static_cast<signed> (std::vector<T>::size())
-        	);
-        }
-};
-
 TrackTriangulator::TrackTriangulator() :
 		m_impl(new TrackTriangulatorImpl())
 {
@@ -109,21 +84,6 @@ TrackTriangulator::~TrackTriangulator()
 {
 }
 
-int TrackTriangulatorImpl::clamp(int p_index, int p_size)
-{
-	if (p_index >= 0 && p_index < p_size) {
-		return p_index;
-	}
-
-	p_index = p_index % p_size;
-
-	if (p_index < 0) {
-		p_index += p_size;
-	}
-
-	return p_index;
-}
-
 CL_Vec2f TrackTriangulatorImpl::helper(const Track &p_track, int p_index, TrackTriangulatorImpl::Side p_side) const
 {
 	const int trackSize = p_track.getPointCount();
@@ -131,12 +91,12 @@ CL_Vec2f TrackTriangulatorImpl::helper(const Track &p_track, int p_index, TrackT
 
 
 	const int nextIndex = p_side == S_RIGHT ?
-			clamp(p_index + 1, trackSize) :
-			clamp(p_index - 1, trackSize);
+			Math::Integer::clamp(p_index + 1, 0, trackSize - 1) :
+			Math::Integer::clamp(p_index - 1, 0, trackSize - 1);
 
 	const int prevIndex = p_side == S_RIGHT ?
-			clamp(p_index - 1, trackSize) :
-			clamp(p_index + 1, trackSize);
+			Math::Integer::clamp(p_index - 1, 0, trackSize - 1) :
+			Math::Integer::clamp(p_index + 1, 0, trackSize - 1);
 
 
 	const CL_Vec2f &nextPoint = p_track.getPoint(nextIndex).getPosition();
@@ -241,7 +201,8 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 
 		CL_BezierCurve curve;
 		const int prevIdx = p_segment;
-		const int nextIdx = m_impl->clamp(p_segment + 1, pointCount);
+		const int nextIdx =
+				Math::Integer::clamp(p_segment + 1, 0, pointCount - 1);
 
 		const TrackPoint &prev = p_track.getPoint(prevIdx);
 		const TrackPoint &next = p_track.getPoint(nextIdx);

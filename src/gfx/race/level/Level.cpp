@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,12 @@
 #include <vector>
 
 #include "gfx/Viewport.h"
+#include "logic/race/level/Object.h"
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackTriangulator.h"
 #include "logic/race/level/TrackSegment.h"
+#include "math/Integer.h"
 
 namespace Gfx
 {
@@ -67,6 +69,8 @@ class LevelImpl
 
 		void drawStartLine(CL_GraphicContext &p_gc);
 
+		void drawObjects(CL_GraphicContext &p_gc);
+
 };
 
 Level::Level(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
@@ -84,6 +88,7 @@ void Level::draw(CL_GraphicContext &p_gc)
 {
 	m_impl->drawTriangles(p_gc);
 	m_impl->drawStartLine(p_gc);
+	m_impl->drawObjects(p_gc);
 }
 
 void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
@@ -165,6 +170,34 @@ void LevelImpl::drawStartLine(CL_GraphicContext &p_gc)
 
 		p_gc.set_pen(oldPen);
 	}
+}
+
+void LevelImpl::drawObjects(CL_GraphicContext &p_gc)
+{
+	CL_Pen oldPen = p_gc.get_pen();
+
+	CL_Pen pen;
+	pen.set_line_width(3);
+	p_gc.set_pen(pen);
+	const int objCount = m_levelLogic.getObjectCount();
+
+	for (int i = 0; i < objCount; ++i) {
+		const Race::Object &obj = m_levelLogic.getObject(i);
+		const int ptCount = obj.getPointCount();
+
+		if (ptCount > 1) {
+			for (int j = 0; j < ptCount; ++j) {
+				const CL_Pointf &prev = obj.getPoint(
+						Math::Integer::clamp(j - 1, 0, ptCount - 1)
+				);
+				const CL_Pointf &curr = obj.getPoint(j);
+
+				CL_Draw::line(p_gc, prev, curr, CL_Colorf::white);
+			}
+		}
+	}
+
+	p_gc.set_pen(oldPen);
 }
 
 void Level::load(CL_GraphicContext &p_gc)

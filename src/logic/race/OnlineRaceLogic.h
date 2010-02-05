@@ -31,6 +31,7 @@
 #include <map>
 #include <ClanLib/core.h>
 
+#include "common/RemotePlayer.h"
 #include "RaceLogic.h"
 #include "network/client/Client.h"
 
@@ -81,7 +82,7 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 	private:
 
-		typedef std::vector<Player> TPlayerList;
+		typedef std::vector<CL_SharedPtr<RemotePlayer> > TPlayerList;
 
 
 		/** Initialized state */

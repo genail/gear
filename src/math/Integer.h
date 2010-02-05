@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,39 +28,21 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+namespace Math
+{
 
-#include "Packet.h"
-
-namespace Net {
-
-class CarState : public Net::Packet {
-
+class Integer
+{
 	public:
 
-		CarState();
-
-		virtual ~CarState() {}
-
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
-
-
-		void setName(const CL_String &p_name);
-
-		void setSerializedData(const CL_NetGameEvent &p_data);
+		static int clamp(int p_val, int p_min, int p_max);
 
 	private:
 
-		CL_String m_name;
+		Integer();
 
-		CL_NetGameEvent m_serialData;
+		virtual ~Integer();
 };
 
 }
+

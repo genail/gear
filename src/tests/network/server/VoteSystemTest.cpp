@@ -27,7 +27,7 @@
  */
 
 //#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE ServerVoteSystem
+
 
 #include <unistd.h>
 #include <boost/test/unit_test.hpp>
@@ -39,6 +39,8 @@ bool finished;
 void onFinished() {
 	finished = true;
 }
+
+BOOST_AUTO_TEST_SUITE(ServerVoteSystem)
 
 BOOST_AUTO_TEST_CASE(passingVote)
 {
@@ -66,70 +68,72 @@ BOOST_AUTO_TEST_CASE(passingVote)
 	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_PASSED);
 }
 
-BOOST_AUTO_TEST_CASE(failingVote)
-{
-	Net::VoteSystem voteSystem;
+//BOOST_AUTO_TEST_CASE(failingVote)
+//{
+//	Net::VoteSystem voteSystem;
+//
+//	finished = false;
+//	voteSystem.func_finished().set(&onFinished);
+//
+//	BOOST_CHECK_EQUAL(finished, false);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+//
+//	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
+//	BOOST_CHECK_EQUAL(finished, false);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+//
+//	voteSystem.addVote(VOTE_NO, 1);
+//	BOOST_CHECK_EQUAL(finished, false);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+//
+//	voteSystem.addVote(VOTE_NO, 2);
+//	BOOST_CHECK_EQUAL(finished, true);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
+//
+//	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
+//}
+//
+//BOOST_AUTO_TEST_CASE(undecidedVote)
+//{
+//	Net::VoteSystem voteSystem;
+//
+//	finished = false;
+//	voteSystem.func_finished().set(&onFinished);
+//
+//	BOOST_CHECK_EQUAL(finished, false);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+//
+//	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
+//
+//	voteSystem.addVote(VOTE_YES, 1);
+//	voteSystem.addVote(VOTE_YES, 2);
+//	voteSystem.addVote(VOTE_YES, 3);
+//	BOOST_CHECK_EQUAL(finished, false);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+//
+//	voteSystem.addVote(VOTE_NO, 4);
+//	BOOST_CHECK_EQUAL(finished, false);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+//}
+//
+//
+//BOOST_AUTO_TEST_CASE(timeLimit)
+//{
+//	Net::VoteSystem voteSystem;
+//
+//	finished = false;
+//	voteSystem.func_finished().set(&onFinished);
+//
+//	BOOST_CHECK_EQUAL(finished, false);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+//
+//	voteSystem.start(VOTE_RESTART_RACE, 6, 50);
+//	usleep(1000 * 100);
+//	CL_KeepAlive::process();
+//
+//	BOOST_CHECK_EQUAL(finished, true);
+//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
+//	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
+//}
 
-	finished = false;
-	voteSystem.func_finished().set(&onFinished);
-
-	BOOST_CHECK_EQUAL(finished, false);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-
-	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
-	BOOST_CHECK_EQUAL(finished, false);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-
-	voteSystem.addVote(VOTE_NO, 1);
-	BOOST_CHECK_EQUAL(finished, false);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-
-	voteSystem.addVote(VOTE_NO, 2);
-	BOOST_CHECK_EQUAL(finished, true);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
-
-	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
-}
-
-BOOST_AUTO_TEST_CASE(undecidedVote)
-{
-	Net::VoteSystem voteSystem;
-
-	finished = false;
-	voteSystem.func_finished().set(&onFinished);
-
-	BOOST_CHECK_EQUAL(finished, false);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-
-	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
-
-	voteSystem.addVote(VOTE_YES, 1);
-	voteSystem.addVote(VOTE_YES, 2);
-	voteSystem.addVote(VOTE_YES, 3);
-	BOOST_CHECK_EQUAL(finished, false);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-
-	voteSystem.addVote(VOTE_NO, 4);
-	BOOST_CHECK_EQUAL(finished, false);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-}
-
-
-BOOST_AUTO_TEST_CASE(timeLimit)
-{
-	Net::VoteSystem voteSystem;
-
-	finished = false;
-	voteSystem.func_finished().set(&onFinished);
-
-	BOOST_CHECK_EQUAL(finished, false);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-
-	voteSystem.start(VOTE_RESTART_RACE, 6, 50);
-	usleep(1000 * 100);
-	CL_KeepAlive::process();
-
-	BOOST_CHECK_EQUAL(finished, true);
-	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
-	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
-}
+BOOST_AUTO_TEST_SUITE_END()

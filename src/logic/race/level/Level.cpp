@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,12 @@
 #include <assert.h>
 
 #include "common/Limits.h"
+#include "common/LoopVector.h"
 #include "common/Units.h"
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
 #include "logic/race/level/Checkpoint.h"
+#include "logic/race/level/Object.h"
 #include "logic/race/Car.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackTriangulator.h"
@@ -44,38 +46,6 @@
 #include "logic/race/resistance/ResistanceMap.h"
 
 namespace Race {
-
-template <typename T>
-class LoopVector : public std::vector<T>
-{
-	public:
-
-		T &operator[] (int p_index) {
-			return std::vector<T>::operator[](clamp(p_index));
-		}
-
-		const T &operator[] (int p_index) const {
-			return std::vector<T>::operator[](clamp(p_index));
-		}
-
-	private:
-
-		int clamp(int p_index) const {
-			const int s = static_cast<signed> (std::vector<T>::size());
-
-			if (p_index >= 0 && p_index < s) {
-				return p_index;
-			}
-
-			p_index = p_index % s;
-
-			if (p_index < 0) {
-				p_index += s;
-			}
-
-			return p_index;
-		}
-};
 
 class RoadPoint : public CL_Pointf
 {
@@ -117,6 +87,9 @@ class LevelImpl
 		/** All cars */
 		std::vector<Car*> m_cars;
 
+		/** Level objects */
+		std::vector<Object> m_objects;
+
 		/** Map of start positions */
 		std::map<int, CL_Pointf> m_startPositions;
 
@@ -145,6 +118,24 @@ class LevelImpl
 		void loadTrackEl(const CL_DomNode &p_trackNode);
 
 		void loadBoundsEl(const CL_DomNode &p_boundsNode);
+
+		void loadObjectsEl(const CL_DomNode &p_objectsNode);
+
+		void loadObjectEl(const CL_DomNode &p_objNode);
+
+		std::vector<CL_Pointf> loadObjectGeom(const CL_DomNode &p_geomNode);
+
+		void loadObjectRefs(
+				const std::vector<CL_Pointf> &p_geom,
+				const CL_DomNode &p_refsNode
+		);
+
+		void geomTranslate(
+				std::vector<CL_Pointf> *p_geom,
+				const CL_Vec2f &p_vec
+		);
+
+		Race::Object buildObject(const std::vector<CL_Pointf> &p_geom);
 
 
 		// saving
@@ -211,6 +202,10 @@ void Level::load(const CL_String& p_filename)
 		const CL_DomNode trackNode = contentNode.named_item("track");
 		m_impl->loadTrackEl(trackNode);
 
+		// load objects
+		const CL_DomNode objectsNode = contentNode.named_item("objects");
+		m_impl->loadObjectsEl(objectsNode);
+
 		// load track bounds
 		const CL_DomNode boundsNode = contentNode.named_item("bounds");
 		m_impl->loadBoundsEl(boundsNode);
@@ -259,7 +254,94 @@ void LevelImpl::loadTrackEl(const CL_DomNode &p_trackNode)
 			cl_log_event(LOG_WARN, "Unknown element in <track>: %1", blockNode.get_node_name());
 		}
 	}
+}
 
+void LevelImpl::loadObjectsEl(const CL_DomNode &p_objectsNode)
+{
+	const CL_DomNodeList objList = p_objectsNode.get_child_nodes();
+	const int objListSize = objList.get_length();
+
+	for (int i = 0; i < objListSize; ++i) {
+		loadObjectEl(objList.item(i));
+	}
+}
+
+void LevelImpl::loadObjectEl(const CL_DomNode &p_objNode)
+{
+	const CL_DomNode geomNode = p_objNode.named_item("geometry");
+	const CL_DomNode refsNode = p_objNode.named_item("refs");
+
+	std::vector<CL_Pointf> geom = loadObjectGeom(geomNode);
+	loadObjectRefs(geom, refsNode);
+}
+
+std::vector<CL_Pointf> LevelImpl::loadObjectGeom(const CL_DomNode &p_geomNode)
+{
+	const CL_DomNodeList list = p_geomNode.get_child_nodes();
+	const int listSize = list.get_length();
+
+	float x, y;
+	std::vector<CL_Pointf> result;
+
+	for (int i = 0; i < listSize; ++i) {
+		const CL_DomNode vertex = list.item(i);
+		x = vertex.select_float("@x");
+		y = vertex.select_float("@y");
+
+		result.push_back(CL_Pointf(x, y));
+	}
+
+	return result;
+}
+
+void LevelImpl::loadObjectRefs(
+		const std::vector<CL_Pointf> &p_geom,
+		const CL_DomNode &p_refsNode
+)
+{
+	const CL_DomNodeList list = p_refsNode.get_child_nodes();
+	const int listSize = list.get_length();
+
+	CL_Vec2f trans;
+
+	for (int i = 0; i < listSize; ++i) {
+		std::vector<CL_Pointf> geomCopy(p_geom);
+
+		const CL_DomNode ref = list.item(i);
+		const CL_DomNode position = ref.named_item("position");
+
+		trans.x = position.select_float("@x");
+		trans.y = position.select_float("@y");
+
+		geomTranslate(&geomCopy, trans);
+		m_objects.push_back(buildObject(geomCopy));
+	}
+}
+
+void LevelImpl::geomTranslate(
+		std::vector<CL_Pointf> *p_geom,
+		const CL_Vec2f &p_vec
+)
+{
+	const int geomSize = static_cast<signed>(p_geom->size());
+	for (int i = 0; i < geomSize; i++) {
+		(*p_geom)[i] += p_vec;
+	}
+}
+
+Race::Object LevelImpl::buildObject(const std::vector<CL_Pointf> &p_geom)
+{
+	const int geomSize = static_cast<signed>(p_geom.size());
+	CL_Pointf *pts = new CL_Pointf[geomSize];
+
+	for (int i = 0; i < geomSize; ++i) {
+		pts[i] = Units::toScreen(p_geom[i]);
+	}
+
+	Race::Object obj(pts, geomSize);
+
+	delete[] pts;
+	return obj;
 }
 
 CL_SharedPtr<RaceResistance::Geometry> LevelImpl::buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const
@@ -420,15 +502,13 @@ void LevelImpl::saveTrackEl(CL_DomDocument &p_doc, CL_DomNode &p_trackNode)
 
 float Level::getResistance(float p_realX, float p_realY)
 {
-	return m_impl->m_resistanceMap.resistance(CL_Pointf(p_realX, p_realY));
+//	return m_impl->m_resistanceMap.resistance(CL_Pointf(p_realX, p_realY));
+	return 0.0f;
 }
 
 void Level::addCar(Car *p_car) {
 
-	assert(m_impl->m_loaded && "Level is not loaded");
-
-	p_car->m_level = this;
-
+	G_ASSERT(m_impl->m_loaded && "Level is not loaded");
 	m_impl->m_cars.push_back(p_car);
 }
 
@@ -443,8 +523,6 @@ void Level::removeCar(Car *p_car) {
 			break;
 		}
 	}
-
-	p_car->m_level = NULL;
 }
 
 void Level::getStartPosAndRot(
@@ -592,6 +670,17 @@ const TrackTriangulator &Level::getTrackTriangulator() const
 TrackTriangulator &Level::getTrackTriangulator()
 {
 	return m_impl->m_trackTriangulator;
+}
+
+int Level::getObjectCount() const
+{
+	return static_cast<signed>(m_impl->m_objects.size());
+}
+
+const Race::Object &Level::getObject(int p_idx) const
+{
+	G_ASSERT(p_idx >= 0 && p_idx < getObjectCount());
+	return m_impl->m_objects[p_idx];
 }
 
 } // namespace

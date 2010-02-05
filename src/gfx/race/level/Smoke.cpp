@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,30 +28,38 @@
 
 #include "Smoke.h"
 
-#include <assert.h>
+#include <stdlib.h>
+
+#include "common.h"
 
 #include "gfx/Stage.h"
 #include "math/Easing.h"
 
 namespace Gfx {
 
+const int SMOKE_SPRITES_COUNT = 3;
+
+CL_Sprite Smoke::m_smokeSprites[SMOKE_SPRITES_COUNT];
+
 Smoke::Smoke(const CL_Pointf &p_position) :
 		m_position(p_position)
 {
+	m_spriteIdx = rand() % SMOKE_SPRITES_COUNT;
 }
 
 Smoke::~Smoke()
 {
+	// empty
 }
 
 void Smoke::start()
 {
 	Animation::start();
 
-	m_alpha.animate(0.1f, 0.3f, 500, Math::Easing::NONE, 0);
+	m_alpha.animate(0.1f, 0.3f, 250, Math::Easing::NONE, 0);
 	m_alpha.animate(0.3f, 0.0f, 5500, Math::Easing::NONE, 500);
 
-	m_size.animate(0.3f, 2.0f, 6000);
+	m_size.animate(0.1f, 0.5f, 6000, Math::Easing::REGULAR_OUT);
 }
 
 void Smoke::update(unsigned p_timeElapsed)
@@ -64,7 +72,7 @@ void Smoke::update(unsigned p_timeElapsed)
 
 void Smoke::draw(CL_GraphicContext &p_gc)
 {
-	assert(!m_smokeSprite.is_null());
+	G_ASSERT(!m_smokeSprites[0].is_null());
 
 	static const unsigned ANIMATION_END = 6000;
 
@@ -72,10 +80,10 @@ void Smoke::draw(CL_GraphicContext &p_gc)
 
 	if (now < ANIMATION_END) {
 
-		m_smokeSprite.set_alpha(m_alpha.get());
-		m_smokeSprite.set_scale(m_size.get(), m_size.get());
+		m_smokeSprites[m_spriteIdx].set_alpha(m_alpha.get());
+		m_smokeSprites[m_spriteIdx].set_scale(m_size.get(), m_size.get());
 
-		m_smokeSprite.draw(p_gc, m_position.x, m_position.y);
+		m_smokeSprites[m_spriteIdx].draw(p_gc, m_position.x, m_position.y);
 	} else {
 		setFinished(true);
 	}
@@ -84,7 +92,17 @@ void Smoke::draw(CL_GraphicContext &p_gc)
 
 void Smoke::load(CL_GraphicContext &p_gc)
 {
-	m_smokeSprite = CL_Sprite(p_gc, "race/smoke", Stage::getResourceManager());
+	if (m_smokeSprites[0].is_null()) {
+		for (int i = 0; i <= SMOKE_SPRITES_COUNT - 1; ++i) {
+			m_smokeSprites[i] =
+					CL_Sprite(
+							p_gc,
+							cl_format("race/smoke%1", i + 1),
+							Stage::getResourceManager()
+					);
+		}
+	}
+
 }
 
 }

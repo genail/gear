@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,38 +29,48 @@
 #pragma once
 
 #include <ClanLib/core.h>
+#include <ClanLib/display.h>
 
-#include "Packet.h"
+#include "common.h"
 
-namespace Net {
+namespace Race
+{
 
-class CarState : public Net::Packet {
+class ObjectImpl;
 
+class Object
+{
 	public:
 
-		CarState();
+		/**
+		 * Build level object from <code>p_points</code>.
+		 * <p>
+		 * Points must be ordered in counter-clockwise order.
+		 *
+		 * @param p_points Points to build from.
+		 * @param p_count Number of points to read.
+		 */
+		Object(const CL_Pointf p_points[], int p_count);
 
-		virtual ~CarState() {}
+		virtual ~Object();
 
 
-		virtual CL_NetGameEvent buildEvent() const;
+		const CL_CollisionOutline &getCollisionOutline() const;
 
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
+		const CL_Pointf &getPoint(int p_idx) const;
 
-		const CL_String &getName() const;
-
-		CL_NetGameEvent getSerializedData() const;
+		int getPointCount() const;
 
 
-		void setName(const CL_String &p_name);
+		const std::vector<CL_CollidingContours> &collide(
+				const CL_CollisionOutline &p_outline
+		) const;
 
-		void setSerializedData(const CL_NetGameEvent &p_data);
 
 	private:
 
-		CL_String m_name;
-
-		CL_NetGameEvent m_serialData;
+		CL_SharedPtr<ObjectImpl> m_impl;
 };
 
 }
+

@@ -479,11 +479,13 @@ void Car::serialize(CL_NetGameEvent *p_event) const
 	p_event->add_argument(m_impl->m_phyMoveVec.y);
 	p_event->add_argument(m_impl->m_phySpeedDelta);
 	p_event->add_argument(m_impl->m_phyWheelsTurn);
+
+	p_event->add_argument(m_impl->m_damage);
 }
 
 void Car::deserialize(const CL_NetGameEvent &p_event)
 {
-	static const unsigned ARGUMENT_COUNT = 14;
+	static const unsigned ARGUMENT_COUNT = 15;
 
 	if (p_event.get_argument_count() != ARGUMENT_COUNT) {
 		// when serialize data is invalid don't do anything
@@ -519,6 +521,8 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 	m_impl->m_phyMoveVec.y = p_event.get_argument(idx++);
 	m_impl->m_phySpeedDelta = p_event.get_argument(idx++);
 	m_impl->m_phyWheelsTurn = p_event.get_argument(idx++);
+
+	m_impl->m_damage = p_event.get_argument(idx++);
 }
 
 bool CarImpl::isChoking()

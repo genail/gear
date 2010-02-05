@@ -434,35 +434,40 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 		}
 	}
 
-	// if car is drifting then add new smokes
-	Player &player = Game::getInstance().getPlayer();
-	const Race::Car &car = player.getCar();
-
-	// but keep this limit on mind
 	static const unsigned SMOKE_PERIOD = 25;
-	static unsigned timeFromLastSmoke = SMOKE_PERIOD;
-
-	timeFromLastSmoke += p_timeElapsed;
-
 	static const int RAND_LIMIT = 20;
 
-	if (
-			(car.isDrifting() || car.isChoking())
-			&& timeFromLastSmoke >= SMOKE_PERIOD
-		) {
+	// if car is drifting then add new smokes
+	const int playerCount = m_logic->getPlayerCount();
 
-		CL_Pointf smokePosition = car.getPosition();
-		smokePosition.x += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);
-		smokePosition.y += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);
+	for (int i = 0; i < playerCount; ++i) {
+		const Race::Car &car = m_logic->getPlayer(i).getCar();
 
-		CL_SharedPtr<Gfx::Smoke> smoke(new Gfx::Smoke(smokePosition));
-		smoke->start();
+		if (m_carSmokePeriod.find(&car) == m_carSmokePeriod.end()) {
+			m_carSmokePeriod[&car] = SMOKE_PERIOD;
+		}
 
-		m_smokes.push_back(smoke);
+		unsigned &timeFromLastSmoke = m_carSmokePeriod[&car];
 
-		timeFromLastSmoke = 0;
+		timeFromLastSmoke += p_timeElapsed;
+
+		if (
+				(car.isDrifting() || car.isChoking())
+				&& timeFromLastSmoke >= SMOKE_PERIOD
+			) {
+
+			CL_Pointf smokePosition = car.getPosition();
+			smokePosition.x += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);
+			smokePosition.y += (rand() % (RAND_LIMIT * 2) - RAND_LIMIT);
+
+			CL_SharedPtr<Gfx::Smoke> smoke(new Gfx::Smoke(smokePosition));
+			smoke->start();
+
+			m_smokes.push_back(smoke);
+
+			timeFromLastSmoke = 0;
+		}
 	}
-
 }
 
 CL_Pointf RaceGraphics::real(const CL_Pointf &p_point) const

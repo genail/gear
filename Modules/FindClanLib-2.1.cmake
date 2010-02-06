@@ -29,6 +29,7 @@ IF(NOT ClanLib_FIND_COMPONENTS)
     GUIStyleSilver
     MikMod
     Network
+    RegExp
     SDL
     Signals
     Sound
@@ -107,6 +108,7 @@ MARK_AS_ADVANCED(
   ClanLib_GUIStyleSilver_LIBRARY
   ClanLib_MikMod_LIBRARY
   ClanLib_Network_LIBRARY
+  ClanLib_RegExp_LIBRARY
   ClanLib_SDL_LIBRARY
   ClanLib_Signals_LIBRARY
   ClanLib_Sound_LIBRARY

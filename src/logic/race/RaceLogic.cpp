@@ -52,7 +52,7 @@ class RaceLogicImpl
 		/** Progress object */
 		Progress m_progress;
 
-		/** Race beginning time. If 0 then race not started yet */
+		/** Race beginning time. If 0 then race not started or pending yet. */
 		unsigned m_raceStartTimeMs;
 
 		/** Race end time. If 0 then race not finished yet */

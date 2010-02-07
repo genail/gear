@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,9 @@
 
 #pragma once
 
-#include "Label.h"
+#include <ClanLib/core.h>
+
 #include "gfx/Drawable.h"
-#include "gfx/race/ui/SpeedMeter.h"
-#include "gfx/race/ui/PlayerList.h"
 
 namespace Math {
 	class Time;
@@ -43,6 +42,8 @@ namespace Race {
 
 namespace Gfx {
 
+class RaceUIImpl;
+class SpeedMeter;
 class Viewport;
 
 class RaceUI: public Gfx::Drawable {
@@ -57,58 +58,11 @@ class RaceUI: public Gfx::Drawable {
 
 		virtual void load(CL_GraphicContext &p_gc);
 
-		SpeedMeter &getSpeedMeter() { return m_speedMeter; }
+		SpeedMeter &getSpeedMeter();
 
 	private:
 
-		/** Speed control widget */
-		SpeedMeter m_speedMeter;
-
-		/** Player list widget */
-		PlayerList m_playerList;
-
-		/** Vote label */
-		Label m_voteLabel;
-
-		/** Message board label */
-		Label m_messageBoardLabel;
-
-		/** Lap count label */
-		Label m_lapLabel;
-
-		/** Lap times label */
-		Label m_lapTimesLabel;
-
-		/** Lap times label */
-		Label m_lapTimesLabelBold;
-
-		/** Player names under cars label */
-		Label m_carLabel;
-
-		// Race logic pointer
-		const Race::RaceLogic *m_logic;
-
-		// Viewport pointer
-		const Gfx::Viewport *m_viewport;
-
-
-		CL_String formatTime(const Math::Time &p_time);
-
-		// draw routines
-
-		void drawMeters(CL_GraphicContext &p_gc);
-
-		void drawVote(CL_GraphicContext &p_gc);
-
-		void drawMessageBoard(CL_GraphicContext &p_gc);
-
-		void drawLapLabel(CL_GraphicContext &p_gc);
-
-		void drawCarLabels(CL_GraphicContext &p_gc);
-
-		void drawPlayerList(CL_GraphicContext &p_gc);
-
-		void drawLapTimes(CL_GraphicContext &p_gc);
+		CL_SharedPtr<RaceUIImpl> m_impl;
 };
 
 } // namespace

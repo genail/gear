@@ -57,49 +57,22 @@ class RaceLogic {
 		virtual ~RaceLogic();
 
 
+		// object initialization / destroy
+
 		virtual void initialize() = 0;
 
 		virtual void destroy() = 0;
 
 
+		// getters
+
+		bool hasPlayer(const CL_String &p_name) const;
 
 		const Race::Level &getLevel() const;
 
 		const MessageBoard &getMessageBoard() const;
 
 		std::vector<CL_String> getPlayerNames() const;
-
-		const Progress &getProgress() const;
-
-		unsigned getRaceFinishTime() const;
-
-		int getRaceLapCount() const;
-
-		unsigned getRaceStartTime() const;
-
-		/** @return Message that will be displayed on screen when vote is running. */
-		virtual const CL_String &getVoteMessage() const;
-
-		virtual int getVoteNoCount() const;
-
-		/** @return Time in milliseconds that is deadline to this vote */
-		virtual unsigned getVoteTimeout() const;
-
-		virtual int getVoteYesCount() const;
-
-		virtual bool isVoteRunning() const;
-
-
-
-		virtual void callAVote(VoteType p_type, const CL_String &p_subject="");
-
-		bool hasPlayer(const CL_String &p_name) const;
-
-		bool isRaceFinished() const;
-
-		bool isRacePending() const;
-
-		bool isRaceStarted() const;
 
 		const Player &getPlayer(int p_index) const;
 
@@ -114,13 +87,55 @@ class RaceLogic {
 		 *
 		 * @p_startTimeMs Race start time in ms from system boot.
 		 */
+
+
+
+		// race workflow
+
+		const Progress &getProgress() const;
+
+		unsigned getRaceFinishTime() const;
+
+		int getRaceLapCount() const;
+
+		/** @return race start time or 0 if startRace() never called. */
+		unsigned getRaceStartTime() const;
+
+		bool isRaceFinished() const;
+
+		bool isRacePending() const;
+
+		bool isRaceStarted() const;
+
 		void startRace(int p_lapCount, unsigned p_startTimeMs);
 
-		virtual void update(unsigned p_timeElapsed);
+
+		// voting system
+
+		/** @return Message that will be displayed on screen when vote is running. */
+		virtual const CL_String &getVoteMessage() const;
+
+		virtual int getVoteNoCount() const;
+
+		/** @return Time in milliseconds that is deadline to this vote */
+		virtual unsigned getVoteTimeout() const;
+
+		virtual int getVoteYesCount() const;
+
+		virtual bool isVoteRunning() const;
+
+		virtual void callAVote(VoteType p_type, const CL_String &p_subject="");
 
 		virtual void voteNo();
 
 		virtual void voteYes();
+
+
+		// other operations
+
+		virtual void update(unsigned p_timeElapsed);
+
+
 
 
 	protected:

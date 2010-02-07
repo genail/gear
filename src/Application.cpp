@@ -159,6 +159,9 @@ int Application::main(const std::vector<CL_String> &args)
 				cl_log_event("init", "initializing OpenGL 2.x");
 				setup_gl2 = new CL_SetupGL();
 				break;
+
+			default:
+				G_ASSERT(0 && "unknown GLVer option");
 		}
 
 

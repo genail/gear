@@ -39,6 +39,7 @@
 #include "gfx/race/level/DecorationSprite.h"
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
+#include "gfx/race/ui/SpeedMeter.h"
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
 #include "logic/race/Progress.h"

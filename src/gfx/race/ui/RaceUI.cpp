@@ -34,6 +34,9 @@
 #include "common/Game.h"
 #include "gfx/Stage.h"
 #include "gfx/Viewport.h"
+#include "gfx/race/ui/Label.h"
+#include "gfx/race/ui/PlayerList.h"
+#include "gfx/race/ui/SpeedMeter.h"
 #include "gfx/scenes/RaceScene.h"
 #include "logic/race/Car.h"
 #include "logic/race/RaceLogic.h"
@@ -49,44 +52,119 @@ struct Comparator {
 	}
 };
 
-RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
-	m_playerList(p_logic),
-	m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
-	m_messageBoardLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
-	m_lapLabel(CL_Pointf(Stage::getWidth() - 20, 5), "", Label::F_BOLD, 25),
-	m_lapTimesLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
-	m_lapTimesLabelBold(CL_Pointf(), "", Label::F_BOLD, 14),
-	m_carLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
-	m_logic(p_logic),
-	m_viewport(p_viewport)
+class RaceUIImpl
 {
-	m_playerList.setPosition(CL_Pointf(Stage::getWidth() - 200, 100));
-	m_lapLabel.setAttachPoint(Label::AP_RIGHT | Label::AP_TOP);
-	m_carLabel.setAttachPoint(Label::AP_CENTER | Label::AP_TOP);
+	public:
+
+		/** Speed control widget */
+		SpeedMeter m_speedMeter;
+
+		/** Player list widget */
+		PlayerList m_playerList;
+
+		/** Vote label */
+		Label m_voteLabel;
+
+		/** Message board label */
+		Label m_messageBoardLabel;
+
+		/** Lap count label */
+		Label m_lapLabel;
+
+		/** Lap times label */
+		Label m_lapTimesLabel;
+
+		/** Lap times label */
+		Label m_lapTimesLabelBold;
+
+		/** Player names under cars label */
+		Label m_carLabel;
+
+		/** Countdown label */
+		Label m_countdownLabel;
+
+		// Race logic pointer
+		const Race::RaceLogic *m_logic;
+
+		// Viewport pointer
+		const Gfx::Viewport *m_viewport;
+
+
+		RaceUIImpl(
+				const Race::RaceLogic *p_logic,
+				const Gfx::Viewport *p_viewport
+		) :
+			m_playerList(p_logic),
+			m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
+			m_messageBoardLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
+			m_lapLabel(CL_Pointf(Stage::getWidth() - 20, 5), "", Label::F_BOLD, 25),
+			m_lapTimesLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
+			m_lapTimesLabelBold(CL_Pointf(), "", Label::F_BOLD, 14),
+			m_carLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
+			m_countdownLabel(CL_Pointf(0.0f, -15.0f), "", Label::F_BOLD, 75),
+			m_logic(p_logic),
+			m_viewport(p_viewport)
+		{
+			m_playerList.setPosition(CL_Pointf(Stage::getWidth() - 200, 100));
+			m_lapLabel.setAttachPoint(Label::AP_RIGHT | Label::AP_TOP);
+			m_carLabel.setAttachPoint(Label::AP_CENTER | Label::AP_TOP);
+			m_countdownLabel.setAttachPoint(Label::AP_CENTER);
+		}
+
+
+		CL_String formatTime(const Math::Time &p_time);
+
+		// draw routines
+
+		void drawMeters(CL_GraphicContext &p_gc);
+
+		void drawVote(CL_GraphicContext &p_gc);
+
+		void drawMessageBoard(CL_GraphicContext &p_gc);
+
+		void drawLapLabel(CL_GraphicContext &p_gc);
+
+		void drawCarLabels(CL_GraphicContext &p_gc);
+
+		void drawPlayerList(CL_GraphicContext &p_gc);
+
+		void drawLapTimes(CL_GraphicContext &p_gc);
+
+		void drawCountdown(CL_GraphicContext &p_gc);
+
+		void drawCountdownBg(CL_GraphicContext &p_gc);
+};
+
+RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
+	m_impl(new RaceUIImpl(p_logic, p_viewport))
+{
+	// empty
 }
 
 RaceUI::~RaceUI()
 {
+	// empty
 }
 
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
-	drawMeters(p_gc);
-	drawVote(p_gc);
-	drawMessageBoard(p_gc);
-	drawLapLabel(p_gc);
-	drawLapTimes(p_gc);
-	drawCarLabels(p_gc);
-	drawPlayerList(p_gc);
+	m_impl->drawMeters(p_gc);
+	m_impl->drawVote(p_gc);
+	m_impl->drawMessageBoard(p_gc);
+	m_impl->drawLapLabel(p_gc);
+	m_impl->drawLapTimes(p_gc);
+	m_impl->drawCarLabels(p_gc);
+	m_impl->drawPlayerList(p_gc);
+	m_impl->drawCountdown(p_gc);
 }
 
-void RaceUI::drawMeters(CL_GraphicContext &p_gc)
+void RaceUIImpl::drawMeters(CL_GraphicContext &p_gc)
 {
 	// draw speed control
 	m_speedMeter.draw(p_gc);
 }
 
-void RaceUI::drawVote(CL_GraphicContext &p_gc)
+void RaceUIImpl::drawVote(CL_GraphicContext &p_gc)
 {
 	if (m_logic->isVoteRunning()) {
 
@@ -115,7 +193,7 @@ void RaceUI::drawVote(CL_GraphicContext &p_gc)
 	}
 }
 
-void RaceUI::drawMessageBoard(CL_GraphicContext &p_gc)
+void RaceUIImpl::drawMessageBoard(CL_GraphicContext &p_gc)
 {
 	static const float START_POSITION_X = 0.3f;
 	static const float START_POSITION_Y = 0.95f;
@@ -169,7 +247,7 @@ void RaceUI::drawMessageBoard(CL_GraphicContext &p_gc)
 
 }
 
-void RaceUI::drawLapLabel(CL_GraphicContext &p_gc)
+void RaceUIImpl::drawLapLabel(CL_GraphicContext &p_gc)
 {
 	const int lapsTotal = m_logic->getRaceLapCount();
 	int lapsCurrent = m_logic->getProgress().getLapNumber(
@@ -184,7 +262,7 @@ void RaceUI::drawLapLabel(CL_GraphicContext &p_gc)
 	m_lapLabel.draw(p_gc);
 }
 
-void RaceUI::drawLapTimes(CL_GraphicContext &p_gc)
+void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 {
 	static const int TOP_MARGIN = 70;
 	static const int RIGHT_MARGIN = 100;
@@ -264,7 +342,7 @@ void RaceUI::drawLapTimes(CL_GraphicContext &p_gc)
 
 }
 
-CL_String RaceUI::formatTime(const Math::Time &p_time)
+CL_String RaceUIImpl::formatTime(const Math::Time &p_time)
 {
 	// buffer for time formating
 	static const int BUF_SIZE = 16;
@@ -288,7 +366,7 @@ CL_String RaceUI::formatTime(const Math::Time &p_time)
 	return buf;
 }
 
-void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
+void RaceUIImpl::drawCarLabels(CL_GraphicContext &p_gc)
 {
 	const Race::Level &level = m_logic->getLevel();
 	const int carCount = level.getCarCount();
@@ -309,22 +387,104 @@ void RaceUI::drawCarLabels(CL_GraphicContext &p_gc)
 	}
 }
 
-void RaceUI::drawPlayerList(CL_GraphicContext &p_gc)
+void RaceUIImpl::drawPlayerList(CL_GraphicContext &p_gc)
 {
 	m_playerList.draw(p_gc);
 }
 
+void RaceUIImpl::drawCountdown(CL_GraphicContext &p_gc)
+{
+	const unsigned startTime = m_logic->getRaceStartTime();
+
+	if (startTime == 0) { // not started nor pending
+		return;
+	}
+
+	const unsigned now = CL_System::get_time();
+
+
+	if (now < startTime) {
+		// race not started yet
+		static const unsigned COUNTDOWN_START_TIME_SEC = 3;
+
+		const int delta = static_cast<int> (startTime - now);
+		const unsigned sec = (delta / 1000) + 1;
+
+		if (sec <= COUNTDOWN_START_TIME_SEC) {
+			// draw background
+			drawCountdownBg(p_gc);
+
+			// calculate fraction
+			const float f = (delta - (sec - 1) * 1000) / 1000.0f;
+			const float f2 = 1.0f - f;
+
+			// draw foreground
+			p_gc.push_translate(Stage::getWidth() / 2, Stage::getHeight() / 2);
+//			p_gc.mult_scale(3.0f - f * 2, 3.0f - f * 2, 1.0f);
+			p_gc.mult_scale(1.0f + f2 * 10, 1.0f + f2 * 10, 1.0f);
+
+			m_countdownLabel.setText(CL_StringHelp::int_to_local8(sec));
+			m_countdownLabel.setColor(CL_Colorf(1.0f, 1.0f, 1.0f, f));
+			m_countdownLabel.draw(p_gc);
+
+			p_gc.pop_modelview();
+		}
+
+	} else {
+//		cl_log_event(LOG_DEBUG, "aa");
+		// race already started
+		static const int START_DISPLAY_TIME_MS = 2000;
+
+		const int delta = static_cast<int> (now - startTime);
+		if (delta <= START_DISPLAY_TIME_MS) {
+			// draw background
+			drawCountdownBg(p_gc);
+
+			// draw foreground
+			p_gc.push_translate(Stage::getWidth() / 2, Stage::getHeight() / 2);
+
+			static const CL_Colorf START_COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+			m_countdownLabel.setText(_("START"));
+			m_countdownLabel.setColor(START_COLOR);
+			m_countdownLabel.draw(p_gc);
+
+			p_gc.pop_modelview();
+		}
+	}
+}
+
+void RaceUIImpl::drawCountdownBg(CL_GraphicContext &p_gc)
+{
+	static const float BG_HEIGHT_PIX = 100;
+	static const CL_Colorf BG_COLOR(0.0f, 0.0f, 0.0f, 0.3f);
+
+	// draw bg
+	const float x1 = 0.0f;
+	const float y1 = Stage::getHeight() / 2 - BG_HEIGHT_PIX / 2;
+	const float x2 = Stage::getWidth();
+	const float y2 = y1 + BG_HEIGHT_PIX;
+
+	CL_Draw::fill(p_gc, x1, y1, x2, y2, BG_COLOR);
+}
+
 void RaceUI::load(CL_GraphicContext &p_gc)
 {
-	m_speedMeter.load(p_gc);
-	m_playerList.load(p_gc);
-	m_voteLabel.load(p_gc);
-	m_messageBoardLabel.load(p_gc);
-	m_lapLabel.load(p_gc);
-	m_lapTimesLabel.load(p_gc);
-	m_lapTimesLabelBold.load(p_gc);
-	m_carLabel.load(p_gc);
+	m_impl->m_speedMeter.load(p_gc);
+	m_impl->m_playerList.load(p_gc);
+	m_impl->m_voteLabel.load(p_gc);
+	m_impl->m_messageBoardLabel.load(p_gc);
+	m_impl->m_lapLabel.load(p_gc);
+	m_impl->m_lapTimesLabel.load(p_gc);
+	m_impl->m_lapTimesLabelBold.load(p_gc);
+	m_impl->m_carLabel.load(p_gc);
+	m_impl->m_countdownLabel.load(p_gc);
 
+}
+
+SpeedMeter &RaceUI::getSpeedMeter()
+{
+	return m_impl->m_speedMeter;
 }
 
 } // namespace

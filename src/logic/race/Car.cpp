@@ -58,6 +58,8 @@ class CarImpl
 		/** This will help to keep 1/60 iteration speed */
 		unsigned m_timeFromLastUpdate;
 
+		/** Iteration counter */
+		unsigned m_iterCnt;
 
 		// current vehicle state
 
@@ -116,6 +118,7 @@ class CarImpl
 		CarImpl(const Car *p_base) :
 			m_base(p_base),
 			m_timeFromLastUpdate(0),
+			m_iterCnt(0),
 			m_position(300.0f, 300.0f),
 			m_rotation(0, cl_degrees),
 			m_speed(0.0f),
@@ -359,7 +362,9 @@ void CarImpl::update1_60() {
 
 	// set speed delta
 	m_phySpeedDelta = m_speed - prevSpeed;
-	
+
+	// increase the iteration counter
+	m_iterCnt++;
 
 	// act to input changes
 	if (m_inputChanged) {
@@ -453,6 +458,9 @@ void Car::applyCollision(const CL_LineSegment2f &p_seg)
 
 void Car::serialize(CL_NetGameEvent *p_event) const
 {
+	// save iteration counter
+	p_event->add_argument(m_impl->m_iterCnt);
+
 	// save inputs
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputAccel));
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputBrake));
@@ -471,11 +479,13 @@ void Car::serialize(CL_NetGameEvent *p_event) const
 	p_event->add_argument(m_impl->m_phyMoveVec.y);
 	p_event->add_argument(m_impl->m_phySpeedDelta);
 	p_event->add_argument(m_impl->m_phyWheelsTurn);
+
+	p_event->add_argument(m_impl->m_damage);
 }
 
 void Car::deserialize(const CL_NetGameEvent &p_event)
 {
-	static const unsigned ARGUMENT_COUNT = 13;
+	static const unsigned ARGUMENT_COUNT = 15;
 
 	if (p_event.get_argument_count() != ARGUMENT_COUNT) {
 		// when serialize data is invalid don't do anything
@@ -490,7 +500,10 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 
 	int idx = 0;
 
-	// save inputs
+	// load iteration counter
+	m_impl->m_iterCnt = p_event.get_argument(idx++);
+
+	// saved inputs
 	m_impl->m_inputAccel = p_event.get_argument(idx++);
 	m_impl->m_inputBrake = p_event.get_argument(idx++);
 	m_impl->m_inputTurn = p_event.get_argument(idx++);
@@ -508,6 +521,8 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 	m_impl->m_phyMoveVec.y = p_event.get_argument(idx++);
 	m_impl->m_phySpeedDelta = p_event.get_argument(idx++);
 	m_impl->m_phyWheelsTurn = p_event.get_argument(idx++);
+
+	m_impl->m_damage = p_event.get_argument(idx++);
 }
 
 bool CarImpl::isChoking()
@@ -516,16 +531,21 @@ bool CarImpl::isChoking()
 		return false;
 	}
 
-	const unsigned time = CL_System::get_time();
-	if (1 << 12 & time && 1 << 9 & time) { // 0.5s every 4s
+	// c is iter count. 60 per second
+	const unsigned c = m_iterCnt;
+
+	// lets assume that 64 iterations is one second
+	// so then...
+
+	if (1 << 8 & c && 1 << 5 & c) { // 0.5s every 4s
 		return true;
 	}
 
-	if (1 << 11 & time && 1 << 8 & time) { // 0.25s every 2s
+	if (1 << 7 & c && 1 << 4 & c) { // 0.25s every 2s
 		return true;
 	}
 
-	if (1 << 10 & time && 1 << 7 & time) { // 0.1s every 1s
+	if (1 << 6 & c && 1 << 3 & c) { // 0.1s every 1s
 		return true;
 	}
 
@@ -689,6 +709,11 @@ bool Car::isBrake() const
 float Car::getTurn() const
 {
 	return m_impl->m_inputTurn;
+}
+
+void Car::reset()
+{
+	m_impl->m_damage = 0.0f;
 }
 
 void Car::clone(const Car &p_car)

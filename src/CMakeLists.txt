@@ -9,6 +9,7 @@ ENDMACRO(JOIN_LIST)
 
 # Common source files
 SET(COMMON_SRCS
+	common/Collections.cpp
 	common/Game.cpp
 	common/Player.cpp
 	common/Properties.cpp
@@ -320,13 +321,6 @@ SET(TEST_COMPILE_FLAGS "${TEST_COMPILE_FLAGS} -DTEST ${COMMON_COMPILE_FLAGS}")
 #######################
 # Configure variables #
 #######################
-
-# Game client configuration
-IF (USE_GL2)
-	SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DGL2")
-ELSE (USE_GL2)
-	SET(GEAR_COMPILE_FLAGS "${GEAR_COMPILE_FLAGS} -DGL1")
-ENDIF (USE_GL2)
 
 # Vertical synchronization
 IF (VSYNC)

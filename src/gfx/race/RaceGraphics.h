@@ -91,6 +91,10 @@ class RaceGraphics {
 		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMapping;
 		TCarMapping m_carMapping;
 
+		/** Car smoke periods */
+		typedef std::map<const Race::Car*, unsigned> TCarPeriodMap;
+		TCarPeriodMap m_carSmokePeriod;
+
 		/** Tyre stripes */
 		TyreStripes m_tyreStripes;
 

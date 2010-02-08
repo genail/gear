@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,5 +28,15 @@
 
 #pragma once
 
-#define PROTOCOL_VERSION_MAJOR 1
+// Protocol version definition
+//
+// There are two version numbers: minor and major
+// When major numbers are different on client and server then
+// the communication cannot be made and client will be dropped.
+// When major numbers are equals but only minor differs then
+// communication can be made without any errors.
+// When both numbers are equal then communication is fully
+// established.
+
+#define PROTOCOL_VERSION_MAJOR 2
 #define PROTOCOL_VERSION_MINOR 0

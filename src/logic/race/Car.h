@@ -103,6 +103,13 @@ class Car : boost::noncopyable
 		// state setters
 
 		/**
+		 * Resets car states that changes over race
+		 * like damage. It does not change position,
+		 * speed or rotation.
+		 */
+		void reset();
+
+		/**
 		 * Sets the car angle. It should be clockwise
 		 * oriented starting from positive X axis.
 		 *

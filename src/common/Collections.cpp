@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -26,44 +26,12 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Collections.h"
 
-#include <ClanLib/core.h>
-
-#include "gfx/Drawable.h"
-
-namespace Math {
-	class Time;
+Collections::Collections()
+{
 }
 
-namespace Race {
-	class RaceLogic;
+Collections::~Collections()
+{
 }
-
-namespace Gfx {
-
-class RaceUIImpl;
-class SpeedMeter;
-class Viewport;
-
-class RaceUI: public Gfx::Drawable {
-
-	public:
-
-		explicit RaceUI(const Race::RaceLogic* p_logic, const Gfx::Viewport *p_viewport);
-
-		virtual ~RaceUI();
-
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-
-		SpeedMeter &getSpeedMeter();
-
-	private:
-
-		CL_SharedPtr<RaceUIImpl> m_impl;
-};
-
-} // namespace
-

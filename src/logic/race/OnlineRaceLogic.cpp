@@ -120,6 +120,7 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 		car.setLocked(false);
 
 		display(_("*** START! ***"));
+		getProgress().resetClock();
 	}
 
 }
@@ -197,6 +198,7 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 
 	// initialize progress object
 	getProgress().initialize();
+	getProgress().resetClock();
 
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();
@@ -252,6 +254,8 @@ void OnlineRaceLogic::onRaceStart(
 	cl_log_event(LOG_RACE, "race is starting");
 
 	Car &car = Game::getInstance().getPlayer().getCar();
+
+	car.reset();
 
 	car.setPosition(p_carPosition);
 	car.setAngle(p_carRotation);

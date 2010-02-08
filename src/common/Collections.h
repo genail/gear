@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -28,42 +28,51 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include <vector>
 
-#include "gfx/Drawable.h"
+#include "common.h"
 
-namespace Math {
-	class Time;
-}
-
-namespace Race {
-	class RaceLogic;
-}
-
-namespace Gfx {
-
-class RaceUIImpl;
-class SpeedMeter;
-class Viewport;
-
-class RaceUI: public Gfx::Drawable {
-
+class Collections
+{
 	public:
 
-		explicit RaceUI(const Race::RaceLogic* p_logic, const Gfx::Viewport *p_viewport);
+		virtual ~Collections();
 
-		virtual ~RaceUI();
+		template <typename T1>
+		static bool contains(const std::vector<T1> &p_v, const T1 &p_el);
 
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void load(CL_GraphicContext &p_gc);
-
-		SpeedMeter &getSpeedMeter();
+		template <typename T1>
+		static int index(
+				const std::vector<T1> &p_v,
+				const T1 &p_el,
+				int p_offset = 0
+		);
 
 	private:
 
-		CL_SharedPtr<RaceUIImpl> m_impl;
+		Collections();
 };
 
-} // namespace
+template <typename T>
+bool Collections::contains(const std::vector<T> &p_v, const T &p_el)
+{
+	return index(p_v, p_el) != -1;
+}
+
+template <typename T1>
+int Collections::index(
+		const std::vector<T1> &p_v,
+		const T1 &p_el,
+		int p_offset
+)
+{
+	const int c = static_cast<int> (p_v.size());
+	for (int i = p_offset; i < c; ++i) {
+		if (p_v[i] == p_el) {
+			return i;
+		}
+	}
+
+	return -1;
+}
 

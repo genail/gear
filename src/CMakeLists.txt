@@ -103,6 +103,7 @@ SET(CLIENT_SRCS
 	editor/EditorHelper.cpp
 	editor/EditorMenu.cpp
 	editor/EditorLogic.cpp
+	editor/EditorBase.cpp
 	gfx/DebugLayer.cpp
 	gfx/DirectScene.cpp
 	gfx/GameWindow.cpp

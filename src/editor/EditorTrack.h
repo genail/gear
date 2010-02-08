@@ -31,6 +31,7 @@
 #include <ClanLib/display.h>
 
 #include "EditorHelper.h"
+#include "EditorBase.h"
 
 #include "common.h"
 #include "gfx/Viewport.h"
@@ -44,30 +45,30 @@ namespace Editor
 {
 	class EditorTrackImpl;
 
-	class EditorTrack
+	class EditorTrack : public EditorBase
 	{
 	public:
 		EditorTrack(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport);
 
 		~EditorTrack();
 
+		virtual void onDraw(CL_GraphicContext &p_gc);
+
+		virtual void onMouseMoved();
+
+		virtual void onHandleInput();
+
+		virtual void onMouseScrolled(bool p_up);
+
+		virtual bool getHandle() const;
+
+	private:
+
 		void drawTrack(CL_GraphicContext &p_gc);
 
 		void drawNet(CL_GraphicContext &p_gc);
 
-		void load(CL_GraphicContext &p_gc);
-
-		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
-
-		void update(unsigned int p_timeElapsed);
-
-		void handleInput(bool p_pressed, const CL_InputEvent& p_event);
-
-		void mouseScrolled(bool p_up);
-
-		bool getHandle() const;
-
-	private:
+		void setDefaultView();
 
 		CL_SharedPtr<EditorTrackImpl> m_impl;
 	};

@@ -31,6 +31,7 @@
 #include "EditorTrack.h"
 #include "EditorPoint.h"
 #include "EditorLogic.h"
+#include "EditorBase.h"
 
 #include "EditorMenu.h"
 #include "controllers/EditorMenuController.h"
@@ -58,10 +59,12 @@ namespace Editor
 			m_editorMenu(p_directScene),
 			m_editorMenuController(&m_editorMenu, m_editorLogic),
 			m_editorPoint(m_track, m_gfxLevel, m_viewport),
-			m_lastMousePos(0.0f, 0.0f),
-			m_inconditionalLastMousePos(0.0f, 0.0f)
+			m_editors()
 		{
 			m_raceLevel.setTrack(m_track);
+
+			m_editors.push_back(m_editorPoint);
+			m_editors.push_back(m_editorTrack);
 		}
 
 		~EditorManagementImpl()
@@ -87,17 +90,13 @@ namespace Editor
 
 		EditorLogic m_editorLogic;
 
+		std::vector<EditorBase> m_editors;
+
 		// menu
 
 		Gfx::EditorMenu m_editorMenu;
 
 		EditorMenuController m_editorMenuController;
-
-		// help variables
-
-		CL_Pointf m_lastMousePos;
-
-		CL_Pointf m_inconditionalLastMousePos;
 
 	};
 
@@ -135,19 +134,13 @@ namespace Editor
 
 	void EditorManagement::mouseMoved(const CL_Point &p_pos)
 	{
-		CL_Pointf inconditionalDeltaPos = (CL_Pointf)p_pos - m_impl->m_inconditionalLastMousePos;
-
 		CL_Pointf mousePos = m_impl->m_viewport.toWorld((CL_Pointf)p_pos);
-		CL_Pointf deltaPos = mousePos - m_impl->m_lastMousePos;
 
 		if (!m_impl->m_editorMenu.isVisible())
 		{
 			m_impl->m_editorPoint.mouseMoved(mousePos, m_impl->m_lastMousePos, deltaPos);
 			m_impl->m_editorTrack.mouseMoved((CL_Pointf)p_pos, m_impl->m_inconditionalLastMousePos, inconditionalDeltaPos);
 		}
-
-		m_impl->m_lastMousePos = mousePos;
-		m_impl->m_inconditionalLastMousePos = (CL_Pointf)p_pos;
 	}
 
 	void EditorManagement::update(unsigned int p_timeElapsed)

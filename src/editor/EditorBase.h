@@ -35,27 +35,25 @@
 
 #include "common.h"
 
-namespace Gfx
-{
-	class DirectScene;
-}
+#include "gfx/race/level/Level.h"
+#include "logic/race/level/Level.h"
+#include "logic/race/level/Track.h"
+#include "gfx/Viewport.h"
 
 namespace Editor
 {
-	class EditorManagementImpl;
-
-	class EditorManagement
+	class EditorBase
 	{
 	public:
-		EditorManagement(Gfx::DirectScene& p_directScene);
+		EditorBase(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport);
 
-		~EditorManagement();
+		virtual ~EditorBase();
 
 		void draw(CL_GraphicContext &p_gc);
 
 		void load(CL_GraphicContext &p_gc);
 
-		void mouseMoved(const CL_Point &p_pos);
+		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_inconditionalMousePos);
 
 		void mouseScrolled(bool p_up);
 
@@ -63,8 +61,52 @@ namespace Editor
 
 		void handleInput(InputState p_state, const CL_InputEvent& p_event);
 
-	private:
+		virtual bool getHandle() const = 0;
 
-		CL_SharedPtr<EditorManagementImpl> m_impl;
+	protected:
+		virtual void onDraw(CL_GraphicContext &p_gc);
+
+		virtual void onLoad(CL_GraphicContext &p_gc);
+
+		virtual void onMouseMoved();
+
+		virtual void onMouseScrolled(bool p_up);
+
+		virtual void onUpdate(unsigned int p_timeElapsed);
+
+		virtual void onHandleInput();
+
+		bool hasContainsKey(int p_key);
+
+		const std::vector<int>& getKeys() const;
+
+		CL_Pointf m_lastMousePos;
+
+		CL_Pointf m_mousePos;
+
+		CL_Pointf m_deltaMousePos;
+
+		CL_Pointf m_inconditionalMousePos;
+
+		CL_Pointf m_inconditionalLastMousePos;
+
+		CL_Pointf m_inconditionalDeltaMousePos;
+
+		Race::Level& m_raceLevel;
+		
+		Gfx::Level& m_gfxLevel;
+
+		Race::Track& m_track;
+
+		Gfx::Viewport& m_viewport;
+
+	private:
+		void addKey(int p_key);
+
+		void removeKey(int p_key);
+
+		int findKey(int p_key);
+
+		std::vector<int> m_keys;
 	};
 }

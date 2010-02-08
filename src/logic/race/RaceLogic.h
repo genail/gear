@@ -46,6 +46,21 @@ namespace Race {
 class Progress;
 class RaceLogicImpl;
 
+/** Race state */
+enum RaceState
+{
+	/** No action taken. */
+	S_STANDBY,
+	/** Race is pending for start */
+	S_PENDING,
+	/** Race started and not yet finished */
+	S_RUNNING,
+	/** Race finished by local player */
+	S_FINISHED_SINGLE,
+	/** Race finished by all players */
+	S_FINISHED_ALL
+};
+
 class RaceLogic {
 
 	public:
@@ -101,11 +116,7 @@ class RaceLogic {
 		/** @return race start time or 0 if startRace() never called. */
 		unsigned getRaceStartTime() const;
 
-		bool isRaceFinished() const;
-
-		bool isRacePending() const;
-
-		bool isRaceStarted() const;
+		RaceState getRaceState() const;
 
 		void startRace(int p_lapCount, unsigned p_startTimeMs);
 

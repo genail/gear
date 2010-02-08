@@ -28,6 +28,7 @@
 
 #include "RaceLogic.h"
 
+#include "common/Collections.h"
 #include "common/Game.h"
 #include "common/Player.h"
 #include "logic/race/Progress.h"
@@ -49,6 +50,16 @@ class RaceLogicImpl
 		/** All players vector (with local player too) */
 		TPlayerList m_playerList;
 
+		/**
+		 * Players that are registered to ongoing race. During the race
+		 * no new players can be registered, but already registered players
+		 * can leave.
+		 */
+		TConstPlayerList m_regPlayers;
+
+		/** Players that finished this race */
+		TConstPlayerList m_playersFinished;
+
 		/** Progress object */
 		Progress m_progress;
 
@@ -61,11 +72,8 @@ class RaceLogicImpl
 		/** Laps total */
 		int m_lapCount;
 
-		/** Next place to get on finish */
-		int m_nextPlace;
-
-		/** Players that finished this race */
-		TConstPlayerList m_playersFinished;
+		/** Race state */
+		RaceState m_state;
 
 		/** Message board to display game messages */
 		MessageBoard m_messageBoard;
@@ -78,7 +86,7 @@ class RaceLogicImpl
 			m_raceStartTimeMs(0),
 			m_raceFinishTimeMs(0),
 			m_lapCount(0),
-			m_nextPlace(1)
+			m_state(S_STANDBY)
 		{ /* empty */ }
 
 
@@ -86,11 +94,11 @@ class RaceLogicImpl
 
 		// update routines
 
+		void updateState();
+
 		void updateCollisions();
 
 		void updateCarPhysics(unsigned p_timeElapsed);
-
-		void updateCheckpoints();
 
 		void updatePlayersProgress();
 
@@ -109,10 +117,19 @@ RaceLogic::~RaceLogic()
 
 void RaceLogic::update(unsigned p_timeElapsed)
 {
+	m_impl->updateState();
 	m_impl->updateCollisions();
 	m_impl->updateCarPhysics(p_timeElapsed);
-	m_impl->updateCheckpoints();
 	m_impl->updatePlayersProgress();
+}
+
+void RaceLogicImpl::updateState()
+{
+	if (m_state == S_PENDING) {
+		if (m_raceStartTimeMs <= CL_System::get_time()) {
+			m_state = S_RUNNING;
+		}
+	}
 }
 
 void RaceLogicImpl::updateCollisions()
@@ -170,36 +187,6 @@ void RaceLogicImpl::updateCarPhysics(unsigned p_timeElapsed)
 	}
 }
 
-void RaceLogicImpl::updateCheckpoints()
-{
-//	const int carCount = m_level.getCarCount();
-//
-//
-//	for (int i = 0; i < carCount; ++i) {
-//		Car &car = m_level.getCar(i);
-//
-//		const Checkpoint *currentCheckpoint = car.getCurrentCheckpoint() ? car.getCurrentCheckpoint() : m_level.getTrack().getFirst();
-//
-//		// find next checkpoint
-//		bool movingForward, newLap;
-//		const Checkpoint *nextCheckpoint = m_level.getTrack().check(car.getPosition(), currentCheckpoint, &movingForward, &newLap);
-//
-//		// apply to car
-//		if (nextCheckpoint != currentCheckpoint) {
-//			car.updateCurrentCheckpoint(nextCheckpoint);
-//
-//			if (!movingForward) {
-//				display(_("Wrong way"));
-//			}
-//
-//			if (newLap) {
-//				display(_("New lap"));
-//			}
-//		}
-//
-//	}
-}
-
 void RaceLogicImpl::updatePlayersProgress()
 {
 	static const unsigned MILLISECOND = 1;
@@ -207,37 +194,32 @@ void RaceLogicImpl::updatePlayersProgress()
 	static const unsigned SECOND = CENTISECOND * 100;
 	static const unsigned MINUTE = SECOND * 60;
 
+	if (m_state != S_RUNNING) {
+		// do not do anything is race is not running
+		return;
+	}
+
 	unsigned now = 0, min = 0, sec = 0, centi = 0;
 
 	foreach (const Player *player, m_playerList) {
 
-		if (m_progress.getLapNumber(player->getCar()) > m_lapCount && !hasPlayerFinished(*player)) {
-
-			// calculate timing
-			if (now == 0) {
-				now = CL_System::get_time();
-				unsigned diff = now - m_raceStartTimeMs;
-
-				min = diff / MINUTE;
-				diff -= min * MINUTE;
-
-				sec = diff / SECOND;
-				diff -= sec * SECOND;
-
-				centi = diff / CENTISECOND;
-			}
-
-			m_messageBoard.addMessage(
-					cl_format(
-							"Player '%1' has finished at %2 place (%3:%4:%5)",
-							player->getName(),
-							m_nextPlace++,
-							min, sec, centi
-					)
-			);
+		const int lapNum = m_progress.getLapNumber(player->getCar());
+		if (lapNum > m_lapCount && !hasPlayerFinished(*player)) {
 
 			m_playersFinished.push_back(player);
+
+			if (player == &Game::getInstance().getPlayer()) {
+				// this is local player
+				m_state = S_FINISHED_SINGLE;
+				cl_log_event(LOG_DEBUG, "Local player finished the race");
+			}
 		}
+	}
+
+	if (m_playersFinished.size() == m_regPlayers.size()) {
+		// all players that are in race reached the finish line
+		m_state = S_FINISHED_ALL;
+		cl_log_event(LOG_DEBUG, "All players finished the race");
 	}
 
 	// update overall progress
@@ -357,26 +339,19 @@ void RaceLogic::startRace(int p_lapCount, unsigned p_startTimeMs)
 	m_impl->m_lapCount = p_lapCount;
 	m_impl->m_raceStartTimeMs = p_startTimeMs;
 
-	m_impl->m_nextPlace = 1;
 	m_impl->m_raceFinishTimeMs = 0;
 	m_impl->m_playersFinished.clear();
 
+	// register current players to race
+	m_impl->m_regPlayers.clear();
+
+	foreach (Player *p, m_impl->m_playerList) {
+		m_impl->m_regPlayers.push_back(p);
+	}
+
+	m_impl->m_state = S_PENDING;
+
 	display(_("Get ready..."));
-}
-
-bool RaceLogic::isRaceFinished() const
-{
-	return m_impl->m_raceFinishTimeMs != 0;
-}
-
-bool RaceLogic::isRacePending() const
-{
-	return m_impl->m_raceStartTimeMs > CL_System::get_time();
-}
-
-bool RaceLogic::isRaceStarted() const
-{
-	return m_impl->m_raceStartTimeMs <= CL_System::get_time();
 }
 
 int RaceLogic::getRaceLapCount() const
@@ -421,6 +396,21 @@ void RaceLogic::addPlayer(Player *p_player)
 	m_impl->m_progress.addCar(p_player->getCar());
 }
 
+void RaceLogic::removePlayer(const Player &p_player)
+{
+	// remove from main player list
+	const bool found = Collections::remove(m_impl->m_playerList, &p_player);
+
+	if (found) {
+		m_impl->m_progress.removeCar(p_player.getCar());
+	}
+
+	// remove from registered if presend
+	Collections::remove(m_impl->m_regPlayers, &p_player);
+
+	G_ASSERT(found && "player not found");
+}
+
 const Player &RaceLogic::getPlayer(int p_index) const
 {
 	G_ASSERT(p_index >= 0 && p_index < getPlayerCount());
@@ -438,25 +428,6 @@ int RaceLogic::getPlayerCount() const
 	return static_cast<signed>(m_impl->m_playerList.size());
 }
 
-void RaceLogic::removePlayer(const Player &p_player)
-{
-	RaceLogicImpl::TPlayerList::iterator itor;
-
-	for (
-			itor = m_impl->m_playerList.begin();
-			itor != m_impl->m_playerList.end();
-			++itor
-	) {
-		if (*itor == &p_player) {
-			m_impl->m_playerList.erase(itor);
-			m_impl->m_progress.removeCar(p_player.getCar());
-			return;
-		}
-	}
-
-	G_ASSERT(0 && "player not found");
-}
-
 Progress &RaceLogic::getProgress()
 {
 	return m_impl->m_progress;
@@ -465,6 +436,11 @@ Progress &RaceLogic::getProgress()
 const Progress &RaceLogic::getProgress() const
 {
 	return m_impl->m_progress;
+}
+
+RaceState RaceLogic::getRaceState() const
+{
+	return m_impl->m_state;
 }
 
 } // namespace

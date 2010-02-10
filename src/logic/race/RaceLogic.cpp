@@ -189,17 +189,11 @@ void RaceLogicImpl::updateCarPhysics(unsigned p_timeElapsed)
 
 void RaceLogicImpl::updatePlayersProgress()
 {
-	static const unsigned MILLISECOND = 1;
-	static const unsigned CENTISECOND = MILLISECOND * 10;
-	static const unsigned SECOND = CENTISECOND * 100;
-	static const unsigned MINUTE = SECOND * 60;
-
-	if (m_state != S_RUNNING) {
+	if (m_state != S_RUNNING && m_state != S_FINISHED_SINGLE) {
 		// do not do anything is race is not running
 		return;
 	}
 
-	unsigned now = 0, min = 0, sec = 0, centi = 0;
 
 	foreach (const Player *player, m_playerList) {
 

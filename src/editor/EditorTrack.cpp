@@ -135,9 +135,4 @@ namespace Editor
 				m_viewport.setScale(newScale);
 		}
 	}
-
-	bool EditorTrack::getHandle() const
-	{
-		return (getKeys().size() != 0);
-	}
 }

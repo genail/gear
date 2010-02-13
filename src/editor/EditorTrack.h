@@ -60,8 +60,6 @@ namespace Editor
 
 		virtual void onMouseScrolled(bool p_up);
 
-		virtual bool getHandle() const;
-
 	private:
 
 		void drawTrack(CL_GraphicContext &p_gc);

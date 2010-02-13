@@ -58,13 +58,13 @@ namespace Editor
 			m_editorLogic(m_raceLevel),
 			m_editorMenu(p_directScene),
 			m_editorMenuController(&m_editorMenu, m_editorLogic),
-			m_editorPoint(m_track, m_gfxLevel, m_viewport),
+			m_editorPoint(m_raceLevel, m_gfxLevel, m_track, m_viewport),
 			m_editors()
 		{
 			m_raceLevel.setTrack(m_track);
 
-			m_editors.push_back(m_editorPoint);
-			m_editors.push_back(m_editorTrack);
+			m_editors.push_back(&m_editorPoint);
+			m_editors.push_back(&m_editorTrack);
 		}
 
 		~EditorManagementImpl()
@@ -90,7 +90,7 @@ namespace Editor
 
 		EditorLogic m_editorLogic;
 
-		std::vector<EditorBase> m_editors;
+		std::vector<EditorBase*> m_editors;
 
 		// menu
 
@@ -117,9 +117,8 @@ namespace Editor
 
 		m_impl->m_viewport.prepareGC(p_gc);
 
-		m_impl->m_editorTrack.drawNet(p_gc);
-		m_impl->m_editorTrack.drawTrack(p_gc);
-		m_impl->m_editorPoint.draw(p_gc);
+		for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
+			m_impl->m_editors[i]->draw(p_gc);
 
 		m_impl->m_viewport.finalizeGC(p_gc);
 	}
@@ -128,8 +127,8 @@ namespace Editor
 	{
 		m_impl->m_gfxLevel.load(p_gc);
 
-		m_impl->m_editorPoint.load(p_gc);
-		m_impl->m_editorTrack.load(p_gc);
+		for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
+			m_impl->m_editors[i]->load(p_gc);
 	}
 
 	void EditorManagement::mouseMoved(const CL_Point &p_pos)
@@ -138,15 +137,15 @@ namespace Editor
 
 		if (!m_impl->m_editorMenu.isVisible())
 		{
-			m_impl->m_editorPoint.mouseMoved(mousePos, m_impl->m_lastMousePos, deltaPos);
-			m_impl->m_editorTrack.mouseMoved((CL_Pointf)p_pos, m_impl->m_inconditionalLastMousePos, inconditionalDeltaPos);
+			for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
+				m_impl->m_editors[i]->mouseMoved(mousePos, (CL_Pointf)p_pos);
 		}
 	}
 
 	void EditorManagement::update(unsigned int p_timeElapsed)
 	{
-		m_impl->m_editorPoint.update(p_timeElapsed);
-		m_impl->m_editorTrack.update(p_timeElapsed);
+		for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
+			m_impl->m_editors[i]->update(p_timeElapsed);
 	}
 
 	void EditorManagement::handleInput(InputState p_state, const CL_InputEvent& p_event)
@@ -177,12 +176,10 @@ namespace Editor
 
 		if (!m_impl->m_editorMenu.isVisible())
 		{
-			bool handle = (m_impl->m_editorTrack.getHandle() || m_impl->m_editorPoint.getHandle());
-
-			if (!handle || !pressed)
+			if (!pressed)
 			{
-				m_impl->m_editorPoint.handleInput(pressed, p_event);
-				m_impl->m_editorTrack.handleInput(pressed, p_event);
+				for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
+					m_impl->m_editors[i]->handleInput(p_state, p_event);
 			}
 		}
 	}
@@ -191,8 +188,8 @@ namespace Editor
 	{
 		if (!m_impl->m_editorMenu.isVisible())
 		{
-			m_impl->m_editorPoint.mouseScrolled(p_up);
-			m_impl->m_editorTrack.mouseScrolled(p_up);
+			for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
+				m_impl->m_editors[i]->mouseScrolled(p_up);
 		}
 	}
 }

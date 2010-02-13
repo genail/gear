@@ -61,8 +61,6 @@ namespace Editor
 
 		void handleInput(InputState p_state, const CL_InputEvent& p_event);
 
-		virtual bool getHandle() const = 0;
-
 	protected:
 		virtual void onDraw(CL_GraphicContext &p_gc);
 
@@ -80,6 +78,8 @@ namespace Editor
 
 		const std::vector<int>& getKeys() const;
 
+		bool isFirstKey(int p_key);
+
 		CL_Pointf m_lastMousePos;
 
 		CL_Pointf m_mousePos;
@@ -91,6 +91,12 @@ namespace Editor
 		CL_Pointf m_inconditionalLastMousePos;
 
 		CL_Pointf m_inconditionalDeltaMousePos;
+
+		bool m_alt;
+
+		bool m_ctrl;
+
+		bool m_shift;
 
 		Race::Level& m_raceLevel;
 		

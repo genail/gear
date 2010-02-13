@@ -81,6 +81,10 @@ namespace Editor
 
 	void EditorBase::handleInput(InputState p_state, const CL_InputEvent& p_event)
 	{
+		m_alt = p_event.alt;
+		m_ctrl = p_event.ctrl;
+		m_shift = p_event.shift;
+
 		switch (p_state)
 		{
 		case Pressed:
@@ -97,6 +101,14 @@ namespace Editor
 	bool EditorBase::hasContainsKey(int p_key)
 	{
 		if (findKey(p_key) != -1)
+			return true;
+		else
+			return false;
+	}
+
+	bool EditorBase::isFirstKey(int p_key)
+	{
+		if (m_keys[0] == p_key)
 			return true;
 		else
 			return false;

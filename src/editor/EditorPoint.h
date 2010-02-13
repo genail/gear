@@ -31,9 +31,11 @@
 #include <ClanLib/display.h>
 
 #include "EditorHelper.h"
+#include "EditorBase.h"
 
 #include "common.h"
 #include "gfx/Viewport.h"
+#include "logic/race/level/Level.h"
 #include "logic/race/level/Track.h"
 #include "logic/race/level/TrackPoint.h"
 #include "logic/race/level/TrackTriangulator.h"
@@ -43,28 +45,45 @@ namespace Editor
 { 
 	class EditorPointImpl;
 
-	class EditorPoint
+	class EditorPoint : EditorBase
 	{
 	public:
-		EditorPoint(Race::Track& p_track, Gfx::Level& p_gfxLevel, Gfx::Viewport& p_viewport);
+		EditorPoint(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport);
 
 		~EditorPoint();
 
-		void draw(CL_GraphicContext &p_gc);
+		virtual void onDraw(CL_GraphicContext &p_gc);
 
-		void load(CL_GraphicContext &p_gc);
+		virtual void onMouseScrolled(bool p_up);
 
-		void mouseScrolled(bool p_up);
+		virtual void onMouseMoved();
 
-		void mouseMoved(const CL_Pointf &p_mousePos, const CL_Pointf &p_lastMousePos, const CL_Pointf &p_deltaPos);
+		virtual void onUpdate(unsigned int p_timeElapsed);
 
-		void update(unsigned int p_timeElapsed);
-
-		void handleInput(bool p_pressed, const CL_InputEvent& p_event);
-
-		bool getHandle() const;
+		virtual void onHandleInput();
 
 	private:
+		void setDefaultPoints();
+
+		void drawPoints(CL_GraphicContext &p_gc);
+
+		void drawPoint(int p_index, bool &p_isSelected, bool &p_isLight, CL_GraphicContext &p_gc);
+
+		void findPointAt(const CL_Pointf &p_pos, int &p_index);
+
+		void getShiftRect(int p_index, int* x1, int* y1, int* x2, int* y2);
+
+		CL_Rect getPointRect(int p_index);
+
+		CL_Rect getPointRect(const CL_Pointf &p_point);
+
+		void setToPerpendicular(CL_Vec2f &p_vector2, bool p_isInvert);
+
+		void setMinAndMaxShiftPoint(int p_index);
+
+		void setRadius(int p_index, int p_set);
+
+		void triangulate(int p_index);
 
 		CL_SharedPtr<EditorPointImpl> m_impl;
 	};

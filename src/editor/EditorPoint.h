@@ -45,7 +45,7 @@ namespace Editor
 { 
 	class EditorPointImpl;
 
-	class EditorPoint : EditorBase
+	class EditorPoint : public EditorBase
 	{
 	public:
 		EditorPoint(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport);

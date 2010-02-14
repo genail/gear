@@ -96,7 +96,7 @@ namespace Editor
 		m_impl(new EditorPointImpl()),
 		EditorBase(p_raceLevel, p_gfxLevel, p_track, p_viewport)
 	{
-
+		setDefaultPoints();
 	}
 
 	EditorPoint::~EditorPoint()
@@ -132,7 +132,7 @@ namespace Editor
 
 		if (p_isSelected)
 		{
-			if (isFirstKey(CL_KEY_CONTROL) && m_impl->m_selectedIndex != -1)
+			if (isFirstKey(CL_KEY_SHIFT) && m_impl->m_selectedIndex != -1)
 			{
 				CL_Pen pen;
 
@@ -367,7 +367,7 @@ namespace Editor
 		{
 			TrackPoint trackPoint = m_track.getPoint(m_impl->m_selectedIndex);
 
-			if (isFirstKey(CL_KEY_CONTROL))
+			if (isFirstKey(CL_KEY_SHIFT))
 			{
 				float lastMaxShiftDeltaLength = m_impl->m_maxShiftPoint.distance(m_lastMousePos);
 				float lastMinShiftDeltaLength = m_impl->m_minShiftPoint.distance(m_lastMousePos);
@@ -403,7 +403,7 @@ namespace Editor
 
 	void EditorPoint::onMouseScrolled(bool p_up)
 	{
-		if (m_impl->m_selectedIndex >= 0 && (m_shift || m_alt))
+		if (m_impl->m_selectedIndex >= 0 && (m_ctrl || m_alt))
 		{
 			int set = p_up ? 1 : -1;
 

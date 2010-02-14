@@ -63,8 +63,8 @@ namespace Editor
 		{
 			m_raceLevel.setTrack(m_track);
 
-			m_editors.push_back(&m_editorPoint);
 			m_editors.push_back(&m_editorTrack);
+			m_editors.push_back(&m_editorPoint);
 		}
 
 		~EditorManagementImpl()
@@ -116,6 +116,8 @@ namespace Editor
 		CL_Draw::fill(p_gc, 0.0f, 0.0f, Stage::getWidth(), Stage::getHeight(), CL_Colorf::green);
 
 		m_impl->m_viewport.prepareGC(p_gc);
+
+		m_impl->m_gfxLevel.getTrackTriangulator().triangulate(m_impl->m_track); // !!!
 
 		for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
 			m_impl->m_editors[i]->draw(p_gc);
@@ -176,11 +178,8 @@ namespace Editor
 
 		if (!m_impl->m_editorMenu.isVisible())
 		{
-			if (!pressed)
-			{
-				for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
-					m_impl->m_editors[i]->handleInput(p_state, p_event);
-			}
+			for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
+				m_impl->m_editors[i]->handleInput(p_state, p_event);
 		}
 	}
 

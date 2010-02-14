@@ -236,8 +236,10 @@ int Application::main(const std::vector<CL_String> &args)
 			displayWindow.flip(SYNC_PARAM);
 		}
 
-	} catch (CL_Exception e) {
+	} catch (CL_Exception &e) {
 		CL_Console::write_line(e.message);
+	} catch (std::exception &e) {
+		CL_Console::write_line(e.what());
 	}
 
 	Properties::save();

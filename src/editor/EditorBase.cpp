@@ -108,7 +108,7 @@ namespace Editor
 
 	bool EditorBase::isFirstKey(int p_key)
 	{
-		if (m_keys[0] == p_key)
+		if (m_keys.size() > 0 && m_keys[0] == p_key)
 			return true;
 		else
 			return false;

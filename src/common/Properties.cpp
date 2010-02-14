@@ -54,25 +54,27 @@ void Properties::load()
 
 		file.close();
 
-		const std::vector<CL_TempString> lines =
-				CL_StringHelp::split_text(buffer.get_data(), END_OF_LINE, true);
+		if (buffer.get_size() != 0) {
+			const std::vector<CL_TempString> lines =
+					CL_StringHelp::split_text(buffer.get_data(), END_OF_LINE, true);
 
-		const int linesCount = static_cast<signed>(lines.size());
+			const int linesCount = static_cast<signed>(lines.size());
 
-		std::vector<CL_TempString> parts;
+			std::vector<CL_TempString> parts;
 
-		for (int i = 0; i < linesCount; ++i) {
-			parts = CL_StringHelp::split_text(lines[i], "=", false);
+			for (int i = 0; i < linesCount; ++i) {
+				parts = CL_StringHelp::split_text(lines[i], "=", false);
 
-			if (parts.size() == 2) {
-				const CL_TempString left = CL_StringHelp::trim(parts[0]);
-				const CL_TempString right = CL_StringHelp::trim(parts[1]);
+				if (parts.size() == 2) {
+					const CL_TempString left = CL_StringHelp::trim(parts[0]);
+					const CL_TempString right = CL_StringHelp::trim(parts[1]);
 
-				Properties::setProperty(left, right);
+					Properties::setProperty(left, right);
 
-				cl_log_event(LOG_DEBUG, "Option '%1' set to '%2'", left, right);
-			} else {
-				cl_log_event(LOG_DEBUG, "Cannot parse line: %1", lines[i]);
+					cl_log_event(LOG_DEBUG, "Option '%1' set to '%2'", left, right);
+				} else {
+					cl_log_event(LOG_DEBUG, "Cannot parse line: %1", lines[i]);
+				}
 			}
 		}
 

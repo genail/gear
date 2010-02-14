@@ -42,6 +42,7 @@
 #include "network/client/Client.h"
 #include "gfx/race/RaceGraphics.h"
 #include "gfx/race/level/Bound.h"
+#include "gfx/race/ui/ScoreTable.h"
 #include "debug/RaceSceneKeyBindings.h"
 
 
@@ -186,6 +187,10 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 		case CL_KEY_F2:
 			if (pressed && m_logic->isVoteRunning()) {
 				m_logic->voteNo();
+			}
+		case CL_KEY_TAB:
+			if (pressed) {
+				m_graphics->getUi().getScoreTable().restartAnimation();
 			}
 			break;
 #if !defined(NDEBUG)

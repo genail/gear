@@ -59,11 +59,16 @@ class RaceGraphics {
 
 		virtual ~RaceGraphics();
 
+
 		void draw(CL_GraphicContext &p_gc);
 
 		void load(CL_GraphicContext &p_gc);
 
+
 		void update(unsigned p_timeElapsed);
+
+
+		Gfx::RaceUI &getUi();
 
 	private:
 

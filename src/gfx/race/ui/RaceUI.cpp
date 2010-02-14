@@ -35,6 +35,7 @@
 #include "gfx/Viewport.h"
 #include "gfx/race/ui/Label.h"
 #include "gfx/race/ui/PlayerList.h"
+#include "gfx/race/ui/ScoreTable.h"
 #include "gfx/race/ui/SpeedMeter.h"
 #include "gfx/scenes/RaceScene.h"
 #include "logic/race/Car.h"
@@ -60,6 +61,9 @@ class RaceUIImpl
 
 		/** Player list widget */
 		PlayerList m_playerList;
+
+		/** Score table */
+		ScoreTable m_scoreTable;
 
 		/** Global message label */
 		Label m_globMsgLabel;
@@ -97,6 +101,7 @@ class RaceUIImpl
 				const Gfx::Viewport *p_viewport
 		) :
 			m_playerList(p_logic),
+			m_scoreTable(p_logic),
 			m_globMsgLabel(CL_Pointf(Stage::getWidth() / 2, Stage::getHeight() / 3), "", Label::F_BOLD, 36),
 			m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
 			m_messageBoardLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
@@ -137,6 +142,8 @@ class RaceUIImpl
 		void drawCountdownBg(CL_GraphicContext &p_gc);
 
 		void drawGlobalMessage(CL_GraphicContext &p_gc);
+
+		void drawScoreTable(CL_GraphicContext &p_gc);
 };
 
 RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
@@ -150,6 +157,11 @@ RaceUI::~RaceUI()
 	// empty
 }
 
+void RaceUI::update(unsigned p_timeElapsed)
+{
+	m_impl->m_scoreTable.update(p_timeElapsed);
+}
+
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
 	m_impl->drawMeters(p_gc);
@@ -161,6 +173,7 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 	m_impl->drawPlayerList(p_gc);
 	m_impl->drawCountdown(p_gc);
 	m_impl->drawGlobalMessage(p_gc);
+	m_impl->drawScoreTable(p_gc);
 }
 
 void RaceUIImpl::drawMeters(CL_GraphicContext &p_gc)
@@ -457,6 +470,11 @@ void RaceUIImpl::drawGlobalMessage(CL_GraphicContext &p_gc)
 	}
 }
 
+void RaceUIImpl::drawScoreTable(CL_GraphicContext &p_gc)
+{
+	m_scoreTable.draw(p_gc);
+}
+
 void RaceUI::load(CL_GraphicContext &p_gc)
 {
 	m_impl->m_speedMeter.load(p_gc);
@@ -469,12 +487,18 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 	m_impl->m_lapTimesLabelBold.load(p_gc);
 	m_impl->m_carLabel.load(p_gc);
 	m_impl->m_countdownLabel.load(p_gc);
+	m_impl->m_scoreTable.load(p_gc);
 
 }
 
 SpeedMeter &RaceUI::getSpeedMeter()
 {
 	return m_impl->m_speedMeter;
+}
+
+ScoreTable &RaceUI::getScoreTable()
+{
+	return m_impl->m_scoreTable;
 }
 
 } // namespace

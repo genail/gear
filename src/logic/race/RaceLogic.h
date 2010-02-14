@@ -63,6 +63,12 @@ enum RaceState
 
 class RaceLogic {
 
+	/**
+	 * Invoked when race state has changed. First argument is always
+	 * the old state, second the new one.
+	 */
+	SIG_H_2(stateChanged, RaceState, RaceState);
+
 	public:
 
 		typedef std::list<Player*> TPlayerList;

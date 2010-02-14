@@ -96,6 +96,10 @@ class RaceUIImpl
 		const Gfx::Viewport *m_viewport;
 
 
+		// slots container
+		CL_SlotContainer m_slots;
+
+
 		RaceUIImpl(
 				const Race::RaceLogic *p_logic,
 				const Gfx::Viewport *p_viewport
@@ -109,7 +113,7 @@ class RaceUIImpl
 			m_lapTimesLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 			m_lapTimesLabelBold(CL_Pointf(), "", Label::F_BOLD, 14),
 			m_carLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
-			m_countdownLabel(CL_Pointf(0.0f, -15.0f), "", Label::F_BOLD, 75),
+			m_countdownLabel(CL_Pointf(0.0f, 0.0f), "", Label::F_BOLD, 75),
 			m_logic(p_logic),
 			m_viewport(p_viewport)
 		{
@@ -118,6 +122,9 @@ class RaceUIImpl
 			m_lapLabel.setAttachPoint(Label::AP_RIGHT | Label::AP_TOP);
 			m_carLabel.setAttachPoint(Label::AP_CENTER | Label::AP_TOP);
 			m_countdownLabel.setAttachPoint(Label::AP_CENTER);
+
+			// connect signals
+			m_slots.connect(p_logic->sig_stateChanged(), this, &RaceUIImpl::onStateChanged);
 		}
 
 
@@ -144,6 +151,10 @@ class RaceUIImpl
 		void drawGlobalMessage(CL_GraphicContext &p_gc);
 
 		void drawScoreTable(CL_GraphicContext &p_gc);
+
+
+		// state changed slot
+		void onStateChanged(Race::RaceState p_from, Race::RaceState p_to);
 };
 
 RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
@@ -472,7 +483,9 @@ void RaceUIImpl::drawGlobalMessage(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::drawScoreTable(CL_GraphicContext &p_gc)
 {
-	m_scoreTable.draw(p_gc);
+	if (m_logic->getRaceState() == Race::S_FINISHED_ALL) {
+		m_scoreTable.draw(p_gc);
+	}
 }
 
 void RaceUI::load(CL_GraphicContext &p_gc)
@@ -489,6 +502,15 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 	m_impl->m_countdownLabel.load(p_gc);
 	m_impl->m_scoreTable.load(p_gc);
 
+}
+
+void RaceUIImpl::onStateChanged(Race::RaceState p_from, Race::RaceState p_to)
+{
+	if (p_from == Race::S_FINISHED_SINGLE && p_to == Race::S_FINISHED_ALL) {
+		// finish race action, invoke table display
+		m_scoreTable.rebuild();
+		m_scoreTable.restartAnimation();
+	}
 }
 
 SpeedMeter &RaceUI::getSpeedMeter()

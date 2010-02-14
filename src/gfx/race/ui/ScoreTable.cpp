@@ -165,15 +165,7 @@ class ScoreTableImpl
 ScoreTable::ScoreTable(const Race::RaceLogic *p_logic) :
 	m_impl(new ScoreTableImpl(p_logic))
 {
-
 	// empty
-
-	// debug
-	for (int i = 1; i <= 6; ++i) {
-		m_impl->m_rows.push_back(
-				new TableRow(i, "Alojzy", Math::Time(1), Math::Time(1))
-		);
-	}
 }
 
 ScoreTable::~ScoreTable()
@@ -292,6 +284,7 @@ void ScoreTable::rebuild()
 	foreach (TableRow *row, m_impl->m_rows) {
 		delete row;
 	}
+	m_impl->m_rows.clear();
 
 	const int lapCount = m_impl->m_logic->getRaceLapCount();
 	const int pCount = m_impl->m_logic->getPlayerCount();
@@ -322,7 +315,7 @@ void ScoreTable::rebuild()
 	// sort and build table rows
 	timeEntries.sort();
 
-	int i = 0;
+	int i = 1;
 	foreach (const TimeEntry &te, timeEntries) {
 		m_impl->m_rows.push_back(
 				new TableRow(i++, te.m_player.getName(), te.m_total, te.m_best)

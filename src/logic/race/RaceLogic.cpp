@@ -44,6 +44,10 @@ class RaceLogicImpl
 		typedef std::vector<const Player*> TConstPlayerList;
 
 
+		// signals
+		SIG_IMPL(RaceLogic, stateChanged);
+
+
 		/** The level */
 		Level m_level;
 
@@ -105,6 +109,8 @@ class RaceLogicImpl
 		void updateTyreStripes();
 };
 
+SIG_CPP(RaceLogic, stateChanged);
+
 RaceLogic::RaceLogic() :
 	m_impl(new RaceLogicImpl())
 {
@@ -128,6 +134,7 @@ void RaceLogicImpl::updateState()
 	if (m_state == S_PENDING) {
 		if (m_raceStartTimeMs <= CL_System::get_time()) {
 			m_state = S_RUNNING;
+			INVOKE_2(stateChanged, S_PENDING, S_RUNNING);
 		}
 	}
 }
@@ -204,7 +211,12 @@ void RaceLogicImpl::updatePlayersProgress()
 
 			if (player == &Game::getInstance().getPlayer()) {
 				// this is local player
+
+				// change the state
+				RaceState oldState = m_state;
 				m_state = S_FINISHED_SINGLE;
+				INVOKE_2(stateChanged, oldState, m_state);
+
 				cl_log_event(LOG_DEBUG, "Local player finished the race");
 			}
 		}
@@ -212,7 +224,12 @@ void RaceLogicImpl::updatePlayersProgress()
 
 	if (m_playersFinished.size() == m_regPlayers.size()) {
 		// all players that are in race reached the finish line
+
+		// change the state
+		RaceState oldState = m_state;
 		m_state = S_FINISHED_ALL;
+		INVOKE_2(stateChanged, oldState, m_state);
+
 		cl_log_event(LOG_DEBUG, "All players finished the race");
 	}
 
@@ -343,7 +360,10 @@ void RaceLogic::startRace(int p_lapCount, unsigned p_startTimeMs)
 		m_impl->m_regPlayers.push_back(p);
 	}
 
+
+	RaceState oldState = m_impl->m_state;
 	m_impl->m_state = S_PENDING;
+	m_impl->INVOKE_2(stateChanged, oldState, m_impl->m_state);
 
 	display(_("Get ready..."));
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ void MainMenuController::onRaceStartClicked()
 	m_scene->displayError("");
 
 	if (m_scene->getPlayerName().empty()) {
-		m_scene->displayError(_("No player's name choosen. See Options."));
+		m_scene->displayError(_("No player's name chosen. See Options."));
 		return;
 	}
 

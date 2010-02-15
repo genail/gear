@@ -274,7 +274,8 @@ void OnlineRaceLogic::onRaceStart(
 
 	m_client->sendCarState(carState);
 
-	startRace(1, CL_System::get_time() + RACE_START_DELAY);
+	// FIXME: where to store lap count?
+	startRace(3, CL_System::get_time() + RACE_START_DELAY);
 }
 
 void OnlineRaceLogic::onInputChange(const Car &p_car)

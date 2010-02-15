@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@
 #include "EditorBase.h"
 
 #include "EditorMenu.h"
-#include "controllers/EditorMenuController.h"
 
 #include "gfx/Viewport.h"
 #include "gfx/race/level/Level.h"
@@ -56,8 +55,7 @@ namespace Editor
 			m_gfxLevel(m_raceLevel, m_viewport),
 			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
 			m_editorLogic(m_raceLevel),
-			m_editorMenu(p_directScene),
-			m_editorMenuController(&m_editorMenu, m_editorLogic),
+			m_editorMenu(p_directScene, m_editorLogic),
 			m_editorPoint(m_raceLevel, m_gfxLevel, m_track, m_viewport),
 			m_editors()
 		{
@@ -96,8 +94,6 @@ namespace Editor
 
 		Gfx::EditorMenu m_editorMenu;
 
-		EditorMenuController m_editorMenuController;
-
 	};
 
 	EditorManagement::EditorManagement(Gfx::DirectScene& p_directScene) : 
@@ -117,6 +113,9 @@ namespace Editor
 
 		m_impl->m_viewport.prepareGC(p_gc);
 
+		// bercik, 15 luty:
+		// ma³o wydajne rozwi¹zanie, które oblicza przed ka¿dym odrysowaniem ca³¹ trasê.
+		// nale¿y usnu¹æ w przysz³oœci po usuniêciu b³êdu z niewyliczeniem ca³ej trasy na pocz¹tku
 		m_impl->m_gfxLevel.getTrackTriangulator().triangulate(m_impl->m_track); // !!!
 
 		for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)

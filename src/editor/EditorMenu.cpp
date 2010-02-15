@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,8 +39,9 @@ const float WINDOW_ROUNDNESS = 20.0f;
 const int MARGIN = 20;
 const int BUTTON_HEIGHT = 30;
 const int BUTTON_SPACE = 15;
+const int EDIT_HEIGHT = 20;
 
-EditorMenu::EditorMenu(DirectScene &p_scene) :
+EditorMenu::EditorMenu(DirectScene &p_scene, Editor::EditorLogic& p_editorLogic) :
 	Overlay(
 			p_scene,
 			CL_Rect(
@@ -50,12 +51,20 @@ EditorMenu::EditorMenu(DirectScene &p_scene) :
 					(int) (Stage::getHeight() / 2 + WINDOW_HEIGHT / 2)
 			)
 	),
+	m_editorLogic(p_editorLogic),
 	m_bg(CL_Sizef(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_ROUNDNESS),
 	m_loadButton(this),
 	m_saveButton(this),
-	m_exitButton(this)
+	m_exitButton(this),
+	m_okButton(this),
+	m_cancelButton(this),
+	m_fileNameLineEdit(this),
+	m_errorLabel(this),
+	m_action()
 {
 	setVisible(false);
+
+	func_visibility_change().set(this, &EditorMenu::onVisibleChanged);
 }
 
 EditorMenu::~EditorMenu()
@@ -65,22 +74,51 @@ EditorMenu::~EditorMenu()
 
 void EditorMenu::load(CL_GraphicContext &p_gc)
 {
-	int y = MARGIN;
+	int	y = MARGIN;
 
 	m_loadButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
 	m_loadButton.set_text(_("Load"));
+	m_loadButton.func_clicked().set(this, &EditorMenu::onLoadClicked);
 
 
 	y += BUTTON_HEIGHT + BUTTON_SPACE;
 
 	m_saveButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
 	m_saveButton.set_text(_("Save"));
+	m_saveButton.func_clicked().set(this, &EditorMenu::onSaveClicked);
 
 
 	y += BUTTON_HEIGHT + BUTTON_SPACE;
 
 	m_exitButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
 	m_exitButton.set_text(_("Exit"));
+	m_exitButton.func_clicked().set(this, &EditorMenu::onExitClicked);
+
+
+	y = MARGIN;
+	int x1 = MARGIN;
+	int x2 = WINDOW_WIDTH - MARGIN;
+
+	m_fileNameLineEdit.set_geometry(CL_Rect(x1, y, x2, y + EDIT_HEIGHT));
+
+
+	y = WINDOW_HEIGHT - (2 * BUTTON_HEIGHT + BUTTON_SPACE + MARGIN);
+
+	m_okButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
+	m_okButton.set_text(_("OK"));
+	m_okButton.func_clicked().set(this, &EditorMenu::onOkClicked);
+
+	
+	y += BUTTON_HEIGHT + BUTTON_SPACE;
+
+	m_cancelButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
+	m_cancelButton.set_text(_("Cancel"));
+	m_cancelButton.func_clicked().set(this, &EditorMenu::onCancelClicked);
+
+
+
+	setVisibleMenu(true);
+	setVisibleSaveLoad(false);
 }
 
 void EditorMenu::draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
@@ -91,19 +129,81 @@ void EditorMenu::draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
 	m_bg.fill(p_gc, ZERO_POINT, FILL_COLOR);
 }
 
-CL_Callback_v0 &EditorMenu::func_exit_clicked()
+void EditorMenu::onSaveClicked()
 {
-	return m_exitButton.func_clicked();
+	m_action = Save;
+	m_fileNameLineEdit.set_text("");
+	m_fileNameLineEdit.set_focus();
+	setVisibleMenu(false);
+	setVisibleSaveLoad(true);
 }
 
-CL_Callback_v0 &EditorMenu::func_save_clicked()
+void EditorMenu::onLoadClicked()
 {
-	return m_saveButton.func_clicked();
+	m_action = Load;
+	m_fileNameLineEdit.set_text("");
+	m_fileNameLineEdit.set_focus();
+	setVisibleMenu(false);
+	setVisibleSaveLoad(true);
 }
 
-CL_Callback_v0 &EditorMenu::func_load_clicked()
+void EditorMenu::onExitClicked()
 {
-	return m_loadButton.func_clicked();
+	setVisible(false);
+	Gfx::Stage::popScene();
+}
+
+void EditorMenu::onOkClicked()
+{
+	CL_String fileName = m_fileNameLineEdit.get_text();
+
+	if (fileName != "")
+	{
+		fileName += ".map";
+
+		switch (m_action)
+		{
+		case Load:
+			m_editorLogic.load(fileName);
+			break;
+		case Save:
+			m_editorLogic.save(fileName);
+			break;
+		}
+	}
+
+	setVisibleMenu(true);
+	setVisibleSaveLoad(false);
+	setVisible(false);
+}
+
+void EditorMenu::onCancelClicked()
+{
+	setVisibleMenu(true);
+	setVisibleSaveLoad(false);
+}
+
+void EditorMenu::onVisibleChanged(bool visible)
+{
+	if (visible)
+	{
+		setVisibleMenu(true);
+		setVisibleSaveLoad(false);
+	}
+}
+
+void EditorMenu::setVisibleMenu(bool visible)
+{
+	m_loadButton.set_visible(visible);
+	m_saveButton.set_visible(visible);
+	m_exitButton.set_visible(visible);
+}
+
+void EditorMenu::setVisibleSaveLoad(bool visible)
+{
+	m_fileNameLineEdit.set_visible(visible);
+	m_okButton.set_visible(visible);
+	m_cancelButton.set_visible(visible);
 }
 
 

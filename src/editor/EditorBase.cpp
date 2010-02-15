@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -109,6 +109,14 @@ namespace Editor
 	bool EditorBase::isFirstKey(int p_key)
 	{
 		if (m_keys.size() > 0 && m_keys[0] == p_key)
+			return true;
+		else
+			return false;
+	}
+
+	bool EditorBase::isSecondKey(int p_key)
+	{
+		if (m_keys.size() > 1 && m_keys[1] == p_key)
 			return true;
 		else
 			return false;

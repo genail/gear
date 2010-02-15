@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -79,6 +79,8 @@ namespace Editor
 		const std::vector<int>& getKeys() const;
 
 		bool isFirstKey(int p_key);
+
+		bool isSecondKey(int p_key);
 
 		CL_Pointf m_lastMousePos;
 

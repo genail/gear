@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@
 #include <ClanLib/display.h>
 
 #include "gfx/Overlay.h"
+#include "editor/EditorLogic.h"
 
 namespace Gfx {
 
@@ -40,7 +41,13 @@ class EditorMenu : public Overlay {
 
 	public:
 
-		EditorMenu(DirectScene &p_scene);
+		enum Action
+		{
+			Save,
+			Load
+		};
+
+		EditorMenu(DirectScene &p_scene, Editor::EditorLogic& p_editorLogic);
 
 		virtual ~EditorMenu();
 
@@ -49,25 +56,52 @@ class EditorMenu : public Overlay {
 
 		virtual void draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip);
 
-
-		// callbacks
-
-		CL_Callback_v0 &func_exit_clicked();
-
-		CL_Callback_v0 &func_load_clicked();
-
-		CL_Callback_v0 &func_save_clicked();
-
 	private:
 
 		/** Background */
 		CL_RoundedRect m_bg;
+
+		// gui
 
 		CL_PushButton m_saveButton;
 
 		CL_PushButton m_loadButton;
 
 		CL_PushButton m_exitButton;
+
+		CL_PushButton m_okButton;
+
+		CL_PushButton m_cancelButton;
+
+		CL_LineEdit m_fileNameLineEdit;
+
+		CL_Label m_errorLabel;
+
+		// help variables
+
+		Editor::EditorLogic& m_editorLogic;
+
+		Action m_action;
+
+		// methods
+
+		void setVisibleMenu(bool visible);
+
+		void setVisibleSaveLoad(bool visible);
+
+		// events
+
+		void onSaveClicked();
+
+		void onLoadClicked();
+
+		void onExitClicked();
+
+		void onOkClicked();
+
+		void onCancelClicked();
+
+		void onVisibleChanged(bool visible);
 };
 
 }

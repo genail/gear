@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,6 +67,8 @@ namespace Editor
 		void drawNet(CL_GraphicContext &p_gc);
 
 		void setDefaultView();
+
+		void setScale(float set);
 
 		CL_SharedPtr<EditorTrackImpl> m_impl;
 	};

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -316,6 +316,32 @@ namespace Editor
 	void EditorPoint::onUpdate(unsigned int p_timeElapsed)
 	{
 		setMinAndMaxShiftPoint(m_impl->m_selectedIndex);
+
+		if (m_impl->m_selectedIndex >= 0 && (m_ctrl || m_alt))
+		{
+			int set = 0;
+			bool isSet = false;
+
+			if (isSecondKey(CL_KEY_ADD))
+			{
+				set = 1;
+				isSet = true;
+			}
+			else if (isSecondKey(CL_KEY_SUBTRACT))
+			{
+				set = -1;
+				isSet = true;
+			}
+
+			if (isSet)
+			{
+				if (m_alt)
+					set *= 2;
+
+				setRadius(m_impl->m_selectedIndex, set);
+				triangulate(m_impl->m_selectedIndex);
+			}
+		}
 	}
 
 	void EditorPoint::onHandleInput()
@@ -331,7 +357,7 @@ namespace Editor
 				m_impl->m_selectedIndex = m_impl->m_lightIndex = -1;
 			}
 		}
-		else if (isFirstKey(CL_KEY_DELETE))
+		else if (isFirstKey(CL_KEY_DELETE) || isFirstKey(CL_KEY_D))
 		{
 			if (m_impl->m_selectedIndex >= 0 && m_track.getPointCount() > 3)
 			{
@@ -344,7 +370,7 @@ namespace Editor
 				triangulate(m_impl->m_selectedIndex);
 			}
 		}
-		else if (isFirstKey(CL_MOUSE_MIDDLE))
+		else if (isFirstKey(CL_MOUSE_MIDDLE) || (isFirstKey(CL_KEY_CONTROL) && isSecondKey(CL_MOUSE_LEFT)))
 		{
 			int index = 0;
 

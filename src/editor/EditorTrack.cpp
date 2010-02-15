@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -100,11 +100,27 @@ namespace Editor
 		m_impl->m_lookPoint = m_track.getPoint(0).getPosition();
 	}
 
+	void EditorTrack::setScale(float set)
+	{
+		float newScale = m_viewport.getScale() + set;
+
+		if (newScale > 0.0f && newScale <= 2.0f)
+			m_viewport.setScale(newScale);
+	}
+
 	void EditorTrack::onHandleInput()
 	{
-		if (hasContainsKey(CL_KEY_SPACE))
+		if (isFirstKey(CL_KEY_SPACE))
 		{
 			setDefaultView();
+		}
+		else if (isFirstKey(CL_KEY_ADD))
+		{
+			setScale(0.1f);
+		}
+		else if (isFirstKey(CL_KEY_SUBTRACT))
+		{
+			setScale(-0.1f);
 		}
 	}
 
@@ -129,10 +145,7 @@ namespace Editor
 		{
 			float set = p_up ? 0.1f : -0.1f;
 
-			float newScale = m_viewport.getScale() + set;
-
-			if (newScale > 0.0f && newScale <= 2.0f)
-				m_viewport.setScale(newScale);
+			setScale(set);
 		}
 	}
 }

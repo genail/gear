@@ -95,7 +95,6 @@ SET(CLIENT_SRCS
 	controllers/OptionsController.cpp
 	controllers/AuthorsController.cpp
 	controllers/EditorController.cpp
-	controllers/EditorMenuController.cpp
 	debug/RaceSceneKeyBindings.cpp
 	editor/EditorManagement.cpp
 	editor/EditorTrack.cpp

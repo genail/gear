@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,9 @@ class RaceScene: public Gfx::DirectScene
 		virtual bool isNative() const { return true; }
 
 
-		void initialize(const CL_String &p_hostname="", int p_port=0);
+		void initializeOffline(const CL_String &p_level);
+
+		void initializeOnline(const CL_String &p_hostname, int p_port);
 
 		void destroy();
 
@@ -83,6 +85,11 @@ class RaceScene: public Gfx::DirectScene
 		virtual void poped();
 
 		virtual void update(unsigned p_timeElapsed);
+
+
+		// getters
+
+		const Race::RaceLogic *getLogic() const;
 
 
 	private:
@@ -157,6 +164,10 @@ class RaceScene: public Gfx::DirectScene
 		void onInputLock();
 
 		void onRaceStateChanged(int p_lapsNum);
+
+
+		// other
+		void initCommon();
 
 #if defined(RACE_SCENE_ONLY)
 		friend class Application;

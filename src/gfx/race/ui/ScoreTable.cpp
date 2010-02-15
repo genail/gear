@@ -304,7 +304,7 @@ void ScoreTable::rebuild()
 			lap = progress.getLapTime(car, lapIdx);
 			total += lap;
 
-			if ((i != 0 && lap < best) || i == 0) {
+			if ((lapIdx !=10 && lap < best) || lapIdx == 1) {
 				best = lap;
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,19 +47,23 @@ Label::Label(
 		Font p_font,
 		int p_size,
 		const CL_Colorf &p_color
-		) :
+) :
 		m_pos(p_pos),
 		m_attachPoint(AP_LEFT | AP_BOTTOM),
 		m_text(p_text),
 		m_font(p_font),
 		m_size(p_size),
-		m_color(p_color)
+		m_color(p_color),
+		m_clFont(NULL)
 {
-
+		// empty
 }
 
 Label::~Label()
 {
+	if (m_clFont) {
+		delete m_clFont;
+	}
 }
 
 void Label::draw(CL_GraphicContext &p_gc)
@@ -71,7 +75,24 @@ void Label::draw(CL_GraphicContext &p_gc)
 
 	calculateAttachPoint(s.width, s.height, ax, ay);
 
-	m_clFont.draw_text(p_gc, m_pos.x - ax, m_pos.y - ay, m_text, m_color);
+	const float x = m_pos.x - ax;
+	const float y = m_pos.y - ay - m_fontMetrics.get_descent();
+
+	m_clFont->draw_text(p_gc, x, y, m_text, m_color);
+
+#if !defined(NDEBUG) && defined(DRAW_LABEL_BOUNDS)
+	// draw label frame debug code
+	CL_Pen newPen;
+	newPen.set_line_width(1.0f);
+
+	const CL_Pen oldPen = p_gc.get_pen();
+	p_gc.set_pen(newPen);
+
+	const float y2 = y + m_fontMetrics.get_descent();
+	CL_Draw::box(p_gc, x, y2 - s.height, x + s.width, y2, CL_Colorf::red);
+
+	p_gc.set_pen(oldPen);
+#endif // !NDEBUG && DRAW_LABEL_BOUNDS
 }
 
 void Label::load(CL_GraphicContext &p_gc)
@@ -79,17 +100,23 @@ void Label::load(CL_GraphicContext &p_gc)
 	Drawable::load(p_gc);
 
 	CL_FontDescription desc;
-	desc.set_typeface_name("tahoma");
 	desc.set_height(m_size);
 
-	if (m_font == F_BOLD) {
-		desc.set_weight(100000);
+	if (m_font == F_REGULAR || m_font == F_BOLD) {
+		desc.set_typeface_name("tahoma");
+
+		if (m_font == F_BOLD) {
+			desc.set_weight(100000);
+		}
+
+		m_clFont = new CL_Font_System(p_gc, desc);
+	} else {
+		desc.set_typeface_name("resources/pixel.ttf");
+		m_clFont = new CL_Font_Freetype(p_gc, desc);
 	}
 
-	m_clFont = CL_Font_System(p_gc, desc);
-
 	// remember metrics
-	m_fontMetrics = m_clFont.get_font_metrics(p_gc);
+	m_fontMetrics = m_clFont->get_font_metrics(p_gc);
 }
 
 void Label::setColor(const CL_Colorf &p_color)
@@ -124,7 +151,7 @@ float Label::width()
 CL_Size Label::size(CL_GraphicContext &p_gc)
 {
 	assert(isLoaded());
-	return m_clFont.get_text_size(p_gc, m_text);
+	return m_clFont->get_text_size(p_gc, m_text);
 }
 
 void Label::setAttachPoint(int p_attachPoint)

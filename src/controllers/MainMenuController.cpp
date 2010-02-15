@@ -56,7 +56,7 @@ void MainMenuController::onRaceStartClicked()
 	m_scene->displayError("");
 
 	if (m_scene->getPlayerName().empty()) {
-		m_scene->displayError(_("No player's name choosen. See Options."));
+		m_scene->displayError(_("No player's name chosen. See Options."));
 		return;
 	}
 

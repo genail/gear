@@ -371,6 +371,8 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 	updateTyreStripes();
 	updateSmokes(p_timeElapsed);
 
+	m_raceUI.update(p_timeElapsed);
+
 #if !defined(NDEBUG)
 	const CL_Pointf &carPos = Game::getInstance().getPlayer().getCar().getPosition();
 	Gfx::Stage::getDebugLayer()->putMessage("car x",  cl_format("%1", carPos.x));
@@ -479,6 +481,11 @@ CL_Pointf RaceGraphics::real(const CL_Pointf &p_point) const
 float RaceGraphics::real(float p_coord) const
 {
 	return p_coord * Race::Block::WIDTH;
+}
+
+Gfx::RaceUI &RaceGraphics::getUi()
+{
+	return m_raceUI;
 }
 
 }

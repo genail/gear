@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  */
 
 #include "Time.h"
+
+#include <stdio.h>
 
 namespace Math
 {
@@ -133,6 +135,45 @@ void TimeImpl::calc() const
 	m_mil = m;
 
 	m_centi = m / CENTISECOND;
+}
+
+CL_String Time::raceFormat() const
+{
+	static const int MIN_LIMIT = 999;
+
+	// buffer for time formating
+	static const int BUF_SIZE = 11;
+	static char buf[BUF_SIZE];
+
+	int min = getMinutes();
+	int sec = getSeconds();
+	int mil = getMillis();
+
+	// do not exceed the limit
+	if (min > MIN_LIMIT) {
+		min = MIN_LIMIT;
+		sec = 99;
+		mil = 999;
+	}
+
+#if !defined(WIN32)
+	// safe snprintf()
+	snprintf(
+			buf, BUF_SIZE,
+			"%02d:%02d:%03d",
+			min, sec, mil
+	);
+
+#else // WIN32
+	// unsafe sprintf() because snprintf() is not available
+	sprintf(
+			buf,
+			"%02d:%02d:%03d",
+			min, sec, mil
+	);
+#endif // WIN32
+
+	return buf;
 }
 
 }

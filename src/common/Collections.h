@@ -48,6 +48,14 @@ class Collections
 				int p_offset = 0
 		);
 
+		// two typenames because you can want to remove const ptr
+		// from std::vector<ptr> what should be possible
+		template <typename T1, typename T2>
+		static bool remove(
+				std::vector<T1> &p_v,
+				const T2 &p_el
+		);
+
 	private:
 
 		Collections();
@@ -76,3 +84,20 @@ int Collections::index(
 	return -1;
 }
 
+template <typename T1, typename T2>
+bool Collections::remove(
+		std::vector<T1> &p_v,
+		const T2 &p_el
+)
+{
+	typedef typename std::vector<T1>::iterator TIter;
+
+	for (TIter itor = p_v.begin(); itor != p_v.end(); ++itor) {
+		if (*itor == p_el) {
+			p_v.erase(itor);
+			return true;
+		}
+	}
+
+	return false;
+}

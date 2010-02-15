@@ -29,13 +29,13 @@
 #include "RaceUI.h"
 
 #include <map>
-#include <stdio.h>
 
 #include "common/Game.h"
 #include "gfx/Stage.h"
 #include "gfx/Viewport.h"
 #include "gfx/race/ui/Label.h"
 #include "gfx/race/ui/PlayerList.h"
+#include "gfx/race/ui/ScoreTable.h"
 #include "gfx/race/ui/SpeedMeter.h"
 #include "gfx/scenes/RaceScene.h"
 #include "logic/race/Car.h"
@@ -61,6 +61,12 @@ class RaceUIImpl
 
 		/** Player list widget */
 		PlayerList m_playerList;
+
+		/** Score table */
+		ScoreTable m_scoreTable;
+
+		/** Global message label */
+		Label m_globMsgLabel;
 
 		/** Vote label */
 		Label m_voteLabel;
@@ -90,29 +96,37 @@ class RaceUIImpl
 		const Gfx::Viewport *m_viewport;
 
 
+		// slots container
+		CL_SlotContainer m_slots;
+
+
 		RaceUIImpl(
 				const Race::RaceLogic *p_logic,
 				const Gfx::Viewport *p_viewport
 		) :
 			m_playerList(p_logic),
+			m_scoreTable(p_logic),
+			m_globMsgLabel(CL_Pointf(Stage::getWidth() / 2, Stage::getHeight() / 3), "", Label::F_BOLD, 36),
 			m_voteLabel(CL_Pointf(100, 20), "", Label::F_BOLD, 20),
 			m_messageBoardLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 			m_lapLabel(CL_Pointf(Stage::getWidth() - 20, 5), "", Label::F_BOLD, 25),
 			m_lapTimesLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 			m_lapTimesLabelBold(CL_Pointf(), "", Label::F_BOLD, 14),
 			m_carLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
-			m_countdownLabel(CL_Pointf(0.0f, -15.0f), "", Label::F_BOLD, 75),
+			m_countdownLabel(CL_Pointf(0.0f, 0.0f), "", Label::F_BOLD, 75),
 			m_logic(p_logic),
 			m_viewport(p_viewport)
 		{
+			m_globMsgLabel.setAttachPoint(Label::AP_CENTER | Label::AP_BOTTOM);
 			m_playerList.setPosition(CL_Pointf(Stage::getWidth() - 200, 100));
 			m_lapLabel.setAttachPoint(Label::AP_RIGHT | Label::AP_TOP);
 			m_carLabel.setAttachPoint(Label::AP_CENTER | Label::AP_TOP);
 			m_countdownLabel.setAttachPoint(Label::AP_CENTER);
+
+			// connect signals
+			m_slots.connect(p_logic->sig_stateChanged(), this, &RaceUIImpl::onStateChanged);
 		}
 
-
-		CL_String formatTime(const Math::Time &p_time);
 
 		// draw routines
 
@@ -133,6 +147,14 @@ class RaceUIImpl
 		void drawCountdown(CL_GraphicContext &p_gc);
 
 		void drawCountdownBg(CL_GraphicContext &p_gc);
+
+		void drawGlobalMessage(CL_GraphicContext &p_gc);
+
+		void drawScoreTable(CL_GraphicContext &p_gc);
+
+
+		// state changed slot
+		void onStateChanged(Race::RaceState p_from, Race::RaceState p_to);
 };
 
 RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
@@ -146,6 +168,11 @@ RaceUI::~RaceUI()
 	// empty
 }
 
+void RaceUI::update(unsigned p_timeElapsed)
+{
+	m_impl->m_scoreTable.update(p_timeElapsed);
+}
+
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
 	m_impl->drawMeters(p_gc);
@@ -156,6 +183,8 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 	m_impl->drawCarLabels(p_gc);
 	m_impl->drawPlayerList(p_gc);
 	m_impl->drawCountdown(p_gc);
+	m_impl->drawGlobalMessage(p_gc);
+	m_impl->drawScoreTable(p_gc);
 }
 
 void RaceUIImpl::drawMeters(CL_GraphicContext &p_gc)
@@ -294,7 +323,7 @@ void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 	unsigned curr;
 
 	// display 0 time until race is started
-	if (m_logic->isRaceStarted()) {
+	if (m_logic->getRaceState() == Race::S_RUNNING) {
 		curr = pr.getLapTime(car, lap);
 	} else {
 		curr = 0;
@@ -317,7 +346,7 @@ void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 	// Lap Time
 	pos.y += Y_DELTA;
 	m_lapTimesLabel.setPosition(pos);
-	m_lapTimesLabel.setText(formatTime(tcurr));
+	m_lapTimesLabel.setText(tcurr.raceFormat());
 	m_lapTimesLabel.draw(p_gc);
 
 	// Best Time label
@@ -332,7 +361,7 @@ void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 	m_lapTimesLabel.setPosition(pos);
 
 	if (best != 0) {
-		m_lapTimesLabel.setText(formatTime(tbest));
+		m_lapTimesLabel.setText(tbest.raceFormat());
 	} else {
 		m_lapTimesLabel.setText("--:--:---");
 	}
@@ -340,30 +369,6 @@ void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 	m_lapTimesLabel.draw(p_gc);
 
 
-}
-
-CL_String RaceUIImpl::formatTime(const Math::Time &p_time)
-{
-	// buffer for time formating
-	static const int BUF_SIZE = 16;
-	static char buf[BUF_SIZE];
-
-#if !defined(WIN32)
-	snprintf(
-			buf, BUF_SIZE,
-			"%02d:%02d:%03d",
-			p_time.getMinutes(), p_time.getSeconds(), p_time.getMillis()
-	);
-
-#else // WIN32
-	sprintf(
-			buf,
-			"%02d:%02d:%03d",
-			p_time.getMinutes(), p_time.getSeconds(), p_time.getMillis()
-	);
-#endif // WIN32
-
-	return buf;
 }
 
 void RaceUIImpl::drawCarLabels(CL_GraphicContext &p_gc)
@@ -468,10 +473,26 @@ void RaceUIImpl::drawCountdownBg(CL_GraphicContext &p_gc)
 	CL_Draw::fill(p_gc, x1, y1, x2, y2, BG_COLOR);
 }
 
+void RaceUIImpl::drawGlobalMessage(CL_GraphicContext &p_gc)
+{
+	if (m_logic->getRaceState() == Race::S_FINISHED_SINGLE) {
+		m_globMsgLabel.setText(_("Race finished. Waiting for other players..."));
+		m_globMsgLabel.draw(p_gc);
+	}
+}
+
+void RaceUIImpl::drawScoreTable(CL_GraphicContext &p_gc)
+{
+	if (m_logic->getRaceState() == Race::S_FINISHED_ALL) {
+		m_scoreTable.draw(p_gc);
+	}
+}
+
 void RaceUI::load(CL_GraphicContext &p_gc)
 {
 	m_impl->m_speedMeter.load(p_gc);
 	m_impl->m_playerList.load(p_gc);
+	m_impl->m_globMsgLabel.load(p_gc);
 	m_impl->m_voteLabel.load(p_gc);
 	m_impl->m_messageBoardLabel.load(p_gc);
 	m_impl->m_lapLabel.load(p_gc);
@@ -479,12 +500,27 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 	m_impl->m_lapTimesLabelBold.load(p_gc);
 	m_impl->m_carLabel.load(p_gc);
 	m_impl->m_countdownLabel.load(p_gc);
+	m_impl->m_scoreTable.load(p_gc);
 
+}
+
+void RaceUIImpl::onStateChanged(Race::RaceState p_from, Race::RaceState p_to)
+{
+	if (p_from == Race::S_FINISHED_SINGLE && p_to == Race::S_FINISHED_ALL) {
+		// finish race action, invoke table display
+		m_scoreTable.rebuild();
+		m_scoreTable.restartAnimation();
+	}
 }
 
 SpeedMeter &RaceUI::getSpeedMeter()
 {
 	return m_impl->m_speedMeter;
+}
+
+ScoreTable &RaceUI::getScoreTable()
+{
+	return m_impl->m_scoreTable;
 }
 
 } // namespace

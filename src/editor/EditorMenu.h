@@ -63,11 +63,17 @@ class EditorMenu : public Overlay {
 
 		// gui
 
-		CL_PushButton m_saveButton;
-
 		CL_PushButton m_loadButton;
 
+		CL_PushButton m_saveButton;
+
+		CL_PushButton m_helpButton;
+
+		CL_PushButton m_testButton;
+
 		CL_PushButton m_exitButton;
+
+		CL_PushButton m_helpOkButton;
 
 		CL_PushButton m_okButton;
 
@@ -76,6 +82,10 @@ class EditorMenu : public Overlay {
 		CL_LineEdit m_fileNameLineEdit;
 
 		CL_Label m_errorLabel;
+
+		CL_Label m_helpLabel;
+
+		CL_Label m_informationLabel;
 
 		// help variables
 
@@ -89,6 +99,20 @@ class EditorMenu : public Overlay {
 
 		void setVisibleSaveLoad(bool visible);
 
+		void setVisibleHelp(bool visible);
+
+		void showMenu();
+
+		void showSaveLoad();
+
+		void showHelp();
+
+		void displayError(CL_String p_message);
+
+		void setInformationText(CL_String p_text);
+
+		void setHelpText();
+
 		// events
 
 		void onSaveClicked();
@@ -100,6 +124,12 @@ class EditorMenu : public Overlay {
 		void onOkClicked();
 
 		void onCancelClicked();
+
+		void onHelpClicked();
+
+		void onTestClicked();
+
+		void onHelpOkClicked();
 
 		void onVisibleChanged(bool visible);
 };

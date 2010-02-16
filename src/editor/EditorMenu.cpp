@@ -34,12 +34,14 @@
 namespace Gfx {
 
 const int WINDOW_WIDTH = 200;
-const int WINDOW_HEIGHT = 155;
+const int WINDOW_HEIGHT = 250;
 const float WINDOW_ROUNDNESS = 20.0f;
 const int MARGIN = 20;
 const int BUTTON_HEIGHT = 30;
 const int BUTTON_SPACE = 15;
 const int EDIT_HEIGHT = 20;
+const int ERROR_LABEL_HEIGHT = 50;
+const int LABEL_HEIGHT = 30;
 
 EditorMenu::EditorMenu(DirectScene &p_scene, Editor::EditorLogic& p_editorLogic) :
 	Overlay(
@@ -56,10 +58,15 @@ EditorMenu::EditorMenu(DirectScene &p_scene, Editor::EditorLogic& p_editorLogic)
 	m_loadButton(this),
 	m_saveButton(this),
 	m_exitButton(this),
+	m_helpOkButton(this),
 	m_okButton(this),
 	m_cancelButton(this),
+	m_helpButton(this),
+	m_testButton(this),
 	m_fileNameLineEdit(this),
 	m_errorLabel(this),
+	m_helpLabel(this),
+	m_informationLabel(this),
 	m_action()
 {
 	setVisible(false);
@@ -90,16 +97,41 @@ void EditorMenu::load(CL_GraphicContext &p_gc)
 
 	y += BUTTON_HEIGHT + BUTTON_SPACE;
 
+	m_helpButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
+	m_helpButton.set_text(_("Help"));
+	m_helpButton.func_clicked().set(this, &EditorMenu::onHelpClicked);
+
+
+	y += BUTTON_HEIGHT + BUTTON_SPACE;
+
+	m_testButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
+	m_testButton.set_text(_("Test"));
+	m_testButton.func_clicked().set(this, &EditorMenu::onTestClicked);
+
+
+	y += BUTTON_HEIGHT + BUTTON_SPACE;
+
 	m_exitButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
 	m_exitButton.set_text(_("Exit"));
 	m_exitButton.func_clicked().set(this, &EditorMenu::onExitClicked);
 
 
 	y = MARGIN;
+
+	m_informationLabel.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + LABEL_HEIGHT));
+	m_informationLabel.set_alignment(CL_Label::align_center);
+
+
+	y += LABEL_HEIGHT + MARGIN;
 	int x1 = MARGIN;
 	int x2 = WINDOW_WIDTH - MARGIN;
 
 	m_fileNameLineEdit.set_geometry(CL_Rect(x1, y, x2, y + EDIT_HEIGHT));
+
+
+	y += EDIT_HEIGHT + MARGIN;
+
+	m_errorLabel.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + ERROR_LABEL_HEIGHT));
 
 
 	y = WINDOW_HEIGHT - (2 * BUTTON_HEIGHT + BUTTON_SPACE + MARGIN);
@@ -116,14 +148,28 @@ void EditorMenu::load(CL_GraphicContext &p_gc)
 	m_cancelButton.func_clicked().set(this, &EditorMenu::onCancelClicked);
 
 
+	int y1 = MARGIN;
+	int y2 = WINDOW_HEIGHT - (2 * MARGIN + BUTTON_HEIGHT);
+	x1 = MARGIN;
+	x2 = WINDOW_WIDTH - MARGIN;
 
-	setVisibleMenu(true);
-	setVisibleSaveLoad(false);
+	m_helpLabel.set_geometry(CL_Rect(x1, y1, x2, y2));
+	setHelpText();
+
+
+	y = WINDOW_HEIGHT - (MARGIN + BUTTON_HEIGHT);
+	
+	m_helpOkButton.set_geometry(CL_Rect(MARGIN, y, WINDOW_WIDTH - MARGIN, y + BUTTON_HEIGHT));
+	m_helpOkButton.set_text(_("OK"));
+	m_helpOkButton.func_clicked().set(this, &EditorMenu::onHelpOkClicked);
+
+
+	showMenu();
 }
 
 void EditorMenu::draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
 {
-	static const CL_Colorf FILL_COLOR(1.0f, 1.0f, 1.0f, 0.8f);
+	static const CL_Colorf FILL_COLOR(1.0f, 1.0f, 1.0f, 0.9f);
 	static const CL_Pointf ZERO_POINT(0, 0);
 
 	m_bg.fill(p_gc, ZERO_POINT, FILL_COLOR);
@@ -132,19 +178,21 @@ void EditorMenu::draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
 void EditorMenu::onSaveClicked()
 {
 	m_action = Save;
+	displayError("");
+	setInformationText(_("Save"));
 	m_fileNameLineEdit.set_text("");
 	m_fileNameLineEdit.set_focus();
-	setVisibleMenu(false);
-	setVisibleSaveLoad(true);
+	showSaveLoad();
 }
 
 void EditorMenu::onLoadClicked()
 {
 	m_action = Load;
+	displayError("");
+	setInformationText(_("Load"));
 	m_fileNameLineEdit.set_text("");
 	m_fileNameLineEdit.set_focus();
-	setVisibleMenu(false);
-	setVisibleSaveLoad(true);
+	showSaveLoad();
 }
 
 void EditorMenu::onExitClicked()
@@ -164,32 +212,78 @@ void EditorMenu::onOkClicked()
 		switch (m_action)
 		{
 		case Load:
-			m_editorLogic.load(fileName);
+			if (!m_editorLogic.load(fileName))
+				displayError("Cannot load map " + fileName);
+			else
+				displayError("Map " + fileName + " load");
 			break;
 		case Save:
 			m_editorLogic.save(fileName);
+			displayError("Map " + fileName + " saved");
 			break;
 		}
 	}
-
-	setVisibleMenu(true);
-	setVisibleSaveLoad(false);
-	setVisible(false);
 }
 
 void EditorMenu::onCancelClicked()
 {
-	setVisibleMenu(true);
-	setVisibleSaveLoad(false);
+	showMenu();
+}
+
+void EditorMenu::onHelpClicked()
+{
+	showHelp();
+}
+
+void EditorMenu::onTestClicked()
+{
+
+}
+
+void EditorMenu::onHelpOkClicked()
+{
+	showMenu();
 }
 
 void EditorMenu::onVisibleChanged(bool visible)
 {
 	if (visible)
 	{
-		setVisibleMenu(true);
-		setVisibleSaveLoad(false);
+		showMenu();
 	}
+}
+
+void EditorMenu::displayError(CL_String p_message)
+{
+	CL_Font font(get_gc(), "helvetica", 14);
+	CL_SpanLayout span;
+	span.add_text(p_message, font, CL_Colorf::red);
+	m_errorLabel.set_span(span);
+}
+
+void EditorMenu::setInformationText(CL_String p_text)
+{
+	CL_Font font(get_gc(), "helvetica", 30);
+	CL_SpanLayout span;
+	span.add_text(p_text, font, CL_Colorf::black);
+	m_informationLabel.set_span(span);
+}
+
+void EditorMenu::setHelpText()
+{
+	CL_String text = "";
+	text += "Add point:\n";
+	text += "Ctrl + Left Mouse or Middle Mouse\n";
+	text += "Change radius:\n";
+	text += "Ctrl +: Mouse Roll or '+','-'\n";
+	text += "Change shift:\n";
+	text += "Shift\n";
+	text += "Change scale:\n";
+	text += "Mouse Roll or '+','-'\n";
+	text += "Delete point:\n";
+	text += "Delete or D\n";
+
+	m_helpLabel.set_text(text);
 }
 
 void EditorMenu::setVisibleMenu(bool visible)
@@ -197,6 +291,8 @@ void EditorMenu::setVisibleMenu(bool visible)
 	m_loadButton.set_visible(visible);
 	m_saveButton.set_visible(visible);
 	m_exitButton.set_visible(visible);
+	m_testButton.set_visible(visible);
+	m_helpButton.set_visible(visible);
 }
 
 void EditorMenu::setVisibleSaveLoad(bool visible)
@@ -204,6 +300,35 @@ void EditorMenu::setVisibleSaveLoad(bool visible)
 	m_fileNameLineEdit.set_visible(visible);
 	m_okButton.set_visible(visible);
 	m_cancelButton.set_visible(visible);
+	m_errorLabel.set_visible(visible);
+	m_informationLabel.set_visible(visible);
+}
+
+void EditorMenu::setVisibleHelp(bool visible)
+{
+	m_helpLabel.set_visible(visible);
+	m_helpOkButton.set_visible(visible);
+}
+
+void EditorMenu::showMenu()
+{
+	setVisibleMenu(true);
+	setVisibleSaveLoad(false);
+	setVisibleHelp(false);
+}
+
+void EditorMenu::showSaveLoad()
+{
+	setVisibleMenu(false);
+	setVisibleSaveLoad(true);
+	setVisibleHelp(false);
+}
+
+void EditorMenu::showHelp()
+{
+	setVisibleMenu(false);
+	setVisibleSaveLoad(false);
+	setVisibleHelp(true);
 }
 
 

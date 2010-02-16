@@ -54,7 +54,7 @@ namespace Editor
 			m_raceLevel(),
 			m_gfxLevel(m_raceLevel, m_viewport),
 			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
-			m_editorLogic(m_raceLevel),
+			m_editorLogic(m_raceLevel, m_gfxLevel, m_track, m_viewport),
 			m_editorMenu(p_directScene, m_editorLogic),
 			m_editorPoint(m_raceLevel, m_gfxLevel, m_track, m_viewport),
 			m_editors()

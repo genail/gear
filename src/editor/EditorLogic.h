@@ -32,7 +32,10 @@
 
 #include "EditorHelper.h"
 
+#include "gfx/race/level/Level.h"
 #include "logic/race/level/Level.h"
+#include "logic/race/level/Track.h"
+#include "gfx/Viewport.h"
 
 namespace Editor
 {
@@ -41,13 +44,13 @@ namespace Editor
 	class EditorLogic
 	{
 	public:
-		EditorLogic(Race::Level& p_raceLevel);
+		EditorLogic(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport);
 
 		~EditorLogic();
 
 		void save(const CL_String& p_fileName);
 
-		void load(const CL_String& p_fileName);
+		bool load(const CL_String& p_fileName);
 
 	private:
 		CL_SharedPtr<EditorLogicImpl> m_impl;

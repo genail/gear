@@ -35,8 +35,11 @@ namespace Editor
 	class EditorLogicImpl
 	{
 	public:
-		EditorLogicImpl(Race::Level& p_raceLevel) :
-			m_raceLevel(p_raceLevel)
+		EditorLogicImpl(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport) :
+			m_raceLevel(p_raceLevel),
+			m_gfxLevel(p_gfxLevel),
+			m_track(p_track),
+			m_viewport(p_viewport)
 		{
 
 		}
@@ -46,11 +49,19 @@ namespace Editor
 
 		}
 
+		// editor variables
+
 		Race::Level& m_raceLevel;
+		
+		Gfx::Level& m_gfxLevel;
+
+		Race::Track& m_track;
+
+		Gfx::Viewport& m_viewport;
 	};
 
-	EditorLogic::EditorLogic(Race::Level &p_raceLevel) : 
-		m_impl(new EditorLogicImpl(p_raceLevel))
+	EditorLogic::EditorLogic(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport) : 
+		m_impl(new EditorLogicImpl(p_raceLevel, p_gfxLevel, p_track, p_viewport))
 	{
 
 	}
@@ -65,8 +76,13 @@ namespace Editor
 		m_impl->m_raceLevel.save(p_fileName);
 	}
 
-	void EditorLogic::load(const CL_String& p_fileName)
+	bool EditorLogic::load(const CL_String& p_fileName)
 	{
+		m_impl->m_raceLevel = Race::Level();
+		m_impl->m_raceLevel.setTrack(m_impl->m_track);
+
 		m_impl->m_raceLevel.load(p_fileName);
+
+		return m_impl->m_raceLevel.isLoaded();
 	}
 }

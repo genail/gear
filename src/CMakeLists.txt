@@ -122,6 +122,7 @@ SET(CLIENT_SRCS
 	gfx/race/ui/GameMenu.cpp
 	gfx/race/ui/PlayerList.cpp
 	gfx/race/ui/RaceUI.cpp
+	gfx/race/ui/ScoreTable.cpp
 	gfx/race/ui/SpeedMeter.cpp
 	gfx/scenes/AuthorsScene.cpp
 	gfx/scenes/EditorScene.cpp

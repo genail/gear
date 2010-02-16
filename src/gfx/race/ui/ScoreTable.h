@@ -12,7 +12,7 @@
  *     * Neither the name of the <organization> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -30,80 +30,52 @@
 
 #include <ClanLib/core.h>
 
-#include "common.h"
 #include "gfx/Drawable.h"
 
-namespace Gfx {
+namespace Race
+{
+	class RaceLogic;
+}
 
-class Label: public Gfx::Drawable {
+namespace Gfx
+{
 
+class ScoreTableImpl;
+
+class ScoreTable : public Gfx::Drawable
+{
 	public:
 
-		static const int AP_LEFT;
-		static const int AP_TOP;
-		static const int AP_RIGHT;
-		static const int AP_BOTTOM;
-		static const int AP_CENTER;
+		ScoreTable(const Race::RaceLogic *p_logic);
 
-		enum Font {
-			F_REGULAR,
-			F_BOLD,
-			F_PIXEL
-		};
+		virtual ~ScoreTable();
 
-		Label(
-				const CL_Pointf &p_pos,
-				const CL_String &p_text,
-				Font p_font = F_REGULAR,
-				int p_size = 14,
-				const CL_Colorf &p_color = CL_Colorf::white
-				);
 
-		virtual ~Label();
-
+		// inherited from Gfx::Drawable
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);
 
 
-		/** Calculates height of this label in pixels */
-		float height();
+		// animation
 
-		/** Calculates width of this label in pixels */
-		DEPRECATED(float width());
+		/** Starts the entry animation */
+		void restartAnimation();
 
-		CL_Size size(CL_GraphicContext &p_gc);
+		/** Go forward with animation */
+		void update(unsigned p_timeElapsed);
 
 
-		void setAttachPoint(int p_attachPoint);
+		/** Rebuilds the score table data based on current progress. */
+		void rebuild();
 
-		void setColor(const CL_Colorf &p_color);
-
-		void setPosition(const CL_Pointf &p_pos);
-
-		void setText(const CL_String &p_text);
 
 	private:
 
-		CL_Pointf m_pos;
+		CL_SharedPtr<ScoreTableImpl> m_impl;
 
-		int m_attachPoint;
+}; // class
 
-		CL_String m_text;
-
-		const Font m_font;
-
-		const int m_size;
-
-		CL_Colorf m_color;
-
-		CL_Font *m_clFont;
-
-		CL_FontMetrics m_fontMetrics;
-
-		void calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y);
-};
-
-}
+} // namespace
 

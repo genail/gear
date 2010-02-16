@@ -116,7 +116,7 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 
 	// make sure that car is not locked when race is started
 	Race::Car &car = m_localPlayer.getCar();
-	if (isRaceStarted() && car.isLocked()) {
+	if (getRaceState() == S_RUNNING && car.isLocked()) {
 		car.setLocked(false);
 
 		display(_("*** START! ***"));
@@ -274,6 +274,7 @@ void OnlineRaceLogic::onRaceStart(
 
 	m_client->sendCarState(carState);
 
+	// FIXME: where to store lap count?
 	startRace(3, CL_System::get_time() + RACE_START_DELAY);
 }
 

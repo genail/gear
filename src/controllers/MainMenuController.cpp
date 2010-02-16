@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@ void MainMenuController::onRaceStartClicked()
 	m_scene->displayError("");
 
 	if (m_scene->getPlayerName().empty()) {
-		m_scene->displayError(_("No player's name choosen. See Options."));
+		m_scene->displayError(_("No player's name chosen. See Options."));
 		return;
 	}
 
@@ -83,10 +83,11 @@ void MainMenuController::onRaceStartClicked()
 		const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
 
 		// online initialization
-		m_raceScene->initialize(serverAddr, serverPort);
+		m_raceScene->initializeOnline(serverAddr, serverPort);
 	} else {
 		// offline initialization
-		m_raceScene->initialize();
+		// FIXME: which level load when playing offline?
+		m_raceScene->initializeOffline("levels/level2.0.xml");
 	}
 
 #if !defined(RACE_SCENE_ONLY)

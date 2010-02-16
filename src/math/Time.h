@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ class Time
 
 		virtual ~Time();
 
+
 		unsigned get() const;
 
 		int getCenti() const;
@@ -54,6 +55,24 @@ class Time
 		int getMillis() const;
 
 		int getMinutes() const;
+
+		/**
+		 * Formats time to race format:
+		 * <p>
+		 * <code>(M)MM:SS:mmm</code>
+		 * <p>
+		 * Where M - minutes, S - seconds, m - milliseconds. The leading
+		 * (M) means that this is optional character.
+		 * <p>
+		 * Result string length may vary from 9 characters (when time is
+		 * below 100 minutes) to 10 characters (when time is above 100 minutes).
+		 * It's not possible to display time above 999:99:99. When this limit
+		 * is reached then any value above this will be displayed as the limit
+		 * value.
+		 *
+		 * @return Race-formated time string.
+		 */
+		CL_String raceFormat() const;
 
 
 	private:

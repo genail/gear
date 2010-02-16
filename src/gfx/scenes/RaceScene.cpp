@@ -42,6 +42,7 @@
 #include "network/client/Client.h"
 #include "gfx/race/RaceGraphics.h"
 #include "gfx/race/level/Bound.h"
+#include "gfx/race/ui/ScoreTable.h"
 #include "debug/RaceSceneKeyBindings.h"
 
 
@@ -62,22 +63,32 @@ RaceScene::RaceScene(CL_GUIComponent &p_parent) :
 RaceScene::~RaceScene() {
 }
 
-void RaceScene::initialize(const CL_String &p_hostname, int p_port)
+void RaceScene::initializeOffline(const CL_String &p_level)
 {
 	if (!m_initialized) {
-		if (p_hostname == "") {
-			// FIXME: let user to choose the level
-			m_logic = new Race::OfflineRaceLogic("levels/level2.0.xml");
-		} else {
-			m_logic = new Race::OnlineRaceLogic(p_hostname, p_port);
-		}
+		m_logic = new Race::OfflineRaceLogic(p_level);
+		initCommon();
+	}
+}
 
-		m_logic->initialize();
-		m_graphics = new Gfx::RaceGraphics(m_logic);
+void RaceScene::initializeOnline(const CL_String &p_hostname, int p_port)
+{
+	G_ASSERT(p_hostname.length() > 0);
+	G_ASSERT(p_port > 0 && p_port <= 0xFFFF);
 
-		m_initialized = true;
+	if (!m_initialized) {
+		m_logic = new Race::OnlineRaceLogic(p_hostname, p_port);
+		initCommon();
 	}
 
+}
+
+void RaceScene::initCommon()
+{
+	m_logic->initialize();
+	m_graphics = new Gfx::RaceGraphics(m_logic);
+
+	m_initialized = true;
 }
 
 void RaceScene::destroy()
@@ -187,6 +198,10 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 			if (pressed && m_logic->isVoteRunning()) {
 				m_logic->voteNo();
 			}
+		case CL_KEY_TAB:
+			if (pressed) {
+				m_graphics->getUi().getScoreTable().restartAnimation();
+			}
 			break;
 #if !defined(NDEBUG)
 		case CL_KEY_R:
@@ -233,5 +248,10 @@ void RaceScene::onInputLock()
 	G_ASSERT(m_initialized);
 
 	m_inputLock = true;
+}
+
+const Race::RaceLogic *RaceScene::getLogic() const
+{
+	return m_logic;
 }
 

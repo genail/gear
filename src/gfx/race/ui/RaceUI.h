@@ -43,6 +43,7 @@ namespace Race {
 namespace Gfx {
 
 class RaceUIImpl;
+class ScoreTable;
 class SpeedMeter;
 class Viewport;
 
@@ -54,9 +55,16 @@ class RaceUI: public Gfx::Drawable {
 
 		virtual ~RaceUI();
 
+
 		virtual void draw(CL_GraphicContext &p_gc);
 
 		virtual void load(CL_GraphicContext &p_gc);
+
+
+		void update(unsigned p_timeElapsed);
+
+
+		ScoreTable &getScoreTable();
 
 		SpeedMeter &getSpeedMeter();
 

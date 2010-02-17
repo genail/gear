@@ -31,7 +31,8 @@
 using namespace Race;
 using namespace Gfx;
 
-const int NET_LINE_MARGIN = 100;
+const int NET_LINE_MARGIN = 300;
+const float DEFAULT_SCALE = 0.4f;
 
 namespace Editor
 {
@@ -39,7 +40,7 @@ namespace Editor
 	{
 	public:
 		EditorTrackImpl() : 
-			m_lookPoint(400.0f, 300.0f),
+			m_lookPoint(650.0f, 550.0f),
 			m_netLineColor(CL_Colorf::white)
 		{
 
@@ -62,6 +63,7 @@ namespace Editor
 		EditorBase(p_raceLevel, p_gfxLevel, p_track, p_viewport)
 	{
 		m_viewport.attachTo(&m_impl->m_lookPoint);
+		m_viewport.setScale(DEFAULT_SCALE);
 	}
 
 	EditorTrack::~EditorTrack()
@@ -96,7 +98,7 @@ namespace Editor
 
 	void EditorTrack::setDefaultView()
 	{
-		m_viewport.setScale(1.0f);
+		m_viewport.setScale(DEFAULT_SCALE);
 		m_impl->m_lookPoint = m_track.getPoint(0).getPosition();
 	}
 
@@ -104,7 +106,7 @@ namespace Editor
 	{
 		float newScale = m_viewport.getScale() + set;
 
-		if (newScale > 0.0f && newScale <= 2.0f)
+		if (newScale > 0.01f && newScale <= 1.0f)
 			m_viewport.setScale(newScale);
 	}
 

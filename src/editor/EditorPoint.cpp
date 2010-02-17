@@ -34,7 +34,7 @@ using namespace Gfx;
 const int POINT_WIDTH = 5;
 const int PAINT_LINE_WIDTH = 2;
 
-const float DEFAULT_RADIUS = 60.0f;
+const float DEFAULT_RADIUS = 150.0f;
 const float DEFAULT_SHIFT = 0.0f;
 
 namespace Editor
@@ -109,9 +109,9 @@ namespace Editor
 		m_track.clear();
 
 		m_track.addPoint(CL_Pointf(150.0f, 150.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
-		m_track.addPoint(CL_Pointf(600.0f, 120.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
-		m_track.addPoint(CL_Pointf(600.0f, 400.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
-		m_track.addPoint(CL_Pointf(200.0f, 450.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
+		m_track.addPoint(CL_Pointf(1200.0f, 120.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
+		m_track.addPoint(CL_Pointf(1300.0f, 800.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
+		m_track.addPoint(CL_Pointf(200.0f, 950.0f), DEFAULT_RADIUS, DEFAULT_SHIFT);
 
 		m_gfxLevel.getTrackTriangulator().triangulate(m_track);
 	}

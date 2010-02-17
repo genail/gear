@@ -46,6 +46,10 @@ namespace Gfx {
 	class RaceGraphics;
 }
 
+namespace Race {
+	class Level;
+}
+
 #if defined(RACE_SCENE_ONLY)
 
 class RaceScene
@@ -68,6 +72,8 @@ class RaceScene: public Gfx::DirectScene
 
 
 		void initializeOffline(const CL_String &p_level);
+
+		void initializeOffline(const Race::Level &p_level);
 
 		void initializeOnline(const CL_String &p_hostname, int p_port);
 

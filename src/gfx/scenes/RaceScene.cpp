@@ -71,6 +71,14 @@ void RaceScene::initializeOffline(const CL_String &p_level)
 	}
 }
 
+void RaceScene::initializeOffline(const Race::Level &p_level)
+{
+	if (!m_initialized) {
+		m_logic = new Race::OfflineRaceLogic(p_level);
+		initCommon();
+	}
+}
+
 void RaceScene::initializeOnline(const CL_String &p_hostname, int p_port)
 {
 	G_ASSERT(p_hostname.length() > 0);

@@ -31,12 +31,22 @@
 #include "common.h"
 #include "common/Game.h"
 #include "logic/race/Progress.h"
+#include "logic/race/level/Level.h"
 
 namespace Race {
 
 OfflineRaceLogic::OfflineRaceLogic(const CL_String &p_levelName) :
-	m_levelName(p_levelName)
+	m_levelName(p_levelName),
+	m_levelOwner(true)
 {
+	G_ASSERT(!p_levelName.empty());
+}
+
+OfflineRaceLogic::OfflineRaceLogic(const Race::Level &p_level) :
+		RaceLogic(p_level),
+		m_levelOwner(false)
+{
+	// empty
 }
 
 OfflineRaceLogic::~OfflineRaceLogic()
@@ -48,8 +58,10 @@ void OfflineRaceLogic::initialize()
 {
 	Level &level = getLevel();
 
-	level.initialize();
-	level.load(m_levelName);
+	if (m_levelOwner) {
+		level.initialize();
+		level.load(m_levelName);
+	}
 
 	// init progress object
 	Progress &prog = getProgress();
@@ -74,7 +86,10 @@ void OfflineRaceLogic::initialize()
 void OfflineRaceLogic::destroy()
 {
 	getProgress().destroy();
-	getLevel().destroy();
+
+	if (m_levelOwner) {
+		getLevel().destroy();
+	}
 }
 
 }

@@ -35,11 +35,12 @@ namespace Editor
 	class EditorLogicImpl
 	{
 	public:
-		EditorLogicImpl(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport) :
+		EditorLogicImpl(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport, RaceScene& p_raceScene) :
 			m_raceLevel(p_raceLevel),
 			m_gfxLevel(p_gfxLevel),
 			m_track(p_track),
-			m_viewport(p_viewport)
+			m_viewport(p_viewport),
+			m_raceScene(p_raceScene)
 		{
 
 		}
@@ -58,10 +59,12 @@ namespace Editor
 		Race::Track& m_track;
 
 		Gfx::Viewport& m_viewport;
+
+		RaceScene& m_raceScene;
 	};
 
-	EditorLogic::EditorLogic(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport) : 
-		m_impl(new EditorLogicImpl(p_raceLevel, p_gfxLevel, p_track, p_viewport))
+	EditorLogic::EditorLogic(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport, RaceScene& p_raceScene) : 
+		m_impl(new EditorLogicImpl(p_raceLevel, p_gfxLevel, p_track, p_viewport, p_raceScene))
 	{
 
 	}
@@ -79,10 +82,22 @@ namespace Editor
 	bool EditorLogic::load(const CL_String& p_fileName)
 	{
 		m_impl->m_raceLevel = Race::Level();
-		m_impl->m_raceLevel.setTrack(m_impl->m_track);
+		m_impl->m_track = m_impl->m_raceLevel.getTrack();
 
 		m_impl->m_raceLevel.load(p_fileName);
 
 		return m_impl->m_raceLevel.isLoaded();
+	}
+
+	void EditorLogic::startTest()
+	{
+		// bercik, 17 luty:
+		// zamieniæ metodê inicjalizacyjn¹ na przyjmuj¹c¹ trasê i usun¹æ zapisywanie tymczasowe trasy do pliku tmp.map
+
+		m_impl->m_raceLevel.save("tmp.map");
+
+		m_impl->m_raceScene.initializeOffline("tmp.map");
+
+		Gfx::Stage::pushScene(&m_impl->m_raceScene);
 	}
 }

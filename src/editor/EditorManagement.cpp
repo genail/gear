@@ -40,6 +40,8 @@
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Track.h"
 
+#include "gfx/scenes/RaceScene.h"
+
 using namespace Gfx;
 using namespace Race;
 
@@ -54,7 +56,8 @@ namespace Editor
 			m_raceLevel(),
 			m_gfxLevel(m_raceLevel, m_viewport),
 			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
-			m_editorLogic(m_raceLevel, m_gfxLevel, m_track, m_viewport),
+			m_raceScene(new RaceScene(p_directScene.getParentComponent())),
+			m_editorLogic(m_raceLevel, m_gfxLevel, m_track, m_viewport, *m_raceScene),
 			m_editorMenu(p_directScene, m_editorLogic),
 			m_editorPoint(m_raceLevel, m_gfxLevel, m_track, m_viewport),
 			m_editors()
@@ -67,7 +70,7 @@ namespace Editor
 
 		~EditorManagementImpl()
 		{
-
+			delete m_raceScene;
 		}
 
 		// track
@@ -79,6 +82,10 @@ namespace Editor
 		Race::Level m_raceLevel;
 
 		Gfx::Level m_gfxLevel;
+
+		// race scene
+
+		RaceScene* m_raceScene;
 
 		// editor variables
 

@@ -237,7 +237,8 @@ void EditorMenu::onHelpClicked()
 
 void EditorMenu::onTestClicked()
 {
-
+	setVisible(false);
+	m_editorLogic.startTest();
 }
 
 void EditorMenu::onHelpOkClicked()
@@ -273,15 +274,17 @@ void EditorMenu::setHelpText()
 {
 	CL_String text = "";
 	text += "Add point:\n";
-	text += "Ctrl + Left Mouse or Middle Mouse\n";
-	text += "Change radius:\n";
-	text += "Ctrl +: Mouse Roll or '+','-'\n";
-	text += "Change shift:\n";
-	text += "Shift\n";
-	text += "Change scale:\n";
-	text += "Mouse Roll or '+','-'\n";
+	text += "CTRL + LEFT MOUSE or MIDDLE MOUSE\n";
 	text += "Delete point:\n";
-	text += "Delete or D\n";
+	text += "DELETE or D\n";
+	text += "Change radius:\n";
+	text += "CTRL + MOUSE ROLL\\'+','-'\n";
+	text += "Change shift:\n";
+	text += "SHIFT\n";
+	text += "Change scale:\n";
+	text += "MOUSE ROLL or '+','-'\n";
+	text += "Go to start line:\n";
+	text += "SPACE";
 
 	m_helpLabel.set_text(text);
 }

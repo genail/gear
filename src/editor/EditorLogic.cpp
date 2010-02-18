@@ -35,7 +35,7 @@ namespace Editor
 	class EditorLogicImpl
 	{
 	public:
-		EditorLogicImpl(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport, RaceScene& p_raceScene) :
+		EditorLogicImpl(Race::Level& p_raceLevel, Gfx::Level* p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport, RaceScene& p_raceScene) :
 			m_raceLevel(p_raceLevel),
 			m_gfxLevel(p_gfxLevel),
 			m_track(p_track),
@@ -54,7 +54,7 @@ namespace Editor
 
 		Race::Level& m_raceLevel;
 		
-		Gfx::Level& m_gfxLevel;
+		Gfx::Level* m_gfxLevel;
 
 		Race::Track& m_track;
 
@@ -63,7 +63,7 @@ namespace Editor
 		RaceScene& m_raceScene;
 	};
 
-	EditorLogic::EditorLogic(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport, RaceScene& p_raceScene) : 
+	EditorLogic::EditorLogic(Race::Level& p_raceLevel, Gfx::Level* p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport, RaceScene& p_raceScene) : 
 		m_impl(new EditorLogicImpl(p_raceLevel, p_gfxLevel, p_track, p_viewport, p_raceScene))
 	{
 
@@ -89,6 +89,8 @@ namespace Editor
 			m_impl->m_raceLevel = newLevel;
 
 			m_impl->m_track = m_impl->m_raceLevel.getTrack();
+
+			m_impl->m_gfxLevel = new Gfx::Level(m_impl->m_raceLevel, m_impl->m_viewport);
 
 			return true;
 		}

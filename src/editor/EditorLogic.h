@@ -47,7 +47,7 @@ namespace Editor
 	class EditorLogic
 	{
 	public:
-		EditorLogic(Race::Level& p_raceLevel, Gfx::Level& p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport, RaceScene& p_raceScene);
+		EditorLogic(Race::Level& p_raceLevel, Gfx::Level* p_gfxLevel, Race::Track& p_track, Gfx::Viewport& p_viewport, RaceScene& p_raceScene);
 
 		~EditorLogic();
 

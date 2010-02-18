@@ -93,6 +93,11 @@ class EditorMenu : public Overlay {
 
 		Action m_action;
 
+		// colors
+
+		CL_Colorf m_errorColor;
+		CL_Colorf m_messageColor;
+
 		// methods
 
 		void setVisibleMenu(bool visible);

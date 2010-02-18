@@ -43,9 +43,6 @@ const int EDIT_HEIGHT = 20;
 const int ERROR_LABEL_HEIGHT = 50;
 const int LABEL_HEIGHT = 30;
 
-const CL_Colorf ERROR_COLOR = CL_Colorf::red;
-const CL_Colorf MESSAGE_COLOR = CL_Colorf::green;
-
 EditorMenu::EditorMenu(DirectScene &p_scene, Editor::EditorLogic& p_editorLogic) :
 	Overlay(
 			p_scene,
@@ -70,7 +67,9 @@ EditorMenu::EditorMenu(DirectScene &p_scene, Editor::EditorLogic& p_editorLogic)
 	m_errorLabel(this),
 	m_helpLabel(this),
 	m_informationLabel(this),
-	m_action()
+	m_action(),
+	m_errorColor(CL_Colorf::red),
+	m_messageColor(CL_Colorf::green)
 {
 	setVisible(false);
 
@@ -181,7 +180,7 @@ void EditorMenu::draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
 void EditorMenu::onSaveClicked()
 {
 	m_action = Save;
-	displayError("", MESSAGE_COLOR);
+	displayError("", m_messageColor);
 	setInformationText(_("Save"));
 	m_fileNameLineEdit.set_text("");
 	m_fileNameLineEdit.set_focus();
@@ -191,7 +190,7 @@ void EditorMenu::onSaveClicked()
 void EditorMenu::onLoadClicked()
 {
 	m_action = Load;
-	displayError("", MESSAGE_COLOR);
+	displayError("", m_messageColor);
 	setInformationText(_("Load"));
 	m_fileNameLineEdit.set_text("");
 	m_fileNameLineEdit.set_focus();
@@ -216,13 +215,13 @@ void EditorMenu::onOkClicked()
 		{
 		case Load:
 			if (!m_editorLogic.load(fileName))
-				displayError("Cannot load map " + fileName, ERROR_COLOR);
+				displayError("Cannot load map " + fileName, m_errorColor);
 			else
-				displayError("Map " + fileName + " load", MESSAGE_COLOR);
+				displayError("Map " + fileName + " load", m_messageColor);
 			break;
 		case Save:
 			m_editorLogic.save(fileName);
-			displayError("Map " + fileName + " saved", MESSAGE_COLOR);
+			displayError("Map " + fileName + " saved", m_messageColor);
 			break;
 		}
 	}

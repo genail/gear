@@ -81,22 +81,26 @@ namespace Editor
 
 	bool EditorLogic::load(const CL_String& p_fileName)
 	{
-		m_impl->m_raceLevel = Race::Level();
-		m_impl->m_track = m_impl->m_raceLevel.getTrack();
+		Race::Level newLevel = Race::Level();
+		newLevel.load(p_fileName);
 
-		m_impl->m_raceLevel.load(p_fileName);
+		if (newLevel.isLoaded())
+		{
+			m_impl->m_raceLevel = newLevel;
 
-		return m_impl->m_raceLevel.isLoaded();
+			m_impl->m_track = m_impl->m_raceLevel.getTrack();
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	void EditorLogic::startTest()
 	{
-		// bercik, 17 luty:
-		// zamieniæ metodê inicjalizacyjn¹ na przyjmuj¹c¹ trasê i usun¹æ zapisywanie tymczasowe trasy do pliku tmp.map
-
-		m_impl->m_raceLevel.save("tmp.map");
-
-		m_impl->m_raceScene.initializeOffline("tmp.map");
+		m_impl->m_raceScene.initializeOffline(m_impl->m_raceLevel);
 
 		Gfx::Stage::pushScene(&m_impl->m_raceScene);
 	}

@@ -107,7 +107,7 @@ class EditorMenu : public Overlay {
 
 		void showHelp();
 
-		void displayError(CL_String p_message);
+		void displayError(CL_String p_message, CL_Colorf p_color);
 
 		void setInformationText(CL_String p_text);
 

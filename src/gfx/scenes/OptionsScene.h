@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ class OptionScene : public Gfx::GuiScene
 		
 		void addResolution(int p_width, int p_height);
 
-		const CL_String& getPlayersName() const;
+		CL_String getPlayersName() const;
 
 		int getResolutionWidth() const;
 

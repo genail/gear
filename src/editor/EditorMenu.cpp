@@ -43,6 +43,9 @@ const int EDIT_HEIGHT = 20;
 const int ERROR_LABEL_HEIGHT = 50;
 const int LABEL_HEIGHT = 30;
 
+const CL_Colorf ERROR_COLOR = CL_Colorf::red;
+const CL_Colorf MESSAGE_COLOR = CL_Colorf::green;
+
 EditorMenu::EditorMenu(DirectScene &p_scene, Editor::EditorLogic& p_editorLogic) :
 	Overlay(
 			p_scene,
@@ -178,7 +181,7 @@ void EditorMenu::draw(CL_GraphicContext &p_gc, const CL_Rect &p_clip)
 void EditorMenu::onSaveClicked()
 {
 	m_action = Save;
-	displayError("");
+	displayError("", MESSAGE_COLOR);
 	setInformationText(_("Save"));
 	m_fileNameLineEdit.set_text("");
 	m_fileNameLineEdit.set_focus();
@@ -188,7 +191,7 @@ void EditorMenu::onSaveClicked()
 void EditorMenu::onLoadClicked()
 {
 	m_action = Load;
-	displayError("");
+	displayError("", MESSAGE_COLOR);
 	setInformationText(_("Load"));
 	m_fileNameLineEdit.set_text("");
 	m_fileNameLineEdit.set_focus();
@@ -213,13 +216,13 @@ void EditorMenu::onOkClicked()
 		{
 		case Load:
 			if (!m_editorLogic.load(fileName))
-				displayError("Cannot load map " + fileName);
+				displayError("Cannot load map " + fileName, ERROR_COLOR);
 			else
-				displayError("Map " + fileName + " load");
+				displayError("Map " + fileName + " load", MESSAGE_COLOR);
 			break;
 		case Save:
 			m_editorLogic.save(fileName);
-			displayError("Map " + fileName + " saved");
+			displayError("Map " + fileName + " saved", MESSAGE_COLOR);
 			break;
 		}
 	}
@@ -254,11 +257,11 @@ void EditorMenu::onVisibleChanged(bool visible)
 	}
 }
 
-void EditorMenu::displayError(CL_String p_message)
+void EditorMenu::displayError(CL_String p_message, CL_Colorf p_color)
 {
 	CL_Font font(get_gc(), "helvetica", 14);
 	CL_SpanLayout span;
-	span.add_text(p_message, font, CL_Colorf::red);
+	span.add_text(p_message, font, p_color);
 	m_errorLabel.set_span(span);
 }
 

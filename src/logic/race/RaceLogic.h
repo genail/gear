@@ -75,6 +75,9 @@ class RaceLogic {
 
 		RaceLogic();
 
+		/** Makes a copy of level object and sets it as current level */
+		RaceLogic(const Race::Level &p_level);
+
 		virtual ~RaceLogic();
 
 

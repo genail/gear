@@ -51,7 +51,8 @@ const float SPACING_1_3 = 30;
 const float SPACING_4_MORE = 10;
 
 // precalculated positions table
-float positions[MAX_ROWS];
+float startPos[MAX_ROWS];
+float endPos[MAX_ROWS];
 
 /** One table row */
 class TableRow
@@ -147,6 +148,7 @@ class ScoreTableImpl
 			int y;
 
 			for (int i = 0; i < MAX_ROWS; ++i) {
+				// at end
 				y = SPACING_0 + (ENTRY_HEIGHT * i);
 
 				if (i <= 3) {
@@ -156,7 +158,11 @@ class ScoreTableImpl
 					y += SPACING_4_MORE * (i - 3);
 				}
 
-				positions[i] = y;
+				endPos[i] = y;
+
+				// at start
+				y += Stage::getHeight() * logf((i + 1) * 4);
+				startPos[i] = y;
 			}
 		}
 
@@ -219,11 +225,9 @@ void TableRow::draw(
 	static const CL_Colorf BG_COLOR(0.0f, 0.0f, 0.0f, 0.7f);
 
 
-	// animation end y
-	const float ey = positions[m_place - 1];
-
-	// animation start y
-	const float sy = ey + Stage::getHeight() * logf(m_place * 4);
+	// animation start and end y
+	const float sy = startPos[m_place - 1];
+	const float ey = endPos[m_place - 1];
 
 
 	const float y = sy + (ey - sy) * p_animProgress;
@@ -288,6 +292,9 @@ void ScoreTable::rebuild()
 
 	const int lapCount = m_impl->m_logic->getRaceLapCount();
 	const int pCount = m_impl->m_logic->getPlayerCount();
+
+	G_ASSERT(pCount <= MAX_ROWS && "limit exhausted");
+
 	const Race::Progress &progress = m_impl->m_logic->getProgress();
 
 	// store time entries

@@ -84,8 +84,8 @@ class RaceLogicImpl
 
 
 
-		RaceLogicImpl() :
-			m_level(),
+		RaceLogicImpl(const Race::Level &p_level) :
+			m_level(p_level),
 			m_progress(m_level),
 			m_raceStartTimeMs(0),
 			m_raceFinishTimeMs(0),
@@ -112,13 +112,20 @@ class RaceLogicImpl
 SIG_CPP(RaceLogic, stateChanged);
 
 RaceLogic::RaceLogic() :
-	m_impl(new RaceLogicImpl())
+	m_impl(new RaceLogicImpl(Race::Level()))
+{
+	display(_("Game loaded"));
+}
+
+RaceLogic::RaceLogic(const Race::Level &p_level) :
+	m_impl(new RaceLogicImpl(p_level))
 {
 	display(_("Game loaded"));
 }
 
 RaceLogic::~RaceLogic()
 {
+	// empty
 }
 
 void RaceLogic::update(unsigned p_timeElapsed)

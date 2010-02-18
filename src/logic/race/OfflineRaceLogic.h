@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,11 +34,20 @@
 
 namespace Race {
 
+class Level;
+
 class OfflineRaceLogic: public Race::RaceLogic {
 
 	public:
 
 		OfflineRaceLogic(const CL_String &p_levelName);
+
+		/**
+		 * Makes a copy of level object. Be aware of that given level should
+		 * be already initialized and it wouldn't be initialized or destroyed
+		 * by this object initialize() or destroy() method.
+		 */
+		OfflineRaceLogic(const Race::Level &p_level);
 
 		virtual ~OfflineRaceLogic();
 
@@ -50,6 +59,8 @@ class OfflineRaceLogic: public Race::RaceLogic {
 	private:
 
 		CL_String m_levelName;
+
+		bool m_levelOwner;
 };
 
 }

@@ -508,7 +508,6 @@ float Level::getResistance(float p_realX, float p_realY)
 
 void Level::addCar(Car *p_car) {
 
-	G_ASSERT(m_impl->m_loaded && "Level is not loaded");
 	m_impl->m_cars.push_back(p_car);
 }
 
@@ -530,7 +529,7 @@ void Level::getStartPosAndRot(
 		CL_Pointf *p_pos, CL_Angle *p_rot
 ) const
 {
-	G_ASSERT(m_impl->m_loaded);
+	G_ASSERT(m_impl->m_track.getPointCount() >= 3);
 	G_ASSERT(p_num >= 1 && "too low position number");
 	G_ASSERT(p_num <= Limits::MAX_PLAYERS);
 

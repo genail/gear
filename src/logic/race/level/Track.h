@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@ class Track {
 
 		virtual ~Track();
 
+		// points manipulation
 
 		void addPoint(
 				const CL_Pointf &p_point,
@@ -55,15 +56,19 @@ class Track {
 				int p_index = std::numeric_limits<int>::max()
 		);
 
+		void removePoint(int p_index);
+
+		void clear();
+
+
+		// points accessors
+
+		int getPointCount() const;
+
 		TrackPoint &getPoint(int p_index);
 
 		const TrackPoint &getPoint(int p_index) const;
 
-		int getPointCount() const;
-
-		void clear();
-
-		void removePoint(int p_index);
 
 	private:
 

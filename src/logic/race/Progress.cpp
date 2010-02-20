@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -167,7 +167,7 @@ void Progress::initialize()
 		return;
 	}
 
-	G_ASSERT(m_impl->m_level.isLoaded() && "level must be loaded first");
+	G_ASSERT(m_impl->m_level.isUsable() && "level is not usable");
 
 	// minimal checkpoint distance
 	static const int MIN_DISTANCE = 50;

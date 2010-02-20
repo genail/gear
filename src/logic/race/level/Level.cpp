@@ -81,9 +81,6 @@ class LevelImpl
 
 		bool m_initialized;
 
-		bool m_loaded;
-
-
 		/** All cars */
 		std::vector<Car*> m_cars;
 
@@ -104,8 +101,7 @@ class LevelImpl
 
 
 		LevelImpl() :
-			m_initialized(false),
-			m_loaded(false)
+			m_initialized(false)
 			{}
 
 		CL_SharedPtr<RaceResistance::Geometry> buildResistanceGeometry(int p_x, int p_y, Common::GroundBlockType p_blockType) const;
@@ -171,14 +167,12 @@ void Level::destroy()
 
 		m_impl->m_startPositions.clear();
 		m_impl->m_track.clear();
-
-		m_impl->m_loaded = false;
 	}
 }
 
-void Level::load(const CL_String& p_filename)
+bool Level::load(const CL_String& p_filename)
 {
-	G_ASSERT(!m_impl->m_loaded && "level is already loaded");
+	G_ASSERT(!isUsable() && "level is already loaded");
 
 	try {
 		cl_log_event(LOG_DEBUG, "loading level %1", p_filename);
@@ -213,15 +207,18 @@ void Level::load(const CL_String& p_filename)
 		file.close();
 
 		cl_log_event(LOG_DEBUG, "level loaded");
-		m_impl->m_loaded = true;
 
 		// run triangulator
 		m_impl->m_trackTriangulator.clear();
 		m_impl->m_trackTriangulator.triangulate(m_impl->m_track);
 
+		return true;
+
 	} catch (CL_Exception &e) {
 		cl_log_event(LOG_ERROR, "cannot load level '%1': %2", p_filename, e.message);
 	}
+
+	return false;
 
 }
 
@@ -647,7 +644,13 @@ Car &Level::getCar(int p_index)
 
 bool Level::isLoaded() const
 {
-	return m_impl->m_loaded;
+	return isUsable();
+}
+
+bool Level::isUsable() const
+{
+	static const int MIN_TRACK_POINT_COUNT = 3;
+	return m_impl->m_track.getPointCount() >= MIN_TRACK_POINT_COUNT;
 }
 
 const Track &Level::getTrack() const

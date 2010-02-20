@@ -30,6 +30,8 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
+
 namespace Race {
 
 class Block;
@@ -60,11 +62,19 @@ class Level
 
 		// loading and saving
 
-		bool isLoaded() const;
+		/** @deprecated Check load() state instead  */
+		DEPRECATED(bool isLoaded() const);
 
-		void load(const CL_String &p_filename);
+		/** @return true if track was loaded */
+		bool load(const CL_String &p_filename);
 
 		void save(const CL_String &p_filename);
+
+		/**
+		 * Tells if level can be used in race. This determines the state of
+		 * track.
+		 */
+		bool isUsable() const;
 
 
 		// car management

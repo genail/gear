@@ -38,7 +38,7 @@
 
 namespace Gfx {
 
-const int IMMUTABLE_STRIPE_LIMIT = 32;
+const int IMMUTABLE_STRIPE_LIMIT = 256;
 
 const CL_Colorf STRIPE_COLOR(0.0f, 0.0f, 0.0f, 0.15f);
 const CL_Vec4f STRIPE_COLOR_VEC(
@@ -87,6 +87,9 @@ class StripeArr
 		/** Primitives array */
 		CL_PrimitivesArray *m_priArr;
 
+		/** m_size * 2 */
+		const int m_size2;
+
 		void compile(CL_GraphicContext &p_gc) {
 			G_ASSERT(!m_compiled);
 
@@ -106,6 +109,7 @@ class StripeArr
 			m_verticles(new CL_Vec2f[p_size * 2]),
 			m_colors(new CL_Vec4f[p_size * 2]),
 			m_size(p_size),
+			m_size2(p_size * 2),
 			m_compiled(false),
 			m_priArr(NULL)
 		{ /* empty */ }
@@ -137,7 +141,7 @@ class StripeArr
 			}
 
 			p_gc.set_program_object(cl_program_color_only);
-			p_gc.draw_primitives(cl_lines, m_size, *m_priArr);
+			p_gc.draw_primitives(cl_lines, m_size2, *m_priArr);
 		}
 };
 
@@ -379,7 +383,7 @@ void TyreStripesImpl::add4WheelStripe(
 
 void TyreStripesImpl::splitImmutable()
 {
-	static const unsigned ARRAYS_LIMIT = 8;
+	static const unsigned ARRAYS_LIMIT = 128;
 
 	// I need to skip first immutable stripes in order to take back
 	// the oldest ones

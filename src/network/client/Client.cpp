@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -140,7 +140,7 @@ void Client::onEventReceived(const CL_NetGameEvent &p_event)
 
 		else if (eventName == EVENT_PLAYER_JOINED) {
 			onPlayerJoined(p_event);
-		} else if (eventName == EVENT_PLAYER_LEAVED) {
+		} else if (eventName == EVENT_PLAYER_LEFT) {
 			onPlayerLeaved(p_event);
 		}
 

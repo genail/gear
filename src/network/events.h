@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@
 
 #define EVENT_PLAYER_JOINED "player_joined"
 
-#define EVENT_PLAYER_LEAVED "player_leaved"
+#define EVENT_PLAYER_LEFT "player_left"
 
 // race events
 

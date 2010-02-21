@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,9 @@ class ServerImpl;
 
 class Server {
 
-	DEF_SIGNAL_1(playerJoined, const CL_String&);
+	SIG_H_1(playerJoined, const CL_String&);
 
-	DEF_SIGNAL_1(playerLeaved, const CL_String&);
+	SIG_H_1(playerLeft, const CL_String&);
 
 	public:
 

@@ -38,5 +38,5 @@
 // When both numbers are equal then communication is fully
 // established.
 
-#define PROTOCOL_VERSION_MAJOR 2
+#define PROTOCOL_VERSION_MAJOR 3
 #define PROTOCOL_VERSION_MINOR 0

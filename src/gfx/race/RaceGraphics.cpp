@@ -79,7 +79,7 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 			CL_Colorf::green
 	);
 
-	if (m_logic->getLevel().isLoaded()) {
+	if (m_logic->getLevel().isUsable()) {
 
 		// load level graphics when level logic is loaded
 		// FIXME: Maybe I should wait for gamestate in separate scene?

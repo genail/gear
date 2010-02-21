@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,35 +26,34 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "PlayerLeft.h"
 
-#include "Packet.h"
+#include <assert.h>
+
+#include "network/events.h"
 
 namespace Net {
 
-class PlayerLeaved: public Net::Packet {
-
-	public:
-
-		PlayerLeaved();
-
-		virtual ~PlayerLeaved();
-
-
-		virtual CL_NetGameEvent buildEvent() const;
-
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-
-		const CL_String &getName() const { return m_name; }
-
-
-		void setName(const CL_String &p_name) { m_name = p_name; }
-
-	private:
-
-		CL_String m_name;
-};
-
+PlayerLeft::PlayerLeft()
+{
 }
 
+PlayerLeft::~PlayerLeft()
+{
+}
+
+CL_NetGameEvent PlayerLeft::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_PLAYER_LEFT);
+	event.add_argument(m_name);
+
+	return event;
+}
+
+void PlayerLeft::parseEvent(const CL_NetGameEvent &p_event)
+{
+	assert(p_event.get_name() == EVENT_PLAYER_LEFT);
+	m_name = p_event.get_argument(0);
+}
+
+}

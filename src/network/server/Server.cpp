@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@
 #include "network/packets/Goodbye.h"
 #include "network/packets/GameState.h"
 #include "network/packets/PlayerJoined.h"
-#include "network/packets/PlayerLeaved.h"
+#include "network/packets/PlayerLeft.h"
 #include "network/packets/RaceStart.h"
 #include "network/packets/VoteStart.h"
 #include "network/packets/VoteEnd.h"
@@ -54,9 +54,10 @@ class ServerImpl
 {
 	public:
 
-		IMPL_SIGNAL_1(playerJoined, const CL_String&);
+		SIG_IMPL(Server, playerJoined);
 
-		IMPL_SIGNAL_1(playerLeaved, const CL_String&);
+		SIG_IMPL(Server, playerLeft);
+
 
 		struct Player {
 
@@ -140,8 +141,8 @@ class ServerImpl
 		void onVoteSystemFinished();
 };
 
-METH_SIGNAL_1(Server, playerJoined, const CL_String&);
-METH_SIGNAL_1(Server, playerLeaved, const CL_String&);
+SIG_CPP(Server, playerJoined);
+SIG_CPP(Server, playerLeft);
 
 Server::Server(const ServerConfiguration &p_conf) :
 	m_impl(new ServerImpl(p_conf))
@@ -154,8 +155,8 @@ Server::Server(const ServerConfiguration &p_conf) :
 	}
 
 	m_impl->m_level.load(levPath);
-	if (!m_impl->m_level.isLoaded()) {
-		cl_log_event(LOG_ERROR, "level %1 not loaded, exiting", levPath);
+	if (!m_impl->m_level.isUsable()) {
+		cl_log_event(LOG_ERROR, "level %1 is not usable, exiting", levPath);
 		exit(1);
 	}
 
@@ -245,14 +246,14 @@ void ServerImpl::onClientDisconnected(CL_NetGameConnection *p_netGameConnection)
 
 		// emit the signal if player was in the game
 		if (player.m_gameStateSent) {
-			INVOKE_1(playerLeaved, player.m_name);
+			INVOKE_1(playerLeft, player.m_name);
 		}
 
 		// send event to rest of players
-		PlayerLeaved playerLeaved;
-		playerLeaved.setName(player.m_name);;
+		PlayerLeft playerLeft;
+		playerLeft.setName(player.m_name);;
 
-		sendToAll(playerLeaved.buildEvent(), itor->first);
+		sendToAll(playerLeft.buildEvent(), itor->first);
 
 		// cleanup
 		m_connections.erase(itor);

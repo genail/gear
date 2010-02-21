@@ -131,7 +131,8 @@
 		}
 
 #define SIG_IMPL(clazz, name) \
-		mutable clazz::_TSig_##name m_sig_##name;
+		public: \
+			mutable clazz::_TSig_##name m_sig_##name;
 
 // 0 arg
 #define SIG_H_0(name) \

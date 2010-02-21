@@ -416,6 +416,7 @@ void TyreStripesImpl::splitImmutable()
 	m_stripeArrays.push_back(arr);
 
 	if (m_stripeArrays.size() > ARRAYS_LIMIT) {
+		delete m_stripeArrays.front();
 		m_stripeArrays.pop_front();
 	}
 }

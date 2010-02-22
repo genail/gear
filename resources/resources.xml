@@ -5,6 +5,9 @@
         </sprite>
     </section>
     <section name="race">
+    
+    	<texture name="street" file="street.png" />
+    
         <sprite name="car" base_angle="90">
             <image file="car.png" />
             <translation origin="center"/>

@@ -30,10 +30,13 @@
 
 #include <vector>
 
+#include "common/Units.h"
+#include "gfx/Stage.h"
 #include "gfx/Viewport.h"
 #include "logic/race/level/Object.h"
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Track.h"
+#include "logic/race/level/TrackPoint.h"
 #include "logic/race/level/TrackTriangulator.h"
 #include "logic/race/level/TrackSegment.h"
 #include "math/Integer.h"
@@ -51,6 +54,18 @@ class LevelImpl
 
 		const Race::TrackTriangulator &m_triangulator;
 
+
+		/** street texture */
+		CL_Texture m_streetTexture;
+
+
+		/** trackpoints distances from start [seg_id][point_id] */
+		std::vector<std::vector<float> > m_distances;
+
+		/** Distance from last point to start point */
+		float m_distanceToStart;
+
+
 		LevelImpl(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
 				m_levelLogic(p_levelLogic),
 				m_viewport(p_viewport),
@@ -64,17 +79,33 @@ class LevelImpl
 
 		void drawTriangle(
 				CL_GraphicContext &p_gc,
-				const CL_Pointf& p_a, const CL_Pointf& p_b, const CL_Pointf& p_c
+				const CL_Pointf& p_a,
+				const CL_Pointf& p_b,
+				const CL_Pointf& p_c,
+				const CL_Vec2f &p_tca, // tex coords for each point
+				const CL_Vec2f &p_tcb,
+				const CL_Vec2f &p_tcc
 		);
 
 		void drawStartLine(CL_GraphicContext &p_gc);
 
 		void drawObjects(CL_GraphicContext &p_gc);
 
+
+		// loaders
+
+		void loadTrackTexture(CL_GraphicContext &p_gc);
+
 };
 
 Level::Level(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
-		m_impl(new LevelImpl(p_levelLogic, p_viewport))
+	m_impl(new LevelImpl(p_levelLogic, p_viewport))
+{
+	// empty
+}
+
+Level::Level(const Race::Level *p_levelLogic, const Viewport *p_viewport) :
+	m_impl(new LevelImpl(*p_levelLogic, *p_viewport))
 {
 	// empty
 }
@@ -93,6 +124,9 @@ void Level::draw(CL_GraphicContext &p_gc)
 
 void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
 {
+	// length of street in meters
+	const float STREET_TILE_LENGTH_M = 30.0f;
+
 	const Race::Track &track = m_levelLogic.getTrack();
 	const int trackPointCount = track.getPointCount();
 
@@ -106,14 +140,55 @@ void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
 			const std::vector<CL_Pointf> &points = seg.getTrianglePoints();
 
 			const int triPointCount = static_cast<signed>(points.size());
-			G_ASSERT(triPointCount % 3 == 0);
+			G_ASSERT(triPointCount % 6 == 0);
 
-			for (int j = 0; j < triPointCount;) {
-				const CL_Pointf &p1 = points[j++];
-				const CL_Pointf &p2 = points[j++];
-				const CL_Pointf &p3 = points[j++];
+			int pointIdx = 0;
+			for (int j = 0; j < triPointCount; ++pointIdx) {
 
-				drawTriangle(p_gc, p1, p2, p3);
+				// D   front    C
+				//  *----------*
+				//  |          |
+				//  *----------*
+				// A    back    B
+				//
+				// order: A, B, C, A, C, D
+
+				const CL_Pointf &pa = points[j++];
+				const CL_Pointf &pb = points[j++];
+				const CL_Pointf &pc = points[j];
+
+				j += 3;
+
+				const CL_Pointf &pd = points[j++];
+
+				// back and front coords
+				const float bDist = m_distances[i][pointIdx];
+				const float fDist = m_distances[i][pointIdx + 1];
+
+				const float bCoord =
+						fmod(bDist, STREET_TILE_LENGTH_M)
+						/ STREET_TILE_LENGTH_M;
+
+				const float fCoord =
+						bCoord + (fDist - bDist)/ STREET_TILE_LENGTH_M;
+
+				// draw ABC triangle
+				drawTriangle(
+						p_gc,
+						pa, pb, pc,
+						CL_Vec2f(1.0f, bCoord),
+						CL_Vec2f(0.0f, bCoord),
+						CL_Vec2f(0.0f, fCoord)
+				);
+
+				// draw ACD triangle
+				drawTriangle(
+						p_gc,
+						pa, pc, pd,
+						CL_Vec2f(1.0f, bCoord),
+						CL_Vec2f(0.0f, fCoord),
+						CL_Vec2f(1.0f, fCoord)
+				);
 			}
 
 		}
@@ -127,17 +202,76 @@ void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
 		const CL_Pointf &nextLeft = m_triangulator.getFirstLeftPoint(nextIdx);
 		const CL_Pointf &nextRight = m_triangulator.getFirstRightPoint(nextIdx);
 
-		drawTriangle(p_gc, prevLeft, prevRight, nextRight);
-		drawTriangle(p_gc, prevLeft, nextRight, nextLeft);
+		const float bDist = m_distances[i][m_distances[i].size() - 2];
+		float fDist = m_distances[nextIdx][0];
+
+		if (fDist < bDist) {
+			// this is end point to start point distance
+			fDist = m_distanceToStart;
+		}
+
+
+		// FIXME: this is a copy of above code!
+		const float bCoord =
+						fmod(bDist, STREET_TILE_LENGTH_M)
+						/ STREET_TILE_LENGTH_M;
+
+		const float fCoord =
+				bCoord + (fDist - bDist)/ STREET_TILE_LENGTH_M;
+
+
+		drawTriangle(
+				p_gc,
+				prevLeft, prevRight, nextRight,
+				CL_Vec2f(1.0f, bCoord),
+				CL_Vec2f(0.0f, bCoord),
+				CL_Vec2f(0.0f, fCoord)
+		);
+
+		drawTriangle(
+				p_gc,
+				prevLeft, nextRight, nextLeft,
+				CL_Vec2f(1.0f, bCoord),
+						CL_Vec2f(0.0f, fCoord),
+						CL_Vec2f(1.0f, fCoord)
+		);
 	}
 }
 
 void LevelImpl::drawTriangle(
 		CL_GraphicContext &p_gc,
-		const CL_Pointf& p_a, const CL_Pointf& p_b, const CL_Pointf& p_c
+		const CL_Pointf& p_a,
+		const CL_Pointf& p_b,
+		const CL_Pointf& p_c,
+		const CL_Vec2f &p_tca,
+		const CL_Vec2f &p_tcb,
+		const CL_Vec2f &p_tcc
 )
 {
-	CL_Draw::triangle(p_gc, p_a, p_b, p_c, CL_Colorf::gray);
+	static const CL_Vec4f WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+
+
+	// prepare primitive array
+	CL_Vec2f verts[] = { p_a, p_b, p_c };
+	CL_Vec4f colors[] = { WHITE, WHITE, WHITE };
+	CL_Vec2f texcoords[] = { p_tca, p_tcb, p_tcc };
+
+	CL_PrimitivesArray arr(p_gc);
+
+	arr.set_attributes(0, verts);
+	arr.set_attributes(1, colors);
+	arr.set_attributes(2, texcoords);
+
+	p_gc.set_program_object(cl_program_single_texture);
+	p_gc.set_texture(0, m_streetTexture);
+
+
+	// draw
+	p_gc.draw_primitives(cl_triangles, 3, arr);
+
+
+	// preserve settings
+	p_gc.set_program_object(cl_program_color_only);
 
 #if !defined(NDEBUG) && defined(DRAW_WIREFRAME)
 	CL_Draw::line(p_gc, p_a, p_b, CL_Colorf::purple);
@@ -203,6 +337,61 @@ void LevelImpl::drawObjects(CL_GraphicContext &p_gc)
 void Level::load(CL_GraphicContext &p_gc)
 {
 	Drawable::load(p_gc);
+	m_impl->loadTrackTexture(p_gc);
+}
+
+void LevelImpl::loadTrackTexture(CL_GraphicContext &p_gc)
+{
+	// load texture
+	m_streetTexture = CL_Texture(
+			"race/street", Gfx::Stage::getResourceManager(), p_gc
+	);
+
+	m_streetTexture.set_wrap_mode(cl_wrap_repeat, cl_wrap_repeat);
+
+	// make sure that level is usable
+	G_ASSERT(m_levelLogic.isUsable());
+
+	const Race::Track &track = m_levelLogic.getTrack();
+	const int count = track.getPointCount();
+
+	// collect all checkpoint distances in m_distances vector
+	// like this:
+	// m_distances[segment_id][point_id]
+
+	m_distances.reserve(count);
+
+	G_ASSERT(count >= 1);
+
+	CL_Pointf prevPoint;
+	float distance = 0.0f;
+	bool hasFirst = false;
+
+	for (int i = 0; i < count; ++i) {
+		m_distances.push_back(std::vector<float>());
+
+		const Race::TrackSegment &seg = m_triangulator.getSegment(i);
+		const std::vector<CL_Pointf> &mids = seg.getMidPoints();
+
+		foreach (const CL_Pointf &pt, mids) {
+			if (hasFirst) {
+				distance += Units::toWorld(prevPoint.distance(pt));
+			} else {
+				hasFirst = true;
+			}
+
+			m_distances[i].push_back(distance);
+			prevPoint = pt;
+		}
+	}
+
+	// calculate distance from last point to start
+	const CL_Pointf &startPoint =
+			m_triangulator.getSegment(0).getMidPoints()[0];
+
+	distance += Units::toWorld(prevPoint.distance(startPoint));
+	m_distanceToStart = distance;
+
 }
 
 Race::TrackTriangulator &Level::getTrackTriangulator()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -80,6 +80,25 @@ class TrackTriangulator
 		 */
 		const CL_Vec2f &getGuide(int p_pointIndex) const;
 
+		/**
+		 * Provides track segment triangles.
+		 * <p>
+		 * Triangles inside are ordered as follows:
+		 * <code>
+		 * D   front    C
+		 *  *----------*
+		 *  |          |
+		 *  *----------*
+		 * A    back    B
+		 * </code>
+		 *
+		 * The ascii art above displays smallest track segment.
+		 * It's built of two triangles: ABC and ACD.
+		 * This order is preserved in TrackSegment.
+		 *
+		 * @param p_segIndex Segment index.
+		 * @return Triangulated track segment.
+		 */
 		const TrackSegment &getSegment(int p_segIndex) const;
 
 		/**

@@ -64,7 +64,7 @@ SET(CLIENT_SRCS
 	network/packets/GameState.cpp
 	network/packets/Goodbye.cpp
 	network/packets/PlayerJoined.cpp
-	network/packets/PlayerLeaved.cpp
+	network/packets/PlayerLeft.cpp
 	network/packets/RaceStart.cpp
 	network/packets/VoteEnd.cpp
 	network/packets/VoteStart.cpp

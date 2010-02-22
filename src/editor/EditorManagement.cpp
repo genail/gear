@@ -120,11 +120,6 @@ namespace Editor
 
 		m_impl->m_viewport.prepareGC(p_gc);
 
-		// bercik, 15 luty:
-		// ma³o wydajne rozwi¹zanie, które oblicza przed ka¿dym odrysowaniem ca³¹ trasê.
-		// nale¿y usnu¹æ w przysz³oœci po usuniêciu b³êdu z niewyliczeniem ca³ej trasy na pocz¹tku
-		m_impl->m_gfxLevel.getTrackTriangulator().triangulate(m_impl->m_track); // !!!
-
 		for (unsigned i = 0; i < m_impl->m_editors.size(); ++i)
 			m_impl->m_editors[i]->draw(p_gc);
 

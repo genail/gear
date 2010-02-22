@@ -101,7 +101,7 @@ namespace Editor
 
 	EditorPoint::~EditorPoint()
 	{
-
+		// null method
 	}
 
 	void EditorPoint::setDefaultPoints()
@@ -288,22 +288,33 @@ namespace Editor
 		}
 	}
 
-	void EditorPoint::triangulate(int p_index)
+	void EditorPoint::triangulate(int p_index, bool p_calculateAllTrack)
 	{
-		if (p_index >= 0 && p_index < m_track.getPointCount())
+		// bercik, 22 luty:
+		// triangulowanie ca³ej trasy eliminuje wiele b³êdów, ale bardzo obci¹¿a procesor dlatego jest to
+		// tylko chwilowe rozwi¹zanie
+
+		if (p_calculateAllTrack)
 		{
-			int segment = p_index - 2;
-			if (segment < 0)
-				segment = m_track.getPointCount() - abs(segment);
-
-			for (int i = 0; i < 4; ++i)
+			m_gfxLevel.getTrackTriangulator().triangulate(m_track);
+		}
+		else
+		{
+			if (p_index >= 0 && p_index < m_track.getPointCount())
 			{
-				if (segment > m_track.getPointCount() - 1)
-					segment = 0;
+				int segment = p_index - 2;
+				if (segment < 0)
+					segment = m_track.getPointCount() - abs(segment);
 
-				m_gfxLevel.getTrackTriangulator().triangulate(m_track, segment);
+				for (int i = 0; i < 4; ++i)
+				{
+					if (segment > m_track.getPointCount() - 1)
+						segment = 0;
 
-				++segment;
+					m_gfxLevel.getTrackTriangulator().triangulate(m_track, segment);
+
+					++segment;
+				}
 			}
 		}
 	}
@@ -339,7 +350,7 @@ namespace Editor
 					set *= 2;
 
 				setRadius(m_impl->m_selectedIndex, set);
-				triangulate(m_impl->m_selectedIndex);
+				triangulate(m_impl->m_selectedIndex, false);
 			}
 		}
 	}
@@ -367,7 +378,7 @@ namespace Editor
 				if (m_impl->m_selectedIndex < 0)
 					m_impl->m_selectedIndex = m_track.getPointCount() - 1;
 
-				triangulate(m_impl->m_selectedIndex);
+				triangulate(m_impl->m_selectedIndex, true);
 			}
 		}
 		else if (isFirstKey(CL_MOUSE_MIDDLE) || (isFirstKey(CL_KEY_CONTROL) && isSecondKey(CL_MOUSE_LEFT)))
@@ -381,7 +392,7 @@ namespace Editor
 
 			m_track.addPoint(m_mousePos, DEFAULT_RADIUS, DEFAULT_SHIFT, index);
 
-			triangulate(m_impl->m_selectedIndex);
+			triangulate(m_impl->m_selectedIndex, true);
 		}
 	}
 
@@ -423,7 +434,7 @@ namespace Editor
 				trackPoint.setPosition(trackPoint.getPosition() + m_deltaMousePos);
 			}
 
-			triangulate(m_impl->m_selectedIndex);
+			triangulate(m_impl->m_selectedIndex, false);
 		}
 	}
 
@@ -437,7 +448,7 @@ namespace Editor
 				set *= 5;
 
 			setRadius(m_impl->m_selectedIndex, set);
-			triangulate(m_impl->m_selectedIndex);
+			triangulate(m_impl->m_selectedIndex, false);
 		}
 	}
 }

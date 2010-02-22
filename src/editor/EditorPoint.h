@@ -83,7 +83,7 @@ namespace Editor
 
 		void setRadius(int p_index, int p_set);
 
-		void triangulate(int p_index);
+		void triangulate(int p_index, bool p_calculateAllTrack);
 
 		CL_SharedPtr<EditorPointImpl> m_impl;
 	};

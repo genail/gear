@@ -44,6 +44,9 @@
 // levels directory
 #define LEVELS_DIR "levels"
 
+// map expansion
+#define MAP_EXPANSION ".map"
+
 // signal and slots
 #define SIGNAL_0(name) \
 	public: \

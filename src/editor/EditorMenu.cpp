@@ -209,19 +209,19 @@ void EditorMenu::onOkClicked()
 
 	if (fileName != "")
 	{
-		fileName += ".map";
+		fileName += MAP_EXPANSION;
 
 		switch (m_action)
 		{
 		case Load:
 			if (!m_editorLogic.load(fileName))
-				displayError("Cannot load map " + fileName, m_errorColor);
+				displayError(_("Cannot load map ") + fileName, m_errorColor);
 			else
-				displayError("Map " + fileName + " load", m_messageColor);
+				displayError(_("Map ") + fileName + _(" load"), m_messageColor);
 			break;
 		case Save:
 			m_editorLogic.save(fileName);
-			displayError("Map " + fileName + " saved", m_messageColor);
+			displayError(_("Map ") + fileName + _(" saved"), m_messageColor);
 			break;
 		}
 	}
@@ -275,18 +275,18 @@ void EditorMenu::setInformationText(CL_String p_text)
 void EditorMenu::setHelpText()
 {
 	CL_String text = "";
-	text += "Add point:\n";
-	text += "CTRL + LEFT MOUSE or MIDDLE MOUSE\n";
-	text += "Delete point:\n";
-	text += "DELETE or D\n";
-	text += "Change radius:\n";
-	text += "CTRL + MOUSE ROLL\\'+','-'\n";
-	text += "Change shift:\n";
-	text += "SHIFT\n";
-	text += "Change scale:\n";
-	text += "MOUSE ROLL or '+','-'\n";
-	text += "Go to start line:\n";
-	text += "SPACE";
+	text += _("Add point:\n");
+	text += _("CTRL + LEFT MOUSE or MIDDLE MOUSE\n");
+	text += _("Delete point:\n");
+	text += _("DELETE or D\n");
+	text += _("Change radius:\n");
+	text += _("CTRL + MOUSE SCROLL\\'+','-'\n");
+	text += _("Change shift:\n");
+	text += _("SHIFT\n");
+	text += _("Change scale:\n");
+	text += _("MOUSE SCROLL or '+','-'\n");
+	text += _("Go to start line:\n");
+	text += _("SPACE");
 
 	m_helpLabel.set_text(text);
 }

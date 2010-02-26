@@ -44,6 +44,8 @@
 namespace Gfx
 {
 
+static const CL_Vec4f WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+
 class LevelImpl
 {
 	public:
@@ -66,12 +68,29 @@ class LevelImpl
 		float m_distanceToStart;
 
 
+		// helpers to optimize drawing process
+		CL_Vec2f m_helperVerts[3];
+		CL_Vec4f m_helperColors[3];
+		CL_Vec2f m_helperTexCoords[3];
+
+		CL_PrimitivesArray *m_helperArr;
+
+
 		LevelImpl(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
 				m_levelLogic(p_levelLogic),
 				m_viewport(p_viewport),
-				m_triangulator(p_levelLogic.getTrackTriangulator())
+				m_triangulator(p_levelLogic.getTrackTriangulator()),
+				m_helperArr(NULL)
 		{
-			// empty
+			for (int i = 0; i < 3; ++i) {
+				m_helperColors[i] = WHITE;
+			}
+		}
+
+		~LevelImpl() {
+			if (m_helperArr) {
+				delete m_helperArr;
+			}
 		}
 
 
@@ -248,26 +267,22 @@ void LevelImpl::drawTriangle(
 		const CL_Vec2f &p_tcc
 )
 {
-	static const CL_Vec4f WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+	// set verts
+	m_helperVerts[0] = p_a;
+	m_helperVerts[1] = p_b;
+	m_helperVerts[2] = p_c;
 
-
-	// prepare primitive array
-	CL_Vec2f verts[] = { p_a, p_b, p_c };
-	CL_Vec4f colors[] = { WHITE, WHITE, WHITE };
-	CL_Vec2f texcoords[] = { p_tca, p_tcb, p_tcc };
-
-	CL_PrimitivesArray arr(p_gc);
-
-	arr.set_attributes(0, verts);
-	arr.set_attributes(1, colors);
-	arr.set_attributes(2, texcoords);
+	// set texture coords
+	m_helperTexCoords[0] = p_tca;
+	m_helperTexCoords[1] = p_tcb;
+	m_helperTexCoords[2] = p_tcc;
 
 	p_gc.set_program_object(cl_program_single_texture);
 	p_gc.set_texture(0, m_streetTexture);
 
 
 	// draw
-	p_gc.draw_primitives(cl_triangles, 3, arr);
+	p_gc.draw_primitives(cl_triangles, 3, *m_helperArr);
 
 
 	// preserve settings
@@ -338,6 +353,13 @@ void Level::load(CL_GraphicContext &p_gc)
 {
 	Drawable::load(p_gc);
 	m_impl->loadTrackTexture(p_gc);
+
+	// prepare helper array
+	m_impl->m_helperArr = new CL_PrimitivesArray(p_gc);
+
+	m_impl->m_helperArr->set_attributes(0, m_impl->m_helperVerts);
+	m_impl->m_helperArr->set_attributes(1, m_impl->m_helperColors);
+	m_impl->m_helperArr->set_attributes(2, m_impl->m_helperTexCoords);
 }
 
 void LevelImpl::loadTrackTexture(CL_GraphicContext &p_gc)

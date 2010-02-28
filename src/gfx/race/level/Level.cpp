@@ -44,7 +44,8 @@
 namespace Gfx
 {
 
-static const CL_Vec4f WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+const CL_Vec4f WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+const int HELPER_SIZE = 4;
 
 class LevelImpl
 {
@@ -69,9 +70,9 @@ class LevelImpl
 
 
 		// helpers to optimize drawing process
-		CL_Vec2f m_helperVerts[3];
-		CL_Vec4f m_helperColors[3];
-		CL_Vec2f m_helperTexCoords[3];
+		CL_Vec2f m_helperVerts[HELPER_SIZE];
+		CL_Vec4f m_helperColors[HELPER_SIZE];
+		CL_Vec2f m_helperTexCoords[HELPER_SIZE];
 
 		CL_PrimitivesArray *m_helperArr;
 
@@ -82,7 +83,7 @@ class LevelImpl
 				m_triangulator(p_levelLogic.getTrackTriangulator()),
 				m_helperArr(NULL)
 		{
-			for (int i = 0; i < 3; ++i) {
+			for (int i = 0; i < HELPER_SIZE; ++i) {
 				m_helperColors[i] = WHITE;
 			}
 		}
@@ -94,16 +95,18 @@ class LevelImpl
 		}
 
 
-		void drawTriangles(CL_GraphicContext &p_gc);
+		void drawQuads(CL_GraphicContext &p_gc);
 
-		void drawTriangle(
+		void drawQuad(
 				CL_GraphicContext &p_gc,
-				const CL_Pointf& p_a,
-				const CL_Pointf& p_b,
-				const CL_Pointf& p_c,
-				const CL_Vec2f &p_tca, // tex coords for each point
+				const CL_Pointf &p_a,
+				const CL_Pointf &p_b,
+				const CL_Pointf &p_c,
+				const CL_Pointf &p_d,
+				const CL_Vec2f &p_tca,
 				const CL_Vec2f &p_tcb,
-				const CL_Vec2f &p_tcc
+				const CL_Vec2f &p_tcc,
+				const CL_Vec2f &p_tcd
 		);
 
 		void drawStartLine(CL_GraphicContext &p_gc);
@@ -136,12 +139,13 @@ Level::~Level()
 
 void Level::draw(CL_GraphicContext &p_gc)
 {
-	m_impl->drawTriangles(p_gc);
+	m_impl->drawQuads(p_gc);
+//	m_impl->drawTriangles(p_gc);
 	m_impl->drawStartLine(p_gc);
 	m_impl->drawObjects(p_gc);
 }
 
-void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
+void LevelImpl::drawQuads(CL_GraphicContext &p_gc)
 {
 	// length of street in meters
 	const float STREET_TILE_LENGTH_M = 30.0f;
@@ -156,58 +160,45 @@ void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
 
 		// run only if this segment is visible
 		if (viewportBounds.is_overlapped(seg.getBounds())) {
-			const std::vector<CL_Pointf> &points = seg.getTrianglePoints();
 
-			const int triPointCount = static_cast<signed>(points.size());
-			G_ASSERT(triPointCount % 6 == 0);
+			const std::vector<Race::TrackSegment::PointPair> &pairs =
+					seg.getPointPairs();
 
-			int pointIdx = 0;
-			for (int j = 0; j < triPointCount; ++pointIdx) {
+			const int pairsCount = static_cast<signed>(pairs.size());
+			CL_Pointf prevLeft, prevRight;
 
-				// D   front    C
-				//  *----------*
-				//  |          |
-				//  *----------*
-				// A    back    B
-				//
-				// order: A, B, C, A, C, D
+			for (int pairIdx = 0; pairIdx < pairsCount; ++pairIdx) {
 
-				const CL_Pointf &pa = points[j++];
-				const CL_Pointf &pb = points[j++];
-				const CL_Pointf &pc = points[j];
+				const CL_Pointf &currLeft = pairs[pairIdx].m_left;
+				const CL_Pointf &currRight = pairs[pairIdx].m_right;
 
-				j += 3;
+				if (pairIdx != 0) {
+					const float bDist = m_distances[i][pairIdx - 1];
+					const float fDist = m_distances[i][pairIdx];
 
-				const CL_Pointf &pd = points[j++];
+					const float bCoord =
+							fmod(bDist, STREET_TILE_LENGTH_M)
+							/ STREET_TILE_LENGTH_M;
 
-				// back and front coords
-				const float bDist = m_distances[i][pointIdx];
-				const float fDist = m_distances[i][pointIdx + 1];
+					const float fCoord =
+							bCoord + (fDist - bDist)/ STREET_TILE_LENGTH_M;
 
-				const float bCoord =
-						fmod(bDist, STREET_TILE_LENGTH_M)
-						/ STREET_TILE_LENGTH_M;
 
-				const float fCoord =
-						bCoord + (fDist - bDist)/ STREET_TILE_LENGTH_M;
+					drawQuad(
+							p_gc,
+							prevLeft,
+							prevRight,
+							currRight,
+							currLeft,
+							CL_Vec2f(0.0f, bCoord),
+							CL_Vec2f(1.0f, bCoord),
+							CL_Vec2f(1.0f, fCoord),
+							CL_Vec2f(0.0f, fCoord)
+					);
+				}
 
-				// draw ABC triangle
-				drawTriangle(
-						p_gc,
-						pa, pb, pc,
-						CL_Vec2f(1.0f, bCoord),
-						CL_Vec2f(0.0f, bCoord),
-						CL_Vec2f(0.0f, fCoord)
-				);
-
-				// draw ACD triangle
-				drawTriangle(
-						p_gc,
-						pa, pc, pd,
-						CL_Vec2f(1.0f, bCoord),
-						CL_Vec2f(0.0f, fCoord),
-						CL_Vec2f(1.0f, fCoord)
-				);
+				prevLeft = currLeft;
+				prevRight = currRight;
 			}
 
 		}
@@ -238,52 +229,50 @@ void LevelImpl::drawTriangles(CL_GraphicContext &p_gc)
 		const float fCoord =
 				bCoord + (fDist - bDist)/ STREET_TILE_LENGTH_M;
 
-
-		drawTriangle(
+		drawQuad(
 				p_gc,
-				prevLeft, prevRight, nextRight,
-				CL_Vec2f(1.0f, bCoord),
+				prevLeft,
+				prevRight,
+				nextRight,
+				nextLeft,
 				CL_Vec2f(0.0f, bCoord),
+				CL_Vec2f(1.0f, bCoord),
+				CL_Vec2f(1.0f, fCoord),
 				CL_Vec2f(0.0f, fCoord)
 		);
 
-		drawTriangle(
-				p_gc,
-				prevLeft, nextRight, nextLeft,
-				CL_Vec2f(1.0f, bCoord),
-						CL_Vec2f(0.0f, fCoord),
-						CL_Vec2f(1.0f, fCoord)
-		);
 	}
 }
 
-void LevelImpl::drawTriangle(
+void LevelImpl::drawQuad(
 		CL_GraphicContext &p_gc,
-		const CL_Pointf& p_a,
-		const CL_Pointf& p_b,
-		const CL_Pointf& p_c,
+		const CL_Pointf &p_a,
+		const CL_Pointf &p_b,
+		const CL_Pointf &p_c,
+		const CL_Pointf &p_d,
 		const CL_Vec2f &p_tca,
 		const CL_Vec2f &p_tcb,
-		const CL_Vec2f &p_tcc
+		const CL_Vec2f &p_tcc,
+		const CL_Vec2f &p_tcd
 )
 {
-	// set verts
+	// verticles
 	m_helperVerts[0] = p_a;
 	m_helperVerts[1] = p_b;
 	m_helperVerts[2] = p_c;
+	m_helperVerts[3] = p_d;
 
-	// set texture coords
+	// texture coords
 	m_helperTexCoords[0] = p_tca;
 	m_helperTexCoords[1] = p_tcb;
 	m_helperTexCoords[2] = p_tcc;
+	m_helperTexCoords[3] = p_tcd;
 
 	p_gc.set_program_object(cl_program_single_texture);
 	p_gc.set_texture(0, m_streetTexture);
 
-
 	// draw
-	p_gc.draw_primitives(cl_triangles, 3, *m_helperArr);
-
+	p_gc.draw_primitives(cl_quads, 4, *m_helperArr);
 
 	// preserve settings
 	p_gc.set_program_object(cl_program_color_only);
@@ -291,7 +280,8 @@ void LevelImpl::drawTriangle(
 #if !defined(NDEBUG) && defined(DRAW_WIREFRAME)
 	CL_Draw::line(p_gc, p_a, p_b, CL_Colorf::purple);
 	CL_Draw::line(p_gc, p_b, p_c, CL_Colorf::purple);
-	CL_Draw::line(p_gc, p_a, p_c, CL_Colorf::purple);
+	CL_Draw::line(p_gc, p_c, p_d, CL_Colorf::purple);
+	CL_Draw::line(p_gc, p_d, p_a, CL_Colorf::purple);
 #endif
 }
 
@@ -370,6 +360,9 @@ void LevelImpl::loadTrackTexture(CL_GraphicContext &p_gc)
 	);
 
 	m_streetTexture.set_wrap_mode(cl_wrap_repeat, cl_wrap_repeat);
+	m_streetTexture.set_generate_mipmap(true);
+	m_streetTexture.set_mag_filter(cl_filter_linear);
+	m_streetTexture.set_min_filter(cl_filter_linear);
 
 	// make sure that level is usable
 	G_ASSERT(m_levelLogic.isUsable());
@@ -385,25 +378,29 @@ void LevelImpl::loadTrackTexture(CL_GraphicContext &p_gc)
 
 	G_ASSERT(count >= 1);
 
-	CL_Pointf prevPoint;
-	float distance = 0.0f;
+	CL_Pointf prevPointL, prevPointR;
+	float distL = 0.0f, distR = 0.0f;
 	bool hasFirst = false;
 
 	for (int i = 0; i < count; ++i) {
 		m_distances.push_back(std::vector<float>());
 
 		const Race::TrackSegment &seg = m_triangulator.getSegment(i);
-		const std::vector<CL_Pointf> &mids = seg.getMidPoints();
+		const std::vector<Race::TrackSegment::PointPair> &pairs =
+				seg.getPointPairs();
 
-		foreach (const CL_Pointf &pt, mids) {
+		foreach (const Race::TrackSegment::PointPair &pair, pairs) {
 			if (hasFirst) {
-				distance += Units::toWorld(prevPoint.distance(pt));
+				distL += Units::toWorld(prevPointL.distance(pair.m_left));
+				distR += Units::toWorld(prevPointR.distance(pair.m_right));
 			} else {
 				hasFirst = true;
 			}
 
-			m_distances[i].push_back(distance);
-			prevPoint = pt;
+			m_distances[i].push_back((distL + distR) / 2);
+
+			prevPointL = pair.m_left;
+			prevPointR = pair.m_right;
 		}
 	}
 
@@ -411,8 +408,10 @@ void LevelImpl::loadTrackTexture(CL_GraphicContext &p_gc)
 	const CL_Pointf &startPoint =
 			m_triangulator.getSegment(0).getMidPoints()[0];
 
-	distance += Units::toWorld(prevPoint.distance(startPoint));
-	m_distanceToStart = distance;
+	distL += Units::toWorld(prevPointL.distance(startPoint));
+	distR += Units::toWorld(prevPointR.distance(startPoint));
+
+	m_distanceToStart = distL;
 
 }
 

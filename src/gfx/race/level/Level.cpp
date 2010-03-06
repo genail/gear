@@ -56,7 +56,7 @@ class LevelImpl
 {
 	public:
 
-		enum Direction {
+		enum Side {
 			D_LEFT,
 			D_RIGHT
 		};
@@ -136,18 +136,14 @@ class LevelImpl
 
 		void drawTrack(CL_GraphicContext &p_gc);
 
+		/** Draw quads of segment p_segIdx */
 		void drawQuads(
 				CL_GraphicContext &p_gc,
-				int p_segmentId
+				int p_segIdx,
+				int p_nextSegIdx
 		);
 
-		void drawSand(
-				CL_GraphicContext &p_gc,
-				int p_segmentId,
-				const std::vector<Race::TrackSegment::PointPair> &p_pairs,
-				Direction p_direction
-		);
-
+		/** Draw one street quad */
 		void drawQuad(
 				CL_GraphicContext &p_gc,
 				const CL_Texture &p_texture,
@@ -159,6 +155,14 @@ class LevelImpl
 				const CL_Vec2f &p_tcb,
 				const CL_Vec2f &p_tcc,
 				const CL_Vec2f &p_tcd
+		);
+
+		/** Draw sand at one street side */
+		void drawSand(
+				CL_GraphicContext &p_gc,
+				int p_segIdx,
+				int p_nextSegIdx,
+				Side p_side
 		);
 
 		/** Draw street cracks */
@@ -215,11 +219,12 @@ void LevelImpl::drawTrack(CL_GraphicContext &p_gc)
 
 	const CL_Rectf &viewportBounds = m_viewport.getWorldClipRect();
 
-	for (int i = 0; i < trackPointCount; ++i) {
+	for (int idx = 0; idx < trackPointCount; ++idx) {
 
-		const int nextIdx = Math::Integer::clamp(i + 1, 0, trackPointCount - 1);
+		const int nextIdx =
+				Math::Integer::clamp(idx + 1, 0, trackPointCount - 1);
 
-		const Race::TrackSegment &seg = m_triangulator.getSegment(i);
+		const Race::TrackSegment &seg = m_triangulator.getSegment(idx);
 
 		CL_Rectf bounds = seg.getBounds();
 		expand(&bounds, m_triangulator.getFirstLeftPoint(nextIdx));
@@ -227,9 +232,9 @@ void LevelImpl::drawTrack(CL_GraphicContext &p_gc)
 
 		// run only if this segment is visible
 		if (viewportBounds.is_overlapped(bounds)) {
-			drawSand(p_gc, i, seg.getPointPairs(), D_LEFT);
-			drawSand(p_gc, i, seg.getPointPairs(), D_RIGHT);
-			drawQuads(p_gc, i);
+			drawSand(p_gc, idx, nextIdx, D_LEFT);
+			drawSand(p_gc, idx, nextIdx, D_RIGHT);
+			drawQuads(p_gc, idx, nextIdx);
 		}
 
 	}
@@ -237,18 +242,12 @@ void LevelImpl::drawTrack(CL_GraphicContext &p_gc)
 
 void LevelImpl::drawQuads(
 		CL_GraphicContext &p_gc,
-		int p_segmentId
+		int p_segIdx,
+		int p_nextSegIdx
 )
 {
 	const std::vector<Race::TrackSegment::PointPair> &p_pairs =
-			m_triangulator.getSegment(p_segmentId).getPointPairs();
-
-	// next segment index
-	const Race::Track &track = m_levelLogic.getTrack();
-	const int trackPointCount = track.getPointCount();
-	const int nextSegId = Math::Integer::clamp(
-			p_segmentId + 1, 0, trackPointCount - 1
-	);
+			m_triangulator.getSegment(p_segIdx).getPointPairs();
 
 	const int pairsCount = static_cast<signed>(p_pairs.size());
 	CL_Pointf prevLeft, prevRight;
@@ -263,19 +262,19 @@ void LevelImpl::drawQuads(
 			currRight = p_pairs[pairIdx].m_right;
 		} else {
 			// last quad is connecting this segment with next one
-			currLeft = m_triangulator.getFirstLeftPoint(nextSegId);
-		    currRight = m_triangulator.getFirstRightPoint(nextSegId);
+			currLeft = m_triangulator.getFirstLeftPoint(p_nextSegIdx);
+		    currRight = m_triangulator.getFirstRightPoint(p_nextSegIdx);
 		}
 
 		if (pairIdx != 0) {
 
 			if (pairIdx < pairsCount) {
-				bDist = m_distances[p_segmentId][pairIdx - 1];
-				fDist = m_distances[p_segmentId][pairIdx];
+				bDist = m_distances[p_segIdx][pairIdx - 1];
+				fDist = m_distances[p_segIdx][pairIdx];
 			} else {
 				// connector
-				bDist = m_distances[p_segmentId][pairIdx - 1];
-				fDist = m_distances[nextSegId][0];
+				bDist = m_distances[p_segIdx][pairIdx - 1];
+				fDist = m_distances[p_nextSegIdx][0];
 			}
 
 			const float bCoord =
@@ -307,36 +306,60 @@ void LevelImpl::drawQuads(
 
 void LevelImpl::drawSand(
 		CL_GraphicContext &p_gc,
-		int p_segmentId,
-		const std::vector<Race::TrackSegment::PointPair> &p_pairs,
-		Direction p_direction
+		int p_segIdx,
+		int p_nextSegIdx,
+		Side p_side
 )
 {
+	const bool left = p_side == D_LEFT;
+
+	// get point pairs
+	const std::vector<Race::TrackSegment::PointPair> &p_pairs =
+			m_triangulator.getSegment(p_segIdx).getPointPairs();
+
+	// get distances according to street side
 	const std::vector<std::vector<float> > &distances =
-			p_direction == D_LEFT ? m_ldistances : m_rdistances;
+			left ? m_ldistances : m_rdistances;
 
 	const int pairsCount = static_cast<signed>(p_pairs.size());
 
 	// far coordinates (away from track)
 	CL_Pointf nearPrev, nearCurr, farA, farB;
 
-	// previous point on wanted side
-	CL_Pointf prev;
-	// previous point on oposite side
-	CL_Pointf prevOposite;
+	// previous and current point on wanted side
+	CL_Pointf prev, curr;
+	// previous and current point on oposite side
+	CL_Pointf prevOposite, currOposite;
+	// distance valued
+	float bDist, fDist;
 
-	for (int pairIdx = 0; pairIdx < pairsCount; ++pairIdx) {
+	CL_Pointf tmpa, tmpb;
 
-		const Race::TrackSegment::PointPair &pair = p_pairs[pairIdx];
+	for (int pairIdx = 0; pairIdx <= pairsCount; ++pairIdx) {
 
-		const CL_Pointf &curr =
-				p_direction == D_LEFT ? pair.m_left : pair.m_right;
-		const CL_Pointf &currOposite =
-				p_direction == D_LEFT ? pair.m_right : pair.m_left;
+		if (pairIdx < pairsCount) {
+			const Race::TrackSegment::PointPair &pair = p_pairs[pairIdx];
+
+			curr = left ? pair.m_left : pair.m_right;
+			currOposite = left ? pair.m_right : pair.m_left;
+		} else {
+			// connector
+			tmpa = m_triangulator.getFirstLeftPoint(p_nextSegIdx);
+			tmpb = m_triangulator.getFirstRightPoint(p_nextSegIdx);
+
+			curr = left ? tmpa : tmpb;
+			currOposite = left ? tmpb : tmpa;
+		}
 
 		if (pairIdx != 0) {
-			const float bDist = distances[p_segmentId][pairIdx - 1];
-			const float fDist = distances[p_segmentId][pairIdx];
+
+			if (pairIdx < pairsCount) {
+				bDist = distances[p_segIdx][pairIdx - 1];
+				fDist = distances[p_segIdx][pairIdx];
+			} else {
+				bDist = distances[p_segIdx][pairIdx - 1];
+				fDist = distances[p_nextSegIdx][0];
+			}
 
 			const float bCoord =
 					fmod(bDist, STREET_TILE_LENGTH_M)
@@ -355,7 +378,7 @@ void LevelImpl::drawSand(
 			nearPrev += (prevOposite - prev) * 0.04;
 			nearCurr += (currOposite - curr) * 0.04;
 
-			switch (p_direction) {
+			switch (p_side) {
 				case D_LEFT:
 					drawQuad(
 							p_gc,

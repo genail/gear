@@ -14,31 +14,26 @@
     	<sprite name="street_crack_1">
     		<image file="crack1.png" />
     		<translation origin="center" />
-    		<scale x="0.7" y="0.7" />
     	</sprite>
     	
     	<sprite name="street_crack_2">
     		<image file="crack2.png" />
     		<translation origin="center" />
-    		<scale x="0.7" y="0.7" />
     	</sprite>
     	
     	<sprite name="street_crack_3">
     		<image file="crack3.png" />
     		<translation origin="center" />
-    		<scale x="0.7" y="0.7" />
     	</sprite>
     	
     	<sprite name="street_crack_4">
     		<image file="crack4.png" />
     		<translation origin="center" />
-    		<scale x="0.7" y="0.7" />
     	</sprite>
     	
     	<sprite name="street_crack_5">
     		<image file="crack5.png" />
     		<translation origin="center" />
-    		<scale x="0.7" y="0.7" />
     	</sprite>
     
     

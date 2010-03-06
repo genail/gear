@@ -62,14 +62,20 @@ class LevelImpl
 		};
 
 		struct Crack {
+
+			/** Level position */
 			CL_Pointf m_position;
 
 			/** m_cracks index */
 			int m_crackId;
 
-			Crack(const CL_Pointf &p_pos, int p_id) :
+			/** Crack scaling */
+			float m_scale;
+
+			Crack(const CL_Pointf &p_pos, int p_id, float p_scale) :
 				m_position(p_pos),
-				m_crackId(p_id)
+				m_crackId(p_id),
+				m_scale(p_scale)
 			{ /* empty */ }
 		};
 
@@ -106,6 +112,12 @@ class LevelImpl
 
 		/** Distance from last point to start point */
 		float m_distanceToStart;
+
+		/** Left side distance from last point to start point */
+		float m_distanceToStartL;
+
+		/** Right site distance from last point to start point */
+		float m_distanceToStartR;
 
 
 		// helpers to optimize drawing process
@@ -274,7 +286,11 @@ void LevelImpl::drawQuads(
 			} else {
 				// connector
 				bDist = m_distances[p_segIdx][pairIdx - 1];
-				fDist = m_distances[p_nextSegIdx][0];
+				if (p_nextSegIdx != 0) {
+					fDist = m_distances[p_nextSegIdx][0];
+				} else {
+					fDist = m_distanceToStart;
+				}
 			}
 
 			const float bCoord =
@@ -328,7 +344,7 @@ void LevelImpl::drawSand(
 
 	// previous and current point on wanted side
 	CL_Pointf prev, curr;
-	// previous and current point on oposite side
+	// previous and current point on opposite side
 	CL_Pointf prevOposite, currOposite;
 	// distance valued
 	float bDist, fDist;
@@ -358,7 +374,11 @@ void LevelImpl::drawSand(
 				fDist = distances[p_segIdx][pairIdx];
 			} else {
 				bDist = distances[p_segIdx][pairIdx - 1];
-				fDist = distances[p_nextSegIdx][0];
+				if (p_nextSegIdx != 0) {
+					fDist = distances[p_nextSegIdx][0];
+				} else {
+					fDist = left ? m_distanceToStartL : m_distanceToStartR;
+				}
 			}
 
 			const float bCoord =
@@ -468,7 +488,33 @@ void LevelImpl::drawCracks(CL_GraphicContext &p_gc)
 		x = crack.m_position.x;
 		y = crack.m_position.y;
 
-		m_crackSprites[crack.m_crackId].draw(p_gc, x, y);
+		CL_Sprite &sprite = m_crackSprites[crack.m_crackId];
+		sprite.set_scale(crack.m_scale, crack.m_scale);
+
+		sprite.draw(p_gc, x, y);
+
+#if defined(DRAW_WIREFRAME)
+		CL_Pen pen;
+		CL_Pen oldPen = p_gc.get_pen();
+
+		pen.set_line_width(1.0f);
+		p_gc.set_pen(pen);
+
+		const int w2_ =
+				(m_crackSprites[crack.m_crackId].get_width() / 2)
+				* crack.m_scale;
+
+		const int h2_ =
+				m_crackSprites[crack.m_crackId].get_height() / 2
+				* crack.m_scale;
+
+
+		CL_Draw::box(
+				p_gc, x - w2_, y - h2_, x + w2_, y + h2_, CL_Colorf::violet
+		);
+
+		p_gc.set_pen(oldPen);
+#endif // DRAW_WIREFRAME
 	}
 }
 
@@ -601,14 +647,15 @@ void LevelImpl::loadTrackTexture(CL_GraphicContext &p_gc)
 	}
 
 	// calculate distance from last point to start
-	const CL_Pointf &startPoint =
-			m_triangulator.getSegment(0).getMidPoints()[0];
+	const Race::TrackSegment::PointPair &pair =
+			m_triangulator.getSegment(0).getPointPairs()[0];
 
-	distL += Units::toWorld(prevPointL.distance(startPoint));
-	distR += Units::toWorld(prevPointR.distance(startPoint));
+	distL += Units::toWorld(prevPointL.distance(pair.m_left));
+	distR += Units::toWorld(prevPointR.distance(pair.m_right));
 
-	m_distanceToStart = distL;
-
+	m_distanceToStart = (distL + distR) / 2;
+	m_distanceToStartL = distL;
+	m_distanceToStartR = distR;
 }
 
 void LevelImpl::loadSandTexture(CL_GraphicContext &p_gc)
@@ -636,8 +683,11 @@ void LevelImpl::loadCracks(CL_GraphicContext &p_gc)
 
 
 	// generate cracks
-	static int MIN_CRACK_DIST = 50;
-	static int MAX_CRACK_DIST = 200;
+	static const int MIN_CRACK_DIST = 50;
+	static const int MAX_CRACK_DIST = 200;
+
+	// resoultion of each crack sprite
+	static const int CRACK_SPRITE_RES = 512;
 
 	const Race::Track &track = m_levelLogic.getTrack();
 	const int count = track.getPointCount();
@@ -667,7 +717,12 @@ void LevelImpl::loadCracks(CL_GraphicContext &p_gc)
 				const CL_Pointf pos((pair.m_left + pair.m_right) / 2);
 				const int index = rand() % CRACKS_COUNT;
 
-				m_crackPositions.push_back(Crack(pos, index));
+				// calculate scaling
+				const float scale =
+						pair.m_left.distance(pair.m_right) / CRACK_SPRITE_RES;
+
+				cl_log_event(LOG_DEBUG, "scale = %1", scale);
+				m_crackPositions.push_back(Crack(pos, index, scale));
 
 				// add new next distance
 				next +=

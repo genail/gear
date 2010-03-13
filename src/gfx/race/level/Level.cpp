@@ -46,6 +46,7 @@ namespace Gfx
 
 const CL_Vec4f WHITE(1.0f, 1.0f, 1.0f, 1.0f);
 const int HELPER_SIZE = 4;
+const int GRASS_HELP_ARR_SIZE = 4; // quad
 
 const int CRACKS_COUNT = 5;
 
@@ -87,19 +88,19 @@ class LevelImpl
 		const Race::TrackTriangulator &m_triangulator;
 
 
+		// textures
+
 		/** Street texture */
 		CL_Texture m_streetTexture;
 
 		/** Sand texture */
 		CL_Texture m_sandTexture;
 
+		/** Grass texture */
+		CL_Texture m_grassTexture;
 
-		// crack sprites in street
-		CL_Sprite m_crackSprites[CRACKS_COUNT];
 
-		// cracks collection to draw
-		std::vector<Crack> m_crackPositions;
-
+		// distance measuring to proper texture drawing
 
 		/** center track point distances from start [seg_id][point_id] */
 		std::vector<std::vector<float> > m_distances;
@@ -120,19 +121,42 @@ class LevelImpl
 		float m_distanceToStartR;
 
 
+		// cracks in street
+
+		/** crack sprites in street */
+		CL_Sprite m_crackSprites[CRACKS_COUNT];
+
+		/** cracks collection to draw */
+		std::vector<Crack> m_crackPositions;
+
+
 		// helpers to optimize drawing process
+
 		CL_Vec2f m_helperVerts[HELPER_SIZE];
+
 		CL_Vec4f m_helperColors[HELPER_SIZE];
+
 		CL_Vec2f m_helperTexCoords[HELPER_SIZE];
 
 		CL_PrimitivesArray *m_helperArr;
+
+
+		// grass drawing helper array
+		CL_PrimitivesArray *m_grassHelpArr;
+
+		CL_Vec2f m_grassHelpVerts[GRASS_HELP_ARR_SIZE];
+
+		CL_Vec4f m_grassHelpColors[GRASS_HELP_ARR_SIZE];
+
+		CL_Vec2f m_grassHelpTexCoords[GRASS_HELP_ARR_SIZE];
 
 
 		LevelImpl(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
 				m_levelLogic(p_levelLogic),
 				m_viewport(p_viewport),
 				m_triangulator(p_levelLogic.getTrackTriangulator()),
-				m_helperArr(NULL)
+				m_helperArr(NULL),
+				m_grassHelpArr(NULL)
 		{
 			for (int i = 0; i < HELPER_SIZE; ++i) {
 				m_helperColors[i] = WHITE;
@@ -143,8 +167,14 @@ class LevelImpl
 			if (m_helperArr) {
 				delete m_helperArr;
 			}
+
+			if (m_grassHelpArr) {
+				delete m_grassHelpArr;
+			}
 		}
 
+
+		// drawers
 
 		void drawTrack(CL_GraphicContext &p_gc);
 
@@ -177,15 +207,19 @@ class LevelImpl
 				Side p_side
 		);
 
-		/** Draw street cracks */
 		void drawCracks(CL_GraphicContext &p_gc);
+
+		void drawGrass(CL_GraphicContext &p_gc);
 
 		void drawStartLine(CL_GraphicContext &p_gc);
 
 		void drawObjects(CL_GraphicContext &p_gc);
 
 
+
 		// loaders
+
+		void loadGrassTexture(CL_GraphicContext &p_gc);
 
 		void loadTrackTexture(CL_GraphicContext &p_gc);
 
@@ -217,6 +251,7 @@ Level::~Level()
 
 void Level::draw(CL_GraphicContext &p_gc)
 {
+	m_impl->drawGrass(p_gc);
 	m_impl->drawTrack(p_gc);
 //	m_impl->drawTriangles(p_gc);
 	m_impl->drawCracks(p_gc);
@@ -437,6 +472,63 @@ void LevelImpl::drawSand(
 	}
 }
 
+void LevelImpl::drawGrass(CL_GraphicContext &p_gc)
+{
+	// drawing texture is 2048 * 2048
+	// world unit is about ~1 meter
+	// this is how long the texture is (in meters)
+	static const float TEX_WIDTH_M = Units::toScreen(120.0f);
+
+	// get the world geometry
+	const CL_Rectf &worldRect = m_viewport.getWorldClipRect();
+
+	// set position coords
+	const CL_Pointf topLeft = worldRect.get_top_left();
+	const CL_Pointf bottomRight = worldRect.get_bottom_right();
+
+	m_grassHelpVerts[0].x = topLeft.x;
+	m_grassHelpVerts[0].y = topLeft.y;
+
+	m_grassHelpVerts[1].x = topLeft.x;
+	m_grassHelpVerts[1].y = bottomRight.y;
+
+	m_grassHelpVerts[2].x = bottomRight.x;
+	m_grassHelpVerts[2].y = bottomRight.y;
+
+	m_grassHelpVerts[3].x = bottomRight.x;
+	m_grassHelpVerts[3].y = topLeft.y;
+
+	const float left = worldRect.left / TEX_WIDTH_M;
+	const float top = worldRect.top / TEX_WIDTH_M;
+	const float right = worldRect.right / TEX_WIDTH_M;
+	const float bottom = worldRect.bottom / TEX_WIDTH_M;
+
+
+	// set texture coords
+	m_grassHelpTexCoords[0].x = left;
+	m_grassHelpTexCoords[0].y = top;
+
+	m_grassHelpTexCoords[1].x = left;
+	m_grassHelpTexCoords[1].y = bottom;
+
+	m_grassHelpTexCoords[2].x = right;
+	m_grassHelpTexCoords[2].y = bottom;
+
+	m_grassHelpTexCoords[3].x = right;
+	m_grassHelpTexCoords[3].y = top;
+
+
+	// draw
+	p_gc.set_program_object(cl_program_single_texture);
+	p_gc.set_texture(0, m_grassTexture);
+
+	// draw
+	p_gc.draw_primitives(cl_quads, 4, *m_grassHelpArr);
+
+	// preserve settings
+	p_gc.set_program_object(cl_program_color_only);
+}
+
 void LevelImpl::drawQuad(
 		CL_GraphicContext &p_gc,
 		const CL_Texture &p_texture,
@@ -576,6 +668,7 @@ void Level::load(CL_GraphicContext &p_gc)
 {
 	Drawable::load(p_gc);
 
+	m_impl->loadGrassTexture(p_gc);
 	m_impl->loadTrackTexture(p_gc);
 	m_impl->loadSandTexture(p_gc);
 	m_impl->loadCracks(p_gc);
@@ -583,9 +676,18 @@ void Level::load(CL_GraphicContext &p_gc)
 	// prepare helper array
 	m_impl->m_helperArr = new CL_PrimitivesArray(p_gc);
 
-	m_impl->m_helperArr->set_attributes(0, m_impl->m_helperVerts);
-	m_impl->m_helperArr->set_attributes(1, m_impl->m_helperColors);
-	m_impl->m_helperArr->set_attributes(2, m_impl->m_helperTexCoords);
+
+	m_impl->m_helperArr->set_attributes(
+			CL_PRIARR_VERTS, m_impl->m_helperVerts
+	);
+
+	m_impl->m_helperArr->set_attributes(
+			CL_PRIARR_COLORS, m_impl->m_helperColors
+	);
+
+	m_impl->m_helperArr->set_attributes(
+			CL_PRIARR_TEXCOORDS, m_impl->m_helperTexCoords
+	);
 }
 
 void LevelImpl::loadTrackTexture(CL_GraphicContext &p_gc)
@@ -668,6 +770,32 @@ void LevelImpl::loadSandTexture(CL_GraphicContext &p_gc)
 	m_sandTexture.set_generate_mipmap(true);
 	m_sandTexture.set_mag_filter(cl_filter_linear);
 	m_sandTexture.set_min_filter(cl_filter_linear);
+}
+
+void LevelImpl::loadGrassTexture(CL_GraphicContext &p_gc)
+{
+	m_grassTexture = CL_Texture(
+			"race/grass", Gfx::Stage::getResourceManager(), p_gc
+	);
+
+	m_grassTexture.set_wrap_mode(cl_wrap_repeat, cl_wrap_repeat);
+
+	// load helper
+	m_grassHelpArr = new CL_PrimitivesArray(p_gc);
+
+	static const CL_Vec4f COLOR = CL_Vec4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_grassHelpColors[0] = COLOR;
+	m_grassHelpColors[1] = COLOR;
+	m_grassHelpColors[2] = COLOR;
+	m_grassHelpColors[3] = COLOR;
+
+
+	m_grassHelpArr->set_attributes(CL_PRIARR_COLORS, m_grassHelpColors);
+
+	// this two will be set by drawing method
+	m_grassHelpArr->set_attributes(CL_PRIARR_VERTS, m_grassHelpVerts);
+	m_grassHelpArr->set_attributes(CL_PRIARR_TEXCOORDS, m_grassHelpTexCoords);
 }
 
 void LevelImpl::loadCracks(CL_GraphicContext &p_gc)

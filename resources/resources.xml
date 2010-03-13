@@ -10,6 +10,7 @@
     
     	<texture name="street" file="street.png" />
     	<texture name="street_sand" file="sand.png" />
+    	<texture name="grass" file="grass.jpg" />
     	
     	<sprite name="street_crack_1">
     		<image file="crack1.png" />

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,34 +31,114 @@
 #include <assert.h>
 
 #include "gfx/Stage.h"
+#include "logic/race/Car.h"
 
 namespace Gfx {
 
-Car::Car()
+const int WHEEL_COUNT = 4;
+const int WHEEL_BL = 0; // back left
+const int WHEEL_BR = 1; // back right
+const int WHEEL_FL = 2; // front left
+const int WHEEL_FR = 3; // front right
+
+class CarImpl
 {
+	public:
+
+		const Race::Car *m_raceCar;
+
+		CL_Pointf m_position;
+
+		CL_Angle m_rotation;
+
+
+		// body sprites
+		// low will be drawn before the wheels
+		// hight after the wheels
+		CL_Sprite m_bodyLow, m_bodyHigh;
+
+		// wheel sprites
+		CL_Sprite m_wheels[WHEEL_COUNT];
+
+
+		CarImpl(const Race::Car *p_car) :
+			m_raceCar(p_car)
+		{ /* empty */ }
+};
+
+Car::Car(const Race::Car *p_car) :
+	m_impl(new CarImpl(p_car))
+{
+	// empty
 }
 
 Car::~Car()
 {
+	// empty
 }
 
 void Car::load(CL_GraphicContext &p_gc)
 {
 	Drawable::load(p_gc);
 
-	m_sprite = CL_Sprite(p_gc, "race/car", Stage::getResourceManager());
+	CL_ResourceManager *res = Stage::getResourceManager();
+
+	m_impl->m_bodyLow = CL_Sprite(
+		p_gc,
+		"race/cars/formula/body_low",
+		res
+	);
+
+	m_impl->m_bodyHigh = CL_Sprite(
+		p_gc,
+		"race/cars/formula/body_high",
+		res
+	);
+
+	m_impl->m_wheels[WHEEL_BL] = CL_Sprite(
+		p_gc,
+		"race/cars/formula/wheels/back_left",
+		res
+	);
+
+	m_impl->m_wheels[WHEEL_BR] = CL_Sprite(
+		p_gc,
+		"race/cars/formula/wheels/back_right",
+		res
+	);
+
+	m_impl->m_wheels[WHEEL_FL] = CL_Sprite(
+		p_gc,
+		"race/cars/formula/wheels/front_left",
+		res
+	);
+
+	m_impl->m_wheels[WHEEL_FR] = CL_Sprite(
+		p_gc,
+		"race/cars/formula/wheels/front_right",
+		res
+	);
 }
 
 void Car::draw(CL_GraphicContext &p_gc)
 {
-	assert(isLoaded());
-
 	p_gc.push_modelview();
 
-	p_gc.mult_translate(m_position.x, m_position.y);
-	p_gc.mult_rotate(m_rotation, 0, 0, 1);
+	const CL_Pointf &pos = m_impl->m_raceCar->getPosition();
+	const CL_Angle &angle = m_impl->m_raceCar->getCorpseAngle();
 
-	m_sprite.draw(p_gc, 0, 0);
+	// put car in right position
+	p_gc.mult_translate(pos.x, pos.y);
+	p_gc.mult_rotate(angle + CL_Angle(-CL_PI/2, cl_radians), 0, 0, 1);
+
+	// low body, wheels, then high body
+	m_impl->m_bodyLow.draw(p_gc, 0, 0);
+
+	for (int i = 0; i < WHEEL_COUNT; ++i) {
+		m_impl->m_wheels[i].draw(p_gc, 0, 0);
+	}
+
+	m_impl->m_bodyHigh.draw(p_gc, 0, 0);
 
 	p_gc.pop_modelview();
 }

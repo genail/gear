@@ -326,16 +326,13 @@ void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	CL_SharedPtr<Gfx::Car> gfxCar;
 
 	if (itor == m_carMapping.end()) {
-		gfxCar = CL_SharedPtr<Gfx::Car>(new Gfx::Car());
+		gfxCar = CL_SharedPtr<Gfx::Car>(new Gfx::Car(&p_car));
 		gfxCar->load(p_gc);
 
 		m_carMapping[&p_car] = gfxCar;
 	} else {
 		gfxCar = itor->second;
 	}
-
-	gfxCar->setPosition(p_car.getPosition());
-	gfxCar->setRotation(p_car.getCorpseAngle());
 
 	gfxCar->draw(p_gc);
 	

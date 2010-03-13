@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,13 +32,19 @@
 
 #include "gfx/Drawable.h"
 
+namespace Race {
+class Car;
+}
+
 namespace Gfx {
+
+class CarImpl;
 
 class Car : public Gfx::Drawable {
 
 	public:
 
-		Car();
+		Car(const Race::Car *p_car);
 
 		virtual ~Car();
 
@@ -46,18 +52,9 @@ class Car : public Gfx::Drawable {
 
 		virtual void load(CL_GraphicContext &p_gc);
 
-
-		void setPosition(const CL_Pointf &p_position) { m_position = p_position; }
-
-		void setRotation(const CL_Angle &p_rotation) { m_rotation = p_rotation; }
-
 	private:
 
-		CL_Sprite m_sprite;
-
-		CL_Pointf m_position;
-
-		CL_Angle m_rotation;
+		CL_SharedPtr<CarImpl> m_impl;
 
 };
 

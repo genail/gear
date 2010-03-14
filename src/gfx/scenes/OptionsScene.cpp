@@ -58,7 +58,7 @@ const int V_MARGIN = 40;
 
 OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	GuiScene(p_parent),
-    m_controller(this),
+	m_controller(this),
 	m_nameLabel(this),
 	m_nameLineEdit(this),
 	m_resolutionLabel(this),
@@ -70,7 +70,7 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	m_soundSlider(this),
 	m_errorLabel(this),
 	m_cancelButton(this),
-    m_okButton(this),
+	m_okButton(this),
 	m_menu(),
 	m_resolutions()
 {
@@ -105,13 +105,14 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 	x = START_X;
 	y += V_MARGIN;
 
-	m_fullScreenCheckBox.set_text(_("Full screen"));
+	m_fullScreenCheckBox.set_text(_("Full screen (coming soon)"));
 	m_fullScreenCheckBox.set_geometry(CL_Rect(x, y, x + CHECKBOX_WIDTH, y + CHECKBOX_HEIGHT));
+	m_fullScreenCheckBox.set_enabled(false);
 
 	x = START_X;
 	y += V_MARGIN;
 
-	m_wsadCheckBox.set_text(_("Use WASD"));
+	m_wsadCheckBox.set_text(_("Use WASD instead of arrow keys"));
 	m_wsadCheckBox.set_geometry(CL_Rect(x, y, x + CHECKBOX_WIDTH, y + CHECKBOX_HEIGHT));
 
 	x = START_X;
@@ -119,12 +120,14 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 
 	m_soundLabel.set_text(_("Sound"));
 	m_soundLabel.set_geometry(CL_Rect(x, y, x + LABEL_WIDTH, y + LABEL_HEIGHT));
+	m_soundLabel.set_enabled(false);
 
 	x += LABEL_WIDTH + H_MARGIN;
 
 	m_soundSlider.set_min(0);
 	m_soundSlider.set_max(100);
 	m_soundSlider.set_geometry(CL_Rect(x, y, x + SLIDER_WIDTH, y + SLIDER_HEIGHT));
+	m_soundSlider.set_enabled(false);
 
 	x += SLIDER_WIDTH + H_MARGIN;
 
@@ -136,16 +139,16 @@ OptionScene::OptionScene(CL_GUIComponent *p_parent) :
 
 	m_errorLabel.set_geometry(CL_Rect(x, y, x + ERROR_LABEL_WIDTH, y + ERROR_LABEL_HEIGHT));
 
-    x = (Gfx::Stage::getWidth() - (2 * BUTTON_WIDTH + H_MARGIN)) / 2;
-    y = Gfx::Stage::getHeight() - (BUTTON_HEIGHT + V_MARGIN);
+	x = (Gfx::Stage::getWidth() - (2 * BUTTON_WIDTH + H_MARGIN)) / 2;
+	y = Gfx::Stage::getHeight() - (BUTTON_HEIGHT + V_MARGIN);
 
-    m_okButton.set_text(_("Ok"));
-    m_okButton.set_geometry(CL_Rect(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT));
+	m_okButton.set_text(_("Ok"));
+	m_okButton.set_geometry(CL_Rect(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT));
 
-    x += V_MARGIN + BUTTON_WIDTH;
+	x += V_MARGIN + BUTTON_WIDTH;
 
-    m_cancelButton.set_text(_("Cancel"));
-    m_cancelButton.set_geometry(CL_Rect(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT));
+	m_cancelButton.set_text(_("Cancel"));
+	m_cancelButton.set_geometry(CL_Rect(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT));
 
 	m_soundSlider.func_value_changed().set(this, &OptionScene::onSliderValueChange);
 	m_okButton.func_clicked().set(this, &OptionScene::onOkClick);
@@ -185,10 +188,10 @@ void OptionScene::pushed()
 {
 	m_errorLabel.set_text("");
 
-	if (Properties::getPropertyAsString("opt_player_name", "") != "")
+	if (Properties::getPropertyAsString(CG_PLAYER_NAME, "") != "")
 	{
-		int width = Properties::getPropertyAsInt("opt_screen_width", -1);
-		int height = Properties::getPropertyAsInt("opt_screen_height", -1);
+		int width = Properties::getPropertyAsInt(CG_SCREEN_WIDTH, -1);
+		int height = Properties::getPropertyAsInt(CG_SCREEN_HEIGHT, -1);
 		int index = 0;
 		if ((index = searchResolution(width, height)) == -1)
 		{
@@ -196,10 +199,10 @@ void OptionScene::pushed()
 		}
 		m_resolutionComboBox.set_selected_item(index);
 
-		m_nameLineEdit.set_text(Properties::getPropertyAsString("opt_player_name", ""));
-		m_fullScreenCheckBox.set_checked(Properties::getPropertyAsBool("opt_fullscreen", false));
-		m_wsadCheckBox.set_checked(Properties::getPropertyAsBool("opt_use_wasd", false));
-		m_soundSlider.set_position(Properties::getPropertyAsInt("opt_sound_volume", 100));
+		m_nameLineEdit.set_text(Properties::getPropertyAsString(CG_PLAYER_NAME, ""));
+		m_fullScreenCheckBox.set_checked(Properties::getPropertyAsBool(CG_FULLSCREEN, false));
+		m_wsadCheckBox.set_checked(Properties::getPropertyAsBool(CG_USE_WASD, false));
+		m_soundSlider.set_position(Properties::getPropertyAsInt(CG_SOUND_VOLUME, 100));
 		setSliderLabelValue();
 	}
 	else
@@ -225,12 +228,12 @@ int OptionScene::searchResolution(const int& p_searchWidth, const int& p_searchH
 
 void OptionScene::onCancelClick()
 {
-    INVOKE_0(cancelClicked);
+	INVOKE_0(cancelClicked);
 }
 
 void OptionScene::onOkClick()
 {
-    INVOKE_0(okClicked);
+	INVOKE_0(okClicked);
 }
 
 void OptionScene::onSliderValueChange()

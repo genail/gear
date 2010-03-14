@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,24 +46,24 @@ void RaceSceneKeyBindings::handleInput(bool p_pressed, const CL_InputEvent& p_ev
 		switch (p_event.id) {
 			case CL_KEY_F9:
 			{
-				int iterationSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
+				int iterationSpeed = Properties::getPropertyAsInt(DBG_ITER_SPEED, 100);
 				if (iterationSpeed > 0) {
 					--iterationSpeed;
 
 					cl_log_event("debug", "Iteration speed decreased to %1", iterationSpeed);
-					Properties::setProperty("dbg_iterSpeed", iterationSpeed);
+					Properties::setProperty(DBG_ITER_SPEED, iterationSpeed);
 				}
 				break;
 			}
 
 			case CL_KEY_F10:
 			{
-				int iterationSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
+				int iterationSpeed = Properties::getPropertyAsInt(DBG_ITER_SPEED, 100);
 				if (iterationSpeed < 300) {
 					++iterationSpeed;
 
 					cl_log_event("debug", "Iteration speed increased to %1", iterationSpeed);
-					Properties::setProperty("dbg_iterSpeed", iterationSpeed);
+					Properties::setProperty(DBG_ITER_SPEED, iterationSpeed);
 				}
 				break;
 			}

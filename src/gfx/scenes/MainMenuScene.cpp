@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_okButton(this),
 	m_errorLabel(this),
 	m_quitButton(this),
-    m_optionButton(this),
+	m_optionButton(this),
 	m_authorsButton(this),
 	m_editorButton(this)
 {
@@ -80,10 +80,10 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_okButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 	m_okButton.set_text(_("Start Race"));
 
-    y += V_MARGIN;
+	y += V_MARGIN;
 
-    m_optionButton.set_text(_("Options"));
-    m_optionButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
+	m_optionButton.set_text(_("Options"));
+	m_optionButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 
 	y += V_MARGIN;
 
@@ -107,12 +107,12 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
 	m_okButton.func_clicked().set(this, &MainMenuScene::onOkClicked);
 	m_quitButton.func_clicked().set(this, &MainMenuScene::onQuitClicked);
-    m_optionButton.func_clicked().set(this, &MainMenuScene::onOptionClicked);
+	m_optionButton.func_clicked().set(this, &MainMenuScene::onOptionClicked);
 	m_authorsButton.func_clicked().set(this, &MainMenuScene::onAuthorsClicked);
 	m_editorButton.func_clicked().set(this, &MainMenuScene::onEditorClicked);
 
 
-	m_serverLineEdit.set_text(Properties::getPropertyAsString("opt_hostname", ""));
+	m_serverLineEdit.set_text(Properties::getPropertyAsString(CG_LAST_HOSTNAME, ""));
 }
 
 MainMenuScene::~MainMenuScene()
@@ -157,7 +157,7 @@ void MainMenuScene::onQuitClicked()
 
 void MainMenuScene::onOptionClicked()
 {
-    INVOKE_0(optionClicked);
+	INVOKE_0(optionClicked);
 }
 
 void MainMenuScene::onAuthorsClicked()

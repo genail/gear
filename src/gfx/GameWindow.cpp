@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -123,7 +123,7 @@ void GameWindow::updateLogic(Scene *p_scene)
 #if !defined(NDEBUG)
 				// apply iteration time change
 				static float timeChangeF = 0.0f;
-				const int iterSpeed = Properties::getPropertyAsInt("dbg_iterSpeed", 100);
+				const int iterSpeed = Properties::getPropertyAsInt(DBG_ITER_SPEED, 100);
 
 				timeChangeF += timeChange * (iterSpeed / 100.0f);
 

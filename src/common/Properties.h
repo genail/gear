@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,29 @@
 
 #include <map>
 #include <ClanLib/core.h>
+
+// display mode
+#define CG_SCREEN_WIDTH "cg_screen_width"
+#define CG_SCREEN_HEIGHT "cg_screen_heght"
+#define CG_FULLSCREEN "cg_fullscreen"
+
+// player settings
+#define CG_PLAYER_NAME "cg_player_name"
+
+// sound
+#define CG_SOUND_VOLUME "cg_sound_volume"
+
+// keyboard
+#define CG_USE_WASD "cg_use_wasd"
+
+// last used hostname
+#define CG_LAST_HOSTNAME "cg_last_hostname"
+
+
+
+// debug constants
+
+#define DBG_ITER_SPEED "dbg_iter_speed"
 
 /**
  * Runtime properties. There are several groups:

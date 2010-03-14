@@ -58,6 +58,11 @@ const int SYNC_PARAM = 0;
 const int SYNC_PARAM = 1;
 #endif
 
+// default screen size
+const int DEF_SCREEN_W = 800;
+const int DEF_SCREEN_H = 600;
+const bool DEF_FULLSCREEN = false;
+
 
 class Application
 {
@@ -136,8 +141,13 @@ int Application::main(const std::vector<CL_String> &args)
 		cl_log_event("init", "initializing display");
 		CL_SetupDisplay setup_display;
 
-		Gfx::Stage::m_width = 800;
-		Gfx::Stage::m_height = 600;
+		Gfx::Stage::m_width =
+				Properties::getPropertyAsInt(CG_SCREEN_WIDTH, DEF_SCREEN_W);
+		Gfx::Stage::m_height =
+				Properties::getPropertyAsInt(CG_SCREEN_HEIGHT, DEF_SCREEN_H);
+
+		const bool fullscreenOpt =
+				Properties::getPropertyAsBool(CG_FULLSCREEN, DEF_FULLSCREEN);
 
 		cl_log_event("init", "display will be %1 x %2", Gfx::Stage::m_width, Gfx::Stage::m_height);
 
@@ -172,6 +182,7 @@ int Application::main(const std::vector<CL_String> &args)
 				CL_Size(Gfx::Stage::m_width, Gfx::Stage::m_height),
 				true
 		);
+		winDesc.set_fullscreen(fullscreenOpt);
 
 		// triple buffering
 		winDesc.set_flipping_buffers(3);

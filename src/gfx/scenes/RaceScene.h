@@ -146,6 +146,11 @@ class RaceScene: public Gfx::DirectScene
 		GameMenuController m_gameMenuController;
 
 
+		// key bindings
+		int m_keySteerLeft, m_keySteerRight;
+		int m_keyAccel, m_keyBrake;
+
+
 		// other
 
 		/** The slots container */

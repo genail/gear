@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ class MainMenuScene : public Gfx::GuiScene
 
 		SIGNAL_0(quitClicked);
 
-        SIGNAL_0(optionClicked);
+		SIGNAL_0(optionClicked);
 
 		SIGNAL_0(authorsClicked);
 
@@ -57,7 +57,7 @@ class MainMenuScene : public Gfx::GuiScene
 
 		virtual void pushed();
 
-		CL_String getPlayerName() const { return Properties::getPropertyAsString("opt_player_name", ""); }
+		CL_String getPlayerName() const { return Properties::getPropertyAsString(CG_PLAYER_NAME, ""); }
 
 		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
 
@@ -79,7 +79,7 @@ class MainMenuScene : public Gfx::GuiScene
 
 		CL_Label m_errorLabel;
 
-        CL_PushButton m_optionButton;
+		CL_PushButton m_optionButton;
 
 		CL_PushButton m_authorsButton;
 
@@ -103,7 +103,7 @@ class MainMenuScene : public Gfx::GuiScene
 
 		void onQuitClicked();
 
-        void onOptionClicked();
+		void onOptionClicked();
 
 		void onAuthorsClicked();
 

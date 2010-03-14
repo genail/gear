@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@
 OptionController::OptionController(OptionScene *p_scene) :
 	m_scene(p_scene)
 {
-    m_slots.connect(m_scene->sig_cancelClicked(), this, &OptionController::onCancelClicked);
-    m_slots.connect(m_scene->sig_okClicked(), this, &OptionController::onOkClicked);
+	m_slots.connect(m_scene->sig_cancelClicked(), this, &OptionController::onCancelClicked);
+	m_slots.connect(m_scene->sig_okClicked(), this, &OptionController::onOkClicked);
 }
 
 OptionController::~OptionController()
@@ -47,7 +47,7 @@ OptionController::~OptionController()
 
 void OptionController::onCancelClicked()
 {
-    Gfx::Stage::popScene();
+	Gfx::Stage::popScene();
 }
 
 void OptionController::onOkClicked()
@@ -58,12 +58,12 @@ void OptionController::onOkClicked()
 		return;
 	}
 
-	Properties::setProperty("opt_screen_width", m_scene->getResolutionWidth());
-	Properties::setProperty("opt_screen_height", m_scene->getResolutionHeight());
-	Properties::setProperty("opt_fullscreen", m_scene->getFullScreen());
-	Properties::setProperty("opt_sound_volume", m_scene->getSound());
-	Properties::setProperty("opt_player_name", m_scene->getPlayersName());
-	Properties::setProperty("opt_use_wasd", m_scene->getWASD());
+	Properties::setProperty(CG_SCREEN_WIDTH, m_scene->getResolutionWidth());
+	Properties::setProperty(CG_SCREEN_HEIGHT, m_scene->getResolutionHeight());
+	Properties::setProperty(CG_FULLSCREEN, m_scene->getFullScreen());
+	Properties::setProperty(CG_SOUND_VOLUME, m_scene->getSound());
+	Properties::setProperty(CG_PLAYER_NAME, m_scene->getPlayersName());
+	Properties::setProperty(CG_USE_WASD, m_scene->getWASD());
 
 	Gfx::Stage::popScene();
 };

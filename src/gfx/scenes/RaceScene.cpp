@@ -33,6 +33,7 @@
 
 #include "common.h"
 #include "common/Game.h"
+#include "common/Properties.h"
 #include "common/Units.h"
 #include "logic/race/Block.h"
 #include "logic/race/OfflineRaceLogic.h"
@@ -95,6 +96,21 @@ void RaceScene::initCommon()
 {
 	m_logic->initialize();
 	m_graphics = new Gfx::RaceGraphics(m_logic);
+
+	// bind keys
+	if (Properties::getPropertyAsBool(CG_USE_WASD, false)) {
+		// use WASD instead of arrows
+		m_keySteerLeft = CL_KEY_A;
+		m_keySteerRight = CL_KEY_D;
+		m_keyAccel = CL_KEY_W;
+		m_keyBrake = CL_KEY_S;
+	} else {
+		// use arrows
+		m_keySteerLeft = CL_KEY_LEFT;
+		m_keySteerRight = CL_KEY_RIGHT;
+		m_keyAccel = CL_KEY_UP;
+		m_keyBrake = CL_KEY_DOWN;
+	}
 
 	m_initialized = true;
 }
@@ -184,45 +200,44 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 			assert(0 && "unknown input state");
 	}
 
-	switch (p_event.id) {
-		case CL_KEY_LEFT:
-			m_turnLeft = pressed;
-			break;
-		case CL_KEY_RIGHT:
-			m_turnRight = pressed;
-			break;
-		case CL_KEY_UP:
-			car.setAcceleration(pressed);
-			break;
-		case CL_KEY_DOWN:
-			car.setBrake(pressed);
-			break;
-		case CL_KEY_F1:
-			if (pressed && m_logic->isVoteRunning()) {
-				m_logic->voteYes();
-			}
-			break;
-		case CL_KEY_F2:
-			if (pressed && m_logic->isVoteRunning()) {
-				m_logic->voteNo();
-			}
-		case CL_KEY_TAB:
-			if (pressed) {
-				m_graphics->getUi().getScoreTable().restartAnimation();
-			}
-			break;
+	if (p_event.id == m_keySteerLeft) {
+		m_turnLeft = pressed;
+	} else if (p_event.id == m_keySteerRight) {
+		m_turnRight = pressed;
+	} else if (p_event.id == m_keyAccel) {
+		car.setAcceleration(pressed);
+	} else if (p_event.id == m_keyBrake) {
+		car.setBrake(pressed);
+	} else {
+
+		switch (p_event.id) {
+			case CL_KEY_F1:
+				if (pressed && m_logic->isVoteRunning()) {
+					m_logic->voteYes();
+				}
+				break;
+			case CL_KEY_F2:
+				if (pressed && m_logic->isVoteRunning()) {
+					m_logic->voteNo();
+				}
+			case CL_KEY_TAB:
+				if (pressed) {
+					m_graphics->getUi().getScoreTable().restartAnimation();
+				}
+				break;
 #if !defined(NDEBUG)
-		case CL_KEY_R:
-			if (!pressed) {
-				std::cout << "<ref>\n\t<position x=\""
-						<< Units::toWorld(car.getPosition().x)
-						<< "\" y=\""
-						<< Units::toWorld(car.getPosition().y)
-						<< "\" />\n</ref>" << std::endl;
-			}
+			case CL_KEY_R:
+				if (!pressed) {
+					std::cout << "<ref>\n\t<position x=\""
+							<< Units::toWorld(car.getPosition().x)
+							<< "\" y=\""
+							<< Units::toWorld(car.getPosition().y)
+							<< "\" />\n</ref>" << std::endl;
+				}
 #endif // NDEBUG
-		default:
-			break;
+			default:
+				break;
+		}
 	}
 
 	// handle quit request

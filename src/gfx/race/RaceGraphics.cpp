@@ -367,6 +367,7 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 	updateViewport(p_timeElapsed);
 	updateTyreStripes();
 	updateSmokes(p_timeElapsed);
+	updateCars(p_timeElapsed);
 
 	m_raceUI.update(p_timeElapsed);
 
@@ -470,14 +471,12 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 	}
 }
 
-CL_Pointf RaceGraphics::real(const CL_Pointf &p_point) const
+void RaceGraphics::updateCars(unsigned p_timeElapsed)
 {
-	return CL_Pointf(real(p_point.x), real(p_point.y));
-}
-
-float RaceGraphics::real(float p_coord) const
-{
-	return p_coord * Race::Block::WIDTH;
+	TCarMappingPair pair;
+	foreach(pair, m_carMapping) {
+		pair.second->update(p_timeElapsed);
+	}
 }
 
 Gfx::RaceUI &RaceGraphics::getUi()

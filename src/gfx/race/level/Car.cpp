@@ -122,6 +122,19 @@ void Car::load(CL_GraphicContext &p_gc)
 
 void Car::draw(CL_GraphicContext &p_gc)
 {
+	// max wheel turn value in radians
+	static const float WHEEL_TURN_MAX = CL_PI / 2;
+
+	// set from wheels turn
+	const CL_Angle wheelTurnAngle(
+			-m_impl->m_raceCar->getPhyWheelTurn() / WHEEL_TURN_MAX,
+			cl_radians
+	);
+	m_impl->m_wheels[WHEEL_FL].set_base_angle(wheelTurnAngle);
+	m_impl->m_wheels[WHEEL_FR].set_base_angle(wheelTurnAngle);
+
+
+	// start drawing
 	p_gc.push_modelview();
 
 	const CL_Pointf &pos = m_impl->m_raceCar->getPosition();
@@ -141,6 +154,13 @@ void Car::draw(CL_GraphicContext &p_gc)
 	m_impl->m_bodyHigh.draw(p_gc, 0, 0);
 
 	p_gc.pop_modelview();
+}
+
+void Car::update(unsigned p_timeElapsed)
+{
+	for (int i = 0; i < WHEEL_COUNT; ++i) {
+		m_impl->m_wheels[i].update(p_timeElapsed);
+	}
 }
 
 }

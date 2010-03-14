@@ -65,7 +65,7 @@
         				</image>
         				
         				<translation origin="center" x="86" y="-142"/>
-        				<animation direction="backward" on_finish="last_frame" />
+        				<animation direction="forward" on_finish="first_frame" />
         				<scale x="0.3" y="0.3" />
         			</sprite>
         			
@@ -79,7 +79,7 @@
         				</image>
         				
         				<translation origin="center" x="-89" y="-142"/>
-        				<animation direction="backward" />
+        				<animation direction="forward" on_finish="first_frame" />
         				<scale x="0.3" y="0.3" />
         			</sprite>
         			
@@ -94,7 +94,7 @@
         				
         				<translation origin="center" x="82" y="142" />
         				<rotation origin="center_left" />
-        				<animation direction="backward" />
+        				<animation direction="forward" on_finish="first_frame" />
         				<scale x="0.3" y="0.3" />
         			</sprite>
         			
@@ -109,7 +109,7 @@
         				
         				<translation origin="center" x="-85" y="142" />
         				<rotation origin="center_right" />
-        				<animation direction="backward" />
+        				<animation direction="forward" on_finish="first_frame" />
         				<scale x="0.3" y="0.3" />
         			</sprite>
         			

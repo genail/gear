@@ -81,6 +81,12 @@ class Car : boost::noncopyable
 		/** @return Car speed in km/s */
 		float getSpeedKMS() const;
 
+		/**
+		 * @return physical wheel turn. -1.0 is maximum left,
+		 * 1.0 is maximum right
+		 */
+		float getPhyWheelTurn() const;
+
 		
 		// implementation data serialization (for network)
 

@@ -52,6 +52,8 @@ class Car : public Gfx::Drawable {
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+		void update(unsigned p_timeElapsed);
+
 	private:
 
 		CL_SharedPtr<CarImpl> m_impl;

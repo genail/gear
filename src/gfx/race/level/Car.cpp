@@ -32,6 +32,7 @@
 
 #include "gfx/Stage.h"
 #include "logic/race/Car.h"
+#include "math/Float.h"
 
 namespace Gfx {
 
@@ -60,9 +61,13 @@ class CarImpl
 		// wheel sprites
 		CL_Sprite m_wheels[WHEEL_COUNT];
 
+		// wheel turn factor (for animation)
+		float m_wheelTurn;
+
 
 		CarImpl(const Race::Car *p_car) :
-			m_raceCar(p_car)
+			m_raceCar(p_car),
+			m_wheelTurn(0.0f)
 		{ /* empty */ }
 };
 
@@ -158,8 +163,33 @@ void Car::draw(CL_GraphicContext &p_gc)
 
 void Car::update(unsigned p_timeElapsed)
 {
+	// what distance car need to make to make one animation iteration
+	static const float WHEEL_TURN_DISTANCE = 2.0f;
+
+	static const float FRAME_0 = WHEEL_TURN_DISTANCE / 3;
+	static const float FRAME_1 = WHEEL_TURN_DISTANCE / 3 * 2;
+
+	// get the turn value
+	float turn = m_impl->m_wheelTurn;
+
+	turn += (p_timeElapsed / 1000.0f) * m_impl->m_raceCar->getSpeed();
+	turn = Math::Float::clamp(turn, 0.0f, WHEEL_TURN_DISTANCE);
+
+	// set the turn back
+	m_impl->m_wheelTurn = turn;
+
+	int frame;
+
+	if (turn <= FRAME_0) {
+		frame = 2;
+	} else if (turn <= FRAME_1) {
+		frame = 1;
+	} else {
+		frame = 0;
+	}
+
 	for (int i = 0; i < WHEEL_COUNT; ++i) {
-		m_impl->m_wheels[i].update(p_timeElapsed);
+		m_impl->m_wheels[i].set_frame(frame);
 	}
 }
 

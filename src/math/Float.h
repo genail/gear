@@ -44,6 +44,8 @@ class Float {
 
 	public:
 
+		static float clamp(float p_val, float p_min, float p_max);
+
 		static bool cmp(float p_a, float p_b, float p_precision);
 
 		static float reduce(float p_val, float p_min, float p_max);

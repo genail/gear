@@ -46,7 +46,7 @@ class Server {
 
 	public:
 
-		explicit Server(const ServerConfiguration &p_conf);
+		explicit Server();
 
 		virtual ~Server();
 

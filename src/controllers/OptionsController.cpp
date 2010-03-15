@@ -58,12 +58,12 @@ void OptionController::onOkClicked()
 		return;
 	}
 
-	Properties::setProperty(CG_SCREEN_WIDTH, m_scene->getResolutionWidth());
-	Properties::setProperty(CG_SCREEN_HEIGHT, m_scene->getResolutionHeight());
-	Properties::setProperty(CG_FULLSCREEN, m_scene->getFullScreen());
-	Properties::setProperty(CG_SOUND_VOLUME, m_scene->getSound());
-	Properties::setProperty(CG_PLAYER_NAME, m_scene->getPlayersName());
-	Properties::setProperty(CG_USE_WASD, m_scene->getWASD());
+	Properties::set(CG_SCREEN_WIDTH, m_scene->getResolutionWidth());
+	Properties::set(CG_SCREEN_HEIGHT, m_scene->getResolutionHeight());
+	Properties::set(CG_FULLSCREEN, m_scene->getFullScreen());
+	Properties::set(CG_SOUND_VOLUME, m_scene->getSound());
+	Properties::set(CG_PLAYER_NAME, m_scene->getPlayersName());
+	Properties::set(CG_USE_WASD, m_scene->getWASD());
 
 	Gfx::Stage::popScene();
 };

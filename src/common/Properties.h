@@ -31,6 +31,21 @@
 #include <map>
 #include <ClanLib/core.h>
 
+//
+// known properties files
+//
+
+// client configuration
+#define CONFIG_FILE_CLIENT "client.cfg"
+
+// server configuration
+#define CONFIG_FILE_SERVER "server.cfg"
+
+
+//
+// Configuration values
+//
+
 // display mode
 #define CG_SCREEN_WIDTH "cg_screen_width"
 #define CG_SCREEN_HEIGHT "cg_screen_heght"
@@ -48,11 +63,16 @@
 // last used hostname
 #define CG_LAST_HOSTNAME "cg_last_hostname"
 
-
-
 // debug constants
-
 #define DBG_ITER_SPEED "dbg_iter_speed"
+
+//
+// Server settings
+//
+
+#define SRV_PORT "srv_port"
+
+#define SRV_LEVEL "srv_level"
 
 /**
  * Runtime properties. There are several groups:
@@ -65,27 +85,54 @@ class Properties {
 
 	public:
 
-		static void load();
+		// null objects
+		static const bool NULL_BOOL;
 
-		static void save();
+		static const int NULL_INT;
 
-
-		static void setProperty(const CL_String &p_key, bool p_value);
-
-		static void setProperty(const CL_String &p_key, int p_value);
-
-		static void setProperty(const CL_String &p_key, const CL_String &p_value);
+		static const CL_String NULL_CL_STRING;
 
 
-		static bool getPropertyAsBool(const CL_String &p_key, bool p_defaultValue);
+		static void load(const CL_String &p_filename);
 
-		static int getPropertyAsInt(const CL_String &p_key, int p_defaultValue);
+		static void save(const CL_String &p_filename);
 
-		static CL_String getPropertyAsString(const CL_String &p_key, const CL_String &defaultValue);
+
+		static void set(
+				const CL_String &p_key,
+				bool p_value
+		);
+
+		static void set(
+				const CL_String &p_key,
+				int p_value
+		);
+
+		static void set(
+				const CL_String &p_key,
+				const CL_String &p_value
+		);
+
+
+		static bool getBool(
+				const CL_String &p_key,
+				const bool &p_defaultValue = NULL_BOOL
+		);
+
+		static int getInt(
+				const CL_String &p_key,
+				const int &p_defaultValue = NULL_INT
+		);
+
+		static CL_String getString(
+				const CL_String &p_key,
+				const CL_String &defaultValue = NULL_CL_STRING
+		);
 
 	private:
 
 		static std::map<CL_String, CL_String> m_keyValueMap;
+
 
 		Properties();
 

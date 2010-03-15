@@ -29,7 +29,7 @@
 #include "Server.h"
 
 #include "common.h"
-#include "ServerConfiguration.h"
+#include "common/Properties.h"
 #include "logic/race/level/Level.h"
 #include "network/events.h"
 #include "network/version.h"
@@ -48,7 +48,6 @@
 namespace Net {
 
 const int VOTE_TIME_LIMIT_SEC = 30;
-
 
 class ServerImpl
 {
@@ -72,9 +71,6 @@ class ServerImpl
 			{}
 		};
 
-		/** Server configuration */
-		const ServerConfiguration m_conf;
-
 		/** Running state */
 		bool m_running;
 
@@ -97,8 +93,7 @@ class ServerImpl
 		CL_SlotContainer m_slots;
 
 
-		ServerImpl(const ServerConfiguration &p_conf) :
-			m_conf(p_conf), // copy this object
+		ServerImpl() :
 			m_running(false)
 		{ /* empty */ }
 
@@ -144,10 +139,15 @@ class ServerImpl
 SIG_CPP(Server, playerJoined);
 SIG_CPP(Server, playerLeft);
 
-Server::Server(const ServerConfiguration &p_conf) :
-	m_impl(new ServerImpl(p_conf))
+Server::Server() :
+	m_impl(new ServerImpl())
 {
-	const CL_String levPath = cl_format("%1/%2", LEVELS_DIR, p_conf.getLevel());
+	const CL_String levPath =
+			cl_format(
+					"%1/%2",
+					LEVELS_DIR,
+					Properties::getString(SRV_LEVEL)
+			);
 
 	if (!CL_FileHelp::file_exists(levPath)) {
 		cl_log_event(LOG_ERROR, "level %1 doesn't exists, exiting", levPath);
@@ -191,10 +191,10 @@ void Server::start()
 {
 	G_ASSERT(!m_impl->m_running);
 
+	const int port = Properties::getInt(SRV_PORT, DEFAULT_PORT);
+
 	try {
-		m_impl->m_gameServer.start(
-				CL_StringHelp::int_to_local8(m_impl->m_conf.getPort())
-		);
+		m_impl->m_gameServer.start(CL_StringHelp::int_to_local8(port));
 
 		m_impl->m_running = true;
 
@@ -471,7 +471,13 @@ GameState ServerImpl::prepareGameState()
 	}
 
 
-	const CL_String levPath = cl_format("%1/%2", LEVELS_DIR, m_conf.getLevel());
+	const CL_String levPath =
+			cl_format(
+					"%1/%2",
+					LEVELS_DIR,
+					Properties::getString(SRV_LEVEL)
+			);
+
 	gamestate.setLevel(levPath);
 
 	return gamestate;

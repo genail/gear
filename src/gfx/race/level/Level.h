@@ -64,6 +64,13 @@ class Level : public Gfx::Drawable
 
 		virtual void load(CL_GraphicContext &p_gc);
 
+		/**
+		 * Sets level editor mode enabled / disabled.
+		 * This mode draw level in way that is editable without graphics
+		 * glitches.
+		 */
+		void setLevelEditorMode(bool p_enabled);
+
 	private:
 
 		CL_SharedPtr<LevelImpl> m_impl;

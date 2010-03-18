@@ -87,6 +87,9 @@ class LevelImpl
 
 		const Race::TrackTriangulator &m_triangulator;
 
+		/** Special drawing mode */
+		bool m_levelEditorMode;
+
 
 		// textures
 
@@ -155,6 +158,7 @@ class LevelImpl
 				m_levelLogic(p_levelLogic),
 				m_viewport(p_viewport),
 				m_triangulator(p_levelLogic.getTrackTriangulator()),
+				m_levelEditorMode(false),
 				m_helperArr(NULL),
 				m_grassHelpArr(NULL)
 		{
@@ -253,8 +257,11 @@ void Level::draw(CL_GraphicContext &p_gc)
 {
 	m_impl->drawGrass(p_gc);
 	m_impl->drawTrack(p_gc);
-//	m_impl->drawTriangles(p_gc);
-	m_impl->drawCracks(p_gc);
+
+	if (!m_impl->m_levelEditorMode) {
+		m_impl->drawCracks(p_gc);
+	}
+
 	m_impl->drawStartLine(p_gc);
 	m_impl->drawObjects(p_gc);
 }
@@ -279,8 +286,10 @@ void LevelImpl::drawTrack(CL_GraphicContext &p_gc)
 
 		// run only if this segment is visible
 		if (viewportBounds.is_overlapped(bounds)) {
-			drawSand(p_gc, idx, nextIdx, D_LEFT);
-			drawSand(p_gc, idx, nextIdx, D_RIGHT);
+			if (!m_levelEditorMode) {
+				drawSand(p_gc, idx, nextIdx, D_LEFT);
+				drawSand(p_gc, idx, nextIdx, D_RIGHT);
+			}
 			drawQuads(p_gc, idx, nextIdx);
 		}
 
@@ -299,7 +308,7 @@ void LevelImpl::drawQuads(
 	const int pairsCount = static_cast<signed>(p_pairs.size());
 	CL_Pointf prevLeft, prevRight;
 	CL_Pointf currLeft, currRight;
-	float bDist, fDist;
+	float bDist = 0.0f, fDist = 0.0f;
 
 	// draw each quad
 	for (int pairIdx = 0; pairIdx <= pairsCount; ++pairIdx) {
@@ -315,16 +324,18 @@ void LevelImpl::drawQuads(
 
 		if (pairIdx != 0) {
 
-			if (pairIdx < pairsCount) {
-				bDist = m_distances[p_segIdx][pairIdx - 1];
-				fDist = m_distances[p_segIdx][pairIdx];
-			} else {
-				// connector
-				bDist = m_distances[p_segIdx][pairIdx - 1];
-				if (p_nextSegIdx != 0) {
-					fDist = m_distances[p_nextSegIdx][0];
+			if (!m_levelEditorMode) {
+				if (pairIdx < pairsCount) {
+					bDist = m_distances[p_segIdx][pairIdx - 1];
+					fDist = m_distances[p_segIdx][pairIdx];
 				} else {
-					fDist = m_distanceToStart;
+					// connector
+					bDist = m_distances[p_segIdx][pairIdx - 1];
+					if (p_nextSegIdx != 0) {
+						fDist = m_distances[p_nextSegIdx][0];
+					} else {
+						fDist = m_distanceToStart;
+					}
 				}
 			}
 
@@ -554,14 +565,25 @@ void LevelImpl::drawQuad(
 	m_helperTexCoords[2] = p_tcc;
 	m_helperTexCoords[3] = p_tcd;
 
-	p_gc.set_program_object(cl_program_single_texture);
-	p_gc.set_texture(0, p_texture);
+	if (!m_levelEditorMode) {
+		p_gc.set_program_object(cl_program_single_texture);
+		p_gc.set_texture(0, p_texture);
+	} else {
+		static const CL_Vec4f gray(0.5f, 0.5f, 0.5f, 1.0f);
+
+		m_helperColors[0] = gray;
+		m_helperColors[1] = gray;
+		m_helperColors[2] = gray;
+		m_helperColors[3] = gray;
+	}
 
 	// draw
 	p_gc.draw_primitives(cl_quads, 4, *m_helperArr);
 
-	// preserve settings
-	p_gc.set_program_object(cl_program_color_only);
+	// preserve old settings
+	if (!m_levelEditorMode) {
+		p_gc.set_program_object(cl_program_color_only);
+	}
 
 #if !defined(NDEBUG) && defined(DRAW_WIREFRAME)
 	CL_Draw::line(p_gc, p_a, p_b, CL_Colorf::purple);
@@ -883,6 +905,11 @@ void LevelImpl::expand(CL_Rectf *p_rect, const CL_Pointf &p_point)
 	} else if (p_point.y > p_rect->bottom) {
 		p_rect->bottom = p_point.y;
 	}
+}
+
+void Level::setLevelEditorMode(bool p_enabled)
+{
+	m_impl->m_levelEditorMode = p_enabled;
 }
 
 } // namespace

@@ -38,7 +38,7 @@ namespace Editor
 		m_track(p_track),
 		m_viewport(p_viewport)
 	{
-
+		m_gfxLevel.setLevelEditorMode(true);
 	}
 
 	EditorBase::~EditorBase()

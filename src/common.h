@@ -47,7 +47,12 @@
 // map expansion
 #define MAP_EXPANSION ".map"
 
+static const int CL_PRIARR_VERTS     = 0;
+static const int CL_PRIARR_COLORS    = 1;
+static const int CL_PRIARR_TEXCOORDS = 2;
+
 // signal and slots
+
 #define SIGNAL_0(name) \
 	public: \
 		CL_Signal_v0 &sig_##name() { return m_sig_##name; } \

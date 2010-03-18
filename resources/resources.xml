@@ -5,6 +5,41 @@
         </sprite>
     </section>
     <section name="race">
+
+		<!-- Level apperance -->
+    
+    	<texture name="street" file="street.png" />
+    	<texture name="street_sand" file="sand.png" />
+    	<texture name="grass" file="grass.jpg" />
+    	
+    	<sprite name="street_crack_1">
+    		<image file="crack1.png" />
+    		<translation origin="center" />
+    	</sprite>
+    	
+    	<sprite name="street_crack_2">
+    		<image file="crack2.png" />
+    		<translation origin="center" />
+    	</sprite>
+    	
+    	<sprite name="street_crack_3">
+    		<image file="crack3.png" />
+    		<translation origin="center" />
+    	</sprite>
+    	
+    	<sprite name="street_crack_4">
+    		<image file="crack4.png" />
+    		<translation origin="center" />
+    	</sprite>
+    	
+    	<sprite name="street_crack_5">
+    		<image file="crack5.png" />
+    		<translation origin="center" />
+    	</sprite>
+    
+    
+    	<!-- Cars apperance -->
+    
         <sprite name="car" base_angle="90">
             <image file="car.png" />
             <translation origin="center"/>
@@ -14,6 +49,7 @@
 
         
         <!-- Special -->
+        
         <sprite name="smoke1">
             <image file="smoke1.png" />
             <translation origin="center" />
@@ -30,6 +66,7 @@
         </sprite>
         
         <!-- Speed control -->
+        
         <sprite name="speed_meter_bg">
             <image file="speed_meter_bg.png" />
             <translation x="-200" y="-200"/>

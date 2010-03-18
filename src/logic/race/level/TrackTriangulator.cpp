@@ -226,7 +226,8 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 		curve.add_control_point(next.getPosition() + nextHelper);
 		curve.add_control_point(next.getPosition());
 
-		std::vector<CL_Pointf> curvePoints = curve.generate_curve_points(CURVE_RESOLUTION);
+		std::vector<CL_Pointf> curvePoints =
+				curve.generate_curve_points(CURVE_RESOLUTION);
 
 		// track points knows thier radius and shift (interpolated values)
 		std::vector<TrackPoint> trackPoints = m_impl->toTrackPoints(
@@ -239,6 +240,7 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 		G_ASSERT(static_cast<signed>(trackPoints.size()) == curveSize);
 
 		std::vector<CL_Pointf> triPoints;
+		std::vector<TrackSegment::PointPair> pointPairs;
 
 		CL_Pointf lastLeftPoint, lastRightPoint;
 		bool first = true;
@@ -281,12 +283,20 @@ void TrackTriangulator::triangulate(const Track &p_track, int p_segment)
 
 			lastLeftPoint = prevPoint + leftVec;
 			lastRightPoint = prevPoint + rightVec;
+
+			// add left and right point pair
+			pointPairs.push_back(
+					TrackSegment::PointPair(
+							lastLeftPoint,
+							lastRightPoint
+					)
+			);
 		}
 
 		// update triangle points in map
 		m_impl->m_intSegMap[p_segment] =
 				CL_SharedPtr<TrackSegment>(
-						new TrackSegment(triPoints, curvePoints)
+						new TrackSegment(triPoints, curvePoints, pointPairs)
 		);
 
 		// update direction vector

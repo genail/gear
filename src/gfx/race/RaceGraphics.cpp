@@ -326,16 +326,13 @@ void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	CL_SharedPtr<Gfx::Car> gfxCar;
 
 	if (itor == m_carMapping.end()) {
-		gfxCar = CL_SharedPtr<Gfx::Car>(new Gfx::Car());
+		gfxCar = CL_SharedPtr<Gfx::Car>(new Gfx::Car(&p_car));
 		gfxCar->load(p_gc);
 
 		m_carMapping[&p_car] = gfxCar;
 	} else {
 		gfxCar = itor->second;
 	}
-
-	gfxCar->setPosition(p_car.getPosition());
-	gfxCar->setRotation(p_car.getCorpseAngle());
 
 	gfxCar->draw(p_gc);
 	
@@ -370,6 +367,7 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 	updateViewport(p_timeElapsed);
 	updateTyreStripes();
 	updateSmokes(p_timeElapsed);
+	updateCars(p_timeElapsed);
 
 	m_raceUI.update(p_timeElapsed);
 
@@ -473,14 +471,12 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 	}
 }
 
-CL_Pointf RaceGraphics::real(const CL_Pointf &p_point) const
+void RaceGraphics::updateCars(unsigned p_timeElapsed)
 {
-	return CL_Pointf(real(p_point.x), real(p_point.y));
-}
-
-float RaceGraphics::real(float p_coord) const
-{
-	return p_coord * Race::Block::WIDTH;
+	TCarMappingPair pair;
+	foreach(pair, m_carMapping) {
+		pair.second->update(p_timeElapsed);
+	}
 }
 
 Gfx::RaceUI &RaceGraphics::getUi()

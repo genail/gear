@@ -758,4 +758,9 @@ bool Car::operator!=(const Car &p_other) const
 	return !(*this == p_other);
 }
 
+float Car::getPhyWheelTurn() const
+{
+	return m_impl->m_phyWheelsTurn;
+}
+
 } // namespace

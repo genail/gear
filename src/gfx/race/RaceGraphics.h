@@ -94,6 +94,7 @@ class RaceGraphics {
 
 		/** Logic car to gfx car mapping */
 		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMapping;
+		typedef std::pair<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMappingPair;
 		TCarMapping m_carMapping;
 
 		/** Car smoke periods */
@@ -131,6 +132,8 @@ class RaceGraphics {
 
 		void updateSmokes(unsigned p_timeElapsed);
 
+		void updateCars(unsigned p_timeElapsed);
+
 		void updateTyreStripes();
 
 
@@ -156,13 +159,6 @@ class RaceGraphics {
 
 
 		void countFps();
-
-		// helpers
-
-		// FIXME: this is copy of Level helpers
-		CL_Pointf real(const CL_Pointf &p_point) const;
-
-		float real(float p_coord) const;
 };
 
 } // namespace

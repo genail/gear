@@ -36,6 +36,23 @@
 
 namespace Math {
 
+float Float::clamp(float p_val, float p_min, float p_max)
+{
+	G_ASSERT(p_max >= p_min);
+
+	if (p_val >= p_min && p_val <= p_max) {
+		return p_val;
+	}
+
+	p_val = fmod(p_val, p_max);
+
+	if (p_val < p_min) {
+		p_val += p_max;
+	}
+
+	return p_val;
+}
+
 bool Float::cmp(float p_a, float p_b, float p_precision)
 {
 	return fabs(p_a - p_b) <= p_precision;

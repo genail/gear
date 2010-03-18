@@ -90,37 +90,37 @@ void Car::load(CL_GraphicContext &p_gc)
 
 	m_impl->m_bodyLow = CL_Sprite(
 		p_gc,
-		"race/cars/formula/body_low",
+		"race/cars/buggy/body_low",
 		res
 	);
 
 	m_impl->m_bodyHigh = CL_Sprite(
 		p_gc,
-		"race/cars/formula/body_high",
+		"race/cars/buggy/body_high",
 		res
 	);
 
 	m_impl->m_wheels[WHEEL_BL] = CL_Sprite(
 		p_gc,
-		"race/cars/formula/wheels/back_left",
+		"race/cars/buggy/wheels/back_left",
 		res
 	);
 
 	m_impl->m_wheels[WHEEL_BR] = CL_Sprite(
 		p_gc,
-		"race/cars/formula/wheels/back_right",
+		"race/cars/buggy/wheels/back_right",
 		res
 	);
 
 	m_impl->m_wheels[WHEEL_FL] = CL_Sprite(
 		p_gc,
-		"race/cars/formula/wheels/front_left",
+		"race/cars/buggy/wheels/front_left",
 		res
 	);
 
 	m_impl->m_wheels[WHEEL_FR] = CL_Sprite(
 		p_gc,
-		"race/cars/formula/wheels/front_right",
+		"race/cars/buggy/wheels/front_right",
 		res
 	);
 }
@@ -128,11 +128,11 @@ void Car::load(CL_GraphicContext &p_gc)
 void Car::draw(CL_GraphicContext &p_gc)
 {
 	// max wheel turn value in radians
-	static const float WHEEL_TURN_MAX = CL_PI / 2;
+	static const float WHEEL_TURN_MAX = CL_PI / 8;
 
 	// set from wheels turn
 	const CL_Angle wheelTurnAngle(
-			-m_impl->m_raceCar->getPhyWheelTurn() / WHEEL_TURN_MAX,
+			-m_impl->m_raceCar->getPhyWheelTurn() * WHEEL_TURN_MAX,
 			cl_radians
 	);
 	m_impl->m_wheels[WHEEL_FL].set_base_angle(wheelTurnAngle);
@@ -156,7 +156,7 @@ void Car::draw(CL_GraphicContext &p_gc)
 		m_impl->m_wheels[i].draw(p_gc, 0, 0);
 	}
 
-	m_impl->m_bodyHigh.draw(p_gc, 0, 0);
+//	m_impl->m_bodyHigh.draw(p_gc, 0, 0);
 
 	p_gc.pop_modelview();
 }

@@ -137,6 +137,97 @@
         		
         	</section>
         	
+        	<!-- Buggy -->
+        	<section name="buggy">
+
+				<section name="wheels">
+        			
+        			<sprite name="back_left">
+        				<image file="buggy.png">
+        					<grid
+        						pos="10, 10"
+        						size="30, 60"
+        						spacing="1, 0"
+        						array="6, 1"
+							/>
+        				</image>
+        				
+        				<translation origin="center" x="75" y="-60"/>
+        				<animation direction="forward" on_finish="first_frame" />
+        				<scale x="0.22" y="0.22" />
+        			</sprite>
+        			
+        			<sprite name="back_right">
+        				<image file="buggy.png">
+        					<grid
+        						pos="10, 10"
+        						size="30, 60"
+        						spacing="1, 0"
+        						array="6, 1"
+							/>
+        				</image>
+        				
+        				<translation origin="center" x="-75" y="-60"/>
+        				<animation direction="forward" on_finish="first_frame" />
+        				<scale x="0.22" y="0.22" />
+        			</sprite>
+        			
+        			<sprite name="front_left">
+        				<image file="buggy.png">
+        					<grid
+        						pos="10, 10"
+        						size="30, 60"
+        						spacing="1, 0"
+        						array="6, 1"
+							/>
+        				</image>
+        				
+        				<translation origin="center" x="75" y="90" />
+        				<rotation origin="center_left" />
+        				<animation direction="forward" on_finish="first_frame" />
+        				<scale x="0.22" y="0.22" />
+        			</sprite>
+        			
+        			<sprite name="front_right">
+        				<image file="buggy.png">
+        					<grid
+        						pos="10, 10"
+        						size="30, 60"
+        						spacing="1, 0"
+        						array="6, 1"
+							/>
+        				</image>
+        				
+        				<translation origin="center" x="-75" y="90" />
+        				<rotation origin="center_right" />
+        				<animation direction="forward" on_finish="first_frame" />
+        				<scale x="0.22" y="0.22" />
+        			</sprite>
+        			
+        		</section>
+        		
+        		<sprite name="body_low">
+        			<image file="buggy.png">
+        				<grid pos="20, 80" size="162, 230" array="1, 1" />
+        			</image>
+        			
+        			<rotation origin="center" />
+        			<translation origin="center" />
+        			<scale x="0.22" y="0.22" />
+        		</sprite>
+        		
+        		<sprite name="body_high">
+        			<image file="buggy.png">
+        				<grid pos="20, 80" size="162, 230" array="1, 1" />
+        			</image>
+        			
+        			<rotation origin="center" />
+        			<translation origin="center" />
+        			<scale x="0.22" y="0.22" />
+        		</sprite>
+        		
+        	</section>
+        	
         </section>
         
     </section>

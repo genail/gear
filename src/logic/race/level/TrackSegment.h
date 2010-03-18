@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,9 +42,29 @@ class TrackSegment
 
 	public:
 
+		class PointPair
+		{
+			public:
+				PointPair(const CL_Pointf &p_left, CL_Pointf& p_right) :
+					m_left(p_left),
+					m_right(p_right)
+				{ /* empty */ }
+
+				CL_Pointf m_left, m_right;
+
+				bool operator=(const PointPair &p_other) {
+					m_left = p_other.m_left;
+					m_right = p_other.m_right;
+
+					return true;
+				}
+		};
+
+
 		TrackSegment(
 				const std::vector<CL_Pointf> &p_triPoints,
-				const std::vector<CL_Pointf> &p_midPoints
+				const std::vector<CL_Pointf> &p_midPoints,
+				const std::vector<PointPair> &p_pairs
 		);
 
 		virtual ~TrackSegment();
@@ -57,6 +77,8 @@ class TrackSegment
 		const std::vector<CL_Pointf> &getMidPoints() const;
 
 		const std::vector<CL_Pointf> &getTrianglePoints() const;
+
+		const std::vector<PointPair> &getPointPairs() const;
 
 
 	private:

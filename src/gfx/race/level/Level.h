@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,10 @@ class Level : public Gfx::Drawable
 {
 	public:
 
-		Level(const Race::Level &p_levelLogic, const Viewport &p_viewport);
+		// use the other constructor instead
+		DEPRECATED(Level(const Race::Level &p_levelLogic, const Viewport &p_viewport));
+
+		Level(const Race::Level *p_levelLogic, const Viewport *p_viewport);
 
 		virtual ~Level();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,19 +37,23 @@ class TrackSegmentImpl
 {
 	public:
 
-		std::vector<CL_Pointf> m_triPoints;
+		const std::vector<CL_Pointf> m_triPoints;
 
-		std::vector<CL_Pointf> m_midPoints;
+		const std::vector<CL_Pointf> m_midPoints;
+
+		const std::vector<TrackSegment::PointPair> m_pairs;
 
 		CL_Rectf m_bounds;
 
 
 		TrackSegmentImpl(
 				const std::vector<CL_Pointf> &p_triPoints,
-				const std::vector<CL_Pointf> &p_midPoints
+				const std::vector<CL_Pointf> &p_midPoints,
+				const std::vector<TrackSegment::PointPair> &p_pairs
 		) :
 			m_triPoints(p_triPoints),
-			m_midPoints(p_midPoints)
+			m_midPoints(p_midPoints),
+			m_pairs(p_pairs)
 		{ /* empty */ }
 
 
@@ -58,9 +62,10 @@ class TrackSegmentImpl
 
 TrackSegment::TrackSegment(
 		const std::vector<CL_Pointf> &p_triPoints,
-		const std::vector<CL_Pointf> &p_midPoints
+		const std::vector<CL_Pointf> &p_midPoints,
+		const std::vector<PointPair> &p_pairs
 ) :
-	m_impl(new TrackSegmentImpl(p_triPoints, p_midPoints))
+	m_impl(new TrackSegmentImpl(p_triPoints, p_midPoints, p_pairs))
 {
 	m_impl->calculateBounds();
 }
@@ -112,6 +117,11 @@ const std::vector<CL_Pointf> &TrackSegment::getMidPoints() const
 const std::vector<CL_Pointf> &TrackSegment::getTrianglePoints() const
 {
 	return m_impl->m_triPoints;
+}
+
+const std::vector<TrackSegment::PointPair> &TrackSegment::getPointPairs() const
+{
+	return m_impl->m_pairs;
 }
 
 }

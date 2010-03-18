@@ -62,6 +62,7 @@ const int SYNC_PARAM = 1;
 const int DEF_SCREEN_W = 800;
 const int DEF_SCREEN_H = 600;
 const bool DEF_FULLSCREEN = false;
+const int DEF_OPENGL_VER = 2;
 
 
 class Application
@@ -98,16 +99,6 @@ int Application::main(const std::vector<CL_String> &args)
 		static const CL_String PREFIX_PARAM = "-P";
 
 
-		// set opengl version
-		enum GLVer {
-			GL1,
-			GL2
-		} glver = GL2;
-
-		if (Collections::contains(args, SWITCH_GL1)) {
-			glver = GL1;
-		}
-
 		// read args properties
 		static const int PREFIX_PARAM_LEN = PREFIX_PARAM.length();
 
@@ -137,6 +128,20 @@ int Application::main(const std::vector<CL_String> &args)
 
 		CL_Console::write_line("loading properties");
 		Properties::load();
+
+		// set opengl version
+		enum GLVer {
+			GL1,
+			GL2
+		} glver = GL2;
+
+		const bool useGL1Opt =
+				Properties::getPropertyAsInt(CG_OPENGL_VER, DEF_OPENGL_VER) == 1;
+
+		if (Collections::contains(args, SWITCH_GL1) || useGL1Opt) {
+			glver = GL1;
+		}
+
 
 		cl_log_event("init", "initializing display");
 		CL_SetupDisplay setup_display;

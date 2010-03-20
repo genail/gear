@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,8 @@
 
 #include "ClanLib/network.h"
 
+#include "common/Properties.h"
 #include "network/server/Server.h"
-#include "ServerConfiguration.h"
 
 CL_ClanApplication app(&ServerApplication::main);
 
@@ -44,9 +44,9 @@ int ServerApplication::main(const std::vector<CL_String> &args)
 		CL_ConsoleLogger logger;
 
 		// load the server configuration
-		ServerConfiguration config;
+		Properties::load(CONFIG_FILE_SERVER);
 
-		Net::Server server(config);
+		Net::Server server;
 
 		server.start();
 

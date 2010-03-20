@@ -111,7 +111,7 @@ int Application::main(const std::vector<CL_String> &args)
 						);
 
 				if (parts.size() == 2) {
-					Properties::setProperty(parts[0], parts[1]);
+					Properties::set(parts[0], parts[1]);
 				} else {
 					CL_Console::write_line(cl_format("cannot parse %1", arg));
 				}
@@ -127,7 +127,7 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_SlotContainer slots;
 
 		CL_Console::write_line("loading properties");
-		Properties::load();
+		Properties::load(CONFIG_FILE_CLIENT);
 
 		// set opengl version
 		enum GLVer {
@@ -147,12 +147,12 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_SetupDisplay setup_display;
 
 		Gfx::Stage::m_width =
-				Properties::getPropertyAsInt(CG_SCREEN_WIDTH, DEF_SCREEN_W);
+				Properties::getInt(CG_SCREEN_WIDTH, DEF_SCREEN_W);
 		Gfx::Stage::m_height =
-				Properties::getPropertyAsInt(CG_SCREEN_HEIGHT, DEF_SCREEN_H);
+				Properties::getInt(CG_SCREEN_HEIGHT, DEF_SCREEN_H);
 
 		const bool fullscreenOpt =
-				Properties::getPropertyAsBool(CG_FULLSCREEN, DEF_FULLSCREEN);
+				Properties::getBool(CG_FULLSCREEN, DEF_FULLSCREEN);
 
 		cl_log_event("init", "display will be %1 x %2", Gfx::Stage::m_width, Gfx::Stage::m_height);
 
@@ -258,7 +258,7 @@ int Application::main(const std::vector<CL_String> &args)
 		CL_Console::write_line(e.what());
 	}
 
-	Properties::save();
+	Properties::save(CONFIG_FILE_CLIENT);
 
 	// free resources
 	if (setup_gl1) {

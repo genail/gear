@@ -112,7 +112,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_editorButton.func_clicked().set(this, &MainMenuScene::onEditorClicked);
 
 
-	m_serverLineEdit.set_text(Properties::getPropertyAsString(CG_LAST_HOSTNAME, ""));
+	m_serverLineEdit.set_text(Properties::getString(CG_LAST_HOSTNAME, ""));
 }
 
 MainMenuScene::~MainMenuScene()

@@ -188,10 +188,10 @@ void OptionScene::pushed()
 {
 	m_errorLabel.set_text("");
 
-	if (Properties::getPropertyAsString(CG_PLAYER_NAME, "") != "")
+	if (Properties::getString(CG_PLAYER_NAME, "") != "")
 	{
-		int width = Properties::getPropertyAsInt(CG_SCREEN_WIDTH, -1);
-		int height = Properties::getPropertyAsInt(CG_SCREEN_HEIGHT, -1);
+		int width = Properties::getInt(CG_SCREEN_WIDTH, -1);
+		int height = Properties::getInt(CG_SCREEN_HEIGHT, -1);
 		int index = 0;
 		if ((index = searchResolution(width, height)) == -1)
 		{
@@ -199,10 +199,10 @@ void OptionScene::pushed()
 		}
 		m_resolutionComboBox.set_selected_item(index);
 
-		m_nameLineEdit.set_text(Properties::getPropertyAsString(CG_PLAYER_NAME, ""));
-		m_fullScreenCheckBox.set_checked(Properties::getPropertyAsBool(CG_FULLSCREEN, false));
-		m_wsadCheckBox.set_checked(Properties::getPropertyAsBool(CG_USE_WASD, false));
-		m_soundSlider.set_position(Properties::getPropertyAsInt(CG_SOUND_VOLUME, 100));
+		m_nameLineEdit.set_text(Properties::getString(CG_PLAYER_NAME, ""));
+		m_fullScreenCheckBox.set_checked(Properties::getBool(CG_FULLSCREEN, false));
+		m_wsadCheckBox.set_checked(Properties::getBool(CG_USE_WASD, false));
+		m_soundSlider.set_position(Properties::getInt(CG_SOUND_VOLUME, 100));
 		setSliderLabelValue();
 	}
 	else

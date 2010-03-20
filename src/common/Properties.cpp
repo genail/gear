@@ -32,22 +32,48 @@
 
 std::map<CL_String, CL_String> Properties::m_keyValueMap;
 
-const char* FILENAME = "gear.cfg";
+const bool Properties::NULL_BOOL = false;
+
+const int Properties::NULL_INT = 0;
+
+const CL_String Properties::NULL_CL_STRING = "";
+
+/**
+ * Checks if second argument is set to other than default.
+ * If it's null object, then error about required p_key is thrown.
+ */
+template <typename T>
+void checkNotNull(
+		const T &p_actual,
+		const T& p_nullObj,
+		const CL_String &p_key
+)
+{
+	if (&p_actual == &p_nullObj) {
+		throw CL_Exception(
+				cl_format(
+						_("required config value '%1' not set"),
+						p_key
+				)
+		);
+	}
+}
+
 
 Properties::Properties()
 {
-
+	// empty
 }
 
 Properties::~Properties()
 {
-
+	// empty
 }
 
-void Properties::load()
+void Properties::load(const CL_String &p_filename)
 {
 	try {
-		CL_File file(FILENAME, CL_File::open_existing, CL_File::access_read);
+		CL_File file(p_filename, CL_File::open_existing, CL_File::access_read);
 
 		CL_DataBuffer buffer(file.get_size());
 		file.read(buffer.get_data(), buffer.get_size());
@@ -56,7 +82,9 @@ void Properties::load()
 
 		if (buffer.get_size() != 0) {
 			const std::vector<CL_TempString> lines =
-					CL_StringHelp::split_text(buffer.get_data(), END_OF_LINE, true);
+					CL_StringHelp::split_text(
+							buffer.get_data(), END_OF_LINE, true
+					);
 
 			const int linesCount = static_cast<signed>(lines.size());
 
@@ -69,9 +97,11 @@ void Properties::load()
 					const CL_TempString left = CL_StringHelp::trim(parts[0]);
 					const CL_TempString right = CL_StringHelp::trim(parts[1]);
 
-					Properties::setProperty(left, right);
+					Properties::set(left, right);
 
-					cl_log_event(LOG_DEBUG, "Option '%1' set to '%2'", left, right);
+					cl_log_event(
+							LOG_DEBUG, "Option '%1' set to '%2'", left, right
+					);
 				} else {
 					cl_log_event(LOG_DEBUG, "Cannot parse line: %1", lines[i]);
 				}
@@ -80,15 +110,17 @@ void Properties::load()
 
 
 	} catch (CL_Exception &e) {
-		cl_log_event(LOG_DEBUG, "File %1 cannot be read: %2", FILENAME, e.message);
+		cl_log_event(
+				LOG_DEBUG, "File %1 cannot be read: %2", p_filename, e.message
+		);
 	}
 
 }
 
-void Properties::save()
+void Properties::save(const CL_String &p_filename)
 {
 	try {
-		CL_File file(FILENAME, CL_File::create_always, CL_File::access_write);
+		CL_File file(p_filename, CL_File::create_always, CL_File::access_write);
 
 		std::pair<CL_String, CL_String> pair;
 		CL_String line;
@@ -97,46 +129,67 @@ void Properties::save()
 			line = cl_format("%1 = %2%3", pair.first, pair.second, END_OF_LINE);
 			file.write(line.c_str(), line.length());
 
-			cl_log_event(LOG_DEBUG, "Option '%1' saved with value '%2'", pair.first, pair.second);
+			cl_log_event(
+					LOG_DEBUG,
+					"Option '%1' saved with value '%2'",
+					pair.first,
+					pair.second
+			);
 		}
 
 		file.close();
 
 	} catch (CL_Exception &e) {
-		cl_log_event(LOG_DEBUG, "File %1 cannot be written: %2", FILENAME, e.message);
+		cl_log_event(
+				LOG_DEBUG,
+				"File %1 cannot be written: %2",
+				p_filename,
+				e.message
+		);
 	}
 }
 
-void Properties::setProperty(const CL_String &p_key, bool p_value)
+void Properties::set(const CL_String &p_key, bool p_value)
 {
-	setProperty(p_key, CL_StringHelp::bool_to_local8(p_value));
+	set(p_key, CL_StringHelp::bool_to_local8(p_value));
 }
 
-void Properties::setProperty(const CL_String &p_key, int p_value)
+void Properties::set(const CL_String &p_key, int p_value)
 {
-	setProperty(p_key, CL_StringHelp::int_to_local8(p_value));
+	set(p_key, CL_StringHelp::int_to_local8(p_value));
 }
 
-void Properties::setProperty(const CL_String &p_key, const CL_String &p_value)
+void Properties::set(const CL_String &p_key, const CL_String &p_value)
 {
 	m_keyValueMap[p_key] = p_value;
 }
 
-bool Properties::getPropertyAsBool(const CL_String &p_key, bool p_defaultValue)
+bool Properties::getBool(const CL_String &p_key, const bool &p_defaultValue)
 {
-	return CL_StringHelp::local8_to_bool(getPropertyAsString(p_key, CL_StringHelp::bool_to_local8(p_defaultValue)));
+	if (m_keyValueMap.find(p_key) != m_keyValueMap.end()) {
+		return CL_StringHelp::local8_to_bool(m_keyValueMap[p_key]);
+	} else {
+		checkNotNull(p_defaultValue, NULL_BOOL, p_key);
+		return p_defaultValue;
+	}
 }
 
-int Properties::getPropertyAsInt(const CL_String &p_key, int p_defaultValue)
+int Properties::getInt(const CL_String &p_key, const int &p_defaultValue)
 {
-	return CL_StringHelp::local8_to_int(getPropertyAsString(p_key, CL_StringHelp::int_to_local8(p_defaultValue)));
+	if (m_keyValueMap.find(p_key) != m_keyValueMap.end()) {
+		return CL_StringHelp::local8_to_int(m_keyValueMap[p_key]);
+	} else {
+		checkNotNull(p_defaultValue, NULL_INT, p_key);
+		return p_defaultValue;
+	}
 }
 
-CL_String Properties::getPropertyAsString(const CL_String &p_key, const CL_String &defaultValue)
+CL_String Properties::getString(const CL_String &p_key, const CL_String &p_defaultValue)
 {
 	if (m_keyValueMap.find(p_key) != m_keyValueMap.end()) {
 		return m_keyValueMap[p_key];
 	} else {
-		return defaultValue;
+		checkNotNull(p_defaultValue, NULL_CL_STRING, p_key);
+		return p_defaultValue;
 	}
 }

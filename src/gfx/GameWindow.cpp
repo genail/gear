@@ -123,7 +123,7 @@ void GameWindow::updateLogic(Scene *p_scene)
 #if !defined(NDEBUG)
 				// apply iteration time change
 				static float timeChangeF = 0.0f;
-				const int iterSpeed = Properties::getPropertyAsInt(DBG_ITER_SPEED, 100);
+				const int iterSpeed = Properties::getInt(DBG_ITER_SPEED, 100);
 
 				timeChangeF += timeChange * (iterSpeed / 100.0f);
 

@@ -98,7 +98,7 @@ void RaceScene::initCommon()
 	m_graphics = new Gfx::RaceGraphics(m_logic);
 
 	// bind keys
-	if (Properties::getPropertyAsBool(CG_USE_WASD, false)) {
+	if (Properties::getBool(CG_USE_WASD, false)) {
 		// use WASD instead of arrows
 		m_keySteerLeft = CL_KEY_A;
 		m_keySteerRight = CL_KEY_D;

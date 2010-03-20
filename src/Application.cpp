@@ -136,7 +136,7 @@ int Application::main(const std::vector<CL_String> &args)
 		} glver = GL2;
 
 		const bool useGL1Opt =
-				Properties::getPropertyAsInt(CG_OPENGL_VER, DEF_OPENGL_VER) == 1;
+				Properties::getInt(CG_OPENGL_VER, DEF_OPENGL_VER) == 1;
 
 		if (Collections::contains(args, SWITCH_GL1) || useGL1Opt) {
 			glver = GL1;

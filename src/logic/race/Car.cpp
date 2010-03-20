@@ -28,6 +28,8 @@
 
 #include <ClanLib/core.h>
 
+#include <limits>
+
 #include "Car.h"
 
 #include "common.h"
@@ -59,7 +61,7 @@ class CarImpl
 		unsigned m_timeFromLastUpdate;
 
 		/** Iteration counter */
-		unsigned m_iterCnt;
+		int32_t m_iterId;
 
 		// current vehicle state
 
@@ -118,7 +120,7 @@ class CarImpl
 		CarImpl(const Car *p_base) :
 			m_base(p_base),
 			m_timeFromLastUpdate(0),
-			m_iterCnt(0),
+			m_iterId(-1),
 			m_position(300.0f, 300.0f),
 			m_rotation(0, cl_degrees),
 			m_speed(0.0f),
@@ -188,6 +190,38 @@ void Car::update(unsigned p_timeElapsed)
 	}
 }
 
+void Car::updateToIteration(int32_t p_targetIterId)
+{
+	// allowed iteration delta
+	static const int DELTA_LIMIT = 10000;
+
+
+	// get the needed iterations count
+	int count;
+
+	if (p_targetIterId > m_impl->m_iterId) {
+		count = p_targetIterId - m_impl->m_iterId;
+	} else {
+		count = std::numeric_limits<int32_t>::max() - m_impl->m_iterId;
+
+		// protection against int32 overflow
+		if (count > DELTA_LIMIT || p_targetIterId > DELTA_LIMIT) {
+			throw CL_Exception("delta limit reached");
+		}
+
+		count += p_targetIterId + 1;
+	}
+
+	// disallow too great iteration count
+	if (count > DELTA_LIMIT) {
+		throw CL_Exception("delta limit reached");
+	}
+
+	for (int i = 0; i < count; ++i) {
+		m_impl->update1_60();
+	}
+}
+
 void CarImpl::alignRotation(CL_Angle &p_what, const CL_Angle &p_to, float p_stepRad)
 {
 	// works only on normalized values
@@ -244,6 +278,15 @@ void CarImpl::update1_60() {
 	static const float LOWER_SPEED_ROTATION_REDUCTION = 6.0f;
 	// speed limit under what turn power will decrease
 	static const float LOWER_SPEED_TURN_REDUCTION = 2.0f;
+
+
+	// increase the iteration id
+	// be aware of 32-bit integer limit
+	if (m_iterId != std::numeric_limits<int32_t>::max()) {
+		m_iterId++;
+	} else {
+		m_iterId = 0;
+	}
 
 	// don't do anything if car is locked
 	if (m_inputLocked) {
@@ -363,9 +406,6 @@ void CarImpl::update1_60() {
 	// set speed delta
 	m_phySpeedDelta = m_speed - prevSpeed;
 
-	// increase the iteration counter
-	m_iterCnt++;
-
 	// act to input changes
 	if (m_inputChanged) {
 		INVOKE_1(inputChanged, *m_base);
@@ -459,7 +499,7 @@ void Car::applyCollision(const CL_LineSegment2f &p_seg)
 void Car::serialize(CL_NetGameEvent *p_event) const
 {
 	// save iteration counter
-	p_event->add_argument(m_impl->m_iterCnt);
+	p_event->add_argument(m_impl->m_iterId);
 
 	// save inputs
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputAccel));
@@ -501,7 +541,7 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 	int idx = 0;
 
 	// load iteration counter
-	m_impl->m_iterCnt = p_event.get_argument(idx++);
+	m_impl->m_iterId = p_event.get_argument(idx++);
 
 	// saved inputs
 	m_impl->m_inputAccel = p_event.get_argument(idx++);
@@ -532,7 +572,7 @@ bool CarImpl::isChoking()
 	}
 
 	// c is iter count. 60 per second
-	const unsigned c = m_iterCnt;
+	const unsigned c = m_iterId;
 
 	// lets assume that 64 iterations is one second
 	// so then...
@@ -761,6 +801,11 @@ bool Car::operator!=(const Car &p_other) const
 float Car::getPhyWheelTurn() const
 {
 	return m_impl->m_phyWheelsTurn;
+}
+
+int32_t Car::getIterationId() const
+{
+	return m_impl->m_iterId;
 }
 
 } // namespace

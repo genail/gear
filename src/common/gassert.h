@@ -26,82 +26,22 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "CarState.h"
+#pragma once
 
-#include "common/gassert.h"
-#include "network/events.h"
+#include <assert.h>
 
-namespace Net {
+// assert macro
 
-CarState::CarState() :
-	m_iterId(-1),
-	m_serialData("")
-{
-	// empty
-}
+#if defined(G_ASSERT)
+#error G_ASSERT already defined
+#endif // G_ASSERT
 
-CL_NetGameEvent CarState::buildEvent() const
-{
-	G_ASSERT(m_serialData.get_argument_count() != 0);
-	// player's name is allowed to be empty
+#define G_ASSERT(expr) \
+	assert(expr)
 
-	CL_NetGameEvent event(EVENT_CAR_STATE);
+#if defined(G_ASSERT_PERROR)
+#error G_ASSERT_PERROR already defined
+#endif // G_ASSERT_PERROR
 
-	event.add_argument(m_iterId);
-	event.add_argument(m_name);
-
-	const int argCount = static_cast<signed>(m_serialData.get_argument_count());
-
-	for (int i = 0; i < argCount; ++i) {
-		event.add_argument(m_serialData.get_argument(i));
-	}
-
-	return event;
-}
-
-void CarState::parseEvent(const CL_NetGameEvent &p_event)
-{
-	G_ASSERT(p_event.get_name() == EVENT_CAR_STATE);
-
-	m_iterId = p_event.get_argument(0);
-	m_name = p_event.get_argument(1);
-	m_serialData = CL_NetGameEvent("");
-
-	const int argCount = static_cast<signed>(p_event.get_argument_count());
-
-	for (int i = 2; i < argCount; ++i) {
-		m_serialData.add_argument(p_event.get_argument(i));
-	}
-}
-
-int32_t CarState::getIterationId() const
-{
-	return m_iterId;
-}
-
-const CL_String &CarState::getName() const
-{
-	return m_name;
-}
-
-CL_NetGameEvent CarState::getSerializedData() const
-{
-	return m_serialData;
-}
-
-void CarState::setIterationId(int32_t p_iterId)
-{
-	m_iterId = p_iterId;
-}
-
-void CarState::setName(const CL_String &p_name)
-{
-	m_name = p_name;
-}
-
-void CarState::setSerializedData(const CL_NetGameEvent &p_data)
-{
-	m_serialData = p_data;
-}
-
-} // namespace
+#define G_ASSERT_PERROR(expr) \
+	assert_perror(expr)

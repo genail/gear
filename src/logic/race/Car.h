@@ -87,6 +87,8 @@ class Car : boost::noncopyable
 		 */
 		float getPhyWheelTurn() const;
 
+		int32_t getIterationId() const;
+
 		
 		// implementation data serialization (for network)
 
@@ -137,6 +139,9 @@ class Car : boost::noncopyable
 		void applyCollision(const CL_LineSegment2f &p_seg);
 
 		virtual void update(unsigned int elapsedTime);
+
+		/** Updates the car state to reach the target iteration id */
+		void updateToIteration(int32_t p_targetIterId);
 
 
 		// operators

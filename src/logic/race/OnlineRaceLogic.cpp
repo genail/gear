@@ -271,6 +271,7 @@ void OnlineRaceLogic::onRaceStart(
 
 	Net::CarState carState;
 	carState.setSerializedData(serialData);
+	carState.setIterationId(car.getIterationId());
 
 	m_client->sendCarState(carState);
 
@@ -286,6 +287,7 @@ void OnlineRaceLogic::onInputChange(const Car &p_car)
 
 		Net::CarState carState;
 		carState.setSerializedData(serialData);
+		carState.setIterationId(p_car.getIterationId());
 
 		m_client->sendCarState(carState);
 	}

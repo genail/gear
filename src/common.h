@@ -28,9 +28,10 @@
 
 #pragma once
 
-#include <assert.h>
 #include <libintl.h>
 #include <boost/foreach.hpp>
+
+#include "common/gassert.h"
 
 // i18n
 #define _(text) gettext(text)
@@ -189,23 +190,6 @@ static const int CL_PRIARR_TEXCOORDS = 2;
 #pragma message("WARNING: You need to implement DEPRECATED for this compiler")
 #define DEPRECATED(func) func
 #endif
-
-
-// assert macro
-
-#if defined(G_ASSERT)
-#error G_ASSERT already defined
-#endif // G_ASSERT
-
-#define G_ASSERT(expr) \
-	assert(expr)
-
-#if defined(G_ASSERT_PERROR)
-#error G_ASSERT_PERROR already defined
-#endif // G_ASSERT_PERROR
-
-#define G_ASSERT_PERROR(expr) \
-	assert_perror(expr)
 
 // end of line string
 #if defined(WINDOWS)

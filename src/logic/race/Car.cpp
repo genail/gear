@@ -39,6 +39,7 @@
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Bound.h"
 #include "math/Float.h"
+#include "math/Integer.h"
 
 namespace Race {
 
@@ -151,6 +152,12 @@ class CarImpl
 };
 
 METH_SIGNAL_1(Car, inputChanged, const Car&)
+
+
+CL_String floatToHex(float p_num);
+
+float hexToFloat(const CL_String &p_str);
+
 
 Car::Car() :
 	m_impl(new CarImpl(this))
@@ -496,6 +503,20 @@ void Car::applyCollision(const CL_LineSegment2f &p_seg)
 
 }
 
+CL_String floatToHex(float p_num)
+{
+	G_ASSERT(sizeof(float) == sizeof(u_int32_t));
+
+	u_int32_t num = *reinterpret_cast<u_int32_t*>(&p_num);
+	return Math::Integer::toHex(num);
+}
+
+float hexToFloat(const CL_String &p_str)
+{
+	int result = Math::Integer::fromHex(p_str);
+	return *reinterpret_cast<float*>(&result);
+}
+
 void Car::serialize(CL_NetGameEvent *p_event) const
 {
 	// save iteration counter
@@ -504,23 +525,23 @@ void Car::serialize(CL_NetGameEvent *p_event) const
 	// save inputs
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputAccel));
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputBrake));
-	p_event->add_argument(m_impl->m_inputTurn);
+	p_event->add_argument(floatToHex(m_impl->m_inputTurn));
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputLocked));
 
 	// corpse state
-	p_event->add_argument(m_impl->m_position.x);
-	p_event->add_argument(m_impl->m_position.y);
-	p_event->add_argument(m_impl->m_rotation.to_radians());
-	p_event->add_argument(m_impl->m_speed);
+	p_event->add_argument(floatToHex(m_impl->m_position.x));
+	p_event->add_argument(floatToHex(m_impl->m_position.y));
+	p_event->add_argument(floatToHex(m_impl->m_rotation.to_radians()));
+	p_event->add_argument(floatToHex(m_impl->m_speed));
 
 	// physics parameters
-	p_event->add_argument(m_impl->m_phyMoveRot.to_radians());
-	p_event->add_argument(m_impl->m_phyMoveVec.x);
-	p_event->add_argument(m_impl->m_phyMoveVec.y);
-	p_event->add_argument(m_impl->m_phySpeedDelta);
-	p_event->add_argument(m_impl->m_phyWheelsTurn);
+	p_event->add_argument(floatToHex(m_impl->m_phyMoveRot.to_radians()));
+	p_event->add_argument(floatToHex(m_impl->m_phyMoveVec.x));
+	p_event->add_argument(floatToHex(m_impl->m_phyMoveVec.y));
+	p_event->add_argument(floatToHex(m_impl->m_phySpeedDelta));
+	p_event->add_argument(floatToHex(m_impl->m_phyWheelsTurn));
 
-	p_event->add_argument(m_impl->m_damage);
+	p_event->add_argument(floatToHex(m_impl->m_damage));
 }
 
 void Car::deserialize(const CL_NetGameEvent &p_event)
@@ -546,23 +567,23 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 	// saved inputs
 	m_impl->m_inputAccel = p_event.get_argument(idx++);
 	m_impl->m_inputBrake = p_event.get_argument(idx++);
-	m_impl->m_inputTurn = p_event.get_argument(idx++);
+	m_impl->m_inputTurn = hexToFloat(p_event.get_argument(idx++));
 	m_impl->m_inputLocked = p_event.get_argument(idx++);
 
 	// corpse state
-	m_impl->m_position.x = p_event.get_argument(idx++);
-	m_impl->m_position.y = p_event.get_argument(idx++);
-	m_impl->m_rotation.set_radians(p_event.get_argument(idx++));
-	m_impl->m_speed = p_event.get_argument(idx++);
+	m_impl->m_position.x = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_position.y = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_rotation.set_radians(hexToFloat(p_event.get_argument(idx++)));
+	m_impl->m_speed = hexToFloat(p_event.get_argument(idx++));
 
 	// physics parameters
-	m_impl->m_phyMoveRot.set_radians(p_event.get_argument(idx++));
-	m_impl->m_phyMoveVec.x = p_event.get_argument(idx++);
-	m_impl->m_phyMoveVec.y = p_event.get_argument(idx++);
-	m_impl->m_phySpeedDelta = p_event.get_argument(idx++);
-	m_impl->m_phyWheelsTurn = p_event.get_argument(idx++);
+	m_impl->m_phyMoveRot.set_radians(hexToFloat(p_event.get_argument(idx++)));
+	m_impl->m_phyMoveVec.x = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_phyMoveVec.y = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_phySpeedDelta = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_phyWheelsTurn = hexToFloat(p_event.get_argument(idx++));
 
-	m_impl->m_damage = p_event.get_argument(idx++);
+	m_impl->m_damage = hexToFloat(p_event.get_argument(idx++));
 }
 
 bool CarImpl::isChoking()
@@ -667,7 +688,11 @@ void Car::setBrake(bool p_value)
 
 void Car::setTurn(float p_value)
 {
-	if (fabs(p_value - m_impl->m_inputTurn) > 0.1f) {
+//	if (fabs(p_value - m_impl->m_inputTurn) > 0.1f) {
+//		m_impl->m_inputChanged = true;
+//	}
+
+	if (p_value != m_impl->m_inputTurn) {
 		m_impl->m_inputChanged = true;
 	}
 

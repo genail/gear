@@ -392,7 +392,7 @@ void ServerImpl::onCarState(
 		const CL_NetGameEvent &p_event)
 {
 	// state check precision
-	static const float PRECISSION = 1.0f;
+	static const float PRECISSION = 0.5f;
 
 
 	// register last car state
@@ -434,7 +434,8 @@ void ServerImpl::onCarState(
 			) {
 				cl_log_event(
 						LOG_WARN,
-						"diff in client and server states:\n%1x%2 vs %3x%4",
+						CL_String("diff in client and server states:\n")
+						+ "client x: %1  y: %2\nserver x: %3  y: %4",
 						cliPos.x, cliPos.y,
 						servPos.x, servPos.y
 				);

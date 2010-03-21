@@ -29,6 +29,8 @@
 #include <unistd.h>
 #include <boost/test/unit_test.hpp>
 
+#include <ClanLib/core.h>
+
 #include "math/Integer.h"
 
 /*
@@ -71,6 +73,28 @@ BOOST_AUTO_TEST_CASE(clamp)
 	BOOST_CHECK(Math::Integer::clamp(2, 0, 2) == 2);
 	BOOST_CHECK(Math::Integer::clamp(3, 0, 2) == 0);
 	BOOST_CHECK(Math::Integer::clamp(4, 0, 2) == 1);
+}
+
+BOOST_AUTO_TEST_CASE(toHex)
+{
+	BOOST_CHECK_EQUAL(Math::Integer::toHex(0).c_str(), "0");
+	BOOST_CHECK_EQUAL(Math::Integer::toHex(1).c_str(), "1");
+	BOOST_CHECK_EQUAL(Math::Integer::toHex(10).c_str(), "A");
+	BOOST_CHECK_EQUAL(Math::Integer::toHex(15).c_str(), "F");
+	BOOST_CHECK_EQUAL(Math::Integer::toHex(16).c_str(), "10");
+	BOOST_CHECK_EQUAL(Math::Integer::toHex(255).c_str(), "FF");
+	BOOST_CHECK_EQUAL(Math::Integer::toHex(256).c_str(), "100");
+}
+
+BOOST_AUTO_TEST_CASE(fromHex)
+{
+	BOOST_CHECK_EQUAL(Math::Integer::fromHex("0"), 0);
+	BOOST_CHECK_EQUAL(Math::Integer::fromHex("1"), 1);
+	BOOST_CHECK_EQUAL(Math::Integer::fromHex("A"), 10);
+	BOOST_CHECK_EQUAL(Math::Integer::fromHex("F"), 15);
+	BOOST_CHECK_EQUAL(Math::Integer::fromHex("10"), 16);
+	BOOST_CHECK_EQUAL(Math::Integer::fromHex("FF"), 255);
+	BOOST_CHECK_EQUAL(Math::Integer::fromHex("100"), 256);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

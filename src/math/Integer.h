@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <ClanLib/core.h>
+
 namespace Math
 {
 
@@ -36,6 +38,10 @@ class Integer
 	public:
 
 		static int clamp(int p_val, int p_min, int p_max);
+
+		static unsigned fromHex(const CL_String &p_str);
+
+		static CL_String toHex(unsigned p_val);
 
 	private:
 

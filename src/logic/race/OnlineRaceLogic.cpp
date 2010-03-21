@@ -38,7 +38,13 @@
 
 namespace Race {
 
+
+// how longs players must wait for race to start
 const unsigned RACE_START_DELAY = 3000;
+
+// after how mush iterations car state must be resend
+const int CAR_STATE_RESEND_DELTA = 60;
+
 
 OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_initialized(false),
@@ -46,6 +52,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_port(p_port),
 	m_client(&Game::getInstance().getNetworkConnection()),
 	m_localPlayer(Game::getInstance().getPlayer()),
+	m_lastIterInputSent(-1),
 	m_voteRunning(false)
 {
 	G_ASSERT(p_port > 0 && p_port <= 0xFFFF);
@@ -123,6 +130,11 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 		getProgress().resetClock();
 	}
 
+	// check is car state must be resent
+	const int iterDelta = abs(car.getIterationId() - m_lastIterInputSent);
+	if (iterDelta >= CAR_STATE_RESEND_DELTA) {
+		sendCarState(car);
+	}
 }
 
 void OnlineRaceLogic::onConnected()
@@ -281,16 +293,31 @@ void OnlineRaceLogic::onRaceStart(
 
 void OnlineRaceLogic::onInputChange(const Car &p_car)
 {
-	if (!p_car.isLocked()) { // ignore when should be locked
-		CL_NetGameEvent serialData("");
-		p_car.serialize(&serialData);
+	sendCarState(p_car);
+}
 
-		Net::CarState carState;
-		carState.setSerializedData(serialData);
-		carState.setIterationId(p_car.getIterationId());
-
-		m_client->sendCarState(carState);
+void OnlineRaceLogic::sendCarState(const Car &p_car)
+{
+	// do not send if already send
+	if (p_car.getIterationId() == m_lastIterInputSent) {
+		return;
 	}
+
+	// ignore sending when car is clocked
+	if (p_car.isLocked()) {
+		return;
+	}
+
+	CL_NetGameEvent serialData("");
+	p_car.serialize(&serialData);
+
+	Net::CarState carState;
+	carState.setSerializedData(serialData);
+	carState.setIterationId(p_car.getIterationId());
+
+	m_client->sendCarState(carState);
+
+	m_lastIterInputSent = p_car.getIterationId();
 }
 
 void OnlineRaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)

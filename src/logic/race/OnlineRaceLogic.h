@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -103,6 +103,9 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		/** Network players */
 		TPlayerList m_remotePlayers;
 
+		/** Last iteration id when input was sent */
+		int32_t m_lastIterInputSent;
+
 		/** Slots container */
 		CL_SlotContainer m_slots;
 
@@ -118,6 +121,9 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		int m_voteNoCount;
 
 		unsigned m_voteTimeout;
+
+
+		void sendCarState(const Car &p_car);
 
 
 		// signal handlers

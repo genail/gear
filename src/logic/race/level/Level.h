@@ -76,6 +76,8 @@ class Level
 		 */
 		bool isUsable() const;
 
+		const Track &getTrack() const;
+
 
 		// car management
 
@@ -87,7 +89,7 @@ class Level
 
 		const Car &getCar(int p_idx) const;
 
-		const Track &getTrack() const;
+		bool hasCar(const Car *p_car);
 
 		void removeCar(Car *p_car);
 

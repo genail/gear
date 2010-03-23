@@ -242,37 +242,36 @@ void ServerImpl::onClientConnected(CL_NetGameConnection *p_conn)
 	// no signal invoke yet
 }
 
-void ServerImpl::onClientDisconnected(CL_NetGameConnection *p_netGameConnection)
+void ServerImpl::onClientDisconnected(CL_NetGameConnection *p_conn)
 {
 	cl_log_event(
 			LOG_EVENT,
 			"player %1 disconnects",
-			m_connections[p_netGameConnection].m_name.empty()
-				? CL_StringHelp::uint_to_local8((unsigned) p_netGameConnection)
-				: m_connections[p_netGameConnection].m_name
+			m_connections[p_conn].m_name.empty()
+				? CL_StringHelp::uint_to_local8((unsigned) p_conn)
+				: m_connections[p_conn].m_name
 	);
 
 	std::map<CL_NetGameConnection*, Player>::iterator itor =
-			m_connections.find(p_netGameConnection);
+			m_connections.find(p_conn);
 
-	if (itor != m_connections.end()) {
+	G_ASSERT(itor != m_connections.end());
 
-		const Player &player = itor->second;
+	const Player &player = itor->second;
 
-		// emit the signal if player was in the game
-		if (player.m_gameStateSent) {
-			INVOKE_1(playerLeft, player.m_name);
-		}
-
-		// send event to rest of players
-		PlayerLeft playerLeft;
-		playerLeft.setName(player.m_name);;
-
-		sendToAll(playerLeft.buildEvent(), itor->first);
-
-		// cleanup
-		m_connections.erase(itor);
+	// emit the signal if player was in the game
+	if (player.m_gameStateSent) {
+		INVOKE_1(playerLeft, player.m_name);
 	}
+
+	// send event to rest of players
+	PlayerLeft playerLeft;
+	playerLeft.setName(player.m_name);;
+
+	sendToAll(playerLeft.buildEvent(), itor->first);
+
+	// cleanup
+	m_connections.erase(itor);
 }
 
 void ServerImpl::onEventArrived(
@@ -428,19 +427,21 @@ void ServerImpl::onCarState(
 			const CL_Pointf &cliPos = player.m_car->getPosition();
 
 
-			if (
-					!Math::Float::cmp(servPos.x, cliPos.x, PRECISSION)
-					|| !Math::Float::cmp(servPos.y, cliPos.y, PRECISSION)
-			) {
-				cl_log_event(
-						LOG_WARN,
-						CL_String("diff in client and server states:\n")
-						+ "client x: %1  y: %2\nserver x: %3  y: %4",
-						cliPos.x, cliPos.y,
-						servPos.x, servPos.y
-				);
+			if (!player.m_lastCarState.isAfterCollision()) {
+				if (
+						!Math::Float::cmp(servPos.x, cliPos.x, PRECISSION)
+						|| !Math::Float::cmp(servPos.y, cliPos.y, PRECISSION)
+				) {
+					cl_log_event(
+							LOG_WARN,
+							CL_String("diff in client and server states:\n")
+							+ "client x: %1  y: %2\nserver x: %3  y: %4",
+							cliPos.x, cliPos.y,
+							servPos.x, servPos.y
+					);
 
-				kick(p_conn, GR_CHEATING);
+					kick(p_conn, GR_CHEATING);
+				}
 			}
 
 		} catch (CL_Exception &e) {

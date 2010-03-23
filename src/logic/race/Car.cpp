@@ -213,7 +213,12 @@ void Car::updateToIteration(int32_t p_targetIterId)
 
 		// protection against int32 overflow
 		if (count > DELTA_LIMIT || p_targetIterId > DELTA_LIMIT) {
-			throw CL_Exception("delta limit reached");
+			throw CL_Exception(
+					cl_format(
+							"delta limit reached: %1 => %2",
+							m_impl->m_iterId, p_targetIterId
+					)
+			);
 		}
 
 		count += p_targetIterId + 1;
@@ -779,6 +784,11 @@ float Car::getTurn() const
 void Car::reset()
 {
 	m_impl->m_damage = 0.0f;
+}
+
+void Car::resetIterationCounter()
+{
+	m_impl->m_iterId = -1;
 }
 
 void Car::clone(const Car &p_car)

@@ -53,6 +53,7 @@ OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
 	m_client(&Game::getInstance().getNetworkConnection()),
 	m_localPlayer(Game::getInstance().getPlayer()),
 	m_lastIterInputSent(-1),
+	m_inputChanged(false),
 	m_voteRunning(false)
 {
 	G_ASSERT(p_port > 0 && p_port <= 0xFFFF);
@@ -121,20 +122,38 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 
 	RaceLogic::update(p_timeElapsed);
 
-	// make sure that car is not locked when race is started
+
 	Race::Car &car = m_localPlayer.getCar();
-	if (getRaceState() == S_RUNNING && car.isLocked()) {
-		car.setLocked(false);
 
-		display(_("*** START! ***"));
-		getProgress().resetClock();
+	if (getLevel().hasCar(&car)) {
+		// make sure that car is not locked when race is started
+		if (getRaceState() == S_RUNNING && car.isLocked()) {
+			car.setLocked(false);
+
+			display(_("*** START! ***"));
+			getProgress().resetClock();
+		}
+
+		// check is car state must be resent
+		if (needToSendCarState()) {
+			sendCarState(car);
+			m_inputChanged = false;
+		}
 	}
+}
 
-	// check is car state must be resent
+bool OnlineRaceLogic::needToSendCarState()
+{
+	return iterationsPeriodReached()
+			|| localCarCollisionInThisIteration()
+			|| m_inputChanged;
+}
+
+bool OnlineRaceLogic::iterationsPeriodReached()
+{
+	const Race::Car &car = m_localPlayer.getCar();
 	const int iterDelta = abs(car.getIterationId() - m_lastIterInputSent);
-	if (iterDelta >= CAR_STATE_RESEND_DELTA) {
-		sendCarState(car);
-	}
+	return iterDelta >= CAR_STATE_RESEND_DELTA;
 }
 
 void OnlineRaceLogic::onConnected()
@@ -238,6 +257,7 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 
 		// prepare car and put it to level
 		car = &player->getCar();
+		car->resetIterationCounter();
 		car->deserialize(p_gameState.getCarState(i).getSerializedData());
 
 		getLevel().addCar(&player->getCar());
@@ -293,7 +313,7 @@ void OnlineRaceLogic::onRaceStart(
 
 void OnlineRaceLogic::onInputChange(const Car &p_car)
 {
-	sendCarState(p_car);
+	m_inputChanged = true;
 }
 
 void OnlineRaceLogic::sendCarState(const Car &p_car)
@@ -314,6 +334,10 @@ void OnlineRaceLogic::sendCarState(const Car &p_car)
 	Net::CarState carState;
 	carState.setSerializedData(serialData);
 	carState.setIterationId(p_car.getIterationId());
+
+	if (localCarCollisionInThisIteration()) {
+		carState.setAfterCollision(true);
+	}
 
 	m_client->sendCarState(carState);
 

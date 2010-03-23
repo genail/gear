@@ -35,6 +35,7 @@ namespace Net {
 
 CarState::CarState() :
 	m_iterId(-1),
+	m_afterCollision(false),
 	m_serialData("")
 {
 	// empty
@@ -49,6 +50,7 @@ CL_NetGameEvent CarState::buildEvent() const
 
 	event.add_argument(m_iterId);
 	event.add_argument(m_name);
+	event.add_argument(CL_NetGameEventValue(m_afterCollision));
 
 	const int argCount = static_cast<signed>(m_serialData.get_argument_count());
 
@@ -63,14 +65,17 @@ void CarState::parseEvent(const CL_NetGameEvent &p_event)
 {
 	G_ASSERT(p_event.get_name() == EVENT_CAR_STATE);
 
-	m_iterId = p_event.get_argument(0);
-	m_name = p_event.get_argument(1);
+	int idx = 0;
+
+	m_iterId = p_event.get_argument(idx++);
+	m_name = p_event.get_argument(idx++);
+	m_afterCollision = p_event.get_argument(idx++);
 	m_serialData = CL_NetGameEvent("");
 
 	const int argCount = static_cast<signed>(p_event.get_argument_count());
 
-	for (int i = 2; i < argCount; ++i) {
-		m_serialData.add_argument(p_event.get_argument(i));
+	for (; idx < argCount; ++idx) {
+		m_serialData.add_argument(p_event.get_argument(idx));
 	}
 }
 
@@ -102,6 +107,16 @@ void CarState::setName(const CL_String &p_name)
 void CarState::setSerializedData(const CL_NetGameEvent &p_data)
 {
 	m_serialData = p_data;
+}
+
+void CarState::setAfterCollision(bool p_afterCollision)
+{
+	m_afterCollision = p_afterCollision;
+}
+
+bool CarState::isAfterCollision() const
+{
+	return m_afterCollision;
 }
 
 } // namespace

@@ -86,7 +86,7 @@ void Client::disconnect()
 
 void Client::send(const CL_NetGameEvent &p_event)
 {
-//	cl_log_event("network", p_event.to_string());
+	cl_log_event("network", p_event.to_string());
 	m_gameClient.send_event(p_event);
 }
 

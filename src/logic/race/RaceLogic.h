@@ -174,6 +174,11 @@ class RaceLogic {
 
 		void removePlayer(const Player &p_player);
 
+
+		// collisions
+
+		bool localCarCollisionInThisIteration() const;
+
 	private:
 
 		CL_SharedPtr<RaceLogicImpl> m_impl;

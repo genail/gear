@@ -106,6 +106,9 @@ class OnlineRaceLogic: public Race::RaceLogic {
 		/** Last iteration id when input was sent */
 		int32_t m_lastIterInputSent;
 
+		/** Do have input changed on the last iteration? */
+		bool m_inputChanged;
+
 		/** Slots container */
 		CL_SlotContainer m_slots;
 
@@ -122,6 +125,10 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		unsigned m_voteTimeout;
 
+
+		bool needToSendCarState();
+
+		bool iterationsPeriodReached();
 
 		void sendCarState(const Car &p_car);
 

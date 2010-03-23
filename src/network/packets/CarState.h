@@ -50,12 +50,16 @@ class CarState : public Net::Packet {
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
 
+		bool isAfterCollision() const;
+
 		int32_t getIterationId() const;
 
 		const CL_String &getName() const;
 
 		CL_NetGameEvent getSerializedData() const;
 
+
+		void setAfterCollision(bool p_afterCollision);
 
 		/**
 		 * Sets the physics iteration id number (beginning from 0).
@@ -73,6 +77,8 @@ class CarState : public Net::Packet {
 		int32_t m_iterId;
 
 		CL_String m_name;
+
+		bool m_afterCollision;
 
 		CL_NetGameEvent m_serialData;
 };

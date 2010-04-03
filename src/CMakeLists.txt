@@ -18,6 +18,7 @@ SET(COMMON_SRCS
     math/Time.cpp
 	network/RemoteCar.cpp
 	network/client/Client.cpp
+	network/masterserver/MasterServer.cpp
 	network/packets/CarState.cpp
 	network/packets/ClientInfo.cpp
 	network/packets/GameState.cpp

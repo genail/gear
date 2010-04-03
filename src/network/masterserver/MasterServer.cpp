@@ -37,11 +37,21 @@ const int NETWORK_PORT_MAX = 65535;
 
 const int TIMEOUT_MS = 10000;
 
+const char *EVENT_HELLO = "HELLO";
+
+const char *EVENT_REGISTER = "REGISTER";
+
+const char *EVENT_KEEPALIVE = "KEEPALIVE";
+
+const char *EVENT_LISTREQUEST = "LISTREQUEST";
+
+const char *EVENT_SERVERLIST = "SERVERLIST";
+
 const char *EVENT_SUCCEED = "SUCCEED";
 
 const char *EVENT_FAILED = "FAILED";
 
-const char *EVENT_SERVERLIST = "SERVERLIST";
+
 
 namespace Net
 {
@@ -219,7 +229,7 @@ void MasterServerImpl::tryIntroduce()
 	m_receivedFailed.reset();
 	m_introduced = false;
 
-	const CL_NetGameEvent helloEvent("HELLO", MS_PROTOCOL_MAJOR, MS_PROTOCOL_MINOR);
+	const CL_NetGameEvent helloEvent(EVENT_HELLO, MS_PROTOCOL_MAJOR, MS_PROTOCOL_MINOR);
 	m_netGameClient.send_event(helloEvent);
 
 	const int result = CL_Event::wait(m_receivedSucceed, m_receivedFailed, TIMEOUT_MS);
@@ -258,7 +268,7 @@ void MasterServerImpl::tryRegister(int p_gameServerPort)
 	m_receivedFailed.reset();
 	m_registered = false;
 
-	const CL_NetGameEvent registerEvent("REGISTER", p_gameServerPort);
+	const CL_NetGameEvent registerEvent(EVENT_REGISTER, p_gameServerPort);
 	m_netGameClient.send_event(registerEvent);
 
 	const int result = CL_Event::wait(m_receivedSucceed, m_receivedFailed, TIMEOUT_MS);
@@ -295,7 +305,7 @@ void MasterServerImpl::tryKeepAlive(int p_gameServerPort)
 	m_receivedFailed.reset();
 	m_keptAlive = false;
 
-	const CL_NetGameEvent registerEvent("KEEPALIVE", p_gameServerPort);
+	const CL_NetGameEvent registerEvent(EVENT_KEEPALIVE, p_gameServerPort);
 	m_netGameClient.send_event(registerEvent);
 
 	const int result = CL_Event::wait(m_receivedSucceed, m_receivedFailed, TIMEOUT_MS);
@@ -330,7 +340,7 @@ void MasterServerImpl::tryGettingGameServerList()
 	m_gotGameServerList = false;
 	m_gameServers.clear();
 
-	const CL_NetGameEvent listRequestEvent("LISTREQUEST");
+	const CL_NetGameEvent listRequestEvent(EVENT_LISTREQUEST);
 	m_netGameClient.send_event(listRequestEvent);
 
 	const int result = CL_Event::wait(m_receivedGameServerList, TIMEOUT_MS);

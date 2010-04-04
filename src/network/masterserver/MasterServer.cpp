@@ -35,7 +35,9 @@
 
 const int NETWORK_PORT_MAX = 65535;
 
-const int TIMEOUT_MS = 10000;
+const unsigned TIMEOUT_MS = 10000;
+
+const int WAIT_SLEEP_TIME_MS = 5;
 
 const char *EVENT_HELLO = "HELLO";
 
@@ -66,17 +68,13 @@ class MasterServerImpl
 
 		CL_NetGameClient m_netGameClient;
 
-		bool m_connected, m_introduced;
+		volatile bool m_connected, m_introduced;
 
-		bool m_registered, m_keptAlive;
+		volatile bool m_registered, m_keptAlive;
 
 		bool m_gotGameServerList;
 
-		CL_Event m_eventConnected, m_eventDisconnected;
-
-		CL_Event m_receivedSucceed, m_receivedFailed;
-
-		CL_Event m_receivedGameServerList;
+		volatile bool m_receivedSucceed, m_receivedFailed, m_receivedServerList;
 
 		std::vector<MasterServer::GameServer> m_gameServers;
 
@@ -90,14 +88,12 @@ class MasterServerImpl
 				m_introduced(false),
 				m_registered(false),
 				m_keptAlive(false),
-				m_gotGameServerList(false) {
+				m_gotGameServerList(false),
+				m_receivedSucceed(false),
+				m_receivedFailed(false),
+				m_receivedServerList(false) {
 			G_ASSERT(!p_host.empty());
 			G_ASSERT(p_port > 0 && p_port <= NETWORK_PORT_MAX);
-
-			m_slots.connect(
-					m_netGameClient.sig_connected(),
-					this, &MasterServerImpl::onConnect
-			);
 
 			m_slots.connect(
 					m_netGameClient.sig_disconnected(),
@@ -120,8 +116,6 @@ class MasterServerImpl
 
 		void tryConnect();
 
-		void onConnect();
-
 		void onDisconnect();
 
 		bool isConnected() const;
@@ -142,6 +136,15 @@ class MasterServerImpl
 		void tryKeepAlive(int p_gameServerPort);
 
 		bool isKeptAlive() const;
+
+
+		void sendEvent(const CL_NetGameEvent &p_event);
+
+		bool receivedAnswer() const;
+
+		void resetAnswer();
+
+		void waitForAnswer();
 
 
 		void tryGettingGameServerList();
@@ -184,15 +187,13 @@ void MasterServerImpl::destroyConnection()
 
 void MasterServerImpl::tryConnect()
 {
-	m_eventConnected.reset();
-	m_eventDisconnected.reset();
 	m_connected = false;
 
-	m_netGameClient.connect(m_host, CL_StringHelp::int_to_text(m_port));
-	int result = CL_Event::wait(m_eventConnected, m_eventDisconnected);
-
-	if (result == 0) {
+	try {
+		m_netGameClient.connect(m_host, CL_StringHelp::int_to_text(m_port));
 		m_connected = true;
+	} catch (...) {
+		throw;
 	}
 }
 
@@ -202,44 +203,69 @@ bool MasterServerImpl::isConnected() const
 	return m_connected;
 }
 
-void MasterServerImpl::onConnect()
-{
-	m_eventConnected.set();
-}
-
 void MasterServerImpl::onDisconnect()
 {
-	m_eventDisconnected.set();
+	m_connected = false;
 }
 
 void MasterServerImpl::onEventArrived(const CL_NetGameEvent &p_event)
 {
 	if (p_event.get_name() == EVENT_SUCCEED) {
-		m_receivedSucceed.set();
+		m_receivedSucceed = true;
 	} else if (p_event.get_name() == EVENT_FAILED) {
-		m_receivedFailed.set();
+		m_receivedFailed = true;
 	} else if (p_event.get_name() == EVENT_SERVERLIST) {
 		parseServerListEvent(p_event);
+		m_receivedServerList = true;
+	}
+}
+
+inline
+void MasterServerImpl::sendEvent(const CL_NetGameEvent &p_event)
+{
+	m_netGameClient.send_event(p_event);
+}
+
+bool MasterServerImpl::receivedAnswer() const
+{
+	return m_receivedSucceed || m_receivedFailed || m_receivedServerList;
+}
+
+void MasterServerImpl::resetAnswer()
+{
+	m_receivedSucceed = false;
+	m_receivedFailed = false;
+	m_receivedServerList = false;
+}
+
+void MasterServerImpl::waitForAnswer()
+{
+	const unsigned before = CL_System::get_time();
+
+	while (isConnected() && !receivedAnswer()) {
+		CL_KeepAlive::process();
+		CL_System::sleep(WAIT_SLEEP_TIME_MS);
+
+		if (CL_System::get_time() - before >= TIMEOUT_MS) {
+			throw CL_Exception("timeout reached");
+		}
 	}
 }
 
 void MasterServerImpl::tryIntroduce()
 {
-	m_receivedSucceed.reset();
-	m_receivedFailed.reset();
 	m_introduced = false;
+	resetAnswer();
 
-	const CL_NetGameEvent helloEvent(EVENT_HELLO, MS_PROTOCOL_MAJOR, MS_PROTOCOL_MINOR);
-	m_netGameClient.send_event(helloEvent);
+	sendEvent(CL_NetGameEvent(EVENT_HELLO, MS_PROTOCOL_MAJOR, MS_PROTOCOL_MINOR));
+	waitForAnswer();
 
-	const int result = CL_Event::wait(m_receivedSucceed, m_receivedFailed, TIMEOUT_MS);
-
-	if (result == 0) {
-		m_introduced = true;
-	} else if (result == 1) {
-		throw CL_Exception(_("version mismatch"));
-	} else {
-		throw CL_Exception(_("timeout reached"));
+	if (isConnected()) {
+		if (m_receivedSucceed) {
+			m_introduced = true;
+		} else {
+			throw CL_Exception(_("version mismatch"));
+		}
 	}
 }
 
@@ -264,19 +290,14 @@ bool MasterServer::registerGameServer(int p_gameServerPort)
 
 void MasterServerImpl::tryRegister(int p_gameServerPort)
 {
-	m_receivedSucceed.reset();
-	m_receivedFailed.reset();
 	m_registered = false;
+	resetAnswer();
 
-	const CL_NetGameEvent registerEvent(EVENT_REGISTER, p_gameServerPort);
-	m_netGameClient.send_event(registerEvent);
+	sendEvent(CL_NetGameEvent(EVENT_REGISTER, p_gameServerPort));
+	waitForAnswer();
 
-	const int result = CL_Event::wait(m_receivedSucceed, m_receivedFailed, TIMEOUT_MS);
-
-	if (result == 0) {
+	if (m_receivedSucceed) {
 		m_registered = true;
-	} else if (result < 0) {
-		throw CL_Exception(_("timeout reached"));
 	}
 }
 
@@ -301,19 +322,13 @@ bool MasterServer::keepAliveGameServer(int p_gameServerPort)
 
 void MasterServerImpl::tryKeepAlive(int p_gameServerPort)
 {
-	m_receivedSucceed.reset();
-	m_receivedFailed.reset();
 	m_keptAlive = false;
 
-	const CL_NetGameEvent registerEvent(EVENT_KEEPALIVE, p_gameServerPort);
-	m_netGameClient.send_event(registerEvent);
+	sendEvent(CL_NetGameEvent(EVENT_KEEPALIVE, p_gameServerPort));
+	waitForAnswer();
 
-	const int result = CL_Event::wait(m_receivedSucceed, m_receivedFailed, TIMEOUT_MS);
-
-	if (result == 0) {
+	if (m_receivedSucceed) {
 		m_keptAlive = true;
-	} else if (result < 0) {
-		throw CL_Exception(_("timeout reached"));
 	}
 }
 
@@ -340,15 +355,11 @@ void MasterServerImpl::tryGettingGameServerList()
 	m_gotGameServerList = false;
 	m_gameServers.clear();
 
-	const CL_NetGameEvent listRequestEvent(EVENT_LISTREQUEST);
-	m_netGameClient.send_event(listRequestEvent);
+	sendEvent(CL_NetGameEvent(EVENT_LISTREQUEST));
+	waitForAnswer();
 
-	const int result = CL_Event::wait(m_receivedGameServerList, TIMEOUT_MS);
-
-	if (result == 0) {
+	if (m_receivedServerList) {
 		m_gotGameServerList = true;
-	} else {
-		throw CL_Exception(_("timeout reached"));
 	}
 }
 
@@ -375,7 +386,6 @@ bool MasterServerImpl::gameServerListAvailable() const
 {
 	return m_gotGameServerList;
 }
-
 
 int MasterServer::gameServerListCount() const
 {

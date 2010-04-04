@@ -43,6 +43,7 @@
 #include "network/packets/VoteStart.h"
 #include "network/packets/VoteEnd.h"
 #include "network/packets/VoteTick.h"
+#include "network/server/MasterServerRegistrant.h"
 #include "network/server/VoteSystem.h"
 
 namespace Net {
@@ -71,31 +72,36 @@ class ServerImpl
 			{}
 		};
 
-		/** Running state */
-		bool m_running;
 
-		/** List of active connections */
 		typedef std::map<CL_NetGameConnection*, Player> TConnectionPlayerMap;
 		typedef std::pair<CL_NetGameConnection*, Player> TConnectionPlayerPair;
 
-		TConnectionPlayerMap m_connections;
 
-		/** The level */
+		bool m_running;
+
 		Race::Level m_level;
 
-		/** Voting system */
 		VoteSystem m_voteSystem;
 
-		/** ClanLib game server */
 		CL_NetGameServer m_gameServer;
 
-		/** Slots container */
+		TConnectionPlayerMap m_connections;
+
+		CL_Thread m_masterServerThread;
+
+		MasterServerRegistrant m_serverRegistrant;
+
 		CL_SlotContainer m_slots;
 
 
-		ServerImpl() :
-			m_running(false)
-		{ /* empty */ }
+		ServerImpl();
+
+		~ServerImpl();
+
+
+		void startServerRegistrant();
+
+		void stopServerRegistrant();
 
 
 		// helpers
@@ -142,6 +148,19 @@ SIG_CPP(Server, playerLeft);
 Server::Server() :
 	m_impl(new ServerImpl())
 {
+	// empty
+}
+
+Server::~Server()
+{
+	if (m_impl->m_running) {
+		stop();
+	}
+}
+
+ServerImpl::ServerImpl() :
+		m_running(false)
+{
 	const CL_String levPath =
 			cl_format(
 					"%1/%2",
@@ -154,37 +173,35 @@ Server::Server() :
 		exit(1);
 	}
 
-	m_impl->m_level.load(levPath);
-	if (!m_impl->m_level.isUsable()) {
+	m_level.load(levPath);
+	if (!m_level.isUsable()) {
 		cl_log_event(LOG_ERROR, "level %1 is not usable, exiting", levPath);
 		exit(1);
 	}
 
-	m_impl->m_slots.connect(
-			m_impl->m_gameServer.sig_client_connected(),
-			m_impl.get(), &ServerImpl::onClientConnected
+	m_slots.connect(
+			m_gameServer.sig_client_connected(),
+			this, &ServerImpl::onClientConnected
 	);
 
-	m_impl->m_slots.connect(
-			m_impl->m_gameServer.sig_client_disconnected(),
-			m_impl.get(), &ServerImpl::onClientDisconnected
+	m_slots.connect(
+			m_gameServer.sig_client_disconnected(),
+			this, &ServerImpl::onClientDisconnected
 	);
 
-	m_impl->m_slots.connect(
-			m_impl->m_gameServer.sig_event_received(),
-			m_impl.get(), &ServerImpl::onEventArrived
+	m_slots.connect(
+			m_gameServer.sig_event_received(),
+			this, &ServerImpl::onEventArrived
 	);
 
-	m_impl->m_voteSystem.func_finished().set(
-			m_impl.get(), &ServerImpl::onVoteSystemFinished
+	m_voteSystem.func_finished().set(
+			this, &ServerImpl::onVoteSystemFinished
 	);
 }
 
-Server::~Server()
+ServerImpl::~ServerImpl()
 {
-	if (m_impl->m_running) {
-		stop();
-	}
+	// empty
 }
 
 void Server::start()
@@ -197,12 +214,18 @@ void Server::start()
 		m_impl->m_gameServer.start(CL_StringHelp::int_to_local8(port));
 
 		m_impl->m_running = true;
-
 		cl_log_event(LOG_INFO, "server is up and running");
 
+		m_impl->startServerRegistrant();
 	} catch (const CL_Exception &e) {
 		cl_log_event(LOG_ERROR, "unable to start the server: %1", e.message);
 	}
+}
+
+void ServerImpl::startServerRegistrant()
+{
+	cl_log_event(LOG_DEBUG, "launching game server register thread");
+	m_masterServerThread.start(&m_serverRegistrant);
 }
 
 void Server::stop()
@@ -212,9 +235,17 @@ void Server::stop()
 	try {
 		m_impl->m_gameServer.stop();
 		m_impl->m_running = false;
+		m_impl->stopServerRegistrant();
 	} catch (const CL_Exception &e) {
 		cl_log_event(LOG_ERROR, "unable to stop the server: %1", e.message);
 	}
+}
+
+void ServerImpl::stopServerRegistrant()
+{
+	cl_log_event(LOG_DEBUG, "stopping game server register thread");
+	m_serverRegistrant.interrupt();
+	m_masterServerThread.join();
 }
 
 void ServerImpl::onClientConnected(CL_NetGameConnection *p_conn)

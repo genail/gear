@@ -30,56 +30,27 @@
 
 #include <ClanLib/core.h>
 
-#ifndef MS_DEFAULT_HOST
-#define MS_DEFAULT_HOST "torvalds.rootnode.net"
-#endif
-
-#ifndef MS_DEFAULT_PORT
-#define MS_DEFAULT_PORT 37005
-#endif
-
-#define MS_PROTOCOL_MAJOR 1
-#define MS_PROTOCOL_MINOR 0
-
 namespace Net
 {
 
-class MasterServerImpl;
-
-class MasterServer
+class MasterServerRegistrant : public CL_Runnable
 {
 	public:
 
-		struct GameServer {
-			CL_String m_addr;
-			int m_port;
-		};
+		MasterServerRegistrant();
 
-		MasterServer(
-				const CL_String &p_host = MS_DEFAULT_HOST,
-				int p_port = MS_DEFAULT_PORT
-		);
-
-		virtual ~MasterServer();
+		virtual ~MasterServerRegistrant();
 
 
-		bool registerGameServer(int p_gameServerPort);
-
-		bool keepAliveGameServer(int p_gameServerPort);
+		virtual void run();
 
 
-		bool requestGameServerList();
-
-		int gameServerListCount() const;
-
-		const GameServer &gameServerAt(int p_index) const;
-
+		void interrupt();
 
 
 	private:
 
-		CL_SharedPtr<MasterServerImpl> m_impl;
-
+		CL_Event m_eventInterrupted;
 };
 
 }

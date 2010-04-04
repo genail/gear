@@ -138,6 +138,7 @@ SET(CLIENT_SRCS
 SET(SERVER_SRCS
 	${COMMON_SRCS}
 	ServerApplication.cpp
+	network/server/MasterServerRegistrant.cpp
 	network/server/Server.cpp
 	network/server/VoteSystem.cpp
 )

@@ -218,10 +218,4 @@ static const int CL_PRIARR_TEXCOORDS = 2;
 #error Unsupported platform
 #endif
 
-// log levels
-#define LOG_DEBUG "debug"
-#define LOG_EVENT "event"
-#define LOG_ERROR "error"
-#define LOG_INFO  "info"
-#define LOG_WARN  "warning"
-#define LOG_RACE  "race"
+#include "common/loglevels.h"

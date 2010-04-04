@@ -26,61 +26,65 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "MasterServerRegistrant.h"
 
-#include <ClanLib/core.h>
-
-#ifndef MS_DEFAULT_HOST
-#define MS_DEFAULT_HOST "torvalds.rootnode.net"
-#endif
-
-#ifndef MS_DEFAULT_PORT
-#define MS_DEFAULT_PORT 37005
-#endif
-
-#define MS_PROTOCOL_MAJOR 1
-#define MS_PROTOCOL_MINOR 0
+#include "common.h"
+#include "common/Properties.h"
+#include "network/masterserver/MasterServer.h"
 
 namespace Net
 {
 
-class MasterServerImpl;
+const int REGISTER_PERDIOD_MS = 50000;
 
-class MasterServer
+MasterServerRegistrant::MasterServerRegistrant()
 {
-	public:
-
-		struct GameServer {
-			CL_String m_addr;
-			int m_port;
-		};
-
-		MasterServer(
-				const CL_String &p_host = MS_DEFAULT_HOST,
-				int p_port = MS_DEFAULT_PORT
-		);
-
-		virtual ~MasterServer();
-
-
-		bool registerGameServer(int p_gameServerPort);
-
-		bool keepAliveGameServer(int p_gameServerPort);
-
-
-		bool requestGameServerList();
-
-		int gameServerListCount() const;
-
-		const GameServer &gameServerAt(int p_index) const;
-
-
-
-	private:
-
-		CL_SharedPtr<MasterServerImpl> m_impl;
-
-};
-
+	// empty
 }
 
+MasterServerRegistrant::~MasterServerRegistrant()
+{
+	// empty
+}
+
+void MasterServerRegistrant::run()
+{
+	MasterServer masterServer;
+	bool registered = false;
+	const int serverPort = Properties::getInt(SRV_PORT, DEFAULT_PORT);
+
+	do {
+		try {
+			if (!registered) {
+				cl_log_event(LOG_DEBUG, "registering game server");
+				const bool registerSucceed = masterServer.registerGameServer(serverPort);
+
+				if (registerSucceed) {
+					cl_log_event(LOG_INFO, "game server registered to MS");
+					registered = true;
+				} else {
+					cl_log_event(LOG_WARN, "game server registration failed");
+				}
+			} else {
+				cl_log_event(LOG_DEBUG, "keeping alive game server");
+				const bool keepAliveSucceed = masterServer.keepAliveGameServer(serverPort);
+
+				if (keepAliveSucceed) {
+					cl_log_event(LOG_INFO, "game server kept alive (MS)");
+				} else {
+					cl_log_event(LOG_INFO, "game server keep alive failed (MS)");
+					registered = false;
+				}
+			}
+		} catch (CL_Exception &e) {
+			cl_log_event(LOG_WARN, "fatal while registering/keeping alive: " + e.message);
+		}
+	} while (CL_Event::wait(m_eventInterrupted, REGISTER_PERDIOD_MS) != 0);
+}
+
+void MasterServerRegistrant::interrupt()
+{
+	m_eventInterrupted.set();
+}
+
+}

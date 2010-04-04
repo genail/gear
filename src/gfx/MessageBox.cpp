@@ -42,49 +42,66 @@ class MessageBoxImpl
 {
 	public:
 
-		MessageBox *m_parent;
+		CL_GUIComponent *m_owner;
+
+		CL_Window *m_window;
 
 		CL_Label *m_label;
 
 		CL_String m_message;
 
 
-		MessageBoxImpl(MessageBox *p_parent);
+		MessageBoxImpl(CL_GUIComponent *p_owner);
+
+		void createWindow();
+
+		void createLabel();
 
 		~MessageBoxImpl();
 };
 
 
 MessageBox::MessageBox(CL_GUIComponent *p_owner) :
-		CL_Window(
-				p_owner,
-				CL_GUITopLevelDescription(
-						"MessageBox",
-						CL_Rect(
-								Stage::getWidth() / 2 + MESSAGE_BOX_X_OFFSET,
-								Stage::getHeight() / 2 + MESSAGE_BOX_Y_OFFSET,
-								CL_Size(
-										MESSAGE_BOX_WIDTH,
-										MESSAGE_BOX_HEIGHT
-								)
-						),
-						false
-				)
-		),
-		m_impl(new MessageBoxImpl(this))
+		m_impl(new MessageBoxImpl(p_owner))
 {
 	// empty
 }
 
-MessageBoxImpl::MessageBoxImpl(MessageBox *p_parent) :
-		m_parent(p_parent)
+MessageBox::~MessageBox()
 {
-	m_parent->set_visible(false);
+	// empty
+}
 
+MessageBoxImpl::MessageBoxImpl(CL_GUIComponent *p_owner) :
+		m_owner(p_owner)
+{
+	createWindow();
+	createLabel();
+}
+
+void MessageBoxImpl::createWindow()
+{
+	CL_Rect windowGeometry(
+			Stage::getWidth() / 2 + MESSAGE_BOX_X_OFFSET,
+			Stage::getHeight() / 2 + MESSAGE_BOX_Y_OFFSET,
+			CL_Size(
+					MESSAGE_BOX_WIDTH,
+					MESSAGE_BOX_HEIGHT
+			)
+	);
+
+	CL_GUITopLevelDescription windowDescription("MessageBox", windowGeometry, false);
+
+	m_window = new CL_Window(m_owner, windowDescription);
+	m_window->set_visible(false);
+}
+
+void MessageBoxImpl::createLabel()
+{
 	static const int MARGIN = 5;
-	CL_Rect clientArea = m_parent->get_client_area();
+	CL_Rect clientArea = m_window->get_client_area();
 
-	m_label = new CL_Label(m_parent);
+	m_label = new CL_Label(m_window);
 	m_label->set_geometry(
 			CL_Rect(
 					clientArea.left + MARGIN,
@@ -101,16 +118,22 @@ MessageBoxImpl::MessageBoxImpl(MessageBox *p_parent) :
 MessageBoxImpl::~MessageBoxImpl()
 {
 	delete m_label;
-}
-
-MessageBox::~MessageBox()
-{
-	// empty
+	delete m_window;
 }
 
 void MessageBox::setMessage(const CL_String &p_message)
 {
 	m_impl->m_label->set_text(p_message);
+}
+
+void MessageBox::show()
+{
+	m_impl->m_window->set_visible(true);
+}
+
+void MessageBox::hide()
+{
+	m_impl->m_window->set_visible(false);
 }
 
 }

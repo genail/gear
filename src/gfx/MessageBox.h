@@ -38,7 +38,7 @@ namespace Gfx
 
 class MessageBoxImpl;
 
-class MessageBox : public CL_Window
+class MessageBox
 {
 	public:
 
@@ -48,6 +48,10 @@ class MessageBox : public CL_Window
 
 
 		void setMessage(const CL_String &p_message);
+
+		void show();
+
+		void hide();
 
 	private:
 

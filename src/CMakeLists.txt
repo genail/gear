@@ -56,40 +56,6 @@ SET(COMMON_SRCS
 # Game client sources
 SET(CLIENT_SRCS
 	${COMMON_SRCS}
-	common/Game.cpp
-	common/Player.cpp
-	common/Properties.cpp
-	network/client/Client.cpp
-	network/packets/CarState.cpp
-	network/packets/ClientInfo.cpp
-	network/packets/GameState.cpp
-	network/packets/Goodbye.cpp
-	network/packets/PlayerJoined.cpp
-	network/packets/PlayerLeft.cpp
-	network/packets/RaceStart.cpp
-	network/packets/VoteEnd.cpp
-	network/packets/VoteStart.cpp
-	network/packets/VoteTick.cpp
-	logic/race/Block.cpp
-	logic/race/Car.cpp
-	logic/race/MessageBoard.cpp
-	logic/race/Progress.cpp
-	logic/race/RaceLogic.cpp
-	logic/race/ScoreTable.cpp	
-	logic/race/level/Bound.cpp
-	logic/race/level/Checkpoint.cpp
-	logic/race/level/Level.cpp
-	logic/race/level/Sandpit.cpp
-	logic/race/level/Track.cpp
-	logic/race/level/TrackPoint.cpp
-	logic/race/level/TrackSegment.cpp
-	logic/race/level/TrackTriangulator.cpp
-	logic/race/resistance/Circle.cpp
-	logic/race/resistance/Geometry.cpp
-	logic/race/resistance/Primitive.cpp
-	logic/race/resistance/Rectangle.cpp
-	logic/race/resistance/ResistanceMap.cpp
-	
 	Application.cpp
 	controllers/GameMenuController.cpp
 	controllers/MainMenuController.cpp
@@ -108,6 +74,7 @@ SET(CLIENT_SRCS
 	gfx/DirectScene.cpp
 	gfx/GameWindow.cpp
 	gfx/GuiScene.cpp
+	gfx/MessageBox.cpp
 	gfx/Overlay.cpp
 	gfx/Stage.cpp
 	gfx/Viewport.cpp

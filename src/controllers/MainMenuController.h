@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,8 @@ class OptionScene;
 class AuthorsScene;
 class EditorScene;
 
+class MainMenuControllerImpl;
+
 class MainMenuController {
 
 	public:
@@ -46,35 +48,6 @@ class MainMenuController {
 
 	private:
 
-		/** This scene */
-		MainMenuScene *m_scene;
-
-		/** Next scene */
-		RaceScene *m_raceScene;
-
-        /** Next scene */
-        OptionScene *m_optionScene;
-
-		/** Next scene */
-        AuthorsScene *m_authorsScene;
-
-		/** Next scene */
-        EditorScene *m_editorScene;
-
-		/** The slot container */
-		CL_SlotContainer m_slots;
-
-
-		// action handlers
-
-		void onRaceStartClicked();
-
-		void onQuitClicked();
-
-        void onOptionClicked();
-
-		void onAuthorsClicked();
-
-		void onEditorClicked();
+		CL_SharedPtr<MainMenuControllerImpl> m_impl;
 };
 

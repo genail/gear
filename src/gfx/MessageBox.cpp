@@ -55,9 +55,12 @@ class MessageBoxImpl
 
 		void createWindow();
 
+		bool onWindowClose();
+
 		void createLabel();
 
 		~MessageBoxImpl();
+
 };
 
 
@@ -94,6 +97,14 @@ void MessageBoxImpl::createWindow()
 
 	m_window = new CL_Window(m_owner, windowDescription);
 	m_window->set_visible(false);
+
+	m_window->func_close().set(this, &MessageBoxImpl::onWindowClose);
+}
+
+bool MessageBoxImpl::onWindowClose()
+{
+	m_window->set_visible(false);
+	return true;
 }
 
 void MessageBoxImpl::createLabel()

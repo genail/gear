@@ -33,6 +33,7 @@
 #include "common/Properties.h"
 #include "gfx/GuiScene.h"
 #include "controllers/MainMenuController.h"
+#include "gfx/MessageBox.h"
 
 class MainMenuScene : public Gfx::GuiScene
 {
@@ -63,6 +64,13 @@ class MainMenuScene : public Gfx::GuiScene
 
 		void displayError(const CL_String& p_message);
 
+
+		void displayConnectingMessageBox();
+
+		void displayConnectionErrorMessageBox();
+
+		void hideMessageBox();
+
 	private:
 
 		// scene controller
@@ -87,6 +95,8 @@ class MainMenuScene : public Gfx::GuiScene
 
 		CL_PushButton m_quitButton;
 
+		Gfx::MessageBox m_messageBox;
+
 
 		// logo
 
@@ -96,6 +106,7 @@ class MainMenuScene : public Gfx::GuiScene
 		//
 		// Methods
 		//
+
 
 		// action slots
 

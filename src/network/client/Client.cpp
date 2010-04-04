@@ -69,6 +69,7 @@ bool Client::connect() {
 
 	try {
 		m_gameClient.connect(m_addr, port);
+		m_connected = true;
 	} catch (CL_Exception e) {
 		cl_log_event("exception", "Cannot connect to %1:%2", m_addr, m_port);
 		return false;
@@ -84,6 +85,11 @@ void Client::disconnect()
 	}
 }
 
+bool Client::isConnected() const
+{
+	return m_connected;
+}
+
 void Client::send(const CL_NetGameEvent &p_event)
 {
 	m_gameClient.send_event(p_event);
@@ -96,7 +102,6 @@ void Client::sendCarState(const Net::CarState &p_state)
 
 void Client::onConnected()
 {
-	m_connected = true;
 	INVOKE_0(connected);
 
 	// I am connected

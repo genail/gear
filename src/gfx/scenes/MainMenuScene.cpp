@@ -57,7 +57,8 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_quitButton(this),
 	m_optionButton(this),
 	m_authorsButton(this),
-	m_editorButton(this)
+	m_editorButton(this),
+	m_messageBox(this)
 {
 	set_class_name("MainMenuScene");
 
@@ -176,4 +177,21 @@ void MainMenuScene::displayError(const CL_String& p_message)
 	CL_SpanLayout span;
 	span.add_text(p_message, font, CL_Colorf::red);
 	m_errorLabel.set_span(span);
+}
+
+void MainMenuScene::displayConnectingMessageBox()
+{
+	m_messageBox.setMessage(_("Connecting to game server"));
+	m_messageBox.show();
+}
+
+void MainMenuScene::displayConnectionErrorMessageBox()
+{
+	m_messageBox.setMessage(_("Connection error"));
+	m_messageBox.show();
+}
+
+void MainMenuScene::hideMessageBox()
+{
+	m_messageBox.hide();
 }

@@ -35,22 +35,145 @@
 #include "gfx/scenes/OptionsScene.h"
 #include "gfx/scenes/AuthorsScene.h"
 #include "gfx/scenes/EditorScene.h"
+#include "network/client/Client.h"
+
+class NetworkClientConnectRunnable : public CL_Runnable
+{
+	public:
+
+		CL_Signal_v0 m_finished;
+
+//		NetworkClientConnectRunnable() :
+//			m_finished(false)
+//		{ /* empty */ }
+
+		virtual void run() {
+			Game &game = Game::getInstance();
+			Net::Client &client = game.getNetworkConnection();
+			client.connect();
+
+			m_finished.invoke();
+		}
+
+
+};
+
+class MainMenuControllerImpl
+{
+	public:
+
+		/** This scene */
+		MainMenuScene *m_scene;
+
+		/** Next scene */
+		RaceScene *m_raceScene;
+
+		/** Next scene */
+		OptionScene *m_optionScene;
+
+		/** Next scene */
+		AuthorsScene *m_authorsScene;
+
+		/** Next scene */
+		EditorScene *m_editorScene;
+
+		NetworkClientConnectRunnable m_connectRunnable;
+
+		CL_Thread m_connectThread;
+
+		/** The slot container */
+		CL_SlotContainer m_slots;
+
+
+		MainMenuControllerImpl(MainMenuScene *p_scene);
+
+		void createScenes();
+
+		void connectMainMenuSceneButtons();
+
+		void prepareConnectionThread();
+
+		~MainMenuControllerImpl();
+
+		void destroyScenes();
+
+
+		// action handlers
+
+		void onRaceStartClicked();
+
+		void displayError(const CL_String &p_text);
+
+		bool playerNameChosen() const;
+
+		void makeNetworkConnection();
+
+		CL_String getGameServerHost();
+
+		int getGameServerPort();
+
+
+		void onQuitClicked();
+
+		void onOptionClicked();
+
+		void onAuthorsClicked();
+
+		void onEditorClicked();
+
+		void onConnectionThreadFinished();
+};
 
 MainMenuController::MainMenuController(MainMenuScene *p_scene) :
-	m_scene(p_scene),
-	m_raceScene(new RaceScene(*p_scene->get_parent_component())),
-	m_optionScene(new OptionScene(p_scene->get_parent_component())),
-	m_authorsScene(new AuthorsScene(p_scene->get_parent_component())),
-	m_editorScene(new EditorScene(*p_scene->get_parent_component()))
+	m_impl(new MainMenuControllerImpl(p_scene))
 {
-	m_slots.connect(m_scene->sig_startRaceClicked(), this, &MainMenuController::onRaceStartClicked);
-	m_slots.connect(m_scene->sig_quitClicked(), this, &MainMenuController::onQuitClicked);
-	m_slots.connect(m_scene->sig_optionClicked(), this, &MainMenuController::onOptionClicked);
-	m_slots.connect(m_scene->sig_authorsClicked(), this, &MainMenuController::onAuthorsClicked);
-	m_slots.connect(m_scene->sig_editorClicked(), this, &MainMenuController::onEditorClicked);
+	// empty
 }
 
 MainMenuController::~MainMenuController()
+{
+	// empty
+}
+
+MainMenuControllerImpl::MainMenuControllerImpl(MainMenuScene *p_scene) :
+		m_scene(p_scene)
+{
+	createScenes();
+	connectMainMenuSceneButtons();
+	prepareConnectionThread();
+}
+
+void MainMenuControllerImpl::createScenes()
+{
+	m_raceScene = new RaceScene(*m_scene->get_parent_component());
+	m_optionScene = new OptionScene(m_scene->get_parent_component());
+	m_authorsScene = new AuthorsScene(m_scene->get_parent_component());
+	m_editorScene = new EditorScene(*m_scene->get_parent_component());
+}
+
+void MainMenuControllerImpl::connectMainMenuSceneButtons()
+{
+	m_slots.connect(m_scene->sig_startRaceClicked(), this, &MainMenuControllerImpl::onRaceStartClicked);
+	m_slots.connect(m_scene->sig_quitClicked(), this, &MainMenuControllerImpl::onQuitClicked);
+	m_slots.connect(m_scene->sig_optionClicked(), this, &MainMenuControllerImpl::onOptionClicked);
+	m_slots.connect(m_scene->sig_authorsClicked(), this, &MainMenuControllerImpl::onAuthorsClicked);
+	m_slots.connect(m_scene->sig_editorClicked(), this, &MainMenuControllerImpl::onEditorClicked);
+}
+
+void MainMenuControllerImpl::prepareConnectionThread()
+{
+	m_slots.connect(
+			m_connectRunnable.m_finished,
+			this, &MainMenuControllerImpl::onConnectionThreadFinished
+	);
+}
+
+MainMenuControllerImpl::~MainMenuControllerImpl()
+{
+	destroyScenes();
+}
+
+void MainMenuControllerImpl::destroyScenes()
 {
 	delete m_raceScene;
 	delete m_optionScene;
@@ -59,12 +182,12 @@ MainMenuController::~MainMenuController()
 }
 
 
-void MainMenuController::onRaceStartClicked()
+void MainMenuControllerImpl::onRaceStartClicked()
 {
-	m_scene->displayError("");
+	displayError("");
 
-	if (m_scene->getPlayerName().empty()) {
-		m_scene->displayError(_("No player's name chosen. See Options."));
+	if (!playerNameChosen()) {
+		displayError(_("No player's name chosen. See Options."));
 		return;
 	}
 
@@ -76,45 +199,89 @@ void MainMenuController::onRaceStartClicked()
 	m_raceScene->destroy();
 
 	if (!m_scene->getServerAddr().empty()) {
-		// separate server addr from port if possible
-		std::vector<CL_TempString> parts = CL_StringHelp::split_text(m_scene->getServerAddr(), ":");
-
-		const CL_String serverAddr = parts[0];
-		const int serverPort = (parts.size() == 2 ? CL_StringHelp::local8_to_int(parts[1]) : DEFAULT_PORT);
-
-		// online initialization
-		m_raceScene->initializeOnline(serverAddr, serverPort);
+		makeNetworkConnection();
 	} else {
 		// offline initialization
 		// FIXME: which level load when playing offline?
 		m_raceScene->initializeOffline("levels/level2.0.xml");
 	}
-
-#if !defined(RACE_SCENE_ONLY)
-	Gfx::Stage::pushScene(m_raceScene);
-#endif // !RACE_SCENE_ONLY
 }
 
-void MainMenuController::onQuitClicked()
+void MainMenuControllerImpl::displayError(const CL_String &p_text)
+{
+	m_scene->displayError(p_text);
+}
+
+bool MainMenuControllerImpl::playerNameChosen() const
+{
+	return !m_scene->getPlayerName().empty();
+}
+
+void MainMenuControllerImpl::makeNetworkConnection()
+{
+	m_scene->displayConnectingMessageBox();
+
+	Game &game = Game::getInstance();
+	Net::Client &netClient = game.getNetworkConnection();
+
+	netClient.setServerAddr(getGameServerHost());
+	netClient.setServerPort(getGameServerPort());
+
+	m_connectThread.start(&m_connectRunnable);
+}
+
+void MainMenuControllerImpl::onConnectionThreadFinished()
+{
+	m_connectThread.join();
+
+	Game &game = Game::getInstance();
+	Net::Client &netClient = game.getNetworkConnection();
+
+	if (netClient.isConnected()) {
+		m_scene->hideMessageBox();
+		m_raceScene->initializeOnline();
+		Gfx::Stage::pushScene(m_raceScene);
+	} else {
+		m_scene->displayConnectionErrorMessageBox();
+	}
+}
+
+CL_String MainMenuControllerImpl::getGameServerHost()
+{
+	std::vector<CL_TempString> parts = CL_StringHelp::split_text(m_scene->getServerAddr(), ":");
+	return parts[0];
+}
+
+int MainMenuControllerImpl::getGameServerPort()
+{
+	std::vector<CL_TempString> parts = CL_StringHelp::split_text(m_scene->getServerAddr(), ":");
+	if (parts.size() == 2) {
+		return CL_StringHelp::local8_to_int(parts[1]);
+	} else {
+		return DEFAULT_PORT;
+	}
+}
+
+void MainMenuControllerImpl::onQuitClicked()
 {
 	Gfx::Stage::popScene();
 }
 
-void MainMenuController::onOptionClicked()
+void MainMenuControllerImpl::onOptionClicked()
 {
 	m_scene->displayError("");
 
 	Gfx::Stage::pushScene(m_optionScene);
 }
 
-void MainMenuController::onAuthorsClicked()
+void MainMenuControllerImpl::onAuthorsClicked()
 {
 	m_scene->displayError("");
 
 	Gfx::Stage::pushScene(m_authorsScene);
 }
 
-void MainMenuController::onEditorClicked()
+void MainMenuControllerImpl::onEditorClicked()
 {
 	Gfx::Stage::pushScene(m_editorScene);
 }

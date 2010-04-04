@@ -40,19 +40,12 @@ namespace Race {
 
 const unsigned RACE_START_DELAY = 3000;
 
-OnlineRaceLogic::OnlineRaceLogic(const CL_String &p_host, int p_port) :
+OnlineRaceLogic::OnlineRaceLogic() :
 	m_initialized(false),
-	m_host(p_host),
-	m_port(p_port),
 	m_client(&Game::getInstance().getNetworkConnection()),
 	m_localPlayer(Game::getInstance().getPlayer()),
 	m_voteRunning(false)
 {
-	G_ASSERT(p_port > 0 && p_port <= 0xFFFF);
-
-	m_client->setServerAddr(m_host);
-	m_client->setServerPort(m_port);
-
 	// connect signal and slots from player's car
 	Car &car = m_localPlayer.getCar();
 
@@ -80,12 +73,6 @@ OnlineRaceLogic::~OnlineRaceLogic()
 void OnlineRaceLogic::initialize()
 {
 	if (!m_initialized) {
-
-		// connect to server
-		if (!m_client->connect()) {
-			display(_("Cannot connect to game server"));
-		}
-
 		m_initialized = true;
 	}
 }
@@ -93,8 +80,6 @@ void OnlineRaceLogic::initialize()
 void OnlineRaceLogic::destroy()
 {
 	if (m_initialized) {
-		m_client->disconnect();
-
 		// remove cars from level
 		const int playerCount = getPlayerCount();
 

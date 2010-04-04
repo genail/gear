@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 	public:
 
-		OnlineRaceLogic(const CL_String &p_host, int p_port);
+		OnlineRaceLogic();
 
 		virtual ~OnlineRaceLogic();
 
@@ -87,12 +87,6 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 		/** Initialized state */
 		bool m_initialized;
-
-		/** Hostname */
-		CL_String m_host;
-
-		/** Port */
-		int m_port;
 
 		/** Network client */
 		Net::Client *m_client;

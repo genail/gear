@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -88,6 +88,9 @@ class Client {
 		virtual ~Client();
 
 
+		bool isConnected() const;
+
+
 		const CL_String& getServerAddr() const { return m_addr; }
 
 		int getServerPort() const { return m_port; }
@@ -120,7 +123,7 @@ class Client {
 		int m_port;
 
 		/** Connected state */
-		bool m_connected;
+		volatile bool m_connected;
 
 		/** Game client object */
 		CL_NetGameClient m_gameClient;

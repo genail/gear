@@ -75,6 +75,8 @@ class Level : public boost::noncopyable
 		 */
 		bool isUsable() const;
 
+		const Track &getTrack() const;
+
 
 		// car management
 
@@ -86,7 +88,7 @@ class Level : public boost::noncopyable
 
 		const Car &getCar(int p_idx) const;
 
-		const Track &getTrack() const;
+		bool hasCar(const Car *p_car);
 
 		void removeCar(Car *p_car);
 

@@ -87,6 +87,8 @@ class Car : boost::noncopyable
 		 */
 		float getPhyWheelTurn() const;
 
+		int32_t getIterationId() const;
+
 		
 		// implementation data serialization (for network)
 
@@ -115,6 +117,8 @@ class Car : boost::noncopyable
 		 */
 		void reset();
 
+		void resetIterationCounter();
+
 		/**
 		 * Sets the car angle. It should be clockwise
 		 * oriented starting from positive X axis.
@@ -131,12 +135,18 @@ class Car : boost::noncopyable
 		/** Clones all given car attributes to this one */
 		void clone(const Car &p_car);
 
-		/** @return Current outline based on car position and rotation */
-		CL_CollisionOutline getCollisionOutline() const;
+		virtual void update(unsigned int elapsedTime);
+
+		/** Updates the car state to reach the target iteration id */
+		void updateToIteration(int32_t p_targetIterId);
+
+
+		// collisions
 
 		void applyCollision(const CL_LineSegment2f &p_seg);
 
-		virtual void update(unsigned int elapsedTime);
+		/** @return Current outline based on car position and rotation */
+		CL_CollisionOutline getCollisionOutline() const;
 
 
 		// operators

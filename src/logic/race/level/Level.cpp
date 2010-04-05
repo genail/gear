@@ -521,6 +521,17 @@ void Level::removeCar(Car *p_car) {
 	}
 }
 
+bool Level::hasCar(const Car *p_car)
+{
+	foreach (const Car *levelCar, m_impl->m_cars) {
+		if (levelCar == p_car) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void Level::getStartPosAndRot(
 		int p_num,
 		CL_Pointf *p_pos, CL_Angle *p_rot

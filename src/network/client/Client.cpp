@@ -92,6 +92,7 @@ bool Client::isConnected() const
 
 void Client::send(const CL_NetGameEvent &p_event)
 {
+	cl_log_event("network", p_event.to_string());
 	m_gameClient.send_event(p_event);
 }
 
@@ -198,7 +199,7 @@ void Client::onGameState(const CL_NetGameEvent &p_gameState)
 
 		INVOKE_1(gameStateReceived, gamestate);
 	} catch (CL_Exception &e) {
-		cl_log_event("protocol error on GAMESTATE: %1", e.message);
+		cl_log_event(LOG_ERROR, "protocol error on GAMESTATE: %1", e.message);
 	}
 
 }

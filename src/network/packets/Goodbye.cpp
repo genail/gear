@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,6 +56,8 @@ CL_String Goodbye::getStringMessage() const
 			return _("Unsupported protocol version");
 		case GR_NAME_ALREADY_IN_USE:
 			return _("Name already in use");
+		case GR_CHEATING:
+			return _("Cheating protection");
 		default:
 			assert(0 && "unknown goodbye reason");
 	}

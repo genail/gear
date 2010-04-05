@@ -58,6 +58,12 @@ class OnlineRaceLogicImpl
 		/** Network players */
 		TPlayerList m_remotePlayers;
 
+		/** Last iteration id when input was sent */
+		int32_t m_lastIterInputSent;
+
+		/** Do have input changed on the last iteration? */
+		bool m_inputChanged;
+
 		/** Slots container */
 		CL_SlotContainer m_slots;
 
@@ -92,6 +98,13 @@ class OnlineRaceLogicImpl
 		void display(const CL_String &p_text);
 
 
+		bool needToSendCarState();
+
+		bool iterationsPeriodReached();
+
+		void sendCarState(const Car &p_car);
+
+
 		// signal handlers
 
 		void onConnected();
@@ -121,9 +134,11 @@ class OnlineRaceLogicImpl
 
 const unsigned RACE_START_DELAY = 3000;
 
+// after how mush iterations car state must be resend
+const int CAR_STATE_RESEND_DELTA = 60;
+
 OnlineRaceLogic::OnlineRaceLogic() :
 		m_impl(new OnlineRaceLogicImpl(this))
-
 {
 	// empty
 }
@@ -133,6 +148,8 @@ OnlineRaceLogicImpl::OnlineRaceLogicImpl(OnlineRaceLogic *p_parent) :
 		m_initialized(false),
 		m_client(&Game::getInstance().getNetworkConnection()),
 		m_localPlayer(Game::getInstance().getPlayer()),
+		m_lastIterInputSent(-1),
+		m_inputChanged(false),
 		m_voteRunning(false)
 {
 	connectLocalPlayerCarSlots();
@@ -214,13 +231,36 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 
 	// make sure that car is not locked when race is started
 	Race::Car &car = m_impl->m_localPlayer.getCar();
-	if (getRaceState() == S_RUNNING && car.isLocked()) {
-		car.setLocked(false);
 
-		display(_("*** START! ***"));
-		getProgress().resetClock();
+	if (getLevel().hasCar(&car)) {
+		// make sure that car is not locked when race is started
+		if (getRaceState() == S_RUNNING && car.isLocked()) {
+			car.setLocked(false);
+
+			display(_("*** START! ***"));
+			getProgress().resetClock();
+		}
+
+		// check is car state must be resent
+		if (m_impl->needToSendCarState()) {
+			m_impl->sendCarState(car);
+			m_impl->m_inputChanged = false;
+		}
 	}
+}
 
+bool OnlineRaceLogicImpl::needToSendCarState()
+{
+	return iterationsPeriodReached()
+			|| m_parent->localCarCollisionInThisIteration()
+			|| m_inputChanged;
+}
+
+bool OnlineRaceLogicImpl::iterationsPeriodReached()
+{
+	const Race::Car &car = m_localPlayer.getCar();
+	const int iterDelta = abs(car.getIterationId() - m_lastIterInputSent);
+	return iterDelta >= CAR_STATE_RESEND_DELTA;
 }
 
 void OnlineRaceLogicImpl::onConnected()
@@ -324,6 +364,7 @@ void OnlineRaceLogicImpl::onGameState(const Net::GameState &p_gameState)
 
 		// prepare car and put it to level
 		car = &player->getCar();
+		car->resetIterationCounter();
 		car->deserialize(p_gameState.getCarState(i).getSerializedData());
 
 		m_parent->getLevel().addCar(&player->getCar());
@@ -369,6 +410,7 @@ const CL_Pointf &p_carPosition,
 
 	Net::CarState carState;
 	carState.setSerializedData(serialData);
+	carState.setIterationId(car.getIterationId());
 
 	m_client->sendCarState(carState);
 
@@ -378,15 +420,35 @@ const CL_Pointf &p_carPosition,
 
 void OnlineRaceLogicImpl::onInputChange(const Car &p_car)
 {
-	if (!p_car.isLocked()) { // ignore when should be locked
-		CL_NetGameEvent serialData("");
-		p_car.serialize(&serialData);
+	m_inputChanged = true;
+}
 
-		Net::CarState carState;
-		carState.setSerializedData(serialData);
-
-		m_client->sendCarState(carState);
+void OnlineRaceLogicImpl::sendCarState(const Car &p_car)
+{
+	// do not send if already send
+	if (p_car.getIterationId() == m_lastIterInputSent) {
+		return;
 	}
+
+	// ignore sending when car is clocked
+	if (p_car.isLocked()) {
+		return;
+	}
+
+	CL_NetGameEvent serialData("");
+	p_car.serialize(&serialData);
+
+	Net::CarState carState;
+	carState.setSerializedData(serialData);
+	carState.setIterationId(p_car.getIterationId());
+
+	if (m_parent->localCarCollisionInThisIteration()) {
+		carState.setAfterCollision(true);
+	}
+
+	m_client->sendCarState(carState);
+
+	m_lastIterInputSent = p_car.getIterationId();
 }
 
 void OnlineRaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)

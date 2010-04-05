@@ -28,17 +28,24 @@
 
 #include "Integer.h"
 
-#include "common.h"
+#include <iostream>
+
+//#include "common.h"
+#include "common/gassert.h"
 
 namespace Math
 {
 
+static const int INT_SEG_CNT = sizeof(int) * 2;
+
 Integer::Integer()
 {
+	// empty
 }
 
 Integer::~Integer()
 {
+	// empty
 }
 
 int Integer::clamp(int p_val, int p_min, int p_max)
@@ -56,6 +63,62 @@ int Integer::clamp(int p_val, int p_min, int p_max)
 	}
 
 	return p_val;
+}
+
+unsigned Integer::fromHex(const CL_String &p_str)
+{
+	G_ASSERT(
+			static_cast<int>(p_str.length()) <= INT_SEG_CNT
+			&& "int size too small"
+	);
+
+	const int cnt = p_str.length();
+	char c;
+	unsigned tmp;
+	unsigned result = 0;
+
+	for (int i = 0; i < cnt; ++i) {
+		c = p_str[i];
+
+		if (c <= '9') {
+			tmp = c - '0';
+		} else {
+			tmp = c - 'A' + 10;
+		}
+
+		result |= (tmp << ((cnt - 1) - i) * 4);
+	}
+
+	return result;
+}
+
+CL_String Integer::toHex(unsigned p_val)
+{
+	CL_String result;
+	unsigned tmp;
+	bool print = false;
+
+	for (int seg = INT_SEG_CNT - 1; seg >= 0; --seg) {
+		tmp = (p_val >> (seg * 4)) & 0xF;
+
+		if (!print && tmp > 0) {
+			print = true;
+		}
+
+		if (print) {
+			if (tmp <= 9) {
+				result += static_cast<char>('0' + tmp);
+			} else {
+				result += static_cast<char>('A' + tmp - 10);
+			}
+		}
+	}
+
+	if (!print) {
+		result = "0";
+	}
+
+	return result;
 }
 
 }

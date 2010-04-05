@@ -28,27 +28,20 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include <assert.h>
 
-namespace Math
-{
+// assert macro
 
-class Integer
-{
-	public:
+#if defined(G_ASSERT)
+#error G_ASSERT already defined
+#endif // G_ASSERT
 
-		static int clamp(int p_val, int p_min, int p_max);
+#define G_ASSERT(expr) \
+	assert(expr)
 
-		static unsigned fromHex(const CL_String &p_str);
+#if defined(G_ASSERT_PERROR)
+#error G_ASSERT_PERROR already defined
+#endif // G_ASSERT_PERROR
 
-		static CL_String toHex(unsigned p_val);
-
-	private:
-
-		Integer();
-
-		virtual ~Integer();
-};
-
-}
-
+#define G_ASSERT_PERROR(expr) \
+	assert_perror(expr)

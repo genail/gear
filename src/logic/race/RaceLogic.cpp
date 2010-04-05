@@ -86,6 +86,8 @@ class RaceLogicImpl
 		/** Message board to display game messages */
 		MessageBoard m_messageBoard;
 
+		bool m_collisionFlag;
+
 
 
 		RaceLogicImpl(Race::Level *p_level) :
@@ -96,7 +98,8 @@ class RaceLogicImpl
 			m_raceStartTimeMs(0),
 			m_raceFinishTimeMs(0),
 			m_lapCount(0),
-			m_state(S_STANDBY)
+			m_state(S_STANDBY),
+			m_collisionFlag(false)
 		{ /* empty */ }
 
 		~RaceLogicImpl()
@@ -109,9 +112,18 @@ class RaceLogicImpl
 
 		bool hasPlayerFinished(const Player &p_player) const;
 
-		// update routines
+		bool isLocalPlayerCar(const Race::Car &car);
+
 
 		void updateState();
+
+		void updateCarCollisions(Race::Car &p_car);
+
+		void updateCollisionWithObject(
+				Race::Car &p_car,
+				const CL_CollisionOutline &p_carOutline,
+				const Race::Object &p_object
+		);
 
 		void updateCollisions();
 
@@ -120,6 +132,7 @@ class RaceLogicImpl
 		void updatePlayersProgress();
 
 		void updateTyreStripes();
+
 };
 
 SIG_CPP(RaceLogic, stateChanged);
@@ -161,8 +174,8 @@ void RaceLogic::destroy()
 void RaceLogic::update(unsigned p_timeElapsed)
 {
 	m_impl->updateState();
-	m_impl->updateCollisions();
 	m_impl->updateCarPhysics(p_timeElapsed);
+	m_impl->updateCollisions();
 	m_impl->updatePlayersProgress();
 }
 
@@ -178,48 +191,69 @@ void RaceLogicImpl::updateState()
 
 void RaceLogicImpl::updateCollisions()
 {
-	const int objCount = m_level->getObjectCount();
+
 	const int carCount = m_level->getCarCount();
+	m_collisionFlag = false;
 
 	for (int carIdx = 0; carIdx < carCount; ++carIdx) {
 		Race::Car &car = m_level->getCar(carIdx);
-
-		// FIXME: can this be given by reference?
-		const CL_CollisionOutline carOutline = car.getCollisionOutline();
-
-		for (int objIdx = 0; objIdx < objCount; ++objIdx) {
-			const Race::Object &obj = m_level->getObject(objIdx);
-
-			// check collision with car
-			const std::vector<CL_CollidingContours> &cont =
-					obj.collide(carOutline);
-
-			// if there are collisions then proceed the segments
-			const int contCount = cont.size();
-			for (int contIdx = 0; contIdx < contCount; ++contIdx) {
-
-				const CL_CollidingContours &cc = cont[contIdx];
-
-				const int ccCount = static_cast<signed>(cc.points.size());
-				for (int ccIdx = 0; ccIdx < ccCount; ++ccIdx) {
-					const CL_CollisionPoint &pt = cc.points[ccIdx];
-
-					const std::vector<CL_Pointf> &c1pts =
-							cc.contour1->get_points();
-
-					CL_LineSegment2f seg(
-							c1pts[pt.contour1_line_start],
-							c1pts[pt.contour1_line_end]
-					);
-
-					car.applyCollision(seg);
-
-				}
-
-
-			}
-		}
+		updateCarCollisions(car);
 	}
+}
+
+void RaceLogicImpl::updateCarCollisions(Race::Car &p_car)
+{
+	const CL_CollisionOutline carOutline = p_car.getCollisionOutline();
+	const int objCount = m_level->getObjectCount();
+
+	for (int objIdx = 0; objIdx < objCount; ++objIdx) {
+		const Race::Object &obj = m_level->getObject(objIdx);
+		updateCollisionWithObject(p_car, carOutline, obj);
+	}
+}
+
+void RaceLogicImpl::updateCollisionWithObject(
+		Race::Car &p_car,
+		const CL_CollisionOutline &p_carOutline,
+		const Race::Object &p_object
+)
+{
+	const std::vector<CL_CollidingContours> &cont =
+			p_object.collide(p_carOutline);
+
+	// if there are collisions then proceed the segments
+	const int contCount = cont.size();
+	for (int contIdx = 0; contIdx < contCount; ++contIdx) {
+
+		const CL_CollidingContours &cc = cont[contIdx];
+
+		const int ccCount = static_cast<signed>(cc.points.size());
+		for (int ccIdx = 0; ccIdx < ccCount; ++ccIdx) {
+			const CL_CollisionPoint &pt = cc.points[ccIdx];
+
+			const std::vector<CL_Pointf> &c1pts =
+					cc.contour1->get_points();
+
+			CL_LineSegment2f seg(
+					c1pts[pt.contour1_line_start],
+					c1pts[pt.contour1_line_end]
+			);
+
+			p_car.applyCollision(seg);
+
+			if (isLocalPlayerCar(p_car)) {
+				m_collisionFlag = true;
+			}
+
+		}
+
+	}
+}
+
+bool RaceLogicImpl::isLocalPlayerCar(const Race::Car &car)
+{
+	Race::Car &localPlayerCar = Game::getInstance().getPlayer().getCar();
+	return &localPlayerCar == &car;
 }
 
 void RaceLogicImpl::updateCarPhysics(unsigned p_timeElapsed)
@@ -492,6 +526,11 @@ const Progress &RaceLogic::getProgress() const
 RaceState RaceLogic::getRaceState() const
 {
 	return m_impl->m_state;
+}
+
+bool RaceLogic::localCarCollisionInThisIteration() const
+{
+	return m_impl->m_collisionFlag;
 }
 
 } // namespace

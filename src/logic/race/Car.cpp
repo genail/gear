@@ -28,6 +28,8 @@
 
 #include <ClanLib/core.h>
 
+#include <limits>
+
 #include "Car.h"
 
 #include "common.h"
@@ -37,6 +39,7 @@
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Bound.h"
 #include "math/Float.h"
+#include "math/Integer.h"
 
 namespace Race {
 
@@ -59,7 +62,7 @@ class CarImpl
 		unsigned m_timeFromLastUpdate;
 
 		/** Iteration counter */
-		unsigned m_iterCnt;
+		int32_t m_iterId;
 
 		// current vehicle state
 
@@ -118,7 +121,7 @@ class CarImpl
 		CarImpl(const Car *p_base) :
 			m_base(p_base),
 			m_timeFromLastUpdate(0),
-			m_iterCnt(0),
+			m_iterId(-1),
 			m_position(300.0f, 300.0f),
 			m_rotation(0, cl_degrees),
 			m_speed(0.0f),
@@ -149,6 +152,12 @@ class CarImpl
 };
 
 METH_SIGNAL_1(Car, inputChanged, const Car&)
+
+
+CL_String floatToHex(float p_num);
+
+float hexToFloat(const CL_String &p_str);
+
 
 Car::Car() :
 	m_impl(new CarImpl(this))
@@ -185,6 +194,43 @@ void Car::update(unsigned p_timeElapsed)
 	while (m_impl->m_timeFromLastUpdate >= breakPoint) {
 		m_impl->update1_60();
 		m_impl->m_timeFromLastUpdate -= breakPoint;
+	}
+}
+
+void Car::updateToIteration(int32_t p_targetIterId)
+{
+	// allowed iteration delta
+	static const int DELTA_LIMIT = 10000;
+
+
+	// get the needed iterations count
+	int count;
+
+	if (p_targetIterId > m_impl->m_iterId) {
+		count = p_targetIterId - m_impl->m_iterId;
+	} else {
+		count = std::numeric_limits<int32_t>::max() - m_impl->m_iterId;
+
+		// protection against int32 overflow
+		if (count > DELTA_LIMIT || p_targetIterId > DELTA_LIMIT) {
+			throw CL_Exception(
+					cl_format(
+							"delta limit reached: %1 => %2",
+							m_impl->m_iterId, p_targetIterId
+					)
+			);
+		}
+
+		count += p_targetIterId + 1;
+	}
+
+	// disallow too great iteration count
+	if (count > DELTA_LIMIT) {
+		throw CL_Exception("delta limit reached");
+	}
+
+	for (int i = 0; i < count; ++i) {
+		m_impl->update1_60();
 	}
 }
 
@@ -244,6 +290,15 @@ void CarImpl::update1_60() {
 	static const float LOWER_SPEED_ROTATION_REDUCTION = 6.0f;
 	// speed limit under what turn power will decrease
 	static const float LOWER_SPEED_TURN_REDUCTION = 2.0f;
+
+
+	// increase the iteration id
+	// be aware of 32-bit integer limit
+	if (m_iterId != std::numeric_limits<int32_t>::max()) {
+		m_iterId++;
+	} else {
+		m_iterId = 0;
+	}
 
 	// don't do anything if car is locked
 	if (m_inputLocked) {
@@ -363,9 +418,6 @@ void CarImpl::update1_60() {
 	// set speed delta
 	m_phySpeedDelta = m_speed - prevSpeed;
 
-	// increase the iteration counter
-	m_iterCnt++;
-
 	// act to input changes
 	if (m_inputChanged) {
 		INVOKE_1(inputChanged, *m_base);
@@ -456,31 +508,45 @@ void Car::applyCollision(const CL_LineSegment2f &p_seg)
 
 }
 
+CL_String floatToHex(float p_num)
+{
+	G_ASSERT(sizeof(float) == sizeof(u_int32_t));
+
+	u_int32_t num = *reinterpret_cast<u_int32_t*>(&p_num);
+	return Math::Integer::toHex(num);
+}
+
+float hexToFloat(const CL_String &p_str)
+{
+	int result = Math::Integer::fromHex(p_str);
+	return *reinterpret_cast<float*>(&result);
+}
+
 void Car::serialize(CL_NetGameEvent *p_event) const
 {
 	// save iteration counter
-	p_event->add_argument(m_impl->m_iterCnt);
+	p_event->add_argument(m_impl->m_iterId);
 
 	// save inputs
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputAccel));
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputBrake));
-	p_event->add_argument(m_impl->m_inputTurn);
+	p_event->add_argument(floatToHex(m_impl->m_inputTurn));
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputLocked));
 
 	// corpse state
-	p_event->add_argument(m_impl->m_position.x);
-	p_event->add_argument(m_impl->m_position.y);
-	p_event->add_argument(m_impl->m_rotation.to_radians());
-	p_event->add_argument(m_impl->m_speed);
+	p_event->add_argument(floatToHex(m_impl->m_position.x));
+	p_event->add_argument(floatToHex(m_impl->m_position.y));
+	p_event->add_argument(floatToHex(m_impl->m_rotation.to_radians()));
+	p_event->add_argument(floatToHex(m_impl->m_speed));
 
 	// physics parameters
-	p_event->add_argument(m_impl->m_phyMoveRot.to_radians());
-	p_event->add_argument(m_impl->m_phyMoveVec.x);
-	p_event->add_argument(m_impl->m_phyMoveVec.y);
-	p_event->add_argument(m_impl->m_phySpeedDelta);
-	p_event->add_argument(m_impl->m_phyWheelsTurn);
+	p_event->add_argument(floatToHex(m_impl->m_phyMoveRot.to_radians()));
+	p_event->add_argument(floatToHex(m_impl->m_phyMoveVec.x));
+	p_event->add_argument(floatToHex(m_impl->m_phyMoveVec.y));
+	p_event->add_argument(floatToHex(m_impl->m_phySpeedDelta));
+	p_event->add_argument(floatToHex(m_impl->m_phyWheelsTurn));
 
-	p_event->add_argument(m_impl->m_damage);
+	p_event->add_argument(floatToHex(m_impl->m_damage));
 }
 
 void Car::deserialize(const CL_NetGameEvent &p_event)
@@ -501,28 +567,28 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 	int idx = 0;
 
 	// load iteration counter
-	m_impl->m_iterCnt = p_event.get_argument(idx++);
+	m_impl->m_iterId = p_event.get_argument(idx++);
 
 	// saved inputs
 	m_impl->m_inputAccel = p_event.get_argument(idx++);
 	m_impl->m_inputBrake = p_event.get_argument(idx++);
-	m_impl->m_inputTurn = p_event.get_argument(idx++);
+	m_impl->m_inputTurn = hexToFloat(p_event.get_argument(idx++));
 	m_impl->m_inputLocked = p_event.get_argument(idx++);
 
 	// corpse state
-	m_impl->m_position.x = p_event.get_argument(idx++);
-	m_impl->m_position.y = p_event.get_argument(idx++);
-	m_impl->m_rotation.set_radians(p_event.get_argument(idx++));
-	m_impl->m_speed = p_event.get_argument(idx++);
+	m_impl->m_position.x = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_position.y = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_rotation.set_radians(hexToFloat(p_event.get_argument(idx++)));
+	m_impl->m_speed = hexToFloat(p_event.get_argument(idx++));
 
 	// physics parameters
-	m_impl->m_phyMoveRot.set_radians(p_event.get_argument(idx++));
-	m_impl->m_phyMoveVec.x = p_event.get_argument(idx++);
-	m_impl->m_phyMoveVec.y = p_event.get_argument(idx++);
-	m_impl->m_phySpeedDelta = p_event.get_argument(idx++);
-	m_impl->m_phyWheelsTurn = p_event.get_argument(idx++);
+	m_impl->m_phyMoveRot.set_radians(hexToFloat(p_event.get_argument(idx++)));
+	m_impl->m_phyMoveVec.x = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_phyMoveVec.y = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_phySpeedDelta = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_phyWheelsTurn = hexToFloat(p_event.get_argument(idx++));
 
-	m_impl->m_damage = p_event.get_argument(idx++);
+	m_impl->m_damage = hexToFloat(p_event.get_argument(idx++));
 }
 
 bool CarImpl::isChoking()
@@ -532,7 +598,7 @@ bool CarImpl::isChoking()
 	}
 
 	// c is iter count. 60 per second
-	const unsigned c = m_iterCnt;
+	const unsigned c = m_iterId;
 
 	// lets assume that 64 iterations is one second
 	// so then...
@@ -627,7 +693,11 @@ void Car::setBrake(bool p_value)
 
 void Car::setTurn(float p_value)
 {
-	if (fabs(p_value - m_impl->m_inputTurn) > 0.1f) {
+//	if (fabs(p_value - m_impl->m_inputTurn) > 0.1f) {
+//		m_impl->m_inputChanged = true;
+//	}
+
+	if (p_value != m_impl->m_inputTurn) {
 		m_impl->m_inputChanged = true;
 	}
 
@@ -716,6 +786,11 @@ void Car::reset()
 	m_impl->m_damage = 0.0f;
 }
 
+void Car::resetIterationCounter()
+{
+	m_impl->m_iterId = -1;
+}
+
 void Car::clone(const Car &p_car)
 {
 	m_impl->m_position = p_car.m_impl->m_position;
@@ -761,6 +836,11 @@ bool Car::operator!=(const Car &p_other) const
 float Car::getPhyWheelTurn() const
 {
 	return m_impl->m_phyWheelsTurn;
+}
+
+int32_t Car::getIterationId() const
+{
+	return m_impl->m_iterId;
 }
 
 } // namespace

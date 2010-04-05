@@ -97,8 +97,10 @@ SET(CLIENT_SRCS
 	gfx/scenes/MainMenuScene.cpp
 	gfx/scenes/RaceScene.cpp
 	gfx/scenes/OptionsScene.cpp
+	logic/race/ArcadeRaceLogic.cpp
 	logic/race/OfflineRaceLogic.cpp
 	logic/race/OnlineRaceLogic.cpp
+	logic/race/TimeTrailRaceLogic.cpp
 )
 
 # Server sources

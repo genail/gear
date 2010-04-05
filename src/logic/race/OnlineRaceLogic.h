@@ -44,6 +44,8 @@ namespace Race {
 
 class Car;
 
+class OnlineRaceLogicImpl;
+
 class OnlineRaceLogic: public Race::RaceLogic {
 
 	public:
@@ -82,64 +84,9 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 	private:
 
-		typedef std::vector<CL_SharedPtr<RemotePlayer> > TPlayerList;
+		CL_SharedPtr<OnlineRaceLogicImpl> m_impl;
 
-
-		/** Initialized state */
-		bool m_initialized;
-
-		/** Network client */
-		Net::Client *m_client;
-
-		/** Local player */
-		Player &m_localPlayer;
-
-		/** Network players */
-		TPlayerList m_remotePlayers;
-
-		/** Slots container */
-		CL_SlotContainer m_slots;
-
-
-		// vote system
-
-		bool m_voteRunning;
-
-		CL_String m_voteMessage;
-
-		int m_voteYesCount;
-
-		int m_voteNoCount;
-
-		unsigned m_voteTimeout;
-
-
-		// signal handlers
-
-		void onConnected();
-
-		void onDisconnected();
-
-		void onGoodbye(GoodbyeReason p_reason, const CL_String &p_message);
-
-		void onPlayerJoined(const CL_String &p_name);
-
-		void onPlayerLeaved(const CL_String &p_name);
-
-		void onGameState(const Net::GameState &p_gameState);
-
-		void onCarState(const Net::CarState &p_carState);
-
-		void onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle &p_carRotation);
-
-		void onInputChange(const Car &p_car);
-
-		void onVoteStarted(VoteType p_voteType, const CL_String& p_subject, unsigned p_timeLimitSec);
-
-		void onVoteEnded(VoteResult p_voteResult);
-
-		void onVoteTick(VoteOption p_voteOption);
-
+		friend class OnlineRaceLogicImpl;
 };
 
 }

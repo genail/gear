@@ -71,9 +71,7 @@ class RaceScene: public Gfx::DirectScene
 		virtual bool isNative() const { return true; }
 
 
-		void initializeOffline(const CL_String &p_level);
-
-		void initializeOffline(const Race::Level &p_level);
+		void initializeOffline(Race::Level *p_level);
 
 		void initializeOnline();
 

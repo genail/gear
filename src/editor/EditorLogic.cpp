@@ -81,24 +81,21 @@ namespace Editor
 
 	bool EditorLogic::load(const CL_String& p_fileName)
 	{
-		Race::Level newLevel = Race::Level();
-		bool load = newLevel.load(p_fileName);
+		bool loaded = m_impl->m_raceLevel.load(p_fileName);
 
-		if (load)
+		if (loaded)
 		{
-			m_impl->m_raceLevel = newLevel;
-
 			m_impl->m_track = m_impl->m_raceLevel.getTrack();
 
-			m_impl->m_gfxLevel = new Gfx::Level(m_impl->m_raceLevel, m_impl->m_viewport);
+			m_impl->m_gfxLevel = new Gfx::Level(&m_impl->m_raceLevel, &m_impl->m_viewport);
 		}
 
-		return load;
+		return loaded;
 	}
 
 	void EditorLogic::startTest()
 	{
-		m_impl->m_raceScene.initializeOffline(m_impl->m_raceLevel);
+		m_impl->m_raceScene.initializeOffline(&m_impl->m_raceLevel);
 
 		Gfx::Stage::pushScene(&m_impl->m_raceScene);
 	}

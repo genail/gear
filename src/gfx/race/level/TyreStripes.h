@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ class TyreStripes : public Drawable {
 
 	public:
 
-		TyreStripes(const Race::Level &p_level);
+		TyreStripes(const Race::Level *p_level);
 
 		virtual ~TyreStripes();
 

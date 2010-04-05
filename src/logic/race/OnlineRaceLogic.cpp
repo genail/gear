@@ -38,69 +38,182 @@
 
 namespace Race {
 
+class OnlineRaceLogicImpl
+{
+	public:
+		typedef std::vector<CL_SharedPtr<RemotePlayer> > TPlayerList;
+
+
+		OnlineRaceLogic *m_parent;
+
+		/** Initialized state */
+		bool m_initialized;
+
+		/** Network client */
+		Net::Client *m_client;
+
+		/** Local player */
+		Player &m_localPlayer;
+
+		/** Network players */
+		TPlayerList m_remotePlayers;
+
+		/** Slots container */
+		CL_SlotContainer m_slots;
+
+
+		// vote system
+
+		bool m_voteRunning;
+
+		CL_String m_voteMessage;
+
+		int m_voteYesCount;
+
+		int m_voteNoCount;
+
+		unsigned m_voteTimeout;
+
+
+		OnlineRaceLogicImpl(OnlineRaceLogic *p_parent);
+
+		void connectLocalPlayerCarSlots();
+
+		void connectNetworkClientSlots();
+
+		~OnlineRaceLogicImpl();
+
+
+		void initialize();
+
+		void destroy();
+
+
+		void display(const CL_String &p_text);
+
+
+		// signal handlers
+
+		void onConnected();
+
+		void onDisconnected();
+
+		void onGoodbye(GoodbyeReason p_reason, const CL_String &p_message);
+
+		void onPlayerJoined(const CL_String &p_name);
+
+		void onPlayerLeaved(const CL_String &p_name);
+
+		void onGameState(const Net::GameState &p_gameState);
+
+		void onCarState(const Net::CarState &p_carState);
+
+		void onRaceStart(const CL_Pointf &p_carPosition, const CL_Angle &p_carRotation);
+
+		void onInputChange(const Car &p_car);
+
+		void onVoteStarted(VoteType p_voteType, const CL_String& p_subject, unsigned p_timeLimitSec);
+
+		void onVoteEnded(VoteResult p_voteResult);
+
+		void onVoteTick(VoteOption p_voteOption);
+};
+
 const unsigned RACE_START_DELAY = 3000;
 
 OnlineRaceLogic::OnlineRaceLogic() :
-	m_initialized(false),
-	m_client(&Game::getInstance().getNetworkConnection()),
-	m_localPlayer(Game::getInstance().getPlayer()),
-	m_voteRunning(false)
+		m_impl(new OnlineRaceLogicImpl(this))
+
 {
-	// connect signal and slots from player's car
+	// empty
+}
+
+OnlineRaceLogicImpl::OnlineRaceLogicImpl(OnlineRaceLogic *p_parent) :
+		m_parent(p_parent),
+		m_initialized(false),
+		m_client(&Game::getInstance().getNetworkConnection()),
+		m_localPlayer(Game::getInstance().getPlayer()),
+		m_voteRunning(false)
+{
+	connectLocalPlayerCarSlots();
+	connectNetworkClientSlots();
+}
+
+void OnlineRaceLogicImpl::connectLocalPlayerCarSlots()
+{
 	Car &car = m_localPlayer.getCar();
+	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogicImpl::onInputChange);
+}
 
-	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogic::onInputChange);
-
-	// connect signals and slots from client
-	m_slots.connect(m_client->sig_connected(),         this, &OnlineRaceLogic::onConnected);
-	m_slots.connect(m_client->sig_disconnected(),      this, &OnlineRaceLogic::onDisconnected);
-	m_slots.connect(m_client->sig_goodbyeReceived(),   this, &OnlineRaceLogic::onGoodbye);
-	m_slots.connect(m_client->sig_playerJoined(),      this, &OnlineRaceLogic::onPlayerJoined);
-	m_slots.connect(m_client->sig_playerLeaved(),      this, &OnlineRaceLogic::onPlayerLeaved);
-	m_slots.connect(m_client->sig_gameStateReceived(), this, &OnlineRaceLogic::onGameState);
-	m_slots.connect(m_client->sig_carStateReceived(),  this, &OnlineRaceLogic::onCarState);
-	m_slots.connect(m_client->sig_raceStartReceived(), this, &OnlineRaceLogic::onRaceStart);
-	m_slots.connect(m_client->sig_voteStarted(),       this, &OnlineRaceLogic::onVoteStarted);
-	m_slots.connect(m_client->sig_voteEnded(),         this, &OnlineRaceLogic::onVoteEnded);
-	m_slots.connect(m_client->sig_voteTickReceived(),  this, &OnlineRaceLogic::onVoteTick);
+void OnlineRaceLogicImpl::connectNetworkClientSlots()
+{
+	m_slots.connect(m_client->sig_connected(),         this, &OnlineRaceLogicImpl::onConnected);
+	m_slots.connect(m_client->sig_disconnected(),      this, &OnlineRaceLogicImpl::onDisconnected);
+	m_slots.connect(m_client->sig_goodbyeReceived(),   this, &OnlineRaceLogicImpl::onGoodbye);
+	m_slots.connect(m_client->sig_playerJoined(),      this, &OnlineRaceLogicImpl::onPlayerJoined);
+	m_slots.connect(m_client->sig_playerLeaved(),      this, &OnlineRaceLogicImpl::onPlayerLeaved);
+	m_slots.connect(m_client->sig_gameStateReceived(), this, &OnlineRaceLogicImpl::onGameState);
+	m_slots.connect(m_client->sig_carStateReceived(),  this, &OnlineRaceLogicImpl::onCarState);
+	m_slots.connect(m_client->sig_raceStartReceived(), this, &OnlineRaceLogicImpl::onRaceStart);
+	m_slots.connect(m_client->sig_voteStarted(),       this, &OnlineRaceLogicImpl::onVoteStarted);
+	m_slots.connect(m_client->sig_voteEnded(),         this, &OnlineRaceLogicImpl::onVoteEnded);
+	m_slots.connect(m_client->sig_voteTickReceived(),  this, &OnlineRaceLogicImpl::onVoteTick);
 }
 
 OnlineRaceLogic::~OnlineRaceLogic()
+{
+	// empty
+}
+
+OnlineRaceLogicImpl::~OnlineRaceLogicImpl()
 {
 	destroy();
 }
 
 void OnlineRaceLogic::initialize()
 {
+	m_impl->initialize();
+}
+
+void OnlineRaceLogic::destroy()
+{
+	m_impl->destroy();
+}
+
+void OnlineRaceLogicImpl::initialize()
+{
 	if (!m_initialized) {
 		m_initialized = true;
 	}
 }
 
-void OnlineRaceLogic::destroy()
+void OnlineRaceLogicImpl::destroy()
 {
 	if (m_initialized) {
 		// remove cars from level
-		const int playerCount = getPlayerCount();
+		const int playerCount = m_parent->getPlayerCount();
 
 		for (int i = 0; i < playerCount; ++i) {
-			Player &player = getPlayer(i);
-			getLevel().removeCar(&player.getCar());
+			Player &player = m_parent->getPlayer(i);
+			m_parent->getLevel().removeCar(&player.getCar());
 		}
 
-		getProgress().destroy();
-		getLevel().destroy();
+		m_parent->getProgress().destroy();
+		m_parent->getLevel().destroy();
 	}
 }
 
+void removeCarsFromLevel();
+void destroyLevel();
+
 void OnlineRaceLogic::update(unsigned p_timeElapsed)
 {
-	G_ASSERT(m_initialized);
+	G_ASSERT(m_impl->m_initialized);
 
 	RaceLogic::update(p_timeElapsed);
 
 	// make sure that car is not locked when race is started
-	Race::Car &car = m_localPlayer.getCar();
+	Race::Car &car = m_impl->m_localPlayer.getCar();
 	if (getRaceState() == S_RUNNING && car.isLocked()) {
 		car.setLocked(false);
 
@@ -110,25 +223,25 @@ void OnlineRaceLogic::update(unsigned p_timeElapsed)
 
 }
 
-void OnlineRaceLogic::onConnected()
+void OnlineRaceLogicImpl::onConnected()
 {
 }
 
-void OnlineRaceLogic::onDisconnected()
+void OnlineRaceLogicImpl::onDisconnected()
 {
 	display(_("Disconnected from host"));
 }
 
-void OnlineRaceLogic::onGoodbye(GoodbyeReason p_reason, const CL_String &p_message)
+void OnlineRaceLogicImpl::onGoodbye(GoodbyeReason p_reason, const CL_String &p_message)
 {
 	display(cl_format(_("Disconnected from server. Reason: %1"), p_message));
 }
 
-void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
+void OnlineRaceLogicImpl::onPlayerJoined(const CL_String &p_name)
 {
 	// check player existence
 
-	if (!hasPlayer(p_name)) {
+	if (!m_parent->hasPlayer(p_name)) {
 		// create new player
 
 		m_remotePlayers.push_back(
@@ -136,10 +249,10 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 		);
 
 		RemotePlayer &player = *m_remotePlayers.back();
-		addPlayer(&player);
+		m_parent->addPlayer(&player);
 
 		// add his car to the level
-		getLevel().addCar(&player.getCar());
+		m_parent->getLevel().addCar(&player.getCar());
 
 		display(cl_format(_("Player %1 joined"), p_name));
 	} else {
@@ -147,16 +260,16 @@ void OnlineRaceLogic::onPlayerJoined(const CL_String &p_name)
 	}
 }
 
-void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
+void OnlineRaceLogicImpl::onPlayerLeaved(const CL_String &p_name)
 {
 	// get the player
-	Player &player = getPlayer(p_name);
+	Player &player = m_parent->getPlayer(p_name);
 
 	// remove from level
-	getLevel().removeCar(&player.getCar());
+	m_parent->getLevel().removeCar(&player.getCar());
 
 	// remove from game
-	removePlayer(player);
+	m_parent->removePlayer(player);
 
 	TPlayerList::iterator itor;
 	bool found = false;
@@ -174,16 +287,16 @@ void OnlineRaceLogic::onPlayerLeaved(const CL_String &p_name)
 	display(cl_format("Player %1 leaved", p_name));
 }
 
-void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
+void OnlineRaceLogicImpl::onGameState(const Net::GameState &p_gameState)
 {
 	// load level
 	const CL_String &levelName = p_gameState.getLevel();
-	getLevel().initialize();
-	getLevel().load(levelName);
+	m_parent->getLevel().initialize();
+	m_parent->getLevel().load(levelName);
 
 	// initialize progress object
-	getProgress().initialize();
-	getProgress().resetClock();
+	m_parent->getProgress().initialize();
+	m_parent->getProgress().resetClock();
 
 	// add rest of players
 	const unsigned playerCount = p_gameState.getPlayerCount();
@@ -207,32 +320,32 @@ void OnlineRaceLogic::onGameState(const Net::GameState &p_gameState)
 		}
 
 		// put player to player list
-		addPlayer(player);
+		m_parent->addPlayer(player);
 
 		// prepare car and put it to level
 		car = &player->getCar();
 		car->deserialize(p_gameState.getCarState(i).getSerializedData());
 
-		getLevel().addCar(&player->getCar());
+		m_parent->getLevel().addCar(&player->getCar());
 	}
 
 
 }
 
-void OnlineRaceLogic::onCarState(const Net::CarState &p_carState)
+void OnlineRaceLogicImpl::onCarState(const Net::CarState &p_carState)
 {
 	const CL_String &playerName = p_carState.getName();
 
-	if (hasPlayer(playerName)) {
+	if (m_parent->hasPlayer(playerName)) {
 		const CL_NetGameEvent serialData = p_carState.getSerializedData();
-		getPlayer(playerName).getCar().deserialize(serialData);
+		m_parent->getPlayer(playerName).getCar().deserialize(serialData);
 	} else {
 		cl_log_event(LOG_ERROR, "Player %1 do not exists", playerName);
 	}
 }
 
-void OnlineRaceLogic::onRaceStart(
-		const CL_Pointf &p_carPosition,
+void OnlineRaceLogicImpl::onRaceStart(
+const CL_Pointf &p_carPosition,
 		const CL_Angle &p_carRotation
 )
 {
@@ -248,7 +361,7 @@ void OnlineRaceLogic::onRaceStart(
 	car.setLocked(true);
 
 	// reset progress data
-	getProgress().reset(car);
+	m_parent->getProgress().reset(car);
 
 	// send current state
 	CL_NetGameEvent serialData("");
@@ -260,10 +373,10 @@ void OnlineRaceLogic::onRaceStart(
 	m_client->sendCarState(carState);
 
 	// FIXME: where to store lap count?
-	startRace(3, CL_System::get_time() + RACE_START_DELAY);
+	m_parent->startRace(3, CL_System::get_time() + RACE_START_DELAY);
 }
 
-void OnlineRaceLogic::onInputChange(const Car &p_car)
+void OnlineRaceLogicImpl::onInputChange(const Car &p_car)
 {
 	if (!p_car.isLocked()) { // ignore when should be locked
 		CL_NetGameEvent serialData("");
@@ -278,35 +391,37 @@ void OnlineRaceLogic::onInputChange(const Car &p_car)
 
 void OnlineRaceLogic::callAVote(VoteType p_type, const CL_String &p_subject)
 {
-	m_client->callAVote(p_type, p_subject);
+	m_impl->m_client->callAVote(p_type, p_subject);
 }
 
 const CL_String &OnlineRaceLogic::getVoteMessage() const
 {
-	return m_voteMessage;
+	return m_impl->m_voteMessage;
 }
 
 bool OnlineRaceLogic::isVoteRunning() const
 {
-	return m_voteRunning;
+	return m_impl->m_voteRunning;
 }
 
 int OnlineRaceLogic::getVoteNoCount() const
 {
-	return m_voteNoCount;
+	return m_impl->m_voteNoCount;
 }
 
 int OnlineRaceLogic::getVoteYesCount() const
 {
-	return m_voteYesCount;
+	return m_impl->m_voteYesCount;
 }
 
 unsigned OnlineRaceLogic::getVoteTimeout() const
 {
-	return m_voteTimeout;
+	return m_impl->m_voteTimeout;
 }
 
-void OnlineRaceLogic::onVoteStarted(VoteType p_voteType, const CL_String& p_subject, unsigned p_timeLimitSec)
+void OnlineRaceLogicImpl::onVoteStarted(
+		VoteType p_voteType, const CL_String& p_subject, unsigned p_timeLimitSec
+)
 {
 	switch (p_voteType) {
 		case VOTE_RESTART_RACE:
@@ -326,7 +441,7 @@ void OnlineRaceLogic::onVoteStarted(VoteType p_voteType, const CL_String& p_subj
 
 }
 
-void OnlineRaceLogic::onVoteEnded(VoteResult p_voteResult)
+void OnlineRaceLogicImpl::onVoteEnded(VoteResult p_voteResult)
 {
 	switch (p_voteResult) {
 		case VOTE_PASSED:
@@ -344,15 +459,15 @@ void OnlineRaceLogic::onVoteEnded(VoteResult p_voteResult)
 
 void OnlineRaceLogic::voteNo()
 {
-	m_client->voteNo();
+	m_impl->m_client->voteNo();
 }
 
 void OnlineRaceLogic::voteYes()
 {
-	m_client->voteYes();
+	m_impl->m_client->voteYes();
 }
 
-void OnlineRaceLogic::onVoteTick(VoteOption p_voteOption)
+void OnlineRaceLogicImpl::onVoteTick(VoteOption p_voteOption)
 {
 	switch (p_voteOption) {
 		case VOTE_YES:
@@ -364,6 +479,11 @@ void OnlineRaceLogic::onVoteTick(VoteOption p_voteOption)
 		default:
 			assert(0 && "unknown VoteOption");
 	}
+}
+
+void OnlineRaceLogicImpl::display(const CL_String &p_text)
+{
+	m_parent->display(p_text);
 }
 
 } // namespace

@@ -61,7 +61,7 @@ enum RaceState
 	S_FINISHED_ALL
 };
 
-class RaceLogic {
+class RaceLogic : public boost::noncopyable {
 
 	/**
 	 * Invoked when race state has changed. First argument is always
@@ -75,17 +75,16 @@ class RaceLogic {
 
 		RaceLogic();
 
-		/** Makes a copy of level object and sets it as current level */
-		RaceLogic(const Race::Level &p_level);
+		RaceLogic(Race::Level *p_level);
 
 		virtual ~RaceLogic();
 
 
 		// object initialization / destroy
 
-		virtual void initialize() = 0;
+		virtual void initialize();
 
-		virtual void destroy() = 0;
+		virtual void destroy();
 
 
 		// getters

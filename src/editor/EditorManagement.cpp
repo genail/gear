@@ -54,7 +54,7 @@ namespace Editor
 			m_track(),
 			m_viewport(),
 			m_raceLevel(),
-			m_gfxLevel(m_raceLevel, m_viewport),
+			m_gfxLevel(&m_raceLevel, &m_viewport),
 			m_editorTrack(m_raceLevel, m_gfxLevel, m_track, m_viewport),
 			m_raceScene(new RaceScene(p_directScene.getParentComponent())),
 			m_editorLogic(m_raceLevel, &m_gfxLevel, m_track, m_viewport, *m_raceScene),

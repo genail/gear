@@ -29,60 +29,32 @@
 #pragma once
 
 #include <ClanLib/core.h>
+#include "logic/race/OnlineRaceLogic.h"
 
 namespace Race
 {
 
-class Car;
-class Checkpoint;
-class Level;
-class ProgressImpl;
+class ArcadeRaceLogicImpl;
 
-class Progress
+class ArcadeRaceLogic : public OnlineRaceLogic
 {
+
 	public:
 
-		Progress(const Level *p_level);
+		ArcadeRaceLogic();
 
-		virtual ~Progress();
+		virtual ~ArcadeRaceLogic();
 
 
-		// operations
+		virtual void initialize();
 
-		void addCar(const Car &p_car);
-
-		void destroy();
-
-		const Checkpoint &getCheckpoint(const Car &p_car) const;
-
-		const Checkpoint &getCheckpoint(int p_idx) const;
-
-		int getCheckpointCount() const;
-
-		int getLapNumber(const Car &p_car) const;
-
-		/**
-		 * Provides lap time in milliseconds. If lap isn't
-		 * finished yet, then ongoing time is returned.
-		 *
-		 * @return lap time in milliseconds
-		 */
-		int getLapTime(const Car &p_car, int p_lap) const;
-
-		void initialize();
-
-		void removeCar(const Car &p_car);
-
-		void reset(const Car &p_car);
-
-		void resetClock();
-
-		void update();
+		virtual void destroy();
 
 
 	private:
 
-		CL_SharedPtr<ProgressImpl> m_impl;
+		CL_SharedPtr<ArcadeRaceLogicImpl> m_impl;
+
 };
 
 }

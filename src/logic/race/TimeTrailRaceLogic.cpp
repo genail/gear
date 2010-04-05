@@ -26,64 +26,20 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
-#include <ClanLib/core.h>
+#include "TimeTrailRaceLogic.h"
 
 namespace Race
 {
 
-class Car;
-class Checkpoint;
-class Level;
-class ProgressImpl;
-
-class Progress
+TimeTrailRaceLogic::TimeTrailRaceLogic()
 {
-	public:
-
-		Progress(const Level *p_level);
-
-		virtual ~Progress();
-
-
-		// operations
-
-		void addCar(const Car &p_car);
-
-		void destroy();
-
-		const Checkpoint &getCheckpoint(const Car &p_car) const;
-
-		const Checkpoint &getCheckpoint(int p_idx) const;
-
-		int getCheckpointCount() const;
-
-		int getLapNumber(const Car &p_car) const;
-
-		/**
-		 * Provides lap time in milliseconds. If lap isn't
-		 * finished yet, then ongoing time is returned.
-		 *
-		 * @return lap time in milliseconds
-		 */
-		int getLapTime(const Car &p_car, int p_lap) const;
-
-		void initialize();
-
-		void removeCar(const Car &p_car);
-
-		void reset(const Car &p_car);
-
-		void resetClock();
-
-		void update();
-
-
-	private:
-
-		CL_SharedPtr<ProgressImpl> m_impl;
-};
+	// TODO Auto-generated constructor stub
 
 }
 
+TimeTrailRaceLogic::~TimeTrailRaceLogic()
+{
+	// TODO Auto-generated destructor stub
+}
+
+}

@@ -81,9 +81,9 @@ class LevelImpl
 		};
 
 
-		const Race::Level m_levelLogic;
+		const Race::Level *m_levelLogic;
 
-		const Viewport &m_viewport;
+		const Viewport *m_viewport;
 
 		const Race::TrackTriangulator &m_triangulator;
 
@@ -154,10 +154,10 @@ class LevelImpl
 		CL_Vec2f m_grassHelpTexCoords[GRASS_HELP_ARR_SIZE];
 
 
-		LevelImpl(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
+		LevelImpl(const Race::Level *p_levelLogic, const Viewport *p_viewport) :
 				m_levelLogic(p_levelLogic),
 				m_viewport(p_viewport),
-				m_triangulator(p_levelLogic.getTrackTriangulator()),
+				m_triangulator(p_levelLogic->getTrackTriangulator()),
 				m_levelEditorMode(false),
 				m_helperArr(NULL),
 				m_grassHelpArr(NULL)
@@ -236,14 +236,8 @@ class LevelImpl
 
 };
 
-Level::Level(const Race::Level &p_levelLogic, const Viewport &p_viewport) :
-	m_impl(new LevelImpl(p_levelLogic, p_viewport))
-{
-	// empty
-}
-
 Level::Level(const Race::Level *p_levelLogic, const Viewport *p_viewport) :
-	m_impl(new LevelImpl(*p_levelLogic, *p_viewport))
+	m_impl(new LevelImpl(p_levelLogic, p_viewport))
 {
 	// empty
 }
@@ -268,10 +262,10 @@ void Level::draw(CL_GraphicContext &p_gc)
 
 void LevelImpl::drawTrack(CL_GraphicContext &p_gc)
 {
-	const Race::Track &track = m_levelLogic.getTrack();
+	const Race::Track &track = m_levelLogic->getTrack();
 	const int trackPointCount = track.getPointCount();
 
-	const CL_Rectf &viewportBounds = m_viewport.getWorldClipRect();
+	const CL_Rectf &viewportBounds = m_viewport->getWorldClipRect();
 
 	for (int idx = 0; idx < trackPointCount; ++idx) {
 
@@ -491,7 +485,7 @@ void LevelImpl::drawGrass(CL_GraphicContext &p_gc)
 	static const float TEX_WIDTH_M = Units::toScreen(120.0f);
 
 	// get the world geometry
-	const CL_Rectf &worldRect = m_viewport.getWorldClipRect();
+	const CL_Rectf &worldRect = m_viewport->getWorldClipRect();
 
 	// set position coords
 	const CL_Pointf topLeft = worldRect.get_top_left();
@@ -634,7 +628,7 @@ void LevelImpl::drawCracks(CL_GraphicContext &p_gc)
 
 void LevelImpl::drawStartLine(CL_GraphicContext &p_gc)
 {
-	const Race::Track &track = m_levelLogic.getTrack();
+	const Race::Track &track = m_levelLogic->getTrack();
 	const int pointCount = track.getPointCount();
 
 	G_ASSERT(pointCount >= 1);
@@ -643,7 +637,7 @@ void LevelImpl::drawStartLine(CL_GraphicContext &p_gc)
 	const CL_Pointf &b = m_triangulator.getFirstRightPoint(0);
 
 	// draw only if visible on screen
-	const CL_Rectf &clip = m_viewport.getWorldClipRect();
+	const CL_Rectf &clip = m_viewport->getWorldClipRect();
 
 	if (clip.contains(a) || clip.contains(b)) {
 		CL_Pen oldPen = p_gc.get_pen();
@@ -665,10 +659,10 @@ void LevelImpl::drawObjects(CL_GraphicContext &p_gc)
 	CL_Pen pen;
 	pen.set_line_width(3);
 	p_gc.set_pen(pen);
-	const int objCount = m_levelLogic.getObjectCount();
+	const int objCount = m_levelLogic->getObjectCount();
 
 	for (int i = 0; i < objCount; ++i) {
-		const Race::Object &obj = m_levelLogic.getObject(i);
+		const Race::Object &obj = m_levelLogic->getObject(i);
 		const int ptCount = obj.getPointCount();
 
 		if (ptCount > 1) {
@@ -725,9 +719,9 @@ void LevelImpl::loadTrackTexture(CL_GraphicContext &p_gc)
 	m_streetTexture.set_min_filter(cl_filter_linear);
 
 	// make sure that level is usable
-	G_ASSERT(m_levelLogic.isUsable());
+	G_ASSERT(m_levelLogic->isUsable());
 
-	const Race::Track &track = m_levelLogic.getTrack();
+	const Race::Track &track = m_levelLogic->getTrack();
 	const int count = track.getPointCount();
 
 	// collect all checkpoint distances in m_distances vector
@@ -839,7 +833,7 @@ void LevelImpl::loadCracks(CL_GraphicContext &p_gc)
 	// resoultion of each crack sprite
 	static const int CRACK_SPRITE_RES = 512;
 
-	const Race::Track &track = m_levelLogic.getTrack();
+	const Race::Track &track = m_levelLogic->getTrack();
 	const int count = track.getPointCount();
 
 	CL_Pointf prevPointL, prevPointR;

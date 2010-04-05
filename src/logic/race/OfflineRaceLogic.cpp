@@ -35,16 +35,41 @@
 
 namespace Race {
 
-OfflineRaceLogic::OfflineRaceLogic(const CL_String &p_levelName) :
-	m_levelName(p_levelName),
-	m_levelOwner(true)
+class OfflineRaceLogicImpl
 {
-	G_ASSERT(!p_levelName.empty());
+	public:
+
+		OfflineRaceLogic *m_parent;
+
+		bool m_initialized;
+
+
+		OfflineRaceLogicImpl(OfflineRaceLogic *p_parent);
+
+
+		void initialize();
+
+		void addLocalPlayerToGame();
+
+		void setLocalPlayerCarAtStartPosition();
+
+
+		void destroy();
+
+		void removeLocalPlayerFromGame();
+
+};
+
+OfflineRaceLogic::OfflineRaceLogic(Race::Level *p_level) :
+		RaceLogic(p_level),
+		m_impl(new OfflineRaceLogicImpl(this))
+{
+	// empty
 }
 
-OfflineRaceLogic::OfflineRaceLogic(const Race::Level &p_level) :
-		RaceLogic(p_level),
-		m_levelOwner(false)
+OfflineRaceLogicImpl::OfflineRaceLogicImpl(OfflineRaceLogic *p_parent) :
+		m_parent(p_parent),
+		m_initialized(false)
 {
 	// empty
 }
@@ -56,23 +81,31 @@ OfflineRaceLogic::~OfflineRaceLogic()
 
 void OfflineRaceLogic::initialize()
 {
-	Level &level = getLevel();
+	RaceLogic::initialize();
+	m_impl->initialize();
+}
 
-	if (m_levelOwner) {
-		level.initialize();
-		level.load(m_levelName);
-	}
+void OfflineRaceLogicImpl::initialize()
+{
+	addLocalPlayerToGame();
+	setLocalPlayerCarAtStartPosition();
+}
 
-	// init progress object
-	Progress &prog = getProgress();
-	prog.initialize();
-	prog.resetClock();
-
+void OfflineRaceLogicImpl::addLocalPlayerToGame()
+{
+	Level &level = m_parent->getLevel();
 	Game &game = Game::getInstance();
 	Player &player = game.getPlayer();
 
-	addPlayer(&player);
+	m_parent->addPlayer(&player);
 	level.addCar(&player.getCar());
+}
+
+void OfflineRaceLogicImpl::setLocalPlayerCarAtStartPosition()
+{
+	Level &level = m_parent->getLevel();
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
 
 	CL_Pointf carPos;
 	CL_Angle carRot;
@@ -80,16 +113,27 @@ void OfflineRaceLogic::initialize()
 
 	player.getCar().setPosition(carPos);
 	player.getCar().setAngle(carRot);
-
 }
 
 void OfflineRaceLogic::destroy()
 {
-	getProgress().destroy();
+	m_impl->destroy();
+	RaceLogic::destroy();
+}
 
-	if (m_levelOwner) {
-		getLevel().destroy();
-	}
+void OfflineRaceLogicImpl::destroy()
+{
+	removeLocalPlayerFromGame();
+}
+
+void OfflineRaceLogicImpl::removeLocalPlayerFromGame()
+{
+	Level &level = m_parent->getLevel();
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+
+	m_parent->removePlayer(player);
+	level.removeCar(&player.getCar());
 }
 
 }

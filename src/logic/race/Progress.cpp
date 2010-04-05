@@ -88,7 +88,7 @@ class ProgressImpl
 		 */
 		TCheckpointDistances m_dists;
 
-		const Level &m_level;
+		const Level *const m_level;
 
 		unsigned m_clock;
 
@@ -98,11 +98,13 @@ class ProgressImpl
 
 		// methods
 
-		ProgressImpl(const Level &p_level) :
+		ProgressImpl(const Level *p_level) :
 			m_level(p_level),
 			m_initd(false),
 			m_clock(0)
-		{ /* empty */ }
+		{
+			G_ASSERT(p_level != NULL);
+		}
 
 		~ProgressImpl()
 		{
@@ -126,7 +128,7 @@ class ProgressImpl
 		bool startLinePassed(const Car *p_car);
 };
 
-Progress::Progress(const Level &p_level) :
+Progress::Progress(const Level *p_level) :
 	m_impl(new ProgressImpl(p_level))
 {
 	// empty
@@ -167,15 +169,15 @@ void Progress::initialize()
 		return;
 	}
 
-	G_ASSERT(m_impl->m_level.isUsable() && "level is not usable");
+	G_ASSERT(m_impl->m_level->isUsable() && "level is not usable");
 
 	// minimal checkpoint distance
 	static const int MIN_DISTANCE = 50;
 
 
 	// load checkpoints
-	const Track &track = m_impl->m_level.getTrack();
-	const TrackTriangulator &triang = m_impl->m_level.getTrackTriangulator();
+	const Track &track = m_impl->m_level->getTrack();
+	const TrackTriangulator &triang = m_impl->m_level->getTrackTriangulator();
 	const int segCount = track.getPointCount();
 
 	int chkPtIdx = 0;
@@ -354,7 +356,7 @@ int ProgressImpl::distance(
 
 bool ProgressImpl::startLinePassed(const Car *p_car)
 {
-	const Race::TrackTriangulator &tri = m_level.getTrackTriangulator();
+	const Race::TrackTriangulator &tri = m_level->getTrackTriangulator();
 	const CL_Pointf &r = tri.getFirstRightPoint(0);
 	const CL_Pointf &l = tri.getFirstLeftPoint(0);
 

@@ -36,18 +36,18 @@ namespace Race {
 
 class Level;
 
+class OfflineRaceLogicImpl;
+
 class OfflineRaceLogic: public Race::RaceLogic {
 
 	public:
 
-		OfflineRaceLogic(const CL_String &p_levelName);
-
 		/**
-		 * Makes a copy of level object. Be aware of that given level should
+		 * Be aware of that given level should
 		 * be already initialized and it wouldn't be initialized or destroyed
 		 * by this object initialize() or destroy() method.
 		 */
-		OfflineRaceLogic(const Race::Level &p_level);
+		OfflineRaceLogic(Race::Level *p_level);
 
 		virtual ~OfflineRaceLogic();
 
@@ -56,11 +56,13 @@ class OfflineRaceLogic: public Race::RaceLogic {
 
 		virtual void destroy();
 
+
 	private:
 
-		CL_String m_levelName;
+		CL_SharedPtr<OfflineRaceLogicImpl> m_impl;
 
-		bool m_levelOwner;
+		friend class OfflineRaceLogicImpl;
+
 };
 
 }

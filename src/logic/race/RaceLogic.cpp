@@ -48,8 +48,12 @@ class RaceLogicImpl
 		SIG_IMPL(RaceLogic, stateChanged);
 
 
+		bool m_initialized;
+
 		/** The level */
-		Level m_level;
+		Level *m_level;
+
+		bool m_levelOwner;
 
 		/** All players vector (with local player too) */
 		TPlayerList m_playerList;
@@ -84,14 +88,23 @@ class RaceLogicImpl
 
 
 
-		RaceLogicImpl(const Race::Level &p_level) :
-			m_level(p_level),
+		RaceLogicImpl(Race::Level *p_level) :
+			m_initialized(false),
+			m_level(p_level == NULL ? new Race::Level() : p_level),
+			m_levelOwner(p_level == NULL),
 			m_progress(m_level),
 			m_raceStartTimeMs(0),
 			m_raceFinishTimeMs(0),
 			m_lapCount(0),
 			m_state(S_STANDBY)
 		{ /* empty */ }
+
+		~RaceLogicImpl()
+		{
+			if (m_levelOwner) {
+				delete m_level;
+			}
+		}
 
 
 		bool hasPlayerFinished(const Player &p_player) const;
@@ -112,13 +125,13 @@ class RaceLogicImpl
 SIG_CPP(RaceLogic, stateChanged);
 
 RaceLogic::RaceLogic() :
-	m_impl(new RaceLogicImpl(Race::Level()))
+		m_impl(new RaceLogicImpl(NULL))
 {
 	display(_("Game loaded"));
 }
 
-RaceLogic::RaceLogic(const Race::Level &p_level) :
-	m_impl(new RaceLogicImpl(p_level))
+RaceLogic::RaceLogic(Race::Level *p_level) :
+		m_impl(new RaceLogicImpl(p_level))
 {
 	display(_("Game loaded"));
 }
@@ -126,6 +139,23 @@ RaceLogic::RaceLogic(const Race::Level &p_level) :
 RaceLogic::~RaceLogic()
 {
 	// empty
+}
+
+void RaceLogic::initialize()
+{
+	if (!m_impl->m_initialized) {
+		m_impl->m_progress.initialize();
+		m_impl->m_progress.resetClock();
+
+		m_impl->m_initialized = true;
+	}
+}
+
+void RaceLogic::destroy()
+{
+	if (m_impl->m_initialized) {
+		m_impl->m_progress.destroy();
+	}
 }
 
 void RaceLogic::update(unsigned p_timeElapsed)
@@ -148,17 +178,17 @@ void RaceLogicImpl::updateState()
 
 void RaceLogicImpl::updateCollisions()
 {
-	const int objCount = m_level.getObjectCount();
-	const int carCount = m_level.getCarCount();
+	const int objCount = m_level->getObjectCount();
+	const int carCount = m_level->getCarCount();
 
 	for (int carIdx = 0; carIdx < carCount; ++carIdx) {
-		Race::Car &car = m_level.getCar(carIdx);
+		Race::Car &car = m_level->getCar(carIdx);
 
 		// FIXME: can this be given by reference?
 		const CL_CollisionOutline carOutline = car.getCollisionOutline();
 
 		for (int objIdx = 0; objIdx < objCount; ++objIdx) {
-			const Race::Object &obj = m_level.getObject(objIdx);
+			const Race::Object &obj = m_level->getObject(objIdx);
 
 			// check collision with car
 			const std::vector<CL_CollidingContours> &cont =
@@ -194,9 +224,9 @@ void RaceLogicImpl::updateCollisions()
 
 void RaceLogicImpl::updateCarPhysics(unsigned p_timeElapsed)
 {
-	const int carCount = m_level.getCarCount();
+	const int carCount = m_level->getCarCount();
 	for (int i = 0; i < carCount; ++i) {
-		Race::Car &car = m_level.getCar(i);
+		Race::Car &car = m_level->getCar(i);
 		car.update(p_timeElapsed);
 	}
 }
@@ -246,7 +276,7 @@ void RaceLogicImpl::updatePlayersProgress()
 
 const Race::Level &RaceLogic::getLevel() const
 {
-	return m_impl->m_level;
+	return *m_impl->m_level;
 }
 
 const MessageBoard &RaceLogic::getMessageBoard() const
@@ -392,7 +422,7 @@ unsigned RaceLogic::getRaceFinishTime() const
 
 Level &RaceLogic::getLevel()
 {
-	return m_impl->m_level;
+	return *m_impl->m_level;
 }
 
 bool RaceLogicImpl::hasPlayerFinished(const Player &p_player) const

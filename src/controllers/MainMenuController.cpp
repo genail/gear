@@ -35,7 +35,9 @@
 #include "gfx/scenes/OptionsScene.h"
 #include "gfx/scenes/AuthorsScene.h"
 #include "gfx/scenes/EditorScene.h"
+#include "logic/race/level/Level.h"
 #include "network/client/Client.h"
+
 
 class NetworkClientConnectRunnable : public CL_Runnable
 {
@@ -81,6 +83,8 @@ class MainMenuControllerImpl
 
 		CL_Thread m_connectThread;
 
+		Race::Level m_offlineRaceLevel;
+
 		/** The slot container */
 		CL_SlotContainer m_slots;
 
@@ -107,6 +111,8 @@ class MainMenuControllerImpl
 		bool playerNameChosen() const;
 
 		void makeNetworkConnection();
+
+		void startOfflineGame();
 
 		CL_String getGameServerHost();
 
@@ -201,10 +207,19 @@ void MainMenuControllerImpl::onRaceStartClicked()
 	if (!m_scene->getServerAddr().empty()) {
 		makeNetworkConnection();
 	} else {
-		// offline initialization
-		// FIXME: which level load when playing offline?
-		m_raceScene->initializeOffline("levels/level2.0.xml");
+		startOfflineGame();
 	}
+}
+
+void MainMenuControllerImpl::startOfflineGame()
+{
+	// FIXME: how to choose a level?
+	if (!m_offlineRaceLevel.isLoaded()) {
+		m_offlineRaceLevel.load("levels/level2.0.xml");
+	}
+
+	m_raceScene->initializeOffline(&m_offlineRaceLevel);
+	Gfx::Stage::pushScene(m_raceScene);
 }
 
 void MainMenuControllerImpl::displayError(const CL_String &p_text)

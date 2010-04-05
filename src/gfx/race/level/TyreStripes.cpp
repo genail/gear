@@ -155,7 +155,7 @@ class TyreStripesImpl
 		typedef std::map<const Race::Car*, CL_Pointf> TDriftPointMap;
 
 		/** Level at what stripes are drawn */
-		Race::Level m_level;
+		const Race::Level *const m_level;
 
 		/** Stripes container. First stripe is the youngest one. */
 		TStripeList m_stripes;
@@ -170,7 +170,7 @@ class TyreStripesImpl
 		TDriftPointMap m_lastDriftMap;
 
 
-		TyreStripesImpl(const Race::Level &p_level) :
+		TyreStripesImpl(const Race::Level *p_level) :
 			m_level(p_level),
 			m_immutableStripeCnt(0)
 		{ /* empty */ }
@@ -202,7 +202,7 @@ class TyreStripesImpl
 
 };
 
-TyreStripes::TyreStripes(const Race::Level &p_level) :
+TyreStripes::TyreStripes(const Race::Level *p_level) :
 	m_impl(new TyreStripesImpl(p_level))
 {
 	// empty
@@ -312,11 +312,11 @@ void TyreStripesImpl::clear()
 
 void TyreStripes::update()
 {
-	const int carCount = m_impl->m_level.getCarCount();
+	const int carCount = m_impl->m_level->getCarCount();
 	TyreStripesImpl::TDriftPointMap::iterator itor;
 
 	for (int i = 0; i < carCount; ++i) {
-		const Race::Car &car = m_impl->m_level.getCar(i);
+		const Race::Car &car = m_impl->m_level->getCar(i);
 		itor = m_impl->m_lastDriftMap.find(&car);
 
 		if (car.isDrifting()) {

@@ -49,9 +49,6 @@ class Level : public Gfx::Drawable
 {
 	public:
 
-		// use the other constructor instead
-		DEPRECATED(Level(const Race::Level &p_levelLogic, const Viewport &p_viewport));
-
 		Level(const Race::Level *p_levelLogic, const Viewport *p_viewport);
 
 		virtual ~Level();

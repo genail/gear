@@ -43,7 +43,7 @@ class TrackTriangulator;
 
 class LevelImpl;
 
-class Level
+class Level : public boost::noncopyable
 {
 
 	public:
@@ -62,8 +62,7 @@ class Level
 
 		// loading and saving
 
-		/** @deprecated Check load() state instead  */
-		DEPRECATED(bool isLoaded() const);
+		bool isLoaded() const;
 
 		/** @return true if track was loaded */
 		bool load(const CL_String &p_filename);

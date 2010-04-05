@@ -64,15 +64,7 @@ RaceScene::RaceScene(CL_GUIComponent &p_parent) :
 RaceScene::~RaceScene() {
 }
 
-void RaceScene::initializeOffline(const CL_String &p_level)
-{
-	if (!m_initialized) {
-		m_logic = new Race::OfflineRaceLogic(p_level);
-		initCommon();
-	}
-}
-
-void RaceScene::initializeOffline(const Race::Level &p_level)
+void RaceScene::initializeOffline(Race::Level *p_level)
 {
 	if (!m_initialized) {
 		m_logic = new Race::OfflineRaceLogic(p_level);

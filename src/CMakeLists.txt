@@ -110,6 +110,7 @@ SET(SERVER_SRCS
 	network/server/MasterServerRegistrant.cpp
 	network/server/Server.cpp
 	network/server/VoteSystem.cpp
+	ranking/LocalRanking.cpp
 )
 
 SET(TEST_SRCS
@@ -123,6 +124,7 @@ SET(TEST_SRCS
 	math/Float.cpp
 	math/Integer.cpp
 	network/server/VoteSystem.cpp
+	ranking/LocalRanking.cpp
 	
 	# test code
 	tests/suite.cpp
@@ -132,9 +134,11 @@ SET(TEST_SRCS
 	tests/math/FloatTest.cpp
 	tests/math/IntegerTest.cpp
 	tests/network/server/VoteSystemTest.cpp
+	tests/ranking/LocalRankingTest.cpp
 )
 
 FIND_PACKAGE(ClanLib-2.1 REQUIRED)
+FIND_PACKAGE(SQLITE3 REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
 FIND_PACKAGE(JPEG REQUIRED)
 FIND_PACKAGE(PNG REQUIRED)
@@ -145,6 +149,7 @@ FIND_PACKAGE(Threads REQUIRED)
 
 INCLUDE_DIRECTORIES(
 	${ClanLib_INCLUDE_DIRS}
+	${SQLITE3_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIRS}
 	${JPEG_INCLUDE_DIRS}
 	${PNG_INCLUDE_DIRS}
@@ -174,6 +179,9 @@ SET(SERVER_LIBS ${LIBS}
 	${ClanLib_Core_LIBRARY}
 	${ClanLib_Display_LIBRARY}
 	${ClanLib_Network_LIBRARY}
+	${ClanLib_Database_LIBRARY}
+	${ClanLib_Sqlite_LIBRARY}
+	${SQLITE3_LIBRARIES}
 	${ZLIB_LIBRARY}
 	${X11_LIBRARY}
 )
@@ -182,6 +190,9 @@ SET(TEST_LIBS ${LIBS}
 	${ClanLib_Core_LIBRARY}
 	${ClanLib_Display_LIBRARY}
 	${ClanLib_Network_LIBRARY}
+	${ClanLib_Database_LIBRARY}
+	${ClanLib_Sqlite_LIBRARY}
+	${SQLITE3_LIBRARIES}
 	${ZLIB_LIBRARY}
 	${X11_LIBRARY}
 )

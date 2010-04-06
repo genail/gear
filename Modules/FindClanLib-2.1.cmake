@@ -33,7 +33,9 @@ IF(NOT ClanLib_FIND_COMPONENTS)
     SDL
     Signals
     Sound
-    Vorbis)
+    Vorbis
+    Database
+    Sqlite)
 ENDIF(NOT ClanLib_FIND_COMPONENTS)
 
 MACRO(ClanLib_MSG MSG)
@@ -113,4 +115,6 @@ MARK_AS_ADVANCED(
   ClanLib_Signals_LIBRARY
   ClanLib_Sound_LIBRARY
   ClanLib_Vorbis_LIBRARY
+  ClanLib_Database_LIBRARY
+  ClanLib_Sqlite_LIBRARY
 )

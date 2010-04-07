@@ -46,13 +46,10 @@ class Server {
 
 	public:
 
-		explicit Server();
-
+		Server();
 		virtual ~Server();
 
-
 		void start();
-
 		void stop();
 
 

@@ -46,6 +46,7 @@
 #include "network/packets/VoteEnd.h"
 #include "network/packets/VoteTick.h"
 #include "network/server/MasterServerRegistrant.h"
+#include "network/server/RankingServer.h"
 #include "network/server/VoteSystem.h"
 
 namespace Net {
@@ -84,17 +85,22 @@ class ServerImpl
 
 		bool m_running;
 
-		Race::Level m_level;
-
-		VoteSystem m_voteSystem;
-
 		CL_NetGameServer m_gameServer;
 
 		TConnectionPlayerMap m_connections;
 
+
+		Race::Level m_level;
+
+		VoteSystem m_voteSystem;
+
+		RankingServer m_rankingServer;
+
+
 		CL_Thread m_masterServerThread;
 
 		MasterServerRegistrant m_serverRegistrant;
+
 
 		CL_SlotContainer m_slots;
 
@@ -120,6 +126,8 @@ class ServerImpl
 		void startRace();
 
 		void kick(CL_NetGameConnection *p_conn, GoodbyeReason p_reason);
+
+		bool isRankingEvent(const CL_NetGameEvent &p_event);
 
 
 		// network events
@@ -330,6 +338,11 @@ void ServerImpl::onEventArrived(
 			onVoteStart(p_conn, p_event);
 		} else if (eventName == EVENT_VOTE_TICK) {
 			onVoteTick(p_conn, p_event);
+		}
+
+		// ranking events
+		else if (isRankingEvent(p_event)) {
+			m_rankingServer.parseEvent(p_conn, p_event);
 		}
 
 		// unknown events remains unhandled
@@ -638,6 +651,12 @@ void ServerImpl::kick(CL_NetGameConnection *p_conn, GoodbyeReason p_reason)
 
 	send(p_conn, goodbye.buildEvent());
 	p_conn->disconnect();
+}
+
+bool ServerImpl::isRankingEvent(const CL_NetGameEvent &p_event)
+{
+	static const int PREFIX_LEN = strlen(EVENT_RANKING_PREFIX);
+	return p_event.get_name().substr(0, PREFIX_LEN) == EVENT_RANKING_PREFIX;
 }
 
 } // namespace

@@ -26,74 +26,29 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RankingEntries.h"
+#pragma once
 
-#include "common.h"
-#include "common/gassert.h"
-#include "network/events.h"
+#include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
 namespace Net
 {
 
-RankingEntries::RankingEntries()
+class RankingServerImpl;
+class RankingServer
 {
-	// empty
-}
+	public:
 
-RankingEntries::~RankingEntries()
-{
-	// empty
-}
+		RankingServer();
+		virtual ~RankingServer();
 
-CL_NetGameEvent RankingEntries::buildEvent() const
-{
-	CL_NetGameEvent event(EVENT_RANKING_ENTRIES);
-	event.add_argument(getEntryCount());
+		void parseEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_rankingEvent);
 
-	foreach(const PlacedRankingEntry &entry, m_rankingEntries) {
-		event.add_argument(entry.uid);
-		event.add_argument(entry.name);
-		event.add_argument(entry.timeMs);
-		event.add_argument(entry.place);
-	}
 
-	return event;
-}
+	private:
 
-void RankingEntries::parseEvent(const CL_NetGameEvent &p_event)
-{
-	G_ASSERT(p_event.get_name() == EVENT_RANKING_ENTRIES);
-	G_ASSERT(getEntryCount() == 0);
-
-	const int entryCount = p_event.get_argument(0);
-
-	int index = 1;
-	PlacedRankingEntry entry;
-
-	for (int i = 0; i < entryCount; ++i) {
-		entry.uid = p_event.get_argument(index++);
-		entry.name = p_event.get_argument(index++);
-		entry.timeMs = p_event.get_argument(index++);
-		entry.place = p_event.get_argument(index++);
-
-		addEntry(entry);
-	}
-}
-
-void RankingEntries::addEntry(const PlacedRankingEntry &p_entry)
-{
-	m_rankingEntries.push_back(p_entry);
-}
-
-int RankingEntries::getEntryCount() const
-{
-	return m_rankingEntries.size();
-}
-
-const PlacedRankingEntry &RankingEntries::getEntry(int p_index) const
-{
-	G_ASSERT(p_index >= 0 && p_index < (signed) m_rankingEntries.size());
-	return m_rankingEntries[p_index];
-}
+		CL_SharedPtr<RankingServerImpl> m_impl;
+};
 
 }
+

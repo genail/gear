@@ -47,15 +47,15 @@ class RankingEntries : public Net::Packet
 		virtual CL_NetGameEvent buildEvent() const;
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-		void addEntry(const RankingEntry &p_entry);
+		void addEntry(const PlacedRankingEntry &p_entry);
 
 		int getEntryCount() const;
-		const RankingEntry &getEntry(int p_index) const;
+		const PlacedRankingEntry &getEntry(int p_index) const;
 
 
 	private:
 
-		std::vector<RankingEntry> m_rankingEntries;
+		std::vector<PlacedRankingEntry> m_rankingEntries;
 };
 
 }

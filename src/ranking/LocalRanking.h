@@ -52,6 +52,8 @@ class LocalRanking
 
 		RankingEntry getEntryAtPosition(int p_position);
 
+		RankingEntry getEntryAtIndex(int p_index);
+
 		int getEntryRankingPosition(int p_index);
 
 		int getEntryCount();

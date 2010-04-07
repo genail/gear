@@ -91,6 +91,8 @@ class LocalRankingImpl
 		void moveEntry(const RankingEntry &p_newEntry, int p_oldIndex);
 
 		int getEntryTime(int p_index);
+
+		RankingEntry getEntryAtIndex(int p_index);
 };
 
 LocalRanking::LocalRanking(const CL_String &p_dbFile) :
@@ -262,6 +264,34 @@ RankingEntry LocalRanking::getEntryAtPosition(int p_position)
 	return rankingEntry;
 }
 
+RankingEntry LocalRanking::getEntryAtIndex(int p_index)
+{
+	return m_impl->getEntryAtIndex(p_index);
+}
+
+RankingEntry LocalRankingImpl::getEntryAtIndex(int p_index)
+{
+	static const CL_String SELECT_STATEMENT = CL_String("")
+			+ "SELECT uid, name, time FROM ranking "
+			+ "WHERE id=?1";
+
+	CL_DBCommand cmd = m_connection.create_command(SELECT_STATEMENT);
+	cmd.set_input_parameter_int(1, p_index);
+
+	RankingEntry rankingEntry;
+	CL_DBReader reader = m_connection.execute_reader(cmd);
+	if (reader.retrieve_row()) {
+		rankingEntry.uid = reader.get_column_string(0);
+		rankingEntry.name = reader.get_column_string(1);
+		rankingEntry.timeMs = reader.get_column_int(2);
+	} else {
+		throw CL_Exception("failed to retrieve index");
+	}
+
+	reader.close();
+	return rankingEntry;
+}
+
 int LocalRanking::getEntryRankingPosition(int p_index)
 {
 	const int time = m_impl->getEntryTime(p_index);
@@ -278,14 +308,8 @@ int LocalRanking::getEntryRankingPosition(int p_index)
 
 int LocalRankingImpl::getEntryTime(int p_index)
 {
-	static const CL_String SELECT_STATEMENT = CL_String("")
-			+ "SELECT time FROM ranking "
-			+ "WHERE id=?1";
-
-	CL_DBCommand cmd = m_connection.create_command(SELECT_STATEMENT);
-	cmd.set_input_parameter_int(1, p_index);
-
-	return m_connection.execute_scalar_int(cmd);
+	const RankingEntry entry = getEntryAtIndex(p_index);
+	return entry.timeMs;
 }
 
 int LocalRanking::getEntryCount()

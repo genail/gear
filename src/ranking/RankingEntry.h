@@ -37,3 +37,8 @@ struct RankingEntry
 	int timeMs;
 };
 
+struct PlacedRankingEntry : public RankingEntry
+{
+	int place;
+};
+

@@ -26,37 +26,54 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "RankingAdvance.h"
 
-#include <ClanLib/core.h>
+#include "common/gassert.h"
+#include "network/events.h"
 
+const unsigned ARGS_COUNT = 3;
 
-// connect / disconnect procedure
+namespace Net
+{
 
-#define EVENT_CLIENT_INFO 	"client_info"
-#define EVENT_GAME_STATE 	"game_state"
-#define EVENT_GOODBYE		"goodbye"
+RankingAdvance::RankingAdvance()
+{
+	// empty
+}
 
-// player events
+RankingAdvance::~RankingAdvance()
+{
+	// empty
+}
 
-#define EVENT_PLAYER_JOINED "player_joined"
-#define EVENT_PLAYER_LEFT   "player_left"
+CL_NetGameEvent RankingAdvance::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_RANKING_ADVANCE);
+	event.add_argument(m_rankingEntry.uid);
+	event.add_argument(m_rankingEntry.name);
+	event.add_argument(m_rankingEntry.timeMs);
 
-// race events
+	return event;
+}
 
-#define EVENT_CAR_STATE		"car_state"
-#define EVENT_RACE_START	"race_start"
+void RankingAdvance::parseEvent(const CL_NetGameEvent &p_event)
+{
+	G_ASSERT(p_event.get_name() == EVENT_RANKING_ADVANCE);
+	G_ASSERT(p_event.get_argument_count() == ARGS_COUNT);
 
-// voting event
+	m_rankingEntry.uid = p_event.get_argument(0);
+	m_rankingEntry.name = p_event.get_argument(1);
+	m_rankingEntry.timeMs = p_event.get_argument(2);
+}
 
-#define EVENT_VOTE_START	"vote:start"
-#define EVENT_VOTE_END		"vote:end"
-#define EVENT_VOTE_TICK		"vote:tick"
+void RankingAdvance::setRankingEntry(const RankingEntry &p_entry)
+{
+	m_rankingEntry = p_entry;
+}
 
-// ranking events
+const RankingEntry &RankingAdvance::getRankingEntry() const
+{
+	return m_rankingEntry;
+}
 
-#define EVENT_RANKING_PREFIX "ranking:"
-
-#define EVENT_RANKING_FIND "ranking:find"
-#define EVENT_RANKING_ENTRIES "ranking:entries"
-#define EVENT_RANKING_ADVANCE "ranking:advance"
+}

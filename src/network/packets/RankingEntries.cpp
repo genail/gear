@@ -26,37 +26,72 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "RankingEntries.h"
 
-#include <ClanLib/core.h>
+#include "common.h"
+#include "common/gassert.h"
+#include "network/events.h"
 
+namespace Net
+{
 
-// connect / disconnect procedure
+RankingEntries::RankingEntries()
+{
+	// empty
+}
 
-#define EVENT_CLIENT_INFO 	"client_info"
-#define EVENT_GAME_STATE 	"game_state"
-#define EVENT_GOODBYE		"goodbye"
+RankingEntries::~RankingEntries()
+{
+	// empty
+}
 
-// player events
+CL_NetGameEvent RankingEntries::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_RANKING_ENTRIES);
+	event.add_argument(getEntryCount());
 
-#define EVENT_PLAYER_JOINED "player_joined"
-#define EVENT_PLAYER_LEFT   "player_left"
+	foreach(const RankingEntry &entry, m_rankingEntries) {
+		event.add_argument(entry.uid);
+		event.add_argument(entry.name);
+		event.add_argument(entry.timeMs);
+	}
 
-// race events
+	return event;
+}
 
-#define EVENT_CAR_STATE		"car_state"
-#define EVENT_RACE_START	"race_start"
+void RankingEntries::parseEvent(const CL_NetGameEvent &p_event)
+{
+	G_ASSERT(p_event.get_name() == EVENT_RANKING_ENTRIES);
+	G_ASSERT(getEntryCount() == 0);
 
-// voting event
+	const int entryCount = p_event.get_argument(0);
 
-#define EVENT_VOTE_START	"vote:start"
-#define EVENT_VOTE_END		"vote:end"
-#define EVENT_VOTE_TICK		"vote:tick"
+	int index = 1;
+	RankingEntry entry;
 
-// ranking events
+	for (int i = 0; i < entryCount; ++i) {
+		entry.uid = p_event.get_argument(index++);
+		entry.name = p_event.get_argument(index++);
+		entry.timeMs = p_event.get_argument(index++);
 
-#define EVENT_RANKING_PREFIX "ranking:"
+		addEntry(entry);
+	}
+}
 
-#define EVENT_RANKING_FIND "ranking:find"
-#define EVENT_RANKING_ENTRIES "ranking:entries"
-#define EVENT_RANKING_ADVANCE "ranking:advance"
+void RankingEntries::addEntry(const RankingEntry &p_entry)
+{
+	m_rankingEntries.push_back(p_entry);
+}
+
+int RankingEntries::getEntryCount() const
+{
+	return m_rankingEntries.size();
+}
+
+const RankingEntry &RankingEntries::getEntry(int p_index) const
+{
+	G_ASSERT(p_index >= 0 && p_index < (signed) m_rankingEntries.size());
+	return m_rankingEntries[p_index];
+}
+
+}

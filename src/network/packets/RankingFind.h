@@ -30,33 +30,29 @@
 
 #include <ClanLib/core.h>
 
+#include "Packet.h"
 
-// connect / disconnect procedure
+namespace Net
+{
 
-#define EVENT_CLIENT_INFO 	"client_info"
-#define EVENT_GAME_STATE 	"game_state"
-#define EVENT_GOODBYE		"goodbye"
+class RankingFind : public Net::Packet
+{
+	public:
 
-// player events
+		RankingFind();
+		virtual ~RankingFind();
 
-#define EVENT_PLAYER_JOINED "player_joined"
-#define EVENT_PLAYER_LEFT   "player_left"
+		virtual CL_NetGameEvent buildEvent() const;
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-// race events
+		void setPlayerId(const CL_String &p_str);
+		const CL_String &getPlayerId() const;
 
-#define EVENT_CAR_STATE		"car_state"
-#define EVENT_RACE_START	"race_start"
 
-// voting event
+	private:
 
-#define EVENT_VOTE_START	"vote:start"
-#define EVENT_VOTE_END		"vote:end"
-#define EVENT_VOTE_TICK		"vote:tick"
+		CL_String m_playerId;
+};
 
-// ranking events
+}
 
-#define EVENT_RANKING_PREFIX "ranking:"
-
-#define EVENT_RANKING_FIND "ranking:find"
-#define EVENT_RANKING_ENTRIES "ranking:entries"
-#define EVENT_RANKING_ADVANCE "ranking:advance"

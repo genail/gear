@@ -26,6 +26,9 @@ SET(COMMON_SRCS
 	network/packets/PlayerJoined.cpp
 	network/packets/PlayerLeft.cpp
 	network/packets/RaceStart.cpp
+	network/packets/RankingAdvance.cpp
+	network/packets/RankingEntries.cpp
+	network/packets/RankingFind.cpp
 	network/packets/VoteEnd.cpp
 	network/packets/VoteStart.cpp
 	network/packets/VoteTick.cpp

@@ -26,37 +26,52 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "RankingFind.h"
 
-#include <ClanLib/core.h>
+#include "common/gassert.h"
+#include "network/events.h"
 
 
-// connect / disconnect procedure
+const unsigned ARGS_COUNT = 1;
 
-#define EVENT_CLIENT_INFO 	"client_info"
-#define EVENT_GAME_STATE 	"game_state"
-#define EVENT_GOODBYE		"goodbye"
 
-// player events
+namespace Net
+{
 
-#define EVENT_PLAYER_JOINED "player_joined"
-#define EVENT_PLAYER_LEFT   "player_left"
+RankingFind::RankingFind()
+{
+	// empty
+}
 
-// race events
+RankingFind::~RankingFind()
+{
+	// empty
+}
 
-#define EVENT_CAR_STATE		"car_state"
-#define EVENT_RACE_START	"race_start"
+CL_NetGameEvent RankingFind::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_RANKING_FIND);
+	event.add_argument(m_playerId);
 
-// voting event
+	return event;
+}
 
-#define EVENT_VOTE_START	"vote:start"
-#define EVENT_VOTE_END		"vote:end"
-#define EVENT_VOTE_TICK		"vote:tick"
+void RankingFind::parseEvent(const CL_NetGameEvent &p_event)
+{
+	G_ASSERT(p_event.get_name() == EVENT_RANKING_FIND);
+	G_ASSERT(p_event.get_argument_count() == ARGS_COUNT);
 
-// ranking events
+	m_playerId = p_event.get_argument(0);
+}
 
-#define EVENT_RANKING_PREFIX "ranking:"
+void RankingFind::setPlayerId(const CL_String &p_str)
+{
+	m_playerId = p_str;
+}
 
-#define EVENT_RANKING_FIND "ranking:find"
-#define EVENT_RANKING_ENTRIES "ranking:entries"
-#define EVENT_RANKING_ADVANCE "ranking:advance"
+const CL_String &RankingFind::getPlayerId() const
+{
+	return m_playerId;
+}
+
+}

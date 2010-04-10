@@ -51,7 +51,7 @@ CL_NetGameEvent RankingEntries::buildEvent() const
 	event.add_argument(getEntryCount());
 
 	foreach(const PlacedRankingEntry &entry, m_rankingEntries) {
-		event.add_argument(entry.uid);
+		event.add_argument(entry.pid);
 		event.add_argument(entry.name);
 		event.add_argument(entry.timeMs);
 		event.add_argument(entry.place);
@@ -71,7 +71,7 @@ void RankingEntries::parseEvent(const CL_NetGameEvent &p_event)
 	PlacedRankingEntry entry;
 
 	for (int i = 0; i < entryCount; ++i) {
-		entry.uid = p_event.get_argument(index++);
+		entry.pid = p_event.get_argument(index++);
 		entry.name = p_event.get_argument(index++);
 		entry.timeMs = p_event.get_argument(index++);
 		entry.place = p_event.get_argument(index++);

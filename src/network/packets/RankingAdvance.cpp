@@ -49,7 +49,7 @@ RankingAdvance::~RankingAdvance()
 CL_NetGameEvent RankingAdvance::buildEvent() const
 {
 	CL_NetGameEvent event(EVENT_RANKING_ADVANCE);
-	event.add_argument(m_rankingEntry.uid);
+	event.add_argument(m_rankingEntry.pid);
 	event.add_argument(m_rankingEntry.name);
 	event.add_argument(m_rankingEntry.timeMs);
 
@@ -61,7 +61,7 @@ void RankingAdvance::parseEvent(const CL_NetGameEvent &p_event)
 	G_ASSERT(p_event.get_name() == EVENT_RANKING_ADVANCE);
 	G_ASSERT(p_event.get_argument_count() == ARGS_COUNT);
 
-	m_rankingEntry.uid = p_event.get_argument(0);
+	m_rankingEntry.pid = p_event.get_argument(0);
 	m_rankingEntry.name = p_event.get_argument(1);
 	m_rankingEntry.timeMs = p_event.get_argument(2);
 }

@@ -93,7 +93,7 @@ void RankingServerImpl::parseRankingFindEvent(
 		RankingEntry rankingEntry = m_localRanking.getEntryAtIndex(index);
 		PlacedRankingEntry placedRankingEntry;
 
-		placedRankingEntry.uid = rankingEntry.uid;
+		placedRankingEntry.pid = rankingEntry.pid;
 		placedRankingEntry.name = rankingEntry.name;
 		placedRankingEntry.timeMs = rankingEntry.timeMs;
 

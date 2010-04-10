@@ -71,11 +71,11 @@ BOOST_AUTO_TEST_CASE(ListEntries)
 	BOOST_CHECK(ranking->getEntryCount() == 0);
 
 	RankingEntry entry1, entry2;
-	entry1.uid = "uid_1";
+	entry1.pid = "uid_1";
 	entry1.name = "name_1";
 	entry1.timeMs = 10;
 
-	entry2.uid = "uid_2";
+	entry2.pid = "uid_2";
 	entry2.name = "name_2";
 	entry2.timeMs = 5;
 
@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_CASE(ListEntries)
 	BOOST_CHECK(dbEntry1.name == entry2.name);
 	BOOST_CHECK(dbEntry2.name == entry1.name);
 
-	BOOST_CHECK(dbEntry1.uid == entry2.uid);
-	BOOST_CHECK(dbEntry2.uid == entry1.uid);
+	BOOST_CHECK(dbEntry1.pid == entry2.pid);
+	BOOST_CHECK(dbEntry2.pid == entry1.pid);
 
 	BOOST_CHECK_EQUAL(dbEntry1.timeMs, entry2.timeMs);
 	BOOST_CHECK_EQUAL(dbEntry2.timeMs, entry1.timeMs);
@@ -103,11 +103,11 @@ BOOST_AUTO_TEST_CASE(Advance)
 	init();
 
 	RankingEntry entry1, entry2;
-	entry1.uid = "uid_1";
+	entry1.pid = "uid_1";
 	entry1.name = "name_1";
 	entry1.timeMs = 10;
 
-	entry2.uid = "uid_2";
+	entry2.pid = "uid_2";
 	entry2.name = "name_2";
 	entry2.timeMs = 5;
 
@@ -128,8 +128,8 @@ BOOST_AUTO_TEST_CASE(Advance)
 	BOOST_CHECK(dbEntry1.name == entry1.name);
 	BOOST_CHECK(dbEntry2.name == entry2.name);
 
-	BOOST_CHECK(dbEntry1.uid == entry1.uid);
-	BOOST_CHECK(dbEntry2.uid == entry2.uid);
+	BOOST_CHECK(dbEntry1.pid == entry1.pid);
+	BOOST_CHECK(dbEntry2.pid == entry2.pid);
 
 	BOOST_CHECK_EQUAL(dbEntry1.timeMs, entry1.timeMs);
 	BOOST_CHECK_EQUAL(dbEntry2.timeMs, entry2.timeMs);
@@ -140,19 +140,19 @@ BOOST_AUTO_TEST_CASE(Position)
 	init();
 
 	RankingEntry entry1, entry2;
-	entry1.uid = "uid_1";
+	entry1.pid = "uid_1";
 	entry1.name = "name_1";
 	entry1.timeMs = 10;
 
-	entry2.uid = "uid_2";
+	entry2.pid = "uid_2";
 	entry2.name = "name_2";
 	entry2.timeMs = 5;
 
 	ranking->advanceEntry(entry1);
 	ranking->advanceEntry(entry2);
 
-	BOOST_CHECK_EQUAL(1, ranking->getEntryRankingPosition(ranking->findEntryIndex(entry2.uid)));
-	BOOST_CHECK_EQUAL(2, ranking->getEntryRankingPosition(ranking->findEntryIndex(entry1.uid)));
+	BOOST_CHECK_EQUAL(1, ranking->getEntryRankingPosition(ranking->findEntryIndex(entry2.pid)));
+	BOOST_CHECK_EQUAL(2, ranking->getEntryRankingPosition(ranking->findEntryIndex(entry1.pid)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

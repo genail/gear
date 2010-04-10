@@ -49,14 +49,14 @@ const CL_String META_TABLE_DEF = CL_String()
 const CL_String RANKING_TABLE_DEF = CL_String()
 		+ "CREATE TABLE ranking ( "
 		+ "id INTEGER PRIMARY KEY ASC AUTOINCREMENT"
-		+ ", uid TEXT"
+		+ ", pid TEXT"
 		+ ", name TEXT"
 		+ ", time INTEGER"
 		+ " )";
 
-const CL_String RANKING_INDEX_UID = CL_String()
-		+ "CREATE UNIQUE INDEX ranking_uid_index "
-		+ "ON ranking (uid)";
+const CL_String RANKING_INDEX_pid = CL_String()
+		+ "CREATE UNIQUE INDEX ranking_pid_index "
+		+ "ON ranking (pid)";
 
 const CL_String RANKING_INDEX_TIME = CL_String()
 		+ "CREATE UNIQUE INDEX ranking_time_index "
@@ -154,7 +154,7 @@ void LocalRankingImpl::createIndexes()
 {
 	CL_DBCommand cmd;
 
-	cmd = m_connection.create_command(RANKING_INDEX_UID);
+	cmd = m_connection.create_command(RANKING_INDEX_pid);
 	m_connection.execute_non_query(cmd);
 
 	cmd = m_connection.create_command(RANKING_INDEX_TIME);
@@ -179,7 +179,7 @@ LocalRanking::~LocalRanking()
 
 void LocalRanking::advanceEntry(const RankingEntry &p_entry)
 {
-	const int index = findEntryIndex(p_entry.uid);
+	const int index = findEntryIndex(p_entry.pid);
 
 	if (index == -1) {
 		m_impl->insertEntry(p_entry);
@@ -192,13 +192,13 @@ void LocalRankingImpl::insertEntry(const RankingEntry &p_entry)
 {
 	static const CL_String INSERT_STATEMENT = CL_String("")
 			+ "INSERT INTO ranking "
-			+ "( uid, name, time ) "
+			+ "( pid, name, time ) "
 			+ "VALUES "
 			+ "(?1, ?2, ?3)";
 
 	CL_DBCommand cmd = m_connection.create_command(INSERT_STATEMENT);
 
-	cmd.set_input_parameter_string(1, p_entry.uid);
+	cmd.set_input_parameter_string(1, p_entry.pid);
 	cmd.set_input_parameter_string(2, p_entry.name);
 	cmd.set_input_parameter_int(3, p_entry.timeMs);
 
@@ -221,14 +221,14 @@ void LocalRankingImpl::moveEntry(const RankingEntry &p_newEntry, int p_oldIndex)
 	m_connection.execute_non_query(cmd);
 }
 
-int LocalRanking::findEntryIndex(const CL_String &p_uid)
+int LocalRanking::findEntryIndex(const CL_String &p_pid)
 {
 	static const CL_String FIND_STATEMENT = CL_String("")
 			+ "SELECT id FROM ranking "
-			+ "WHERE uid=?1";
+			+ "WHERE pid=?1";
 
 	CL_DBCommand cmd = m_impl->m_connection.create_command(FIND_STATEMENT);
-	cmd.set_input_parameter_string(1, p_uid);
+	cmd.set_input_parameter_string(1, p_pid);
 
 	try {
 		return m_impl->m_connection.execute_scalar_int(cmd);
@@ -240,7 +240,7 @@ int LocalRanking::findEntryIndex(const CL_String &p_uid)
 RankingEntry LocalRanking::getEntryAtPosition(int p_position)
 {
 	static const CL_String SELECT_STATEMENT = CL_String("")
-			+ "SELECT uid, name, time FROM ranking "
+			+ "SELECT pid, name, time FROM ranking "
 			+ "ORDER BY time "
 			+ "LIMIT 1 OFFSET ?1";
 
@@ -253,7 +253,7 @@ RankingEntry LocalRanking::getEntryAtPosition(int p_position)
 
 	CL_DBReader reader = m_impl->m_connection.execute_reader(cmd);
 	if (reader.retrieve_row()) {
-		rankingEntry.uid = reader.get_column_string(0);
+		rankingEntry.pid = reader.get_column_string(0);
 		rankingEntry.name = reader.get_column_string(1);
 		rankingEntry.timeMs = reader.get_column_int(2);
 	} else {
@@ -272,7 +272,7 @@ RankingEntry LocalRanking::getEntryAtIndex(int p_index)
 RankingEntry LocalRankingImpl::getEntryAtIndex(int p_index)
 {
 	static const CL_String SELECT_STATEMENT = CL_String("")
-			+ "SELECT uid, name, time FROM ranking "
+			+ "SELECT pid, name, time FROM ranking "
 			+ "WHERE id=?1";
 
 	CL_DBCommand cmd = m_connection.create_command(SELECT_STATEMENT);
@@ -281,7 +281,7 @@ RankingEntry LocalRankingImpl::getEntryAtIndex(int p_index)
 	RankingEntry rankingEntry;
 	CL_DBReader reader = m_connection.execute_reader(cmd);
 	if (reader.retrieve_row()) {
-		rankingEntry.uid = reader.get_column_string(0);
+		rankingEntry.pid = reader.get_column_string(0);
 		rankingEntry.name = reader.get_column_string(1);
 		rankingEntry.timeMs = reader.get_column_int(2);
 	} else {

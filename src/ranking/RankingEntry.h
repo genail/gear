@@ -32,7 +32,7 @@
 
 struct RankingEntry
 {
-	CL_String uid;
+	CL_String pid;
 	CL_String name;
 	int timeMs;
 };

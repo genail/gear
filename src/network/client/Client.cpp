@@ -44,8 +44,8 @@ namespace Net {
 
 Client::Client() :
 	m_port(DEFAULT_PORT),
-	m_connected(false)
-//	m_raceClient(this)
+	m_connected(false),
+	m_rankingClient(this)
 {
 	m_slots.connect(m_gameClient.sig_connected(), this, &Client::onConnected);
 	m_slots.connect(m_gameClient.sig_disconnected(), this, &Client::onDisconnected);
@@ -285,6 +285,11 @@ void Client::vote(bool p_yes)
 	tick.setOption(p_yes ? VOTE_YES : VOTE_NO);
 
 	send(tick.buildEvent());
+}
+
+RankingClient &Client::getRankingClient()
+{
+	return m_rankingClient;
 }
 
 } // namespace

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,10 @@ class PlayerImpl
 
 		bool m_initialized;
 
-		/** Nickname of this player */
-		CL_String8 m_name;
+		CL_String m_name;
 
-		/** The car */
+		CL_String m_id;
+
 		Race::Car m_car;
 
 
@@ -79,4 +79,14 @@ const CL_String &Player::getName() const
 void Player::setName(const CL_String &p_name)
 {
 	m_impl->m_name = p_name;
+}
+
+const CL_String &Player::getId() const
+{
+	return m_impl->m_id;
+}
+
+void Player::setId(const CL_String &p_id)
+{
+	m_impl->m_id = p_id;
 }

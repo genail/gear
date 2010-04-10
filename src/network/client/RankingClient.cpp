@@ -26,32 +26,54 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "RankingClient.h"
 
-#include <ClanLib/core.h>
+#include "common/Game.h"
+#include "network/client/Client.h"
+#include "network/packets/RankingAdvance.h"
 
-#include "logic/race/OnlineRaceLogic.h"
-
-namespace Race
+namespace Net
 {
 
-class TimeTrailRaceLogicImpl;
-class TimeTrailRaceLogic : public OnlineRaceLogic
+class RankingClientImpl
 {
 	public:
 
-		TimeTrailRaceLogic();
-		virtual ~TimeTrailRaceLogic();
-
-		virtual void update(unsigned p_timeElapsed);
+		Client *m_client;
 
 
-	private:
+		RankingClientImpl(Client *p_client) :
+			m_client(p_client)
+		{ /* empty */ }
 
-		CL_SharedPtr<TimeTrailRaceLogicImpl> m_impl;
-
-		friend class TimeTrailRaceLogicImpl;
 };
 
+RankingClient::RankingClient(Client *p_client) :
+		m_impl(new RankingClientImpl(p_client))
+{
+	// empty
 }
 
+RankingClient::~RankingClient()
+{
+	// empty
+}
+
+void RankingClient::sendTimeAdvance(int p_lapTimeMs)
+{
+	const Player &localPlayer = Game::getInstance().getPlayer();
+
+Net::RankingAdvance rankingAdvancePacket;
+	RankingEntry rankingEntry;
+
+	rankingEntry.pid = localPlayer.getId();
+	rankingEntry.name = localPlayer.getName();
+	rankingEntry.timeMs = p_lapTimeMs;
+
+	rankingAdvancePacket.setRankingEntry(rankingEntry);
+	const CL_NetGameEvent netEvent = rankingAdvancePacket.buildEvent();
+
+	m_impl->m_client->send(netEvent);
+}
+
+}

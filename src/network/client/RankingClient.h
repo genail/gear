@@ -30,27 +30,26 @@
 
 #include <ClanLib/core.h>
 
-#include "logic/race/OnlineRaceLogic.h"
-
-namespace Race
+namespace Net
 {
 
-class TimeTrailRaceLogicImpl;
-class TimeTrailRaceLogic : public OnlineRaceLogic
+class Client;
+
+class RankingClientImpl;
+class RankingClient
 {
 	public:
 
-		TimeTrailRaceLogic();
-		virtual ~TimeTrailRaceLogic();
+		RankingClient(Client *p_client);
+		virtual ~RankingClient();
 
-		virtual void update(unsigned p_timeElapsed);
+
+		void sendTimeAdvance(int p_lapTimeMs);
 
 
 	private:
 
-		CL_SharedPtr<TimeTrailRaceLogicImpl> m_impl;
-
-		friend class TimeTrailRaceLogicImpl;
+		CL_SharedPtr<RankingClientImpl> m_impl;
 };
 
 }

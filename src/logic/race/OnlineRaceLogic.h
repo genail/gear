@@ -37,6 +37,7 @@
 
 namespace Net {
 	class CarState;
+	class Client;
 	class GameState;
 }
 
@@ -80,6 +81,11 @@ class OnlineRaceLogic: public Race::RaceLogic {
 
 
 		virtual void update(unsigned p_timeElapsed);
+
+
+	protected:
+
+		Net::Client &getNetworkConnection();
 
 
 	private:

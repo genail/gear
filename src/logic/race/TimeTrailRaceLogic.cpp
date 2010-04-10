@@ -28,18 +28,69 @@
 
 #include "TimeTrailRaceLogic.h"
 
+#include "common/Game.h"
+#include "common/Player.h"
+#include "logic/race/Car.h"
+#include "logic/race/Progress.h"
+#include "network/client/Client.h"
+#include "network/client/RankingClient.h"
+
 namespace Race
 {
 
+class TimeTrailRaceLogicImpl
+{
+	public:
+
+		TimeTrailRaceLogic *m_parent;
+
+		int m_lastLap;
+
+
+		TimeTrailRaceLogicImpl(TimeTrailRaceLogic *p_parent);
+
+		void updateRankingTimesIfNeeded();
+
+};
+
 TimeTrailRaceLogic::TimeTrailRaceLogic()
 {
-	// TODO Auto-generated constructor stub
+	// empty
+}
 
+TimeTrailRaceLogicImpl::TimeTrailRaceLogicImpl(TimeTrailRaceLogic *p_parent) :
+		m_parent(p_parent),
+		m_lastLap(0)
+{
+	// empty
 }
 
 TimeTrailRaceLogic::~TimeTrailRaceLogic()
 {
-	// TODO Auto-generated destructor stub
+	// empty
+}
+
+void TimeTrailRaceLogic::update(unsigned p_timeElapsed)
+{
+	OnlineRaceLogic::update(p_timeElapsed);
+
+	m_impl->updateRankingTimesIfNeeded();
+}
+
+void TimeTrailRaceLogicImpl::updateRankingTimesIfNeeded()
+{
+	const Race::Progress &progress = m_parent->getProgress();
+	const Player &localPlayer = Game::getInstance().getPlayer();
+	const Race::Car &localCar = localPlayer.getCar();
+	const int currentLap = progress.getLapNumber(localCar);
+
+	if (currentLap != m_lastLap) {
+		int lapTimeMs = progress.getLapTime(localCar, m_lastLap);
+		Net::Client &networkClient = Game::getInstance().getNetworkConnection();
+		Net::RankingClient &rankingClient = networkClient.getRankingClient();
+
+		rankingClient.sendTimeAdvance(lapTimeMs);
+	}
 }
 
 }

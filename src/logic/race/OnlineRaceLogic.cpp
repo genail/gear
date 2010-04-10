@@ -548,4 +548,9 @@ void OnlineRaceLogicImpl::display(const CL_String &p_text)
 	m_parent->display(p_text);
 }
 
+Net::Client &OnlineRaceLogic::getNetworkConnection()
+{
+	return *m_impl->m_client;
+}
+
 } // namespace

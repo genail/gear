@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,16 +43,17 @@ class Player : boost::noncopyable {
 	public:
 
 		explicit Player(const CL_String8 &p_name = "");
-
 		virtual ~Player();
 
-		virtual Race::Car &getCar();
 
+		virtual Race::Car &getCar();
 		virtual const Race::Car &getCar() const;
 
 		const CL_String &getName() const;
-
 		void setName(const CL_String &p_name);
+
+		const CL_String &getId() const;
+		void setId(const CL_String &p_id);
 
 	private:
 

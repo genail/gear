@@ -37,6 +37,7 @@
 #include "common/Player.h"
 #include "logic/race/Car.h"
 #include "logic/race/level/Level.h"
+#include "network/client/RankingClient.h"
 
 namespace Net {
 
@@ -95,6 +96,8 @@ class Client {
 
 		int getServerPort() const { return m_port; }
 
+		RankingClient &getRankingClient();
+
 
 		void setServerAddr(const CL_String& p_addr) { m_addr = p_addr; }
 
@@ -116,19 +119,16 @@ class Client {
 
 	private:
 
-		/** Server addr */
 		CL_String m_addr;
 
-		/** Server port */
 		int m_port;
 
-		/** Connected state */
 		volatile bool m_connected;
 
-		/** Game client object */
 		CL_NetGameClient m_gameClient;
 
-		/** The slot container */
+		RankingClient m_rankingClient;
+
 		CL_SlotContainer m_slots;
 
 
@@ -174,6 +174,10 @@ class Client {
 		void onVoteEnd(const CL_NetGameEvent &p_event);
 
 		void onVoteTick(const CL_NetGameEvent &p_event);
+
+
+		friend class RankingClient;
+		friend class RankingClientImpl;
 
 };
 

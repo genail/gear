@@ -29,7 +29,7 @@
 #include "TimeTrailServer.h"
 
 #include "network/events.h"
-#include "network/server/RankingServer.h"
+#include "network/server/RankingService.h"
 
 namespace Net
 {
@@ -40,7 +40,7 @@ class TimeTrailServerImpl
 
 		TimeTrailServer *m_parent;
 
-		RankingServer m_rankingServer;
+		RankingService m_rankingServer;
 
 
 		TimeTrailServerImpl(TimeTrailServer *p_parent);

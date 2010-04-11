@@ -112,7 +112,7 @@ SET(SERVER_SRCS
 	${COMMON_SRCS}
 	ServerApplication.cpp
 	network/server/MasterServerRegistrant.cpp
-	network/server/RankingServer.cpp
+	network/server/RankingService.cpp
 	network/server/Server.cpp
 	network/server/TimeTrailServer.cpp
 	network/server/VoteSystem.cpp

@@ -26,7 +26,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RankingServer.h"
+#include "RankingService.h"
 
 #include "network/events.h"
 #include "network/packets/RankingFind.h"
@@ -37,7 +37,7 @@
 namespace Net
 {
 
-class RankingServerImpl
+class RankingServiceImpl
 {
 	public:
 
@@ -52,23 +52,23 @@ class RankingServerImpl
 
 };
 
-RankingServer::RankingServer() :
-		m_impl(new RankingServerImpl())
+RankingService::RankingService() :
+		m_impl(new RankingServiceImpl())
 {
 	// empty
 }
 
-RankingServer::~RankingServer()
+RankingService::~RankingService()
 {
 	// empty
 }
 
-void RankingServer::parseEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+void RankingService::parseEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
 {
 	m_impl->parseEvent(p_conn, p_event);
 }
 
-void RankingServerImpl::parseEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+void RankingServiceImpl::parseEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
 {
 	const CL_String eventName = p_event.get_name();
 
@@ -79,7 +79,7 @@ void RankingServerImpl::parseEvent(CL_NetGameConnection *p_conn, const CL_NetGam
 	}
 }
 
-void RankingServerImpl::parseRankingFindEvent(
+void RankingServiceImpl::parseRankingFindEvent(
 		CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event
 ) {
 	RankingFind rankingFindPacket;
@@ -105,7 +105,7 @@ void RankingServerImpl::parseRankingFindEvent(
 	p_conn->send_event(rankingEntriesPacket.buildEvent());
 }
 
-void RankingServerImpl::parseRankingAdvanceEvent(
+void RankingServiceImpl::parseRankingAdvanceEvent(
 		CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event
 )
 {

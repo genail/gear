@@ -34,20 +34,20 @@
 namespace Net
 {
 
-class RankingServerImpl;
-class RankingServer
+class RankingServiceImpl;
+class RankingService
 {
 	public:
 
-		RankingServer();
-		virtual ~RankingServer();
+		RankingService();
+		virtual ~RankingService();
 
 		void parseEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_rankingEvent);
 
 
 	private:
 
-		CL_SharedPtr<RankingServerImpl> m_impl;
+		CL_SharedPtr<RankingServiceImpl> m_impl;
 };
 
 }

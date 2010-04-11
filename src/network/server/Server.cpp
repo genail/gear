@@ -46,7 +46,6 @@
 #include "network/packets/VoteEnd.h"
 #include "network/packets/VoteTick.h"
 #include "network/server/MasterServerRegistrant.h"
-#include "network/server/RankingServer.h"
 #include "network/server/VoteSystem.h"
 
 namespace Net {
@@ -83,6 +82,8 @@ class ServerImpl
 		typedef std::pair<CL_NetGameConnection*, Player> TConnectionPlayerPair;
 
 
+		Server *m_parent;
+
 		bool m_running;
 
 		CL_NetGameServer m_gameServer;
@@ -94,8 +95,6 @@ class ServerImpl
 
 		VoteSystem m_voteSystem;
 
-		RankingServer m_rankingServer;
-
 
 		CL_Thread m_masterServerThread;
 
@@ -105,7 +104,7 @@ class ServerImpl
 		CL_SlotContainer m_slots;
 
 
-		ServerImpl();
+		ServerImpl(Server *p_parent);
 
 		~ServerImpl();
 
@@ -127,10 +126,10 @@ class ServerImpl
 
 		void kick(CL_NetGameConnection *p_conn, GoodbyeReason p_reason);
 
-		bool isRankingEvent(const CL_NetGameEvent &p_event);
-
 
 		// network events
+
+		void handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
 		void onClientConnected(CL_NetGameConnection *p_connection);
 
@@ -161,7 +160,7 @@ SIG_CPP(Server, playerJoined);
 SIG_CPP(Server, playerLeft);
 
 Server::Server() :
-	m_impl(new ServerImpl())
+	m_impl(new ServerImpl(this))
 {
 	// empty
 }
@@ -173,7 +172,8 @@ Server::~Server()
 	}
 }
 
-ServerImpl::ServerImpl() :
+ServerImpl::ServerImpl(Server *p_parent) :
+		m_parent(p_parent),
 		m_running(false)
 {
 	const CL_String levPath =
@@ -313,15 +313,23 @@ void ServerImpl::onClientDisconnected(CL_NetGameConnection *p_conn)
 	m_connections.erase(itor);
 }
 
-void ServerImpl::onEventArrived(
-		CL_NetGameConnection *p_conn,
-		const CL_NetGameEvent &p_event
-)
+void ServerImpl::onEventArrived(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
 {
 	cl_log_event(LOG_EVENT, "event %1 arrived", p_event.to_string());
+	handleEvent(p_conn, p_event);
+}
 
+void Server::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+{
+	m_impl->handleEvent(p_conn, p_event);
+}
+
+void ServerImpl::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+{
 	try {
 		bool unhandled = false;
+
+
 		const CL_String eventName = p_event.get_name();
 
 		// connection initialize events
@@ -338,11 +346,6 @@ void ServerImpl::onEventArrived(
 			onVoteStart(p_conn, p_event);
 		} else if (eventName == EVENT_VOTE_TICK) {
 			onVoteTick(p_conn, p_event);
-		}
-
-		// ranking events
-		else if (isRankingEvent(p_event)) {
-			m_rankingServer.parseEvent(p_conn, p_event);
 		}
 
 		// unknown events remains unhandled
@@ -362,7 +365,6 @@ void ServerImpl::onEventArrived(
 	} catch (CL_Exception e) {
 		cl_log_event(LOG_ERROR, e.message);
 	}
-
 }
 
 void ServerImpl::onVoteStart(
@@ -651,12 +653,6 @@ void ServerImpl::kick(CL_NetGameConnection *p_conn, GoodbyeReason p_reason)
 
 	send(p_conn, goodbye.buildEvent());
 	p_conn->disconnect();
-}
-
-bool ServerImpl::isRankingEvent(const CL_NetGameEvent &p_event)
-{
-	static const int PREFIX_LEN = strlen(EVENT_RANKING_PREFIX);
-	return p_event.get_name().substr(0, PREFIX_LEN) == EVENT_RANKING_PREFIX;
 }
 
 } // namespace

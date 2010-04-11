@@ -26,44 +26,74 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "TimeTrailServer.h"
 
-#include <ClanLib/core.h>
+#include "network/events.h"
+#include "network/server/RankingServer.h"
 
-#include "common.h"
+namespace Net
+{
 
-class CL_NetGameConnection;
-class CL_NetGameEvent;
-class ServerConfiguration;
-
-namespace Net {
-
-class ServerImpl;
-
-class Server {
-
-	SIG_H_1(playerJoined, const CL_String&);
-
-	SIG_H_1(playerLeft, const CL_String&);
-
+class TimeTrailServerImpl
+{
 	public:
 
-		Server();
-		virtual ~Server();
+		TimeTrailServer *m_parent;
 
-		void start();
-		void stop();
+		RankingServer m_rankingServer;
 
 
-	protected:
-
-		/** @return true if event was handled */
-		virtual void handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
+		TimeTrailServerImpl(TimeTrailServer *p_parent);
 
 
-	private:
+		void handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
-		CL_SharedPtr<ServerImpl> m_impl;
+		bool isRankingEvent(const CL_NetGameEvent &p_event);
+
+		void handleRankingEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 };
 
-} // namespace
+TimeTrailServer::TimeTrailServer() :
+		m_impl(new TimeTrailServerImpl(this))
+{
+	// empty
+}
+
+TimeTrailServerImpl::TimeTrailServerImpl(TimeTrailServer *p_parent) :
+		m_parent(p_parent)
+{
+	// empty
+}
+
+TimeTrailServer::~TimeTrailServer()
+{
+	// empty
+}
+
+void TimeTrailServer::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+{
+	m_impl->handleEvent(p_conn, p_event);
+}
+
+void TimeTrailServerImpl::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+{
+	if (isRankingEvent(p_event)) {
+		handleRankingEvent(p_conn, p_event);
+	} else {
+		m_parent->handleEvent(p_conn, p_event);
+	}
+}
+
+bool TimeTrailServerImpl::isRankingEvent(const CL_NetGameEvent &p_event)
+{
+	static const int PREFIX_LEN = strlen(EVENT_RANKING_PREFIX);
+	return p_event.get_name().substr(0, PREFIX_LEN) == EVENT_RANKING_PREFIX;
+}
+
+void TimeTrailServerImpl::handleRankingEvent(
+		CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+{
+	m_rankingServer.parseEvent(p_conn, p_event);
+}
+
+}

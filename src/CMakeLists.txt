@@ -114,6 +114,7 @@ SET(SERVER_SRCS
 	network/server/MasterServerRegistrant.cpp
 	network/server/RankingServer.cpp
 	network/server/Server.cpp
+	network/server/TimeTrailServer.cpp
 	network/server/VoteSystem.cpp
 	ranking/LocalRanking.cpp
 )

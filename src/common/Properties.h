@@ -75,6 +75,11 @@
 
 #define SRV_LEVEL "srv_level"
 
+// server game mode; avaiable options are 'arcade' and 'timetrail'
+#define SRV_GAME_MODE "srv_game_mode"
+#define SRV_GAME_MODE_TIMETRAIL "timetrail"
+#define SRV_GAME_MODE_ARCADE "arcade"
+
 /**
  * Runtime properties. There are several groups:
  * <ul>

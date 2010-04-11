@@ -30,40 +30,28 @@
 
 #include <ClanLib/core.h>
 
-#include "common.h"
+#include "network/server/Server.h"
 
-class CL_NetGameConnection;
-class CL_NetGameEvent;
-class ServerConfiguration;
+namespace Net
+{
 
-namespace Net {
-
-class ServerImpl;
-
-class Server {
-
-	SIG_H_1(playerJoined, const CL_String&);
-
-	SIG_H_1(playerLeft, const CL_String&);
-
+class TimeTrailServerImpl;
+class TimeTrailServer : public Server
+{
 	public:
 
-		Server();
-		virtual ~Server();
+		TimeTrailServer();
+		virtual ~TimeTrailServer();
 
-		void start();
-		void stop();
-
-
-	protected:
-
-		/** @return true if event was handled */
 		virtual void handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
 
 	private:
 
-		CL_SharedPtr<ServerImpl> m_impl;
+		CL_SharedPtr<TimeTrailServerImpl> m_impl;
+
+		friend class TimeTrailServerImpl;
 };
 
-} // namespace
+}
+

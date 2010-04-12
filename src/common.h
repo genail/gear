@@ -152,20 +152,20 @@ static const int CL_PRIARR_TEXCOORDS = 2;
 // 1 arg
 #define SIG_H_1(name, T1) \
 	public: \
-		typedef CL_Signal_v1<T1> _TSig_##name; \
-		CL_Signal_v1<T1> &sig_##name() const;
+		typedef CL_Signal_v1< T1 > _TSig_##name; \
+		CL_Signal_v1< T1 > &sig_##name() const;
 
 // 2 args
 #define SIG_H_2(name, T1, T2) \
 	public: \
-		typedef CL_Signal_v2<T1, T2> _TSig_##name; \
-		CL_Signal_v2<T1, T2> &sig_##name() const;
+		typedef CL_Signal_v2< T1, T2 > _TSig_##name; \
+		CL_Signal_v2< T1, T2 > &sig_##name() const;
 
 // 3 args
 #define SIG_H_3(name, T1, T2, T3) \
 	public: \
-		typedef CL_Signal_v3<T1, T2, T3> _TSig_##name; \
-		CL_Signal_v3<T1, T2, T3> &sig_##name() const;
+		typedef CL_Signal_v3< T1, T2, T3 > _TSig_##name; \
+		CL_Signal_v3< T1, T2, T3 > &sig_##name() const;
 
 
 // callbacks

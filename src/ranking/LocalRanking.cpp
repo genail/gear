@@ -237,7 +237,7 @@ int LocalRanking::findEntryIndex(const CL_String &p_pid)
 	}
 }
 
-RankingEntry LocalRanking::getEntryAtPosition(int p_position)
+PlacedRankingEntry LocalRanking::getEntryAtPosition(int p_position)
 {
 	static const CL_String SELECT_STATEMENT = CL_String("")
 			+ "SELECT pid, name, time FROM ranking "
@@ -246,7 +246,7 @@ RankingEntry LocalRanking::getEntryAtPosition(int p_position)
 
 	G_ASSERT(p_position >= 1);
 
-	RankingEntry rankingEntry;
+	PlacedRankingEntry rankingEntry;
 
 	CL_DBCommand cmd = m_impl->m_connection.create_command(SELECT_STATEMENT);
 	cmd.set_input_parameter_int(1, p_position - 1);
@@ -256,6 +256,7 @@ RankingEntry LocalRanking::getEntryAtPosition(int p_position)
 		rankingEntry.pid = reader.get_column_string(0);
 		rankingEntry.name = reader.get_column_string(1);
 		rankingEntry.timeMs = reader.get_column_int(2);
+		rankingEntry.place = p_position;
 	} else {
 		throw CL_Exception("failed to retrieve index");
 	}

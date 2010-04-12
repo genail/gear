@@ -28,10 +28,14 @@
 
 #include "RankingService.h"
 
+#include <string>
+
+#include "common/loglevels.h"
 #include "network/events.h"
-#include "network/packets/RankingFind.h"
-#include "network/packets/RankingEntries.h"
 #include "network/packets/RankingAdvance.h"
+#include "network/packets/RankingEntries.h"
+#include "network/packets/RankingFind.h"
+#include "network/packets/RankingRequest.h"
 #include "ranking/LocalRanking.h"
 
 namespace Net
@@ -49,6 +53,12 @@ class RankingServiceImpl
 		void parseRankingFindEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
 		void parseRankingAdvanceEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
+
+		void parseRankingRequestEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
+
+		RankingEntries prepareRankingEntriesPacket(int p_placeFrom, int p_placeTo);
+
+		void sendPacket(CL_NetGameConnection *p_conn, const Packet &p_packet);
 
 };
 
@@ -76,6 +86,8 @@ void RankingServiceImpl::parseEvent(CL_NetGameConnection *p_conn, const CL_NetGa
 		parseRankingFindEvent(p_conn, p_event);
 	} else if (eventName == EVENT_RANKING_ADVANCE) {
 		parseRankingAdvanceEvent(p_conn, p_event);
+	} else if (eventName == EVENT_RANKING_REQUEST) {
+		parseRankingRequestEvent(p_conn, p_event);
 	}
 }
 
@@ -114,6 +126,54 @@ void RankingServiceImpl::parseRankingAdvanceEvent(
 
 	const RankingEntry &rankingEntry = rankingAdvancePacket.getRankingEntry();
 	m_localRanking.advanceEntry(rankingEntry);
+}
+
+void RankingServiceImpl::parseRankingRequestEvent(
+		CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event
+)
+{
+	static const int ENTRY_COUNT_LIMIT = 20;
+
+	RankingRequest rankingRequestPacket;
+	rankingRequestPacket.parseEvent(p_event);
+
+	int placeFrom = rankingRequestPacket.getPlaceFrom();
+	int placeTo = rankingRequestPacket.getPlaceTo();
+
+	if (placeFrom > placeTo) {
+		std::swap(placeFrom, placeTo);
+	}
+
+	const int entryRequestCount = placeTo - placeFrom;
+	if (entryRequestCount <= ENTRY_COUNT_LIMIT) {
+
+		RankingEntries rankingEntriesPacket = prepareRankingEntriesPacket(placeFrom, placeTo);
+		sendPacket(p_conn, rankingEntriesPacket);
+	} else {
+		cl_log_event(LOG_WARN, "entry request count exceeds the limit (%1)", entryRequestCount);
+	}
+}
+
+RankingEntries RankingServiceImpl::prepareRankingEntriesPacket(int p_placeFrom, int p_placeTo)
+{
+	RankingEntries rankingEntriesPacket;
+	PlacedRankingEntry rankingEntry;
+	try {
+		for (int i = p_placeFrom; i <= p_placeTo; ++i) {
+			rankingEntry = m_localRanking.getEntryAtPosition(i);
+			rankingEntriesPacket.addEntry(rankingEntry);
+		}
+	} catch (CL_Exception &e) {
+		// that's fine, just stop collecting the data
+	}
+
+	return rankingEntriesPacket;
+}
+
+void RankingServiceImpl::sendPacket(CL_NetGameConnection *p_conn, const Packet &p_packet)
+{
+	const CL_NetGameEvent netEvent = p_packet.buildEvent();
+	p_conn->send_event(netEvent);
 }
 
 }

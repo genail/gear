@@ -31,6 +31,7 @@
 #include "common/Game.h"
 #include "network/client/Client.h"
 #include "network/packets/RankingAdvance.h"
+#include "network/packets/RankingRequest.h"
 
 namespace Net
 {
@@ -38,6 +39,9 @@ namespace Net
 class RankingClientImpl
 {
 	public:
+
+		SIG_IMPL(RankingClient, entriesReceived);
+
 
 		Client *m_client;
 
@@ -47,6 +51,10 @@ class RankingClientImpl
 		{ /* empty */ }
 
 };
+
+
+SIG_CPP(RankingClient, entriesReceived);
+
 
 RankingClient::RankingClient(Client *p_client) :
 		m_impl(new RankingClientImpl(p_client))
@@ -63,7 +71,7 @@ void RankingClient::sendTimeAdvance(int p_lapTimeMs)
 {
 	const Player &localPlayer = Game::getInstance().getPlayer();
 
-Net::RankingAdvance rankingAdvancePacket;
+	Net::RankingAdvance rankingAdvancePacket;
 	RankingEntry rankingEntry;
 
 	rankingEntry.pid = localPlayer.getId();
@@ -73,6 +81,21 @@ Net::RankingAdvance rankingAdvancePacket;
 	rankingAdvancePacket.setRankingEntry(rankingEntry);
 	const CL_NetGameEvent netEvent = rankingAdvancePacket.buildEvent();
 
+	m_impl->m_client->send(netEvent);
+}
+
+void RankingClient::requestEntry(int p_place)
+{
+	requestEntries(p_place, p_place);
+}
+
+void RankingClient::requestEntries(int p_placeFrom, int p_placeTo)
+{
+	RankingRequest rankingRequestPacket;
+	rankingRequestPacket.setPlaceFrom(p_placeFrom);
+	rankingRequestPacket.setPlaceFrom(p_placeTo);
+
+	const CL_NetGameEvent netEvent = rankingRequestPacket.buildEvent();
 	m_impl->m_client->send(netEvent);
 }
 

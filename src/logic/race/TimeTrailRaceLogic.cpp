@@ -28,6 +28,7 @@
 
 #include "TimeTrailRaceLogic.h"
 
+#include "common.h"
 #include "common/Game.h"
 #include "common/Player.h"
 #include "logic/race/Car.h"
@@ -44,12 +45,28 @@ class TimeTrailRaceLogicImpl
 
 		TimeTrailRaceLogic *m_parent;
 
-		int m_lastLap;
+		int m_lastLapNum;
+
+		int m_bestServerTimeMs;
+
+		int m_bestPlayerTimeMs;
+
+		CL_SlotContainer m_slots;
 
 
 		TimeTrailRaceLogicImpl(TimeTrailRaceLogic *p_parent);
 
-		void updateRankingTimesIfNeeded();
+		void connectRankingSlots();
+
+
+		void update(unsigned p_timeElapsedMs);
+
+		void updateLocalTimesIfNeeded();
+
+		void updateRemoteRankingTimesIfNeeded();
+
+
+		void onRankingEntriesReceived(const std::vector<PlacedRankingEntry> &p_entries);
 
 };
 
@@ -60,9 +77,11 @@ TimeTrailRaceLogic::TimeTrailRaceLogic()
 
 TimeTrailRaceLogicImpl::TimeTrailRaceLogicImpl(TimeTrailRaceLogic *p_parent) :
 		m_parent(p_parent),
-		m_lastLap(0)
+		m_lastLapNum(0),
+		m_bestServerTimeMs(-1),
+		m_bestPlayerTimeMs(-1)
 {
-	// empty
+	connectRankingSlots();
 }
 
 TimeTrailRaceLogic::~TimeTrailRaceLogic()
@@ -70,26 +89,62 @@ TimeTrailRaceLogic::~TimeTrailRaceLogic()
 	// empty
 }
 
-void TimeTrailRaceLogic::update(unsigned p_timeElapsed)
+void TimeTrailRaceLogicImpl::connectRankingSlots()
 {
-	OnlineRaceLogic::update(p_timeElapsed);
+	Net::Client &networkClient = Game::getInstance().getNetworkConnection();
+	Net::RankingClient &rankingClient = networkClient.getRankingClient();
 
-	m_impl->updateRankingTimesIfNeeded();
+	m_slots.connect(
+			rankingClient.sig_entriesReceived(),
+			this, &TimeTrailRaceLogicImpl::onRankingEntriesReceived);
 }
 
-void TimeTrailRaceLogicImpl::updateRankingTimesIfNeeded()
+void TimeTrailRaceLogic::update(unsigned p_timeElapsedMs)
+{
+	OnlineRaceLogic::update(p_timeElapsedMs);
+
+	m_impl->update(p_timeElapsedMs);
+}
+
+void TimeTrailRaceLogicImpl::update(unsigned p_timeElapsedMs)
+{
+	updateLocalTimesIfNeeded();
+	updateRemoteRankingTimesIfNeeded();
+}
+
+void TimeTrailRaceLogicImpl::updateLocalTimesIfNeeded()
+{
+	Net::Client &networkClient = Game::getInstance().getNetworkConnection();
+	Net::RankingClient &rankingClient = networkClient.getRankingClient();
+
+	if (m_bestServerTimeMs == -1) {
+		rankingClient.requestEntry(1);
+	}
+}
+
+void TimeTrailRaceLogicImpl::updateRemoteRankingTimesIfNeeded()
 {
 	const Race::Progress &progress = m_parent->getProgress();
 	const Player &localPlayer = Game::getInstance().getPlayer();
 	const Race::Car &localCar = localPlayer.getCar();
-	const int currentLap = progress.getLapNumber(localCar);
+	const int currentLapNum = progress.getLapNumber(localCar);
 
-	if (currentLap != m_lastLap) {
-		int lapTimeMs = progress.getLapTime(localCar, m_lastLap);
+	if (currentLapNum != m_lastLapNum) {
+		int lapTimeMs = progress.getLapTime(localCar, m_lastLapNum);
 		Net::Client &networkClient = Game::getInstance().getNetworkConnection();
 		Net::RankingClient &rankingClient = networkClient.getRankingClient();
 
 		rankingClient.sendTimeAdvance(lapTimeMs);
+	}
+}
+
+void TimeTrailRaceLogicImpl::onRankingEntriesReceived(
+		const std::vector<PlacedRankingEntry> &p_entries
+) {
+	foreach(const PlacedRankingEntry &entry, p_entries) {
+		if (entry.place == 1) {
+			m_bestServerTimeMs = entry.timeMs;
+		}
 	}
 }
 

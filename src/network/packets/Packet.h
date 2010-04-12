@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,12 +37,10 @@ class Packet {
 	public:
 
 		Packet() {}
-
 		virtual ~Packet() {}
 
 
 		virtual CL_NetGameEvent buildEvent() const = 0;
-
 		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;
 };
 

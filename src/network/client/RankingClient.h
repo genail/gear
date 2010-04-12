@@ -28,7 +28,11 @@
 
 #pragma once
 
+#include <vector>
 #include <ClanLib/core.h>
+
+#include "common.h"
+#include "ranking/RankingEntry.h"
 
 namespace Net
 {
@@ -39,12 +43,17 @@ class RankingClientImpl;
 class RankingClient
 {
 	public:
+		SIG_H_1(entriesReceived, const std::vector<PlacedRankingEntry>&);
 
 		RankingClient(Client *p_client);
 		virtual ~RankingClient();
 
 
 		void sendTimeAdvance(int p_lapTimeMs);
+
+		void requestEntry(int p_place);
+
+		void requestEntries(int p_placeFrom, int p_placeTo);
 
 
 	private:

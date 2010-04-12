@@ -32,6 +32,7 @@
 
 
 struct RankingEntry;
+struct PlacedRankingEntry;
 class LocalRankingImpl;
 
 #define DB_FILE_NAME "ranking.db"
@@ -50,7 +51,7 @@ class LocalRanking
 
 		int findEntryIndex(const CL_String &p_uid);
 
-		RankingEntry getEntryAtPosition(int p_position);
+		PlacedRankingEntry getEntryAtPosition(int p_position);
 
 		RankingEntry getEntryAtIndex(int p_index);
 

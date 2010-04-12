@@ -26,38 +26,86 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "RankingRequest.h"
 
-#include <ClanLib/core.h>
+#include "common/gassert.h"
+#include "network/events.h"
+
+namespace Net
+{
+
+class RankingRequestImpl
+{
+	public:
+
+		RankingRequest *m_parent;
+
+		int m_placeFrom;
+
+		int m_placeTo;
 
 
-// connect / disconnect procedure
+		RankingRequestImpl(RankingRequest *p_parent);
+		~RankingRequestImpl() {}
+};
 
-#define EVENT_CLIENT_INFO 	"client_info"
-#define EVENT_GAME_STATE 	"game_state"
-#define EVENT_GOODBYE		"goodbye"
 
-// player events
+RankingRequestImpl::RankingRequestImpl(RankingRequest *p_parent) :
+		m_parent(p_parent),
+		m_placeFrom(0),
+		m_placeTo(0)
+{
+	// empty
+}
 
-#define EVENT_PLAYER_JOINED "player_joined"
-#define EVENT_PLAYER_LEFT   "player_left"
+RankingRequest::RankingRequest() :
+		m_impl(new RankingRequestImpl(this))
+{
+	// empty
+}
 
-// race events
+RankingRequest::~RankingRequest()
+{
+	// empty
+}
 
-#define EVENT_CAR_STATE		"car_state"
-#define EVENT_RACE_START	"race_start"
+CL_NetGameEvent RankingRequest::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_RANKING_REQUEST);
+	event.add_argument(m_impl->m_placeFrom);
+	event.add_argument(m_impl->m_placeTo);
 
-// voting event
+	return event;
+}
 
-#define EVENT_VOTE_START	"vote:start"
-#define EVENT_VOTE_END		"vote:end"
-#define EVENT_VOTE_TICK		"vote:tick"
+void RankingRequest::parseEvent(const CL_NetGameEvent &p_event)
+{
+	static const unsigned ARG_COUNT = 2;
+	G_ASSERT(p_event.get_name() == EVENT_RANKING_REQUEST);
+	G_ASSERT(p_event.get_argument_count() == ARG_COUNT);
 
-// ranking events
+	m_impl->m_placeFrom = p_event.get_argument(0);
+	m_impl->m_placeTo = p_event.get_argument(1);
+}
 
-#define EVENT_RANKING_PREFIX "ranking:"
+int RankingRequest::getPlaceFrom() const
+{
+	return m_impl->m_placeFrom;
+}
 
-#define EVENT_RANKING_FIND "ranking:find"
-#define EVENT_RANKING_ENTRIES "ranking:entries"
-#define EVENT_RANKING_REQUEST "ranking:request"
-#define EVENT_RANKING_ADVANCE "ranking:advance"
+int RankingRequest::getPlaceTo() const
+{
+	return m_impl->m_placeTo;
+}
+
+void RankingRequest::setPlaceFrom(int p_placeFrom)
+{
+	m_impl->m_placeFrom = p_placeFrom;
+}
+
+void RankingRequest::setPlaceTo(int p_placeTo)
+{
+	m_impl->m_placeTo = p_placeTo;
+}
+
+}

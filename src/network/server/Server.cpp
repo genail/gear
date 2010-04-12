@@ -526,7 +526,6 @@ void ServerImpl::onClientInfo(
 	}
 
 	// check name availability
-	// check name availability
 	bool nameAvailable = true;
 	TConnectionPlayerPair pair;
 	foreach (pair, m_connections) {

@@ -30,25 +30,59 @@
 
 #include "ClanLib/network.h"
 
+#include "common/loglevels.h"
 #include "common/Properties.h"
 #include "network/server/Server.h"
+#include "network/server/TimeTrailServer.h"
 
 CL_ClanApplication app(&ServerApplication::main);
 
+Net::Server *createTimeTrailServer()
+{
+	cl_log_event(LOG_INFO, "starting TIME TRAIL server");
+	return new Net::TimeTrailServer();
+}
+
+Net::Server *createArcadeServer()
+{
+	cl_log_event(LOG_INFO, "starting ARCADE server");
+	return new Net::Server();
+}
+
+Net::Server *createServer()
+{
+	const CL_String gameModeStr = Properties::getString(SRV_GAME_MODE, SRV_GAME_MODE_ARCADE);
+
+	if (gameModeStr == SRV_GAME_MODE_ARCADE) {
+		return createArcadeServer();
+	} else if (gameModeStr == SRV_GAME_MODE_TIMETRAIL) {
+		return createTimeTrailServer();
+	} else {
+		throw CL_Exception("unknown game mode: " + gameModeStr);
+	}
+}
+
+void destroyServer(Net::Server *&p_server)
+{
+	if (p_server != NULL) {
+		delete p_server;
+		p_server = NULL;
+	}
+}
+
 int ServerApplication::main(const std::vector<CL_String> &args)
 {
+	Net::Server *server = NULL;
+
 	try {
 		CL_SetupCore setup_core;
 		CL_SetupNetwork setup_network;
-
 		CL_ConsoleLogger logger;
 
-		// load the server configuration
 		Properties::load(CONFIG_FILE_SERVER);
 
-		Net::Server server;
-
-		server.start();
+		server = createServer();
+		server->start();
 
 		while (true) {
 			CL_KeepAlive::process();
@@ -58,5 +92,6 @@ int ServerApplication::main(const std::vector<CL_String> &args)
 		CL_Console::write_line("exception thrown: %1", e.message);
 	}
 
+	destroyServer(server);
 	return 0;
 }

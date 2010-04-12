@@ -43,8 +43,12 @@ class TimeTrailServer : public Server
 		TimeTrailServer();
 		virtual ~TimeTrailServer();
 
+
+	protected:
+
 		virtual void handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
+		virtual TGameMode getGameMode() const;
 
 	private:
 

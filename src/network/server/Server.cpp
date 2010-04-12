@@ -38,6 +38,7 @@
 #include "network/packets/CarState.h"
 #include "network/packets/ClientInfo.h"
 #include "network/packets/Goodbye.h"
+#include "network/packets/GameMode.h"
 #include "network/packets/GameState.h"
 #include "network/packets/PlayerJoined.h"
 #include "network/packets/PlayerLeft.h"
@@ -132,6 +133,8 @@ class ServerImpl
 		void handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
 		void onClientConnected(CL_NetGameConnection *p_connection);
+
+		void sendGameMode(CL_NetGameConnection *p_conn);
 
 		void onClientDisconnected(CL_NetGameConnection *p_connection);
 
@@ -567,6 +570,20 @@ void ServerImpl::onClientInfo(
 	send(p_conn, gamestate.buildEvent());
 
 	m_connections[p_conn].m_gameStateSent = true;
+}
+
+void ServerImpl::sendGameMode(CL_NetGameConnection *p_conn)
+{
+	GameMode gameModePacket;
+	gameModePacket.setGameModeType(m_parent->getGameMode());
+
+	const CL_NetGameEvent event = gameModePacket.buildEvent();
+	send(p_conn, event);
+}
+
+TGameMode Server::getGameMode() const
+{
+	return GM_ARCADE;
 }
 
 GameState ServerImpl::prepareGameState()

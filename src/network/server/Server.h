@@ -31,6 +31,7 @@
 #include <ClanLib/core.h>
 
 #include "common.h"
+#include "common/types.h"
 
 class CL_NetGameConnection;
 class CL_NetGameEvent;
@@ -60,10 +61,14 @@ class Server {
 		/** @return true if event was handled */
 		virtual void handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
+		virtual TGameMode getGameMode() const;
+
 
 	private:
 
 		CL_SharedPtr<ServerImpl> m_impl;
+
+		friend class ServerImpl;
 };
 
 } // namespace

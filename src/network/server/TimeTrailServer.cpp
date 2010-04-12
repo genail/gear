@@ -96,4 +96,9 @@ void TimeTrailServerImpl::handleRankingEvent(
 	m_rankingServer.parseEvent(p_conn, p_event);
 }
 
+TGameMode TimeTrailServer::getGameMode() const
+{
+	return GM_TIME_TRAIL;
+}
+
 }

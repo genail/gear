@@ -38,3 +38,7 @@ enum SceneType {
 	ST_GUI,
 	ST_DIRECT
 };
+
+typedef int TGameMode;
+static const TGameMode GM_ARCADE = 0;
+static const TGameMode GM_TIME_TRAIL = 1;

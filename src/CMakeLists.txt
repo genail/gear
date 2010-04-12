@@ -22,6 +22,7 @@ SET(COMMON_SRCS
 	network/masterserver/MasterServer.cpp
 	network/packets/CarState.cpp
 	network/packets/ClientInfo.cpp
+	network/packets/GameMode.cpp
 	network/packets/GameState.cpp
 	network/packets/Goodbye.cpp
 	network/packets/PlayerJoined.cpp

@@ -30,35 +30,33 @@
 
 #include <ClanLib/core.h>
 
+#include "common/types.h"
+#include "network/packets/Packet.h"
 
-// connect / disconnect procedure
+namespace Net
+{
 
-#define EVENT_CLIENT_INFO 	"client_info"
-#define EVENT_GAME_MODE     "game_mode"
-#define EVENT_GAME_STATE 	"game_state"
-#define EVENT_GOODBYE		"goodbye"
+class GameModeImpl;
+class GameMode : public Packet
+{
+	public:
 
-// player events
+		GameMode();
+		virtual ~GameMode();
 
-#define EVENT_PLAYER_JOINED "player_joined"
-#define EVENT_PLAYER_LEFT   "player_left"
+		virtual CL_NetGameEvent buildEvent() const;
+		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-// race events
+		void setGameModeType(TGameMode p_gameModeType);
+		TGameMode getGameModeType() const;
 
-#define EVENT_CAR_STATE		"car_state"
-#define EVENT_RACE_START	"race_start"
+	private:
 
-// voting event
+		CL_SharedPtr<GameModeImpl> m_impl;
 
-#define EVENT_VOTE_START	"vote:start"
-#define EVENT_VOTE_END		"vote:end"
-#define EVENT_VOTE_TICK		"vote:tick"
+		friend class GameModeImpl;
 
-// ranking events
+};
 
-#define EVENT_RANKING_PREFIX "ranking:"
+}
 
-#define EVENT_RANKING_FIND "ranking:find"
-#define EVENT_RANKING_ENTRIES "ranking:entries"
-#define EVENT_RANKING_REQUEST "ranking:request"
-#define EVENT_RANKING_ADVANCE "ranking:advance"

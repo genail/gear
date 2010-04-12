@@ -26,39 +26,70 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "GameMode.h"
 
-#include <ClanLib/core.h>
+#include "common/gassert.h"
+#include "network/events.h"
+
+namespace Net
+{
+
+class GameModeImpl
+{
+	public:
+
+		GameMode *m_parent;
+
+		TGameMode m_gameModeType;
 
 
-// connect / disconnect procedure
+		GameModeImpl(GameMode *p_parent);
+		~GameModeImpl() {}
+};
 
-#define EVENT_CLIENT_INFO 	"client_info"
-#define EVENT_GAME_MODE     "game_mode"
-#define EVENT_GAME_STATE 	"game_state"
-#define EVENT_GOODBYE		"goodbye"
+GameMode::GameMode() :
+		m_impl(new GameModeImpl(this))
+{
+	// empty
+}
 
-// player events
+GameModeImpl::GameModeImpl(GameMode *p_parent) :
+		m_parent(p_parent)
+{
+	// empty
+}
 
-#define EVENT_PLAYER_JOINED "player_joined"
-#define EVENT_PLAYER_LEFT   "player_left"
+GameMode::~GameMode()
+{
+	// empty
+}
 
-// race events
+CL_NetGameEvent GameMode::buildEvent() const
+{
+	CL_NetGameEvent event(EVENT_GAME_MODE);
+	event.add_argument(m_impl->m_gameModeType);
 
-#define EVENT_CAR_STATE		"car_state"
-#define EVENT_RACE_START	"race_start"
+	return event;
+}
 
-// voting event
+void GameMode::parseEvent(const CL_NetGameEvent &p_event)
+{
+	static const unsigned ARG_COUNT = 1;
 
-#define EVENT_VOTE_START	"vote:start"
-#define EVENT_VOTE_END		"vote:end"
-#define EVENT_VOTE_TICK		"vote:tick"
+	G_ASSERT(p_event.get_name() == EVENT_GAME_MODE);
+	G_ASSERT(p_event.get_argument_count() == ARG_COUNT);
 
-// ranking events
+	m_impl->m_gameModeType = p_event.get_argument(0);
+}
 
-#define EVENT_RANKING_PREFIX "ranking:"
+void GameMode::setGameModeType(TGameMode p_gameModeType)
+{
+	m_impl->m_gameModeType = p_gameModeType;
+}
 
-#define EVENT_RANKING_FIND "ranking:find"
-#define EVENT_RANKING_ENTRIES "ranking:entries"
-#define EVENT_RANKING_REQUEST "ranking:request"
-#define EVENT_RANKING_ADVANCE "ranking:advance"
+TGameMode GameMode::getGameModeType() const
+{
+	return m_impl->m_gameModeType;
+}
+
+}

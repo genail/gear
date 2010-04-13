@@ -45,18 +45,47 @@ class NetworkClientConnectRunnable : public CL_Runnable
 
 		CL_Signal_v0 m_finished;
 
-//		NetworkClientConnectRunnable() :
-//			m_finished(false)
-//		{ /* empty */ }
+		volatile TGameMode m_gameMode;
+
+		CL_SlotContainer m_slots;
+
+		NetworkClientConnectRunnable() :
+			m_gameModeReceived(false)
+		{ /* empty */ }
 
 		virtual void run() {
 			Game &game = Game::getInstance();
 			Net::Client &client = game.getNetworkConnection();
+
+			connectClientSlots(client);
 			client.connect();
+			waitForGameMode();
 
 			m_finished.invoke();
 		}
 
+	private:
+
+		volatile bool m_gameModeReceived;
+
+
+		void connectClientSlots(Net::Client &p_client) {
+			m_slots.connect(
+					p_client.sig_gameModeReceived(),
+					this, &NetworkClientConnectRunnable::onGameModeReceived);
+		}
+
+		void waitForGameMode() {
+			while (!m_gameModeReceived) {
+				CL_KeepAlive::process();
+				CL_System::sleep(2);
+			}
+		}
+
+		void onGameModeReceived(TGameMode p_gameMode) {
+			m_gameMode = p_gameMode;
+			m_gameModeReceived = true;
+		}
 
 };
 

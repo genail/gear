@@ -33,6 +33,7 @@
 #include "network/events.h"
 #include "network/packets/Goodbye.h"
 #include "network/packets/ClientInfo.h"
+#include "network/packets/GameMode.h"
 #include "network/packets/GameState.h"
 #include "network/packets/CarState.h"
 #include "network/packets/VoteStart.h"
@@ -138,6 +139,8 @@ void Client::onEventReceived(const CL_NetGameEvent &p_event)
 
 		if (eventName == EVENT_GOODBYE) {
 			onGoodbye(p_event);
+		} else if (eventName == EVENT_GAME_MODE) {
+			onGameMode(p_event);
 		} else if (eventName == EVENT_GAME_STATE) {
 			onGameState(p_event);
 		}
@@ -189,6 +192,14 @@ void Client::onGoodbye(const CL_NetGameEvent &p_event)
 	disconnect();
 
 	INVOKE_2(goodbyeReceived, goodbye.getGoodbyeReason(), goodbye.getStringMessage());
+}
+
+void Client::onGameMode(const CL_NetGameEvent &p_gameState)
+{
+	GameMode gameModePacket;
+	gameModePacket.parseEvent(p_gameState);
+
+	INVOKE_1(gameModeReceived, gameModePacket.getGameModeType());
 }
 
 void Client::onGameState(const CL_NetGameEvent &p_gameState)

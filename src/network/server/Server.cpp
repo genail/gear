@@ -281,7 +281,7 @@ void ServerImpl::onClientConnected(CL_NetGameConnection *p_conn)
 
 	m_connections[p_conn] = player;
 
-	// no signal invoke yet
+	sendGameMode(p_conn);
 }
 
 void ServerImpl::onClientDisconnected(CL_NetGameConnection *p_conn)

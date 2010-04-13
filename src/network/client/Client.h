@@ -52,6 +52,8 @@ class Client {
 		/** Client is disconnected */
 		SIGNAL_0(disconnected);
 
+		SIGNAL_1(gameModeReceived, TGameMode);
+
 		/** Server sends goodbye: reason, reason text */
 		SIGNAL_2(goodbyeReceived, GoodbyeReason, const CL_String&);
 
@@ -158,6 +160,8 @@ class Client {
 		//
 
 		void onGoodbye(const CL_NetGameEvent &p_event);
+
+		void onGameMode(const CL_NetGameEvent &p_gameState);
 
 		void onGameState(const CL_NetGameEvent &p_gameState);
 

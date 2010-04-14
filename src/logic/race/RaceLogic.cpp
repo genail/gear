@@ -81,7 +81,7 @@ class RaceLogicImpl
 		int m_lapCount;
 
 		/** Race state */
-		RaceState m_state;
+		RaceState m_raceState;
 
 		/** Message board to display game messages */
 		MessageBoard m_messageBoard;
@@ -98,7 +98,7 @@ class RaceLogicImpl
 			m_raceStartTimeMs(0),
 			m_raceFinishTimeMs(0),
 			m_lapCount(0),
-			m_state(S_STANDBY),
+			m_raceState(S_STANDBY),
 			m_collisionFlag(false)
 		{ /* empty */ }
 
@@ -132,6 +132,9 @@ class RaceLogicImpl
 		void updatePlayersProgress();
 
 		void updateTyreStripes();
+
+
+		void setRaceState(RaceState p_raceState);
 
 };
 
@@ -181,12 +184,24 @@ void RaceLogic::update(unsigned p_timeElapsed)
 
 void RaceLogicImpl::updateState()
 {
-	if (m_state == S_PENDING) {
+	if (m_raceState == S_PENDING) {
 		if (m_raceStartTimeMs <= CL_System::get_time()) {
-			m_state = S_RUNNING;
-			INVOKE_2(stateChanged, S_PENDING, S_RUNNING);
+			setRaceState(S_RUNNING);
 		}
 	}
+}
+
+void RaceLogic::setRaceState(RaceState p_raceState)
+{
+	m_impl->setRaceState(p_raceState);
+}
+
+void RaceLogicImpl::setRaceState(RaceState p_newRaceState)
+{
+	RaceState oldState = m_raceState;
+	m_raceState = p_newRaceState;
+
+	INVOKE_2(stateChanged, oldState, m_raceState);
 }
 
 void RaceLogicImpl::updateCollisions()
@@ -267,7 +282,7 @@ void RaceLogicImpl::updateCarPhysics(unsigned p_timeElapsed)
 
 void RaceLogicImpl::updatePlayersProgress()
 {
-	if (m_state != S_RUNNING && m_state != S_FINISHED_SINGLE) {
+	if (m_raceState != S_RUNNING && m_raceState != S_FINISHED_SINGLE) {
 		// do not do anything is race is not running
 		return;
 	}
@@ -282,11 +297,7 @@ void RaceLogicImpl::updatePlayersProgress()
 
 			if (player == &Game::getInstance().getPlayer()) {
 				// this is local player
-
-				// change the state
-				RaceState oldState = m_state;
-				m_state = S_FINISHED_SINGLE;
-				INVOKE_2(stateChanged, oldState, m_state);
+				setRaceState(S_FINISHED_SINGLE);
 
 				cl_log_event(LOG_DEBUG, "Local player finished the race");
 			}
@@ -295,12 +306,7 @@ void RaceLogicImpl::updatePlayersProgress()
 
 	if (m_playersFinished.size() == m_regPlayers.size()) {
 		// all players that are in race reached the finish line
-
-		// change the state
-		RaceState oldState = m_state;
-		m_state = S_FINISHED_ALL;
-		INVOKE_2(stateChanged, oldState, m_state);
-
+		setRaceState(S_FINISHED_ALL);
 		cl_log_event(LOG_DEBUG, "All players finished the race");
 	}
 
@@ -432,10 +438,7 @@ void RaceLogic::startRace(int p_lapCount, unsigned p_startTimeMs)
 	}
 
 
-	RaceState oldState = m_impl->m_state;
-	m_impl->m_state = S_PENDING;
-	m_impl->INVOKE_2(stateChanged, oldState, m_impl->m_state);
-
+	setRaceState(S_PENDING);
 	display(_("Get ready..."));
 }
 
@@ -525,7 +528,7 @@ const Progress &RaceLogic::getProgress() const
 
 RaceState RaceLogic::getRaceState() const
 {
-	return m_impl->m_state;
+	return m_impl->m_raceState;
 }
 
 bool RaceLogic::localCarCollisionInThisIteration() const

@@ -86,6 +86,7 @@ TimeTrailRaceLogicImpl::TimeTrailRaceLogicImpl(TimeTrailRaceLogic *p_parent) :
 		m_needToUpdateTimesFromRanking(true)
 {
 	connectRankingSlots();
+	m_parent->setRaceState(S_RUNNING);
 }
 
 TimeTrailRaceLogic::~TimeTrailRaceLogic()
@@ -141,6 +142,8 @@ void TimeTrailRaceLogicImpl::updateRemoteRankingTimesIfNeeded()
 
 		rankingClient.sendTimeAdvance(lapTimeMs);
 	}
+
+	m_lastLapNum = currentLapNum;
 }
 
 void TimeTrailRaceLogicImpl::onRankingEntriesReceived(

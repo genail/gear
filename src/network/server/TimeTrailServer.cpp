@@ -81,8 +81,6 @@ void TimeTrailServer::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGame
 
 bool TimeTrailServerImpl::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
 {
-	cl_log_event("a", "b");
-
 	if (isRankingEvent(p_event)) {
 		handleRankingEvent(p_conn, p_event);
 		return true;

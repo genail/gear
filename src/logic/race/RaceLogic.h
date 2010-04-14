@@ -174,6 +174,9 @@ class RaceLogic : public boost::noncopyable {
 		void removePlayer(const Player &p_player);
 
 
+		void setRaceState(RaceState p_raceState);
+
+
 		// collisions
 
 		bool localCarCollisionInThisIteration() const;

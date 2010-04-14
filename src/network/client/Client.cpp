@@ -93,7 +93,7 @@ bool Client::isConnected() const
 
 void Client::send(const CL_NetGameEvent &p_event)
 {
-	cl_log_event("network", p_event.to_string());
+	cl_log_event("network", "sending event: %1", p_event.to_string());
 	m_gameClient.send_event(p_event);
 }
 
@@ -129,7 +129,7 @@ void Client::onDisconnected()
 
 void Client::onEventReceived(const CL_NetGameEvent &p_event)
 {
-	cl_log_event("event", "Event %1 arrived", p_event.to_string());
+	cl_log_event("event", "event arrived: %1", p_event.to_string());
 
 	try {
 		const CL_String eventName = p_event.get_name();

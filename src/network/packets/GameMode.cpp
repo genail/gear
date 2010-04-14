@@ -45,6 +45,8 @@ class GameModeImpl
 
 		GameModeImpl(GameMode *p_parent);
 		~GameModeImpl() {}
+
+		bool isValid() const;
 };
 
 GameMode::GameMode() :
@@ -80,16 +82,26 @@ void GameMode::parseEvent(const CL_NetGameEvent &p_event)
 	G_ASSERT(p_event.get_argument_count() == ARG_COUNT);
 
 	m_impl->m_gameModeType = p_event.get_argument(0);
+
+	if (!m_impl->isValid()) {
+		throw CL_Exception("invalid game mode option");
+	}
 }
 
 void GameMode::setGameModeType(TGameMode p_gameModeType)
 {
 	m_impl->m_gameModeType = p_gameModeType;
+	G_ASSERT(m_impl->isValid() && "invalid argument");
 }
 
 TGameMode GameMode::getGameModeType() const
 {
 	return m_impl->m_gameModeType;
+}
+
+bool GameModeImpl::isValid() const
+{
+	return  m_gameModeType == GM_ARCADE || m_gameModeType == GM_TIME_TRAIL;
 }
 
 }

@@ -93,7 +93,7 @@ void RankingClient::requestEntries(int p_placeFrom, int p_placeTo)
 {
 	RankingRequest rankingRequestPacket;
 	rankingRequestPacket.setPlaceFrom(p_placeFrom);
-	rankingRequestPacket.setPlaceFrom(p_placeTo);
+	rankingRequestPacket.setPlaceTo(p_placeTo);
 
 	const CL_NetGameEvent netEvent = rankingRequestPacket.buildEvent();
 	m_impl->m_client->send(netEvent);

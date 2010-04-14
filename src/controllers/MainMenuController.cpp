@@ -157,6 +157,8 @@ class MainMenuControllerImpl
 		void onEditorClicked();
 
 		void onConnectionThreadFinished();
+
+		void startOnlineGame();
 };
 
 MainMenuController::MainMenuController(MainMenuScene *p_scene) :
@@ -277,13 +279,17 @@ void MainMenuControllerImpl::makeNetworkConnection()
 void MainMenuControllerImpl::onConnectionThreadFinished()
 {
 	m_connectThread.join();
+	startOnlineGame();
+}
 
+void MainMenuControllerImpl::startOnlineGame()
+{
 	Game &game = Game::getInstance();
 	Net::Client &netClient = game.getNetworkConnection();
 
 	if (netClient.isConnected()) {
 		m_scene->hideMessageBox();
-		m_raceScene->initializeOnline();
+		m_raceScene->initializeOnline(m_connectRunnable.m_gameMode);
 		Gfx::Stage::pushScene(m_raceScene);
 	} else {
 		m_scene->displayConnectionErrorMessageBox();

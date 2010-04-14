@@ -51,6 +51,8 @@ class TimeTrailRaceLogicImpl
 
 		int m_bestPlayerTimeMs;
 
+		bool m_needToUpdateTimesFromRanking;
+
 		CL_SlotContainer m_slots;
 
 
@@ -70,7 +72,8 @@ class TimeTrailRaceLogicImpl
 
 };
 
-TimeTrailRaceLogic::TimeTrailRaceLogic()
+TimeTrailRaceLogic::TimeTrailRaceLogic() :
+		m_impl(new TimeTrailRaceLogicImpl(this))
 {
 	// empty
 }
@@ -79,7 +82,8 @@ TimeTrailRaceLogicImpl::TimeTrailRaceLogicImpl(TimeTrailRaceLogic *p_parent) :
 		m_parent(p_parent),
 		m_lastLapNum(0),
 		m_bestServerTimeMs(-1),
-		m_bestPlayerTimeMs(-1)
+		m_bestPlayerTimeMs(-1),
+		m_needToUpdateTimesFromRanking(true)
 {
 	connectRankingSlots();
 }
@@ -117,8 +121,9 @@ void TimeTrailRaceLogicImpl::updateLocalTimesIfNeeded()
 	Net::Client &networkClient = Game::getInstance().getNetworkConnection();
 	Net::RankingClient &rankingClient = networkClient.getRankingClient();
 
-	if (m_bestServerTimeMs == -1) {
+	if (m_needToUpdateTimesFromRanking) {
 		rankingClient.requestEntry(1);
+		m_needToUpdateTimesFromRanking = false;
 	}
 }
 
@@ -129,7 +134,7 @@ void TimeTrailRaceLogicImpl::updateRemoteRankingTimesIfNeeded()
 	const Race::Car &localCar = localPlayer.getCar();
 	const int currentLapNum = progress.getLapNumber(localCar);
 
-	if (currentLapNum != m_lastLapNum) {
+	if (m_lastLapNum > 0 && currentLapNum != m_lastLapNum) {
 		int lapTimeMs = progress.getLapTime(localCar, m_lastLapNum);
 		Net::Client &networkClient = Game::getInstance().getNetworkConnection();
 		Net::RankingClient &rankingClient = networkClient.getRankingClient();

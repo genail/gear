@@ -38,6 +38,7 @@
 #include "logic/race/Block.h"
 #include "logic/race/OfflineRaceLogic.h"
 #include "logic/race/OnlineRaceLogic.h"
+#include "logic/race/TimeTrailRaceLogic.h"
 #include "network/events.h"
 #include "network/packets/CarState.h"
 #include "network/client/Client.h"
@@ -72,10 +73,24 @@ void RaceScene::initializeOffline(Race::Level *p_level)
 	}
 }
 
-void RaceScene::initializeOnline()
+void RaceScene::initializeOnline(TGameMode p_gameMode)
 {
 	if (!m_initialized) {
-		m_logic = new Race::OnlineRaceLogic();
+
+		switch (p_gameMode) {
+			case GM_ARCADE:
+				cl_log_event(LOG_DEBUG, "building ARCADE logic");
+				m_logic = new Race::OnlineRaceLogic();
+				break;
+			case GM_TIME_TRAIL:
+				cl_log_event(LOG_DEBUG, "building TIME TRAIL logic");
+				m_logic = new Race::TimeTrailRaceLogic();
+				break;
+
+			default:
+				G_ASSERT(0 && "unknown option");
+		}
+
 		initCommon();
 	}
 

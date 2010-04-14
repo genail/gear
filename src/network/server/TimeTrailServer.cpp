@@ -46,7 +46,7 @@ class TimeTrailServerImpl
 		TimeTrailServerImpl(TimeTrailServer *p_parent);
 
 
-		void handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
+		bool handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
 		bool isRankingEvent(const CL_NetGameEvent &p_event);
 
@@ -72,15 +72,22 @@ TimeTrailServer::~TimeTrailServer()
 
 void TimeTrailServer::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
 {
-	m_impl->handleEvent(p_conn, p_event);
+	const bool handled = m_impl->handleEvent(p_conn, p_event);
+
+	if (!handled) {
+		Server::handleEvent(p_conn, p_event);
+	}
 }
 
-void TimeTrailServerImpl::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+bool TimeTrailServerImpl::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
 {
+	cl_log_event("a", "b");
+
 	if (isRankingEvent(p_event)) {
 		handleRankingEvent(p_conn, p_event);
+		return true;
 	} else {
-		m_parent->handleEvent(p_conn, p_event);
+		return false;
 	}
 }
 

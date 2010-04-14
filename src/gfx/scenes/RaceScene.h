@@ -32,11 +32,12 @@
 #include <ClanLib/gui.h>
 #include <ClanLib/network.h>
 
+#include "common/types.h"
+#include "controllers/GameMenuController.h"
 #include "gfx/DirectScene.h"
+#include "gfx/race/ui/GameMenu.h"
 #include "logic/race/RaceLogic.h"
 #include "logic/race/ScoreTable.h"
-#include "gfx/race/ui/GameMenu.h"
-#include "controllers/GameMenuController.h"
 
 namespace Net {
 	class CarState;
@@ -73,7 +74,7 @@ class RaceScene: public Gfx::DirectScene
 
 		void initializeOffline(Race::Level *p_level);
 
-		void initializeOnline();
+		void initializeOnline(TGameMode p_gameMode);
 
 		void destroy();
 

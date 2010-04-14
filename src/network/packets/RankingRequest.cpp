@@ -47,6 +47,9 @@ class RankingRequestImpl
 
 		RankingRequestImpl(RankingRequest *p_parent);
 		~RankingRequestImpl() {}
+
+
+		bool isValid() const;
 };
 
 
@@ -86,6 +89,10 @@ void RankingRequest::parseEvent(const CL_NetGameEvent &p_event)
 
 	m_impl->m_placeFrom = p_event.get_argument(0);
 	m_impl->m_placeTo = p_event.get_argument(1);
+
+	if (!m_impl->isValid()) {
+		throw CL_Exception("invalid from-to values");
+	}
 }
 
 int RankingRequest::getPlaceFrom() const
@@ -100,12 +107,19 @@ int RankingRequest::getPlaceTo() const
 
 void RankingRequest::setPlaceFrom(int p_placeFrom)
 {
+	G_ASSERT(p_placeFrom > 0);
 	m_impl->m_placeFrom = p_placeFrom;
 }
 
 void RankingRequest::setPlaceTo(int p_placeTo)
 {
+	G_ASSERT(p_placeTo > 0);
 	m_impl->m_placeTo = p_placeTo;
+}
+
+bool RankingRequestImpl::isValid() const
+{
+	return m_placeFrom > 0 && m_placeFrom <= m_placeTo;
 }
 
 }

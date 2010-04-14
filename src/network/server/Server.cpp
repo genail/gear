@@ -319,7 +319,7 @@ void ServerImpl::onClientDisconnected(CL_NetGameConnection *p_conn)
 void ServerImpl::onEventArrived(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
 {
 	cl_log_event(LOG_EVENT, "event %1 arrived", p_event.to_string());
-	handleEvent(p_conn, p_event);
+	m_parent->handleEvent(p_conn, p_event);
 }
 
 void Server::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
@@ -489,7 +489,7 @@ void ServerImpl::onCarState(
 							servPos.x, servPos.y
 					);
 
-					kick(p_conn, GR_CHEATING);
+//					kick(p_conn, GR_CHEATING);
 				}
 			}
 
@@ -497,7 +497,7 @@ void ServerImpl::onCarState(
 			// something went wrong while comparing states
 			// this also may be a cheater doing
 			cl_log_event(LOG_WARN, "%1", e.message);
-			kick(p_conn, GR_CHEATING);
+//			kick(p_conn, GR_CHEATING);
 		}
 
 	} else {

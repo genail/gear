@@ -37,6 +37,9 @@ SET(COMMON_SRCS
 	network/packets/VoteTick.cpp
 	logic/race/Block.cpp
 	logic/race/Car.cpp
+	logic/race/GameLogic.cpp
+	logic/race/GameLogicArcade.cpp
+	logic/race/GameLogicTimeTrail.cpp
 	logic/race/MessageBoard.cpp
 	logic/race/Progress.cpp
 	logic/race/RaceLogic.cpp

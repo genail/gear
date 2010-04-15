@@ -58,9 +58,12 @@ class Car : boost::noncopyable
 
 	public:
 
-		Car();
+		DEPRECATED(Car());
 
 		virtual ~Car();
+
+
+		const Player &getOwnerPlayer() const;
 
 
 		// attributes
@@ -172,6 +175,9 @@ class Car : boost::noncopyable
 	private:
 
 		CL_SharedPtr<CarImpl> m_impl;
+
+
+		Car(Player *p_owner);
 
 
 		friend class Race::Level;

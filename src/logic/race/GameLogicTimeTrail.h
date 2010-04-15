@@ -46,6 +46,8 @@ class GameLogicTimeTrail : public GameLogic
 		virtual void initialize();
 		virtual void destroy();
 
+		virtual void update(unsigned p_timeElapsedMs);
+
 
 	private:
 

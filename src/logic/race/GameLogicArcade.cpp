@@ -59,4 +59,14 @@ GameLogicArcade::~GameLogicArcade()
 	// empty
 }
 
+void GameLogicArcade::initialize()
+{
+
+}
+
+void GameLogicArcade::destroy()
+{
+
+}
+
 }

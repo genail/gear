@@ -30,6 +30,7 @@
 
 #include "common/gassert.h"
 #include "logic/race/Car.h"
+#include "logic/race/Progress.h"
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Object.h"
 
@@ -45,6 +46,10 @@ class GameLogicImpl
 		bool m_initialized;
 
 		Level *m_level;
+
+		RaceGameState m_gameState;
+
+		CL_SharedPtr<Progress> m_progress;
 
 
 		GameLogicImpl(GameLogic *p_parent);
@@ -76,7 +81,8 @@ GameLogic::GameLogic() :
 GameLogicImpl::GameLogicImpl(GameLogic *p_parent) :
 		m_parent(p_parent),
 		m_initialized(false),
-		m_level(NULL)
+		m_level(NULL),
+		m_gameState(GS_STANDBY)
 {
 	// empty
 }
@@ -194,6 +200,34 @@ void GameLogicImpl::setLevel(Level *p_level)
 {
 	G_ASSERT(!m_initialized);
 	m_level = p_level;
+	m_progress = CL_SharedPtr<Progress>(new Progress(m_level));
+}
+
+Level &GameLogic::getLevel()
+{
+	return *m_impl->m_level;
+}
+
+void GameLogic::setRaceGameState(RaceGameState p_gameState)
+{
+	m_impl->m_gameState = p_gameState;
+}
+
+RaceGameState GameLogic::getRaceGameState() const
+{
+	return m_impl->m_gameState;
+}
+
+Progress &GameLogic::getProgressObject()
+{
+	G_ASSERT(m_impl->m_initialized);
+	return *m_impl->m_progress.get();
+}
+
+const Progress &GameLogic::getProgressObject() const
+{
+	G_ASSERT(m_impl->m_initialized);
+	return *m_impl->m_progress.get();
 }
 
 }

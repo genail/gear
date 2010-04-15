@@ -141,8 +141,13 @@ Progress::~Progress()
 
 void Progress::addCar(const Car &p_car)
 {
+	addCar(&p_car);
+}
+
+void Progress::addCar(const Car *p_car)
+{
 	G_ASSERT(m_impl->m_initd);
-	m_impl->m_cars[&p_car] = new ProgressInfo(m_impl->m_chkpts[0]);
+	m_impl->m_cars[p_car] = new ProgressInfo(m_impl->m_chkpts[0]);
 }
 
 void Progress::reset(const Car &p_car)
@@ -250,10 +255,15 @@ void ProgressImpl::destroy()
 
 void Progress::removeCar(const Car &p_car)
 {
+	removeCar(&p_car);
+}
+
+void Progress::removeCar(const Car *p_car)
+{
 	G_ASSERT(m_impl->m_initd);
 
 	ProgressImpl::TCarProgressMap::iterator itor =
-			m_impl->m_cars.find(&p_car);
+			m_impl->m_cars.find(p_car);
 
 	G_ASSERT(itor != m_impl->m_cars.end());
 

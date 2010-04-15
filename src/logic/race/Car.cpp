@@ -58,6 +58,8 @@ class CarImpl
 		/** Base object */
 		const Car *const m_base;
 
+		Player *m_ownerPlayer;
+
 		/** This will help to keep 1/60 iteration speed */
 		unsigned m_timeFromLastUpdate;
 
@@ -118,8 +120,9 @@ class CarImpl
 		CL_CollisionOutline m_phyCollisionOutline;
 
 
-		CarImpl(const Car *p_base) :
+		CarImpl(const Car *p_base, Player *p_ownerPlayer) :
 			m_base(p_base),
+			m_ownerPlayer(p_ownerPlayer),
 			m_timeFromLastUpdate(0),
 			m_iterId(-1),
 			m_position(300.0f, 300.0f),
@@ -134,8 +137,10 @@ class CarImpl
 			m_inputChanged(false),
 			m_phySpeedDelta(0.0f),
 			m_phyWheelsTurn(0.0f)
-		{ /* empty */ }
+		{ init(); }
 
+
+		void init();
 
 		void update1_60();
 
@@ -160,7 +165,18 @@ float hexToFloat(const CL_String &p_str);
 
 
 Car::Car() :
-	m_impl(new CarImpl(this))
+		m_impl(new CarImpl(this, NULL))
+{
+	// empty
+}
+
+Car::Car(Player *p_owner) :
+		m_impl(new CarImpl(this, p_owner))
+{
+	// empty
+}
+
+void CarImpl::init()
 {
 	// build car contour for collision check
 	CL_Contour contour;
@@ -172,12 +188,12 @@ Car::Car() :
 	contour.get_points().push_back(CL_Pointf(halfWidth, -halfHeight));
 	contour.get_points().push_back(CL_Pointf(-halfWidth, -halfHeight));
 
-	m_impl->m_phyCollisionOutline.get_contours().push_back(contour);
+	m_phyCollisionOutline.get_contours().push_back(contour);
 
-	m_impl->m_phyCollisionOutline.set_inside_test(true);
+	m_phyCollisionOutline.set_inside_test(true);
 
-	m_impl->m_phyCollisionOutline.calculate_radius();
-	m_impl->m_phyCollisionOutline.calculate_smallest_enclosing_discs();
+	m_phyCollisionOutline.calculate_radius();
+	m_phyCollisionOutline.calculate_smallest_enclosing_discs();
 }
 
 Car::~Car()
@@ -841,6 +857,11 @@ float Car::getPhyWheelTurn() const
 int32_t Car::getIterationId() const
 {
 	return m_impl->m_iterId;
+}
+
+const Player &Car::getOwnerPlayer() const
+{
+	return *m_impl->m_ownerPlayer;
 }
 
 } // namespace

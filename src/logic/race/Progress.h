@@ -30,6 +30,8 @@
 
 #include <ClanLib/core.h>
 
+#include "common.h"
+
 namespace Race
 {
 
@@ -43,21 +45,25 @@ class Progress
 	public:
 
 		Progress(const Level *p_level);
-
 		virtual ~Progress();
 
-
-		// operations
-
-		void addCar(const Car &p_car);
-
+		void initialize();
 		void destroy();
 
-		const Checkpoint &getCheckpoint(const Car &p_car) const;
+		DEPRECATED(void addCar(const Car &p_car));
+		DEPRECATED(void removeCar(const Car &p_car));
 
-		const Checkpoint &getCheckpoint(int p_idx) const;
+		void addCar(const Car *p_car);
+		void removeCar(const Car *p_car);
+
+		void reset(const Car &p_car);
+		void resetClock();
+		void update();
 
 		int getCheckpointCount() const;
+		const Checkpoint &getCheckpoint(const Car &p_car) const;
+		const Checkpoint &getCheckpoint(int p_idx) const;
+
 
 		int getLapNumber(const Car &p_car) const;
 
@@ -69,15 +75,6 @@ class Progress
 		 */
 		int getLapTime(const Car &p_car, int p_lap) const;
 
-		void initialize();
-
-		void removeCar(const Car &p_car);
-
-		void reset(const Car &p_car);
-
-		void resetClock();
-
-		void update();
 
 
 	private:

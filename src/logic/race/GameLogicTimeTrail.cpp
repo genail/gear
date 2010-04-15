@@ -28,6 +28,12 @@
 
 #include "GameLogicTimeTrail.h"
 
+#include "common/gassert.h"
+#include "common/Game.h"
+#include "logic/race/Car.h"
+#include "logic/race/Progress.h"
+#include "logic/race/level/Level.h"
+
 namespace Race
 {
 
@@ -37,9 +43,20 @@ class GameLogicTimeTrailImpl
 
 		GameLogicTimeTrail *m_parent;
 
+		bool m_initialized;
+
 
 		GameLogicTimeTrailImpl(GameLogicTimeTrail *p_parent);
 		~GameLogicTimeTrailImpl() {}
+
+		void initialize();
+		void insertPlayerCar();
+
+		void destroy();
+		void removePlayerCar();
+
+		void update(unsigned p_timeElapsedMs);
+		void updateProgressObject();
 };
 
 GameLogicTimeTrail::GameLogicTimeTrail() :
@@ -49,7 +66,8 @@ GameLogicTimeTrail::GameLogicTimeTrail() :
 }
 
 GameLogicTimeTrailImpl::GameLogicTimeTrailImpl(GameLogicTimeTrail *p_parent) :
-		m_parent(p_parent)
+		m_parent(p_parent),
+		m_initialized(false)
 {
 	// empty
 }
@@ -57,6 +75,73 @@ GameLogicTimeTrailImpl::GameLogicTimeTrailImpl(GameLogicTimeTrail *p_parent) :
 GameLogicTimeTrail::~GameLogicTimeTrail()
 {
 	// empty
+}
+
+void GameLogicTimeTrail::initialize()
+{
+	m_impl->initialize();
+}
+
+void GameLogicTimeTrailImpl::initialize()
+{
+	G_ASSERT(m_initialized);
+	insertPlayerCar();
+	m_initialized = true;
+}
+
+void GameLogicTimeTrailImpl::insertPlayerCar()
+{
+	Level &level = m_parent->getLevel();
+	Progress &progress = m_parent->getProgressObject();
+
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Car &car = player.getCar();
+
+	level.addCar(&car);
+	progress.addCar(&car);
+}
+
+void GameLogicTimeTrail::destroy()
+{
+	m_impl->destroy();
+}
+
+void GameLogicTimeTrailImpl::destroy()
+{
+	G_ASSERT(!m_initialized);
+	removePlayerCar();
+	m_initialized = false;
+}
+
+void GameLogicTimeTrailImpl::removePlayerCar()
+{
+	Level &level = m_parent->getLevel();
+	Progress &progress = m_parent->getProgressObject();
+
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Car &car = player.getCar();
+
+	level.removeCar(&car);
+	progress.removeCar(&car);
+}
+
+void GameLogicTimeTrail::update(unsigned p_timeElapsedMs)
+{
+	GameLogic::update(p_timeElapsedMs);
+	m_impl->update(p_timeElapsedMs);
+}
+
+void GameLogicTimeTrailImpl::update(unsigned p_timeElapsedMs)
+{
+	updateProgressObject();
+}
+
+void GameLogicTimeTrailImpl::updateProgressObject()
+{
+	Progress &progress = m_parent->getProgressObject();
+	progress.update();
 }
 
 }

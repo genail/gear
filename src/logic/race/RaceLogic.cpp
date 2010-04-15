@@ -131,8 +131,6 @@ class RaceLogicImpl
 
 		void updatePlayersProgress();
 
-		void updateTyreStripes();
-
 
 		void setRaceState(RaceState p_raceState);
 

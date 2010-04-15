@@ -33,7 +33,22 @@
 namespace Race
 {
 
+enum RaceGameState
+{
+	/** No action taken. */
+	GS_STANDBY,
+	/** Race is pending for start */
+	GS_PENDING,
+	/** Race started and not yet finished */
+	GS_RUNNING,
+	/** Race finished by local player */
+	GS_FINISHED_SINGLE,
+	/** Race finished by all players */
+	GS_FINISHED_ALL
+};
+
 class Level;
+class Progress;
 
 class GameLogicImpl;
 class GameLogic
@@ -49,6 +64,17 @@ class GameLogic
 		virtual void update(unsigned p_timeElapsedMs);
 
 		void setLevel(Level *p_level);
+
+		RaceGameState getRaceGameState() const;
+		const Progress &getProgressObject() const;
+
+
+	protected:
+
+		Level &getLevel();
+		Progress &getProgressObject();
+
+		void setRaceGameState(RaceGameState p_gameState);
 
 
 	private:

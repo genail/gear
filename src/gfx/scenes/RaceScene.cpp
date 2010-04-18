@@ -35,68 +35,185 @@
 #include "common/Game.h"
 #include "common/Properties.h"
 #include "common/Units.h"
+#include "controllers/GameMenuController.h"
 #include "logic/race/Block.h"
 #include "logic/race/OfflineRaceLogic.h"
 #include "logic/race/OnlineRaceLogic.h"
+#include "logic/race/RaceLogic.h"
+#include "logic/race/ScoreTable.h"
 #include "logic/race/TimeTrailRaceLogic.h"
 #include "network/events.h"
 #include "network/packets/CarState.h"
 #include "network/client/Client.h"
 #include "gfx/race/RaceGraphics.h"
 #include "gfx/race/level/Bound.h"
+#include "gfx/race/ui/GameMenu.h"
 #include "gfx/race/ui/ScoreTable.h"
 #include "debug/RaceSceneKeyBindings.h"
 
+class RaceSceneImpl
+{
+	public:
+
+		enum InputState {
+			Pressed,
+			Released
+		};
+
+
+		RaceScene *m_parent;
+
+		/** Logic subsystem */
+		Race::RaceLogic *m_logic;
+
+		/** Graphics subsystem */
+		Gfx::RaceGraphics *m_graphics;
+
+
+
+		/** The score table */
+		ScoreTable m_scoreTable;
+
+		/** Race start time */
+		unsigned m_raceStartTime;
+
+		/** If this race is initialized */
+		bool m_initialized;
+
+		// input
+
+		/** Set to true if user interaction should be locked */
+		bool m_inputLock;
+
+		/** Keys down */
+		bool m_turnLeft, m_turnRight;
+
+		// display
+
+		/** Last drift car position. If null, then no drift was doing last time. */
+		CL_Pointf m_lastDriftPoint;
+
+		// The game menu
+
+		/** Game menu */
+		Gfx::GameMenu m_gameMenu;
+
+		/** Game menu controller */
+		/** The controller */
+		GameMenuController m_gameMenuController;
+
+
+		// key bindings
+		int m_keySteerLeft, m_keySteerRight;
+		int m_keyAccel, m_keyBrake;
+
+
+		// other
+
+		/** The slots container */
+		CL_SlotContainer m_slots;
+
+
+		RaceSceneImpl(RaceScene *p_parent);
+		~RaceSceneImpl() {}
+
+		void initializeOffline(Race::Level *p_level);
+		void initializeOnline(TGameMode p_gameMode);
+		void destroy();
+
+		void load(CL_GraphicContext &p_gc);
+		void draw(CL_GraphicContext &p_gc);
+		void update(unsigned p_timeElapsed);
+
+		void inputPressed(const CL_InputEvent &p_event);
+		void inputReleased(const CL_InputEvent &p_event);
+
+		// input
+
+		void grabInput();
+
+		void handleInput(InputState p_state, const CL_InputEvent& p_event);
+
+		void updateCarTurn();
+
+
+		// event handlers
+
+		void onInputLock();
+
+		void onRaceStateChanged(int p_lapsNum);
+
+
+		// other
+		void initCommon();
+};
 
 RaceScene::RaceScene(CL_GUIComponent &p_parent) :
-	DirectScene(p_parent),
-	m_logic(NULL),
-	m_graphics(NULL),
-	m_initialized(false),
-	m_inputLock(false),
-	m_turnLeft(false),
-	m_turnRight(false),
-	m_gameMenu(*this),
-	m_gameMenuController(&m_logic, &m_gameMenu)
+		DirectScene(p_parent),
+		m_impl(new RaceSceneImpl(this))
 {
 	// empty
 }
 
-RaceScene::~RaceScene() {
+RaceSceneImpl::RaceSceneImpl(RaceScene *p_parent) :
+		m_parent(p_parent),
+		m_logic(NULL),
+		m_graphics(NULL),
+		m_initialized(false),
+		m_inputLock(false),
+		m_turnLeft(false),
+		m_turnRight(false),
+		m_gameMenu(*p_parent),
+		m_gameMenuController(&m_logic, &m_gameMenu)
+{
+	// empty
+}
+
+RaceScene::~RaceScene()
+{
+	// empty
 }
 
 void RaceScene::initializeOffline(Race::Level *p_level)
 {
-	if (!m_initialized) {
-		m_logic = new Race::OfflineRaceLogic(p_level);
-		initCommon();
-	}
+	m_impl->initializeOffline(p_level);
+}
+
+void RaceSceneImpl::initializeOffline(Race::Level *p_level)
+{
+	G_ASSERT(!m_initialized);
+
+	m_logic = new Race::OfflineRaceLogic(p_level);
+	initCommon();
 }
 
 void RaceScene::initializeOnline(TGameMode p_gameMode)
 {
-	if (!m_initialized) {
-
-		switch (p_gameMode) {
-			case GM_ARCADE:
-				cl_log_event(LOG_DEBUG, "building ARCADE logic");
-				m_logic = new Race::OnlineRaceLogic();
-				break;
-			case GM_TIME_TRAIL:
-				cl_log_event(LOG_DEBUG, "building TIME TRAIL logic");
-				m_logic = new Race::TimeTrailRaceLogic();
-				break;
-
-			default:
-				G_ASSERT(0 && "unknown option");
-		}
-
-		initCommon();
-	}
-
+	m_impl->initializeOnline(p_gameMode);
 }
 
-void RaceScene::initCommon()
+void RaceSceneImpl::initializeOnline(TGameMode p_gameMode)
+{
+	G_ASSERT(!m_initialized);
+
+	switch (p_gameMode) {
+		case GM_ARCADE:
+			cl_log_event(LOG_DEBUG, "building ARCADE logic");
+			m_logic = new Race::OnlineRaceLogic();
+			break;
+		case GM_TIME_TRAIL:
+			cl_log_event(LOG_DEBUG, "building TIME TRAIL logic");
+			m_logic = new Race::TimeTrailRaceLogic();
+			break;
+
+		default:
+			G_ASSERT(0 && "unknown option");
+	}
+
+	initCommon();
+}
+
+void RaceSceneImpl::initCommon()
 {
 	m_logic->initialize();
 	m_graphics = new Gfx::RaceGraphics(m_logic);
@@ -121,58 +238,73 @@ void RaceScene::initCommon()
 
 void RaceScene::destroy()
 {
-	if (m_initialized) {
-		delete m_logic;
-		m_logic = NULL;
+	m_impl->destroy();
+}
 
-		delete m_graphics;
-		m_graphics = NULL;
+void RaceSceneImpl::destroy()
+{
+	G_ASSERT(m_initialized);
 
-		setLoaded(false);
-		m_initialized = false;
-	}
+	delete m_logic;
+	m_logic = NULL;
+
+	delete m_graphics;
+	m_graphics = NULL;
+
+	m_parent->setLoaded(false);
+	m_initialized = false;
 }
 
 void RaceScene::poped()
 {
-	destroy();
-}
-
-void RaceScene::draw(CL_GraphicContext &p_gc)
-{
-	G_ASSERT(m_initialized);
-
-	m_graphics->draw(p_gc);
+	m_impl->destroy();
 }
 
 void RaceScene::load(CL_GraphicContext &p_gc)
 {
-	G_ASSERT(m_initialized);
-
-	cl_log_event(LOG_DEBUG, "RaceScene::load()");
-
-	m_graphics->load(p_gc);
-
-#if !defined(RACE_SCENE_ONLY)
 	DirectScene::load(p_gc);
-#endif // !RACE_SCENE_ONLY
-
+	m_impl->load(p_gc);
 }
 
+void RaceSceneImpl::load(CL_GraphicContext &p_gc)
+{
+	G_ASSERT(m_initialized);
+	m_graphics->load(p_gc);
+}
 
+void RaceScene::draw(CL_GraphicContext &p_gc)
+{
+	m_impl->draw(p_gc);
+}
+
+void RaceSceneImpl::draw(CL_GraphicContext &p_gc)
+{
+	G_ASSERT(m_initialized);
+	m_graphics->draw(p_gc);
+}
 
 void RaceScene::update(unsigned p_timeElapsed)
 {
+	m_impl->update(p_timeElapsed);
+}
+
+void RaceSceneImpl::update(unsigned p_timeElapsed)
+{
 	G_ASSERT(m_initialized);
 
-	if (m_logic)
-	m_logic->update(p_timeElapsed);
+	if (m_logic) {
+		m_logic->update(p_timeElapsed);
+	}
+
 	m_graphics->update(p_timeElapsed);
 }
 
-
-
 void RaceScene::inputPressed(const CL_InputEvent &p_event)
+{
+	m_impl->inputPressed(p_event);
+}
+
+void RaceSceneImpl::inputPressed(const CL_InputEvent &p_event)
 {
 	if (m_initialized) {
 		handleInput(Pressed, p_event);
@@ -181,12 +313,17 @@ void RaceScene::inputPressed(const CL_InputEvent &p_event)
 
 void RaceScene::inputReleased(const CL_InputEvent &p_event)
 {
+	m_impl->inputReleased(p_event);
+}
+
+void RaceSceneImpl::inputReleased(const CL_InputEvent &p_event)
+{
 	if (m_initialized) {
 		handleInput(Released, p_event);
 	}
 }
 
-void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
+void RaceSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_event)
 {
 	G_ASSERT(m_initialized);
 
@@ -262,7 +399,7 @@ void RaceScene::handleInput(InputState p_state, const CL_InputEvent& p_event)
 #endif // !NDEBUG
 }
 
-void RaceScene::updateCarTurn()
+void RaceSceneImpl::updateCarTurn()
 {
 	G_ASSERT(m_initialized);
 
@@ -270,15 +407,14 @@ void RaceScene::updateCarTurn()
 	car.setTurn((int) -m_turnLeft + (int) m_turnRight);
 }
 
-void RaceScene::onInputLock()
+void RaceSceneImpl::onInputLock()
 {
 	G_ASSERT(m_initialized);
-
 	m_inputLock = true;
 }
 
 const Race::RaceLogic *RaceScene::getLogic() const
 {
-	return m_logic;
+	return m_impl->m_logic;
 }
 

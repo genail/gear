@@ -233,8 +233,6 @@ void MainMenuControllerImpl::onRaceStartClicked()
 	game.getPlayer().setName(m_scene->getPlayerName());
 
 	// create race scene
-	m_raceScene->destroy();
-
 	if (!m_scene->getServerAddr().empty()) {
 		makeNetworkConnection();
 	} else {

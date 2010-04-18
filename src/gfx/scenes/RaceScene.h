@@ -33,11 +33,8 @@
 #include <ClanLib/network.h>
 
 #include "common/types.h"
-#include "controllers/GameMenuController.h"
 #include "gfx/DirectScene.h"
-#include "gfx/race/ui/GameMenu.h"
-#include "logic/race/RaceLogic.h"
-#include "logic/race/ScoreTable.h"
+
 
 namespace Net {
 	class CarState;
@@ -49,138 +46,42 @@ namespace Gfx {
 
 namespace Race {
 	class Level;
+	class RaceLogic;
 }
 
-#if defined(RACE_SCENE_ONLY)
-
-class RaceScene
-{
-
-#else // RACE_SCENE_ONLY
-
+class RaceSceneImpl;
 class RaceScene: public Gfx::DirectScene
 {
-
-#endif // !RACE_SCENE_ONLY
 
 	public:
 
 		RaceScene(CL_GUIComponent &p_parent);
-
 		virtual ~RaceScene();
 
 		virtual bool isNative() const { return true; }
 
 
 		void initializeOffline(Race::Level *p_level);
-
 		void initializeOnline(TGameMode p_gameMode);
-
 		void destroy();
 
 
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		virtual void inputPressed(const CL_InputEvent &p_event);
-
-		virtual void inputReleased(const CL_InputEvent &p_event);
-
 		virtual void load(CL_GraphicContext &p_gc);
-
-		virtual void poped();
-
+		virtual void draw(CL_GraphicContext &p_gc);
 		virtual void update(unsigned p_timeElapsed);
 
+		virtual void inputPressed(const CL_InputEvent &p_event);
+		virtual void inputReleased(const CL_InputEvent &p_event);
 
-		// getters
+		virtual void poped();
 
 		const Race::RaceLogic *getLogic() const;
 
 
 	private:
 
-		enum InputState {
-			Pressed,
-			Released
-		};
+		CL_SharedPtr<RaceSceneImpl> m_impl;
 
-
-		/** Logic subsystem */
-		Race::RaceLogic *m_logic;
-
-		/** Graphics subsystem */
-		Gfx::RaceGraphics *m_graphics;
-
-
-
-		/** The score table */
-		ScoreTable m_scoreTable;
-
-		/** Race start time */
-		unsigned m_raceStartTime;
-
-		/** If this race is initialized */
-		bool m_initialized;
-
-		// input
-
-		/** Set to true if user interaction should be locked */
-		bool m_inputLock;
-
-		/** Keys down */
-		bool m_turnLeft, m_turnRight;
-
-		// display
-
-		/** Last drift car position. If null, then no drift was doing last time. */
-		CL_Pointf m_lastDriftPoint;
-
-		// The game menu
-
-		/** Game menu */
-		Gfx::GameMenu m_gameMenu;
-
-		/** Game menu controller */
-		/** The controller */
-		GameMenuController m_gameMenuController;
-
-
-		// key bindings
-		int m_keySteerLeft, m_keySteerRight;
-		int m_keyAccel, m_keyBrake;
-
-
-		// other
-
-		/** The slots container */
-		CL_SlotContainer m_slots;
-
-
-		//
-		// Methods
-		//
-
-		// input
-
-		void grabInput();
-
-		void handleInput(InputState p_state, const CL_InputEvent& p_event);
-
-		void updateCarTurn();
-
-
-		// event handlers
-
-		void onInputLock();
-
-		void onRaceStateChanged(int p_lapsNum);
-
-
-		// other
-		void initCommon();
-
-#if defined(RACE_SCENE_ONLY)
-		friend class Application;
-#endif // RACE_SCENE_ONLY
+		friend class RaceSceneImpl;
 
 };

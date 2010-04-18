@@ -176,7 +176,7 @@ void RaceUI::draw(CL_GraphicContext &p_gc)
 	m_impl->drawLapTimes(p_gc);
 	m_impl->drawCarLabels(p_gc);
 	m_impl->drawPlayerList(p_gc);
-	m_impl->drawCountdown(p_gc);
+//	m_impl->drawCountdown(p_gc); FIXME: reenable this
 	m_impl->drawGlobalMessage(p_gc);
 	m_impl->drawScoreTable(p_gc);
 }

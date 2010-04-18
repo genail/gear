@@ -79,13 +79,15 @@ GameLogicTimeTrail::~GameLogicTimeTrail()
 
 void GameLogicTimeTrail::initialize()
 {
+	GameLogic::initialize();
 	m_impl->initialize();
 }
 
 void GameLogicTimeTrailImpl::initialize()
 {
-	G_ASSERT(m_initialized);
+	G_ASSERT(!m_initialized);
 	insertPlayerCar();
+
 	m_initialized = true;
 }
 
@@ -105,11 +107,12 @@ void GameLogicTimeTrailImpl::insertPlayerCar()
 void GameLogicTimeTrail::destroy()
 {
 	m_impl->destroy();
+	GameLogic::destroy();
 }
 
 void GameLogicTimeTrailImpl::destroy()
 {
-	G_ASSERT(!m_initialized);
+	G_ASSERT(m_initialized);
 	removePlayerCar();
 	m_initialized = false;
 }

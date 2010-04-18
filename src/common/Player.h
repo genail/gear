@@ -59,4 +59,6 @@ class Player : boost::noncopyable {
 
 		CL_SharedPtr<PlayerImpl> m_impl;
 
+		friend class PlayerImpl;
+
 };

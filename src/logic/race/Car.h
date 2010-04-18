@@ -60,6 +60,8 @@ class Car : boost::noncopyable
 
 		DEPRECATED(Car());
 
+		Car(Player *p_owner);
+
 		virtual ~Car();
 
 
@@ -175,10 +177,6 @@ class Car : boost::noncopyable
 	private:
 
 		CL_SharedPtr<CarImpl> m_impl;
-
-
-		Car(Player *p_owner);
-
 
 		friend class Race::Level;
 		friend class Net::RemoteCar;

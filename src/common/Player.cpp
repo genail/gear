@@ -34,6 +34,8 @@ class PlayerImpl
 {
 	public:
 
+		Player *m_parent;
+
 		bool m_initialized;
 
 		CL_String m_name;
@@ -43,15 +45,17 @@ class PlayerImpl
 		Race::Car m_car;
 
 
-		PlayerImpl(const CL_String &p_name = "") :
+		PlayerImpl(Player *p_parent, const CL_String &p_name) :
+			m_parent(p_parent),
 			m_initialized(false),
-			m_name(p_name)
+			m_name(p_name),
+			m_car(m_parent)
 		{ /* empty */ }
 
 };
 
 Player::Player(const CL_String8& p_name) :
-	m_impl(new PlayerImpl(p_name))
+	m_impl(new PlayerImpl(this, p_name))
 {
 	// empty
 }

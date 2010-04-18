@@ -110,6 +110,8 @@ void GameLogicImpl::initialize()
 	G_ASSERT(!m_initialized);
 	G_ASSERT(m_level != NULL && "level not set");
 
+	m_progress->initialize();
+
 	m_initialized = true;
 }
 
@@ -121,6 +123,9 @@ void GameLogic::destroy()
 void GameLogicImpl::destroy()
 {
 	G_ASSERT(m_initialized);
+
+	m_progress->destroy();
+
 	m_initialized = false;
 }
 

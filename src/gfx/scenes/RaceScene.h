@@ -46,7 +46,7 @@ namespace Gfx {
 
 namespace Race {
 	class Level;
-	class RaceLogic;
+	class GameLogic;
 }
 
 class RaceSceneImpl;
@@ -75,7 +75,7 @@ class RaceScene: public Gfx::DirectScene
 
 		virtual void poped();
 
-		const Race::RaceLogic *getLogic() const;
+		const Race::GameLogic *getLogic() const;
 
 
 	private:

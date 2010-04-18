@@ -43,12 +43,12 @@
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
 #include "logic/race/Progress.h"
-#include "logic/race/RaceLogic.h"
+#include "logic/race/GameLogic.h"
 #include "logic/race/level/Checkpoint.h"
 
 namespace Gfx {
 
-RaceGraphics::RaceGraphics(const Race::RaceLogic *p_logic) :
+RaceGraphics::RaceGraphics(const Race::GameLogic *p_logic) :
 		m_loaded(false),
 		m_viewport(),
 		m_logic(p_logic),
@@ -439,10 +439,11 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 	static const int RAND_LIMIT = 20;
 
 	// if car is drifting then add new smokes
-	const int playerCount = m_logic->getPlayerCount();
+	const Race::Level &level = m_logic->getLevel();
+	const int carCount = level.getCarCount();
 
-	for (int i = 0; i < playerCount; ++i) {
-		const Race::Car &car = m_logic->getPlayer(i).getCar();
+	for (int i = 0; i < carCount; ++i) {
+		const Race::Car &car = level.getCar(i);
 
 		if (m_carSmokePeriod.find(&car) == m_carSmokePeriod.end()) {
 			m_carSmokePeriod[&car] = SMOKE_PERIOD;

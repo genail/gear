@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,23 +28,41 @@
 
 #pragma once
 
-//
-// Vote enums
-//
+#include <vector>
+#include <ClanLib/core.h>
 
-enum VoteOption
-{
-	VOTE_YES,
-	VOTE_NO
-};
+#include "common.h"
+#include "common/types.h"
 
-enum VoteType
+class VoteSystemImpl;
+class VoteSystem : boost::noncopyable
 {
-	VOTE_RESTART_RACE
-};
 
-enum VoteResult
-{
-	VOTE_PASSED,
-	VOTE_FAILED
+	public:
+
+		VoteSystem();
+		virtual ~VoteSystem();
+
+		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs);
+		bool addVote(VoteOption p_option, int p_voterId = -1);
+
+		bool isRunning() const;
+		bool isFinished() const;
+
+		int getYesCount() const;
+		int getNoCount() const;
+
+		unsigned getFinishTime() const;
+		VoteResult getResult() const;
+		VoteType getType() const;
+
+		void setVoteSubject(const CL_String &p_subject);
+		const CL_String &getVoteSubject() const;
+
+		SIG_H_0(finished);
+
+	private:
+
+		CL_SharedPtr<VoteSystemImpl> m_impl;
+
 };

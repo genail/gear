@@ -42,3 +42,20 @@ enum SceneType {
 typedef int TGameMode;
 static const TGameMode GM_ARCADE = 0;
 static const TGameMode GM_TIME_TRAIL = 1;
+
+enum VoteOption
+{
+	VOTE_YES,
+	VOTE_NO
+};
+
+enum VoteType
+{
+	VOTE_RESTART_RACE
+};
+
+enum VoteResult
+{
+	VOTE_PASSED,
+	VOTE_FAILED
+};

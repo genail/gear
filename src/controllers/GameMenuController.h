@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@ namespace Gfx {
 }
 
 namespace Race {
-	class RaceLogic;
+	class GameLogic;
 }
 
 class GameMenuControllerImpl;
@@ -44,7 +44,7 @@ class GameMenuController {
 
 	public:
 
-		GameMenuController(Race::RaceLogic **p_raceLogic, Gfx::GameMenu *p_gameMenu);
+		GameMenuController(Race::GameLogic **p_raceLogic, Gfx::GameMenu *p_gameMenu);
 
 		virtual ~GameMenuController();
 

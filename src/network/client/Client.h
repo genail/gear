@@ -33,7 +33,7 @@
 
 #include "common.h"
 #include "common/types.h"
-#include "common/votetypes.h"
+#include "common/types.h"
 #include "common/Player.h"
 #include "logic/race/Car.h"
 #include "logic/race/level/Level.h"

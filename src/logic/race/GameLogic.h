@@ -30,6 +30,8 @@
 
 #include <ClanLib/core.h>
 
+class VoteSystem;
+
 namespace Race
 {
 
@@ -48,6 +50,7 @@ enum RaceGameState
 };
 
 class Level;
+class MessageBoard;
 class Progress;
 
 class GameLogicImpl;
@@ -64,10 +67,16 @@ class GameLogic
 		virtual void update(unsigned p_timeElapsedMs);
 
 		void setLevel(Level *p_level);
+		const Level &getLevel() const;
+
+		int getLapCount() const;
 
 		RaceGameState getRaceGameState() const;
 		const Progress &getProgressObject() const;
 
+		VoteSystem &getVoteSystem();
+		const VoteSystem &getVoteSystem() const;
+		const MessageBoard &getMessageBoard() const;
 
 	protected:
 
@@ -75,6 +84,7 @@ class GameLogic
 		Progress &getProgressObject();
 
 		void setRaceGameState(RaceGameState p_gameState);
+		void setLapCount(int p_lapCount);
 
 
 	private:

@@ -36,12 +36,11 @@
 #include "common/Properties.h"
 #include "common/Units.h"
 #include "controllers/GameMenuController.h"
+#include "logic/VoteSystem.h"
 #include "logic/race/Block.h"
-#include "logic/race/OfflineRaceLogic.h"
-#include "logic/race/OnlineRaceLogic.h"
-#include "logic/race/RaceLogic.h"
+#include "logic/race/GameLogic.h"
+#include "logic/race/GameLogicTimeTrail.h"
 #include "logic/race/ScoreTable.h"
-#include "logic/race/TimeTrailRaceLogic.h"
 #include "network/events.h"
 #include "network/packets/CarState.h"
 #include "network/client/Client.h"
@@ -62,31 +61,19 @@ class RaceSceneImpl
 
 
 		RaceScene *m_parent;
+		bool m_initialized;
 
-		/** Logic subsystem */
-		Race::RaceLogic *m_logic;
-
-		/** Graphics subsystem */
+		Race::GameLogic *m_logic;
 		Gfx::RaceGraphics *m_graphics;
 
-
-
-		/** The score table */
 		ScoreTable m_scoreTable;
-
-		/** Race start time */
-		unsigned m_raceStartTime;
-
-		/** If this race is initialized */
-		bool m_initialized;
 
 		// input
 
 		/** Set to true if user interaction should be locked */
 		bool m_inputLock;
 
-		/** Keys down */
-		bool m_turnLeft, m_turnRight;
+		bool m_keyTurnLeftDown, m_keyTurnRightDown;
 
 		// display
 
@@ -157,12 +144,12 @@ RaceScene::RaceScene(CL_GUIComponent &p_parent) :
 
 RaceSceneImpl::RaceSceneImpl(RaceScene *p_parent) :
 		m_parent(p_parent),
+		m_initialized(false),
 		m_logic(NULL),
 		m_graphics(NULL),
-		m_initialized(false),
 		m_inputLock(false),
-		m_turnLeft(false),
-		m_turnRight(false),
+		m_keyTurnLeftDown(false),
+		m_keyTurnRightDown(false),
 		m_gameMenu(*p_parent),
 		m_gameMenuController(&m_logic, &m_gameMenu)
 {
@@ -183,7 +170,9 @@ void RaceSceneImpl::initializeOffline(Race::Level *p_level)
 {
 	G_ASSERT(!m_initialized);
 
-	m_logic = new Race::OfflineRaceLogic(p_level);
+	m_logic = new Race::GameLogicTimeTrail();
+	m_logic->setLevel(p_level);
+
 	initCommon();
 }
 
@@ -195,20 +184,21 @@ void RaceScene::initializeOnline(TGameMode p_gameMode)
 void RaceSceneImpl::initializeOnline(TGameMode p_gameMode)
 {
 	G_ASSERT(!m_initialized);
+	G_ASSERT(0 && "not supported yet");
 
-	switch (p_gameMode) {
-		case GM_ARCADE:
-			cl_log_event(LOG_DEBUG, "building ARCADE logic");
-			m_logic = new Race::OnlineRaceLogic();
-			break;
-		case GM_TIME_TRAIL:
-			cl_log_event(LOG_DEBUG, "building TIME TRAIL logic");
-			m_logic = new Race::TimeTrailRaceLogic();
-			break;
-
-		default:
-			G_ASSERT(0 && "unknown option");
-	}
+//	switch (p_gameMode) {
+//		case GM_ARCADE:
+//			cl_log_event(LOG_DEBUG, "building ARCADE logic");
+//			m_logic = new Race::OnlineRaceLogic();
+//			break;
+//		case GM_TIME_TRAIL:
+//			cl_log_event(LOG_DEBUG, "building TIME TRAIL logic");
+//			m_logic = new Race::TimeTrailRaceLogic();
+//			break;
+//
+//		default:
+//			G_ASSERT(0 && "unknown option");
+//	}
 
 	initCommon();
 }
@@ -342,24 +332,26 @@ void RaceSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_event
 	}
 
 	if (p_event.id == m_keySteerLeft) {
-		m_turnLeft = pressed;
+		m_keyTurnLeftDown = pressed;
 	} else if (p_event.id == m_keySteerRight) {
-		m_turnRight = pressed;
+		m_keyTurnRightDown = pressed;
 	} else if (p_event.id == m_keyAccel) {
 		car.setAcceleration(pressed);
 	} else if (p_event.id == m_keyBrake) {
 		car.setBrake(pressed);
 	} else {
 
+		VoteSystem &voteSystem = m_logic->getVoteSystem();
+
 		switch (p_event.id) {
 			case CL_KEY_F1:
-				if (pressed && m_logic->isVoteRunning()) {
-					m_logic->voteYes();
+				if (pressed && voteSystem.isRunning()) {
+					voteSystem.addVote(VOTE_YES);
 				}
 				break;
 			case CL_KEY_F2:
-				if (pressed && m_logic->isVoteRunning()) {
-					m_logic->voteNo();
+				if (pressed && voteSystem.isRunning()) {
+					voteSystem.addVote(VOTE_NO);
 				}
 			case CL_KEY_TAB:
 				if (pressed) {
@@ -404,7 +396,7 @@ void RaceSceneImpl::updateCarTurn()
 	G_ASSERT(m_initialized);
 
 	Race::Car &car = Game::getInstance().getPlayer().getCar();
-	car.setTurn((int) -m_turnLeft + (int) m_turnRight);
+	car.setTurn((int) -m_keyTurnLeftDown + (int) m_keyTurnRightDown);
 }
 
 void RaceSceneImpl::onInputLock()
@@ -413,7 +405,7 @@ void RaceSceneImpl::onInputLock()
 	m_inputLock = true;
 }
 
-const Race::RaceLogic *RaceScene::getLogic() const
+const Race::GameLogic *RaceScene::getLogic() const
 {
 	return m_impl->m_logic;
 }

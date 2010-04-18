@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 #include "gfx/Drawable.h"
 
 namespace Race {
-	class RaceLogic;
+	class GameLogic;
 }
 
 namespace Gfx {
@@ -44,7 +44,7 @@ class PlayerList : public Gfx::Drawable {
 
 	public:
 
-		PlayerList(const Race::RaceLogic *p_logic);
+		PlayerList(const Race::GameLogic *p_logic);
 
 		virtual ~PlayerList();
 

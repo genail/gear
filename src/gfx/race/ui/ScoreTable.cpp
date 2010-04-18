@@ -38,8 +38,10 @@
 #include "gfx/race/ui/Label.h"
 #include "math/Float.h"
 #include "math/Time.h"
+#include "logic/race/Car.h"
 #include "logic/race/Progress.h"
-#include "logic/race/RaceLogic.h"
+#include "logic/race/GameLogic.h"
+#include "logic/race/level/Level.h"
 
 namespace Gfx
 {
@@ -117,7 +119,7 @@ class ScoreTableImpl
 {
 	public:
 
-		const Race::RaceLogic *m_logic;
+		const Race::GameLogic *m_logic;
 
 		std::vector<TableRow*> m_rows;
 
@@ -136,7 +138,7 @@ class ScoreTableImpl
 
 
 
-		ScoreTableImpl(const Race::RaceLogic *p_logic) :
+		ScoreTableImpl(const Race::GameLogic *p_logic) :
 			m_logic(p_logic),
 			m_highPosLabel(CL_Pointf(), "", Gfx::Label::F_PIXEL, 108),
 			m_lowPosLabel(CL_Pointf(), "", Gfx::Label::F_PIXEL, 72),
@@ -168,7 +170,7 @@ class ScoreTableImpl
 
 }; // class ScoreTableImpl
 
-ScoreTable::ScoreTable(const Race::RaceLogic *p_logic) :
+ScoreTable::ScoreTable(const Race::GameLogic *p_logic) :
 	m_impl(new ScoreTableImpl(p_logic))
 {
 	// empty
@@ -282,28 +284,32 @@ void TableRow::draw(
 
 void ScoreTable::rebuild()
 {
-	G_ASSERT(m_impl->m_logic->getRaceState() == Race::S_FINISHED_ALL);
+	G_ASSERT(m_impl->m_logic->getRaceGameState() == Race::GS_FINISHED_ALL);
 
 	// clear last table
 	foreach (TableRow *row, m_impl->m_rows) {
 		delete row;
 	}
+
 	m_impl->m_rows.clear();
 
-	const int lapCount = m_impl->m_logic->getRaceLapCount();
-	const int pCount = m_impl->m_logic->getPlayerCount();
+
+
+	const int lapCount = m_impl->m_logic->getLapCount();
+	const Race::Level &level = m_impl->m_logic->getLevel();
+	const int pCount = level.getCarCount();
 
 	G_ASSERT(pCount <= MAX_ROWS && "limit exhausted");
 
-	const Race::Progress &progress = m_impl->m_logic->getProgress();
+	const Race::Progress &progress = m_impl->m_logic->getProgressObject();
 
 	// store time entries
 	std::list<TimeEntry> timeEntries;
 	int lap, best, total;
 
 	for (int i = 0; i < pCount; ++i) {
-		const Player &player = m_impl->m_logic->getPlayer(i);
-		const Race::Car &car = player.getCar();
+		const Race::Car &car = level.getCar(i);
+		const Player &player = car.getOwnerPlayer();
 
 		// calculate best lap and total time
 		total = 0;

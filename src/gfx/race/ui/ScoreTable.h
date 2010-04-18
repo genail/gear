@@ -34,7 +34,7 @@
 
 namespace Race
 {
-	class RaceLogic;
+	class GameLogic;
 }
 
 namespace Gfx
@@ -46,7 +46,7 @@ class ScoreTable : public Gfx::Drawable
 {
 	public:
 
-		ScoreTable(const Race::RaceLogic *p_logic);
+		ScoreTable(const Race::GameLogic *p_logic);
 
 		virtual ~ScoreTable();
 

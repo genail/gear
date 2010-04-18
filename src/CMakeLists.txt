@@ -35,6 +35,7 @@ SET(COMMON_SRCS
 	network/packets/VoteEnd.cpp
 	network/packets/VoteStart.cpp
 	network/packets/VoteTick.cpp
+	logic/VoteSystem.cpp
 	logic/race/Block.cpp
 	logic/race/Car.cpp
 	logic/race/GameLogic.cpp
@@ -120,7 +121,6 @@ SET(SERVER_SRCS
 	network/server/RankingService.cpp
 	network/server/Server.cpp
 	network/server/TimeTrailServer.cpp
-	network/server/VoteSystem.cpp
 	ranking/LocalRanking.cpp
 )
 
@@ -134,7 +134,7 @@ SET(TEST_SRCS
 	math/Easing.cpp
 	math/Float.cpp
 	math/Integer.cpp
-	network/server/VoteSystem.cpp
+	logic/VoteSystem.cpp
 	ranking/LocalRanking.cpp
 	
 	# test code

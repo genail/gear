@@ -37,7 +37,7 @@ namespace Math {
 }
 
 namespace Race {
-	class RaceLogic;
+	class GameLogic;
 }
 
 namespace Gfx {
@@ -51,7 +51,7 @@ class RaceUI: public Gfx::Drawable {
 
 	public:
 
-		explicit RaceUI(const Race::RaceLogic* p_logic, const Gfx::Viewport *p_viewport);
+		RaceUI(const Race::GameLogic* p_logic, const Gfx::Viewport *p_viewport);
 
 		virtual ~RaceUI();
 

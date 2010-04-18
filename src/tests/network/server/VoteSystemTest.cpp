@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,10 @@
 #include <unistd.h>
 #include <boost/test/unit_test.hpp>
 
-#include "network/server/VoteSystem.h"
+#include "logic/VoteSystem.h"
 
 bool finished;
+CL_SlotContainer m_slots;
 
 void onFinished() {
 	finished = true;
@@ -44,10 +45,10 @@ BOOST_AUTO_TEST_SUITE(ServerVoteSystem)
 
 BOOST_AUTO_TEST_CASE(passingVote)
 {
-	Net::VoteSystem voteSystem;
+	VoteSystem voteSystem;
 
 	finished = false;
-	voteSystem.func_finished().set(&onFinished);
+	m_slots.connect(voteSystem.sig_finished(), &onFinished);
 
 	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);

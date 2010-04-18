@@ -30,6 +30,7 @@
 
 #include "common.h"
 #include "common/Properties.h"
+#include "logic/VoteSystem.h"
 #include "logic/race/Car.h"
 #include "logic/race/level/Level.h"
 #include "math/Float.h"
@@ -47,7 +48,6 @@
 #include "network/packets/VoteEnd.h"
 #include "network/packets/VoteTick.h"
 #include "network/server/MasterServerRegistrant.h"
-#include "network/server/VoteSystem.h"
 
 namespace Net {
 
@@ -212,9 +212,7 @@ ServerImpl::ServerImpl(Server *p_parent) :
 			this, &ServerImpl::onEventArrived
 	);
 
-	m_voteSystem.func_finished().set(
-			this, &ServerImpl::onVoteSystemFinished
-	);
+	m_slots.connect(m_voteSystem.sig_finished(), this, &ServerImpl::onVoteSystemFinished);
 }
 
 ServerImpl::~ServerImpl()

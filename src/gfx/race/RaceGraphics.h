@@ -40,7 +40,7 @@
 namespace Race {
 	class Block;
 	class Car;
-	class RaceLogic;
+	class GameLogic;
 }
 
 namespace Gfx {
@@ -55,7 +55,7 @@ class RaceGraphics {
 
 	public:
 
-		RaceGraphics(const Race::RaceLogic *p_logic);
+		RaceGraphics(const Race::GameLogic *p_logic);
 
 		virtual ~RaceGraphics();
 
@@ -78,7 +78,7 @@ class RaceGraphics {
 		Gfx::Viewport m_viewport;
 
 		/** Logic with data for reading only */
-		const Race::RaceLogic *m_logic;
+		const Race::GameLogic *m_logic;
 
 		/** Level graphics */
 		Gfx::Level m_level;

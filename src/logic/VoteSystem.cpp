@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,46 +28,116 @@
 
 #include "VoteSystem.h"
 
-#include <assert.h>
 #include <ClanLib/core.h>
 
 #include "common.h"
+#include "common/gassert.h"
 
 /** Yes to all ratio that will result in succeeded voting */
 const float PASS_RATIO = 1.0f / 2.0f + 0.001f;
 /** No to all ratio that will result in failed voting */
 const float FAIL_RATIO = PASS_RATIO;
 
-namespace Net {
+class VoteSystemImpl
+{
+	public:
+
+		enum State {
+			S_HOLD,
+			S_RUNNING,
+			S_FINISHED
+		};
+
+
+		VoteSystem *m_parent;
+
+		VoteType m_type;
+		CL_String m_subject;
+
+		unsigned m_voterCount;
+		unsigned m_yesCount, m_noCount;
+
+		/** Voting state */
+		State m_state;
+
+		/** Set to -1 if result is now known yet */
+		int m_result;
+
+		/** Voters that already gave thier vote */
+		std::vector<int> m_voters;
+
+		CL_Timer m_timer;
+		unsigned m_finishTime;
+
+
+		VoteSystemImpl(VoteSystem *p_parent);
+		~VoteSystemImpl() { /* empty */ }
+
+
+		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs);
+		bool addVote(VoteOption p_option, int p_voterId = -1);
+
+
+		int calculateResult() const;
+
+		bool hasVoter(int p_id) const;
+
+		void onTimerExpired();
+
+
+		SIG_IMPL(VoteSystem, finished);
+};
+
+SIG_CPP(VoteSystem, finished);
 
 VoteSystem::VoteSystem() :
-	m_state(S_HOLD)
+		m_impl(new VoteSystemImpl(this))
 {
-	m_timer.func_expired().set(this, &VoteSystem::onTimerExpired);
+	// empty
+}
+
+VoteSystemImpl::VoteSystemImpl(VoteSystem *p_parent) :
+		m_parent(p_parent),
+		m_state(S_HOLD),
+		m_voterCount(0),
+		m_yesCount(0),
+		m_noCount(0),
+		m_finishTime(0)
+{
+	m_timer.func_expired().set(this, &VoteSystemImpl::onTimerExpired);
 }
 
 VoteSystem::~VoteSystem()
 {
+	// empty
 }
 
-VoteResult VoteSystem::getResult() const
+void VoteSystem::start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs)
 {
-	assert(isFinished());
-	return m_result != -1 ? (VoteResult) m_result : VOTE_FAILED;
+	m_impl->start(p_type, p_voterCount, p_timeLimitMs);
 }
 
-bool VoteSystem::isFinished() const
+void VoteSystemImpl::start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs)
 {
-	return m_state == S_FINISHED;
-}
+	m_type = p_type;
+	m_voterCount = p_voterCount;
 
-bool VoteSystem::isRunning() const
-{
-	return m_state == S_RUNNING;
-}
+	m_yesCount = m_noCount = 0;
+	m_result = -1;
+	m_state = S_RUNNING;
 
+	m_voters.clear();
+	m_timer.start(p_timeLimitMs, false);
+
+	m_finishTime = CL_System::get_time() + p_timeLimitMs;
+}
 
 bool VoteSystem::addVote(VoteOption p_option, int p_voterId)
+{
+	m_impl->addVote(p_option, p_voterId);
+}
+
+bool VoteSystemImpl::addVote(VoteOption p_option, int p_voterId)
 {
 	if(!hasVoter(p_voterId)) {
 
@@ -92,7 +162,7 @@ bool VoteSystem::addVote(VoteOption p_option, int p_voterId)
 			m_state = S_FINISHED;
 			m_timer.stop();
 
-			C_INVOKE_0(finished);
+			INVOKE_0(finished);
 		}
 
 		return true;
@@ -103,20 +173,33 @@ bool VoteSystem::addVote(VoteOption p_option, int p_voterId)
 	}
 }
 
-void VoteSystem::start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimit)
+VoteResult VoteSystem::getResult() const
 {
-	m_type = p_type;
-	m_voterCount = p_voterCount;
-
-	m_yesCount = m_noCount = 0;
-	m_result = -1;
-	m_state = S_RUNNING;
-
-	m_voters.clear();
-	m_timer.start(p_timeLimit, false);
+	G_ASSERT(isFinished());
+	return m_impl->m_result != -1 ? (VoteResult) m_impl->m_result : VOTE_FAILED;
 }
 
-int VoteSystem::calculateResult() const
+bool VoteSystem::isFinished() const
+{
+	return m_impl->m_state == VoteSystemImpl::S_FINISHED;
+}
+
+bool VoteSystem::isRunning() const
+{
+	return m_impl->m_state == VoteSystemImpl::S_RUNNING;
+}
+
+int VoteSystem::getYesCount() const
+{
+	return m_impl->m_yesCount;
+}
+
+int VoteSystem::getNoCount() const
+{
+	return m_impl->m_noCount;
+}
+
+int VoteSystemImpl::calculateResult() const
 {
 	// check if passed
 	const float yesToAllRatio = m_yesCount / (float) m_voterCount;
@@ -137,7 +220,7 @@ int VoteSystem::calculateResult() const
 
 }
 
-bool VoteSystem::hasVoter(int p_id) const
+bool VoteSystemImpl::hasVoter(int p_id) const
 {
 	foreach (int id, m_voters) {
 		if (id == p_id) {
@@ -148,18 +231,31 @@ bool VoteSystem::hasVoter(int p_id) const
 	return false;
 }
 
-void VoteSystem::onTimerExpired()
+void VoteSystemImpl::onTimerExpired()
 {
 	if (m_state == S_RUNNING) {
 
 		m_state = S_FINISHED;
-		C_INVOKE_0(finished);
+		INVOKE_0(finished);
 	}
+}
+
+unsigned VoteSystem::getFinishTime() const
+{
+	return m_impl->m_finishTime;
 }
 
 VoteType VoteSystem::getType() const
 {
-	return m_type;
+	return m_impl->m_type;
 }
 
-} // namespace
+void VoteSystem::setVoteSubject(const CL_String &p_subject)
+{
+	m_impl->m_subject = p_subject;
+}
+
+const CL_String &VoteSystem::getVoteSubject() const
+{
+	return m_impl->m_subject;
+}

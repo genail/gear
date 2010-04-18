@@ -38,8 +38,10 @@
 #include "gfx/race/ui/ScoreTable.h"
 #include "gfx/race/ui/SpeedMeter.h"
 #include "gfx/scenes/RaceScene.h"
+#include "logic/VoteSystem.h"
 #include "logic/race/Car.h"
-#include "logic/race/RaceLogic.h"
+#include "logic/race/GameLogic.h"
+#include "logic/race/MessageBoard.h"
 #include "logic/race/Progress.h"
 #include "math/Time.h"
 
@@ -56,41 +58,22 @@ class RaceUIImpl
 {
 	public:
 
-		/** Speed control widget */
 		SpeedMeter m_speedMeter;
-
-		/** Player list widget */
 		PlayerList m_playerList;
-
-		/** Score table */
 		ScoreTable m_scoreTable;
 
-		/** Global message label */
 		Label m_globMsgLabel;
-
-		/** Vote label */
 		Label m_voteLabel;
-
-		/** Message board label */
 		Label m_messageBoardLabel;
-
-		/** Lap count label */
 		Label m_lapLabel;
-
-		/** Lap times label */
 		Label m_lapTimesLabel;
-
-		/** Lap times label */
 		Label m_lapTimesLabelBold;
-
-		/** Player names under cars label */
 		Label m_carLabel;
-
-		/** Countdown label */
 		Label m_countdownLabel;
 
 		// Race logic pointer
-		const Race::RaceLogic *m_logic;
+		const Race::GameLogic *m_logic;
+		Race::RaceGameState m_lastState;
 
 		// Viewport pointer
 		const Gfx::Viewport *m_viewport;
@@ -101,7 +84,7 @@ class RaceUIImpl
 
 
 		RaceUIImpl(
-				const Race::RaceLogic *p_logic,
+				const Race::GameLogic *p_logic,
 				const Gfx::Viewport *p_viewport
 		) :
 			m_playerList(p_logic),
@@ -115,6 +98,7 @@ class RaceUIImpl
 			m_carLabel(CL_Pointf(), "", Label::F_REGULAR, 14),
 			m_countdownLabel(CL_Pointf(0.0f, 0.0f), "", Label::F_BOLD, 75),
 			m_logic(p_logic),
+			m_lastState(m_logic->getRaceGameState()),
 			m_viewport(p_viewport)
 		{
 			m_globMsgLabel.setAttachPoint(Label::AP_CENTER | Label::AP_BOTTOM);
@@ -122,10 +106,12 @@ class RaceUIImpl
 			m_lapLabel.setAttachPoint(Label::AP_RIGHT | Label::AP_TOP);
 			m_carLabel.setAttachPoint(Label::AP_CENTER | Label::AP_TOP);
 			m_countdownLabel.setAttachPoint(Label::AP_CENTER);
-
-			// connect signals
-			m_slots.connect(p_logic->sig_stateChanged(), this, &RaceUIImpl::onStateChanged);
 		}
+
+
+		void watchRaceGameStateForChanges();
+
+		void handleRaceGameStateChanges(Race::RaceGameState p_from, Race::RaceGameState p_to);
 
 
 		// draw routines
@@ -152,12 +138,9 @@ class RaceUIImpl
 
 		void drawScoreTable(CL_GraphicContext &p_gc);
 
-
-		// state changed slot
-		void onStateChanged(Race::RaceState p_from, Race::RaceState p_to);
 };
 
-RaceUI::RaceUI(const Race::RaceLogic *p_logic, const Gfx::Viewport *p_viewport) :
+RaceUI::RaceUI(const Race::GameLogic *p_logic, const Gfx::Viewport *p_viewport) :
 	m_impl(new RaceUIImpl(p_logic, p_viewport))
 {
 	// empty
@@ -170,7 +153,18 @@ RaceUI::~RaceUI()
 
 void RaceUI::update(unsigned p_timeElapsed)
 {
+	m_impl->watchRaceGameStateForChanges();
 	m_impl->m_scoreTable.update(p_timeElapsed);
+}
+
+void RaceUIImpl::watchRaceGameStateForChanges()
+{
+	const Race::RaceGameState currentState = m_logic->getRaceGameState();
+	if (currentState != m_lastState) {
+		handleRaceGameStateChanges(m_lastState, currentState);
+
+		m_lastState = currentState;
+	}
 }
 
 void RaceUI::draw(CL_GraphicContext &p_gc)
@@ -195,21 +189,23 @@ void RaceUIImpl::drawMeters(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::drawVote(CL_GraphicContext &p_gc)
 {
-	if (m_logic->isVoteRunning()) {
+	const VoteSystem &voteSystem = m_logic->getVoteSystem();
+
+	if (voteSystem.isRunning()) {
 
 		// calculate time left in seconds
 		const unsigned now = CL_System::get_time();
-		const unsigned deadline = m_logic->getVoteTimeout();
-
+		const unsigned deadline = voteSystem.getFinishTime();
 		const unsigned timeLeftSec = deadline >= now ? (deadline - now) / 1000 : 0;
+
+		const CL_String &subject = voteSystem.getVoteSubject();
+		const int yesCount = voteSystem.getYesCount();
+		const int noCount = voteSystem.getNoCount();
 
 		m_voteLabel.setText(
 				cl_format(
 						_("VOTE (%1): %2 yes: %3 no: %4"),
-						timeLeftSec,
-						m_logic->getVoteMessage(),
-						m_logic->getVoteYesCount(),
-						m_logic->getVoteNoCount()
+						timeLeftSec, subject, yesCount, noCount
 				)
 		);
 
@@ -278,16 +274,23 @@ void RaceUIImpl::drawMessageBoard(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::drawLapLabel(CL_GraphicContext &p_gc)
 {
-	const int lapsTotal = m_logic->getRaceLapCount();
-	int lapsCurrent = m_logic->getProgress().getLapNumber(
-			Game::getInstance().getPlayer().getCar()
-	);
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Race::Car &car = player.getCar();
 
-//	if (lapsCurrent > lapsTotal) {
-//		lapsCurrent = lapsTotal;
-//	}
+	const Race::Progress &progress = m_logic->getProgressObject();
+	const int currentLap = progress.getLapNumber(car);
+	const int lapsTotal = m_logic->getLapCount();
 
-	m_lapLabel.setText(cl_format(_("Lap %1 / %2"), lapsCurrent, lapsTotal));
+	CL_String text;
+
+	if (lapsTotal == 0) {
+		text = cl_format(_("Lap %1"), currentLap);
+	} else {
+		text = cl_format(_("Lap %1 / %2"), currentLap, lapsTotal);
+	}
+
+	m_lapLabel.setText(text);
 	m_lapLabel.draw(p_gc);
 }
 
@@ -298,7 +301,7 @@ void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 	static const int Y_DELTA = 16;
 
 	const Race::Car &car = Game::getInstance().getPlayer().getCar();
-	const Race::Progress &pr = m_logic->getProgress();
+	const Race::Progress &pr = m_logic->getProgressObject();
 	const int lap = pr.getLapNumber(car);
 
 	if (lap == 0) {
@@ -323,7 +326,7 @@ void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 	unsigned curr;
 
 	// display 0 time until race is started
-	if (m_logic->getRaceState() == Race::S_RUNNING) {
+	if (m_logic->getRaceGameState() == Race::GS_RUNNING) {
 		curr = pr.getLapTime(car, lap);
 	} else {
 		curr = 0;
@@ -386,7 +389,7 @@ void RaceUIImpl::drawCarLabels(CL_GraphicContext &p_gc)
 		pos.y += 20;
 
 		m_carLabel.setPosition(pos);
-		m_carLabel.setText(m_logic->getPlayer(car).getName()); // FIXME: not optimal
+		m_carLabel.setText(car.getOwnerPlayer().getName());
 
 		m_carLabel.draw(p_gc);
 	}
@@ -399,7 +402,9 @@ void RaceUIImpl::drawPlayerList(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::drawCountdown(CL_GraphicContext &p_gc)
 {
-	const unsigned startTime = m_logic->getRaceStartTime();
+//	const unsigned startTime = m_logic->getRaceStartTime();
+	const unsigned startTime = 0;
+	G_ASSERT(0 && "disabled by now");
 
 	if (startTime == 0) { // not started nor pending
 		return;
@@ -475,7 +480,7 @@ void RaceUIImpl::drawCountdownBg(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::drawGlobalMessage(CL_GraphicContext &p_gc)
 {
-	if (m_logic->getRaceState() == Race::S_FINISHED_SINGLE) {
+	if (m_logic->getRaceGameState() == Race::GS_FINISHED_SINGLE) {
 		m_globMsgLabel.setText(_("Race finished. Waiting for other players..."));
 		m_globMsgLabel.draw(p_gc);
 	}
@@ -483,7 +488,7 @@ void RaceUIImpl::drawGlobalMessage(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::drawScoreTable(CL_GraphicContext &p_gc)
 {
-	if (m_logic->getRaceState() == Race::S_FINISHED_ALL) {
+	if (m_logic->getRaceGameState() == Race::GS_FINISHED_ALL) {
 		m_scoreTable.draw(p_gc);
 	}
 }
@@ -504,9 +509,9 @@ void RaceUI::load(CL_GraphicContext &p_gc)
 
 }
 
-void RaceUIImpl::onStateChanged(Race::RaceState p_from, Race::RaceState p_to)
+void RaceUIImpl::handleRaceGameStateChanges(Race::RaceGameState p_from, Race::RaceGameState p_to)
 {
-	if (p_from == Race::S_FINISHED_SINGLE && p_to == Race::S_FINISHED_ALL) {
+	if (p_from == Race::GS_FINISHED_SINGLE && p_to == Race::GS_FINISHED_ALL) {
 		// finish race action, invoke table display
 		m_scoreTable.rebuild();
 		m_scoreTable.restartAnimation();

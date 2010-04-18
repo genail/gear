@@ -29,7 +29,9 @@
 #include "GameLogic.h"
 
 #include "common/gassert.h"
+#include "logic/VoteSystem.h"
 #include "logic/race/Car.h"
+#include "logic/race/MessageBoard.h"
 #include "logic/race/Progress.h"
 #include "logic/race/level/Level.h"
 #include "logic/race/level/Object.h"
@@ -46,10 +48,14 @@ class GameLogicImpl
 		bool m_initialized;
 
 		Level *m_level;
+		int m_lapCount;
 
 		RaceGameState m_gameState;
 
 		CL_SharedPtr<Progress> m_progress;
+
+		VoteSystem m_voteSystem;
+		MessageBoard m_messageBoard;
 
 
 		GameLogicImpl(GameLogic *p_parent);
@@ -69,6 +75,7 @@ class GameLogicImpl
 		);
 
 		void setLevel(Level *p_level);
+		const Level &getLevel() const;
 
 };
 
@@ -82,6 +89,7 @@ GameLogicImpl::GameLogicImpl(GameLogic *p_parent) :
 		m_parent(p_parent),
 		m_initialized(false),
 		m_level(NULL),
+		m_lapCount(0),
 		m_gameState(GS_STANDBY)
 {
 	// empty
@@ -203,6 +211,17 @@ void GameLogicImpl::setLevel(Level *p_level)
 	m_progress = CL_SharedPtr<Progress>(new Progress(m_level));
 }
 
+const Level &GameLogic::getLevel() const
+{
+	return m_impl->getLevel();
+}
+
+const Level &GameLogicImpl::getLevel() const
+{
+	G_ASSERT(m_initialized);
+	return *m_level;
+}
+
 Level &GameLogic::getLevel()
 {
 	return *m_impl->m_level;
@@ -228,6 +247,31 @@ const Progress &GameLogic::getProgressObject() const
 {
 	G_ASSERT(m_impl->m_initialized);
 	return *m_impl->m_progress.get();
+}
+
+VoteSystem &GameLogic::getVoteSystem()
+{
+	return m_impl->m_voteSystem;
+}
+
+const VoteSystem &GameLogic::getVoteSystem() const
+{
+	return m_impl->m_voteSystem;
+}
+
+const MessageBoard &GameLogic::getMessageBoard() const
+{
+	return m_impl->m_messageBoard;
+}
+
+void GameLogic::setLapCount(int p_lapCount)
+{
+	m_impl->m_lapCount = p_lapCount;
+}
+
+int GameLogic::getLapCount() const
+{
+	return m_impl->m_lapCount;
 }
 
 }

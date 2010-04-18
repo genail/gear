@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,22 @@
 
 #include "GameMenuController.h"
 
+#include "common/gassert.h"
 #include "gfx/Stage.h"
 #include "gfx/race/ui/GameMenu.h"
-#include "logic/race/RaceLogic.h"
+#include "logic/race/GameLogic.h"
 
 class GameMenuControllerImpl
 {
 	public:
 
-		Race::RaceLogic **m_raceLogic;
+		Race::GameLogic **m_raceLogic;
 
 		Gfx::GameMenu *m_gameMenu;
 
 
 		GameMenuControllerImpl(
-				Race::RaceLogic **p_raceLogic,
+				Race::GameLogic **p_raceLogic,
 				Gfx::GameMenu *p_gameMenu
 		) :
 			m_raceLogic(p_raceLogic),
@@ -69,7 +70,7 @@ class GameMenuControllerImpl
 };
 
 GameMenuController::GameMenuController(
-		Race::RaceLogic **p_raceLogic,
+		Race::GameLogic **p_raceLogic,
 		Gfx::GameMenu *p_gameMenu
 ) :
 	m_impl(new GameMenuControllerImpl(p_raceLogic, p_gameMenu))
@@ -91,5 +92,6 @@ void GameMenuControllerImpl::onExitClicked()
 void GameMenuControllerImpl::onVoteClicked()
 {
 	m_gameMenu->setVisible(false);
-	(*m_raceLogic)->callAVote(VOTE_RESTART_RACE);
+	G_ASSERT(0 && "not supported by now");
+//	(*m_raceLogic)->callAVote(VOTE_RESTART_RACE);
 }

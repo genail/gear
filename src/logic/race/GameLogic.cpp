@@ -59,7 +59,7 @@ class GameLogicImpl
 
 
 		GameLogicImpl(GameLogic *p_parent);
-		~GameLogicImpl() {}
+		~GameLogicImpl();
 
 		void initialize();
 		void destroy();
@@ -98,6 +98,11 @@ GameLogicImpl::GameLogicImpl(GameLogic *p_parent) :
 GameLogic::~GameLogic()
 {
 	// empty
+}
+
+GameLogicImpl::~GameLogicImpl()
+{
+	G_ASSERT(!m_initialized && "not destroyed properly");
 }
 
 void GameLogic::initialize()

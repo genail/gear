@@ -47,7 +47,7 @@ class GameLogicTimeTrailImpl
 
 
 		GameLogicTimeTrailImpl(GameLogicTimeTrail *p_parent);
-		~GameLogicTimeTrailImpl() {}
+		~GameLogicTimeTrailImpl();
 
 		void initialize();
 		void insertPlayerCar();
@@ -70,6 +70,11 @@ GameLogicTimeTrailImpl::GameLogicTimeTrailImpl(GameLogicTimeTrail *p_parent) :
 		m_initialized(false)
 {
 	// empty
+}
+
+GameLogicTimeTrailImpl::~GameLogicTimeTrailImpl()
+{
+	G_ASSERT(!m_initialized && "not destroyed properly");
 }
 
 GameLogicTimeTrail::~GameLogicTimeTrail()

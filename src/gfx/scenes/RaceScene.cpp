@@ -235,6 +235,8 @@ void RaceSceneImpl::destroy()
 {
 	G_ASSERT(m_initialized);
 
+	m_logic->destroy();
+
 	delete m_logic;
 	m_logic = NULL;
 

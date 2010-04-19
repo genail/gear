@@ -142,6 +142,9 @@ void GameLogic::update(unsigned p_timeElapsedMs)
 void GameLogicImpl::update(unsigned p_timeElapsedMs)
 {
 	updateCarsPhysics(p_timeElapsedMs);
+	updateCollisions();
+
+	m_progress->update();
 }
 
 void GameLogicImpl::updateCarsPhysics(unsigned p_timeElapsedMs)

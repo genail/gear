@@ -51,6 +51,9 @@ class GameLogicTimeTrailImpl
 
 		void initialize();
 		void insertPlayerCar();
+		void putCarAtFirstStartPosition();
+		void markAsRunning();
+		void resetProgressClock();
 
 		void destroy();
 		void removePlayerCar();
@@ -91,7 +94,10 @@ void GameLogicTimeTrail::initialize()
 void GameLogicTimeTrailImpl::initialize()
 {
 	G_ASSERT(!m_initialized);
+
 	insertPlayerCar();
+	markAsRunning();
+	resetProgressClock();
 
 	m_initialized = true;
 }
@@ -107,6 +113,34 @@ void GameLogicTimeTrailImpl::insertPlayerCar()
 
 	level.addCar(&car);
 	progress.addCar(&car);
+
+	putCarAtFirstStartPosition();
+}
+
+void GameLogicTimeTrailImpl::putCarAtFirstStartPosition()
+{
+	Level &level = m_parent->getLevel();
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Car &car = player.getCar();
+
+	CL_Pointf startPosition;
+	CL_Angle startAngle;
+
+	level.getStartPosAndRot(1, &startPosition, &startAngle);
+	car.setPosition(startPosition);
+	car.setAngle(startAngle);
+}
+
+void GameLogicTimeTrailImpl::markAsRunning()
+{
+	m_parent->setRaceGameState(GS_RUNNING);
+}
+
+void GameLogicTimeTrailImpl::resetProgressClock()
+{
+	Progress &progress = m_parent->getProgressObject();
+	progress.resetClock();
 }
 
 void GameLogicTimeTrail::destroy()

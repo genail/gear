@@ -30,69 +30,25 @@
 
 #include <ClanLib/core.h>
 
-class VoteSystem;
+#include "logic/race/GameLogicTimeTrail.h"
 
 namespace Race
 {
 
-enum RaceGameState
-{
-	/** No action taken. */
-	GS_STANDBY,
-	/** Race is pending for start */
-	GS_PENDING,
-	/** Race started and not yet finished */
-	GS_RUNNING,
-	/** Race finished by local player */
-	GS_FINISHED_SINGLE,
-	/** Race finished by all players */
-	GS_FINISHED_ALL
-};
-
-class Level;
-class MessageBoard;
-class Progress;
-
-class GameLogicImpl;
-class GameLogic
+class GameLogicTimeTrailOnlineImpl;
+class GameLogicTimeTrailOnline : public GameLogicTimeTrail
 {
 	public:
 
-		GameLogic();
-		virtual ~GameLogic();
-
-		virtual void initialize();
-		virtual void destroy();
-
-		virtual void update(unsigned p_timeElapsedMs);
-
-		void setLevel(Level *p_level);
-		const Level &getLevel() const;
-
-		int getLapCount() const;
-
-		RaceGameState getRaceGameState() const;
-		const Progress &getProgressObject() const;
-
-		VoteSystem &getVoteSystem();
-		const VoteSystem &getVoteSystem() const;
-		const MessageBoard &getMessageBoard() const;
-
-	protected:
-
-		Level &getLevel();
-		Progress &getProgressObject();
-
-		void setRaceGameState(RaceGameState p_gameState);
-		void setLapCount(int p_lapCount);
+		GameLogicTimeTrailOnline();
+		virtual ~GameLogicTimeTrailOnline();
 
 
 	private:
 
-		CL_SharedPtr<GameLogicImpl> m_impl;
+		CL_SharedPtr<GameLogicTimeTrailOnlineImpl> m_impl;
 
-		friend class GameLogicImpl;
-		friend class BasicGameClientImpl;
+		friend class GameLogicTimeTrailOnlineImpl;
 
 };
 

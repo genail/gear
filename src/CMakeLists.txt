@@ -108,6 +108,8 @@ SET(CLIENT_SRCS
 	gfx/scenes/RaceScene.cpp
 	gfx/scenes/OptionsScene.cpp
 	logic/race/ArcadeRaceLogic.cpp
+	logic/race/BasicGameClient.cpp
+	logic/race/GameLogicTimeTrailOnline.cpp
 	logic/race/OfflineRaceLogic.cpp
 	logic/race/OnlineRaceLogic.cpp
 	logic/race/TimeTrailRaceLogic.cpp

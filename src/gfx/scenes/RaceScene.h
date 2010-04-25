@@ -38,6 +38,7 @@
 
 namespace Net {
 	class CarState;
+	class GameState;
 }
 
 namespace Gfx {
@@ -62,7 +63,7 @@ class RaceScene: public Gfx::DirectScene
 
 
 		void initializeOffline(Race::Level *p_level);
-		void initializeOnline(TGameMode p_gameMode);
+		void initializeOnline(TGameMode p_gameMode, const Net::GameState &p_gameState);
 		void destroy();
 
 

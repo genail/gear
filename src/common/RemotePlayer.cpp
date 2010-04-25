@@ -40,7 +40,7 @@ class RemotePlayerImpl
 
 };
 
-RemotePlayer::RemotePlayer(const CL_String8 &p_name) :
+RemotePlayer::RemotePlayer(const CL_String &p_name) :
 	Player(p_name),
 	m_impl(new RemotePlayerImpl())
 {

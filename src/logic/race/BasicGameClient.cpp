@@ -34,6 +34,7 @@
 #include "logic/race/level/Level.h"
 #include "network/client/Client.h"
 #include "network/packets/GameState.h"
+#include "network/packets/CarState.h"
 
 namespace Race
 {
@@ -64,6 +65,9 @@ class BasicGameClientImpl
 		void onPlayerLeaved(const CL_String &p_name);
 		void removePlayer(const CL_String &p_name);
 		void removePlayerCarFromLevel(RemotePlayer &p_remotePlayer);
+
+		void applyGameState(const Net::GameState &p_gameState);
+		void applyCarState(RemotePlayer &p_remotePlayer, const Net::CarState &p_carState);
 };
 
 BasicGameClient::BasicGameClient(GameLogic *p_gameLogic) :
@@ -147,6 +151,32 @@ void BasicGameClientImpl::removePlayerCarFromLevel(RemotePlayer &p_remotePlayer)
 {
 	Race::Level &level = m_gameLogic->getLevel();
 	level.removeCar(&p_remotePlayer.getCar());
+}
+
+void BasicGameClient::applyGameState(const Net::GameState &p_gameState)
+{
+	m_impl->applyGameState(p_gameState);
+}
+
+void BasicGameClientImpl::applyGameState(const Net::GameState &p_gameState)
+{
+	const int playerCount = p_gameState.getPlayerCount();
+	for (int i = 0; i < playerCount; ++i) {
+		const CL_String &playerName = p_gameState.getPlayerName(i);
+		CL_SharedPtr<RemotePlayer> remotePlayer(new RemotePlayer(playerName));
+		m_namePlayerMap[playerName] = remotePlayer;
+
+		const Net::CarState &carState = p_gameState.getCarState(i);
+		applyCarState(*remotePlayer.get(), carState);
+	}
+}
+
+void BasicGameClientImpl::applyCarState(
+		RemotePlayer &p_remotePlayer, const Net::CarState &p_carState)
+{
+	Race::Car &car = p_remotePlayer.getCar();
+	CL_NetGameEvent serializedCarData = p_carState.getSerializedData();
+	car.deserialize(serializedCarData);
 }
 
 }

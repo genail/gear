@@ -40,9 +40,11 @@
 #include "logic/race/Block.h"
 #include "logic/race/GameLogic.h"
 #include "logic/race/GameLogicTimeTrail.h"
+#include "logic/race/GameLogicTimeTrailOnline.h"
 #include "logic/race/ScoreTable.h"
 #include "network/events.h"
 #include "network/packets/CarState.h"
+#include "network/packets/GameState.h"
 #include "network/client/Client.h"
 #include "gfx/race/RaceGraphics.h"
 #include "gfx/race/level/Bound.h"
@@ -67,6 +69,9 @@ class RaceSceneImpl
 		Gfx::RaceGraphics *m_graphics;
 
 		ScoreTable m_scoreTable;
+
+		Race::Level *m_level;
+		bool m_levelOwner;
 
 		// input
 
@@ -105,7 +110,9 @@ class RaceSceneImpl
 		~RaceSceneImpl() {}
 
 		void initializeOffline(Race::Level *p_level);
-		void initializeOnline(TGameMode p_gameMode);
+		void initializeOnline(TGameMode p_gameMode, const Net::GameState &p_gameState);
+		void initTimeTrailOnlineLogic(const Net::GameState &p_gameState);
+		void loadLevel(const CL_String &p_levelName);
 		void destroy();
 
 		void load(CL_GraphicContext &p_gc);
@@ -147,6 +154,8 @@ RaceSceneImpl::RaceSceneImpl(RaceScene *p_parent) :
 		m_initialized(false),
 		m_logic(NULL),
 		m_graphics(NULL),
+		m_level(NULL),
+		m_levelOwner(false),
 		m_inputLock(false),
 		m_keyTurnLeftDown(false),
 		m_keyTurnRightDown(false),
@@ -176,31 +185,53 @@ void RaceSceneImpl::initializeOffline(Race::Level *p_level)
 	initCommon();
 }
 
-void RaceScene::initializeOnline(TGameMode p_gameMode)
+void RaceScene::initializeOnline(TGameMode p_gameMode, const Net::GameState &p_gameState)
 {
-	m_impl->initializeOnline(p_gameMode);
+	m_impl->initializeOnline(p_gameMode, p_gameState);
 }
 
-void RaceSceneImpl::initializeOnline(TGameMode p_gameMode)
+void RaceSceneImpl::initializeOnline(TGameMode p_gameMode, const Net::GameState &p_gameState)
 {
 	G_ASSERT(!m_initialized);
-	G_ASSERT(0 && "not supported yet");
 
-//	switch (p_gameMode) {
-//		case GM_ARCADE:
-//			cl_log_event(LOG_DEBUG, "building ARCADE logic");
-//			m_logic = new Race::OnlineRaceLogic();
-//			break;
-//		case GM_TIME_TRAIL:
-//			cl_log_event(LOG_DEBUG, "building TIME TRAIL logic");
-//			m_logic = new Race::TimeTrailRaceLogic();
-//			break;
-//
-//		default:
-//			G_ASSERT(0 && "unknown option");
-//	}
+	switch (p_gameMode) {
+		case GM_ARCADE:
+			G_ASSERT(0 && "not supported yet");
+			break;
+
+		case GM_TIME_TRAIL:
+			initTimeTrailOnlineLogic(p_gameState);
+			break;
+
+		default:
+			G_ASSERT(0 && "unknown option");
+	}
 
 	initCommon();
+}
+
+void RaceSceneImpl::initTimeTrailOnlineLogic(const Net::GameState &p_gameState)
+{
+	cl_log_event(LOG_DEBUG, "building TIME TRAIL logic");
+	Race::GameLogicTimeTrailOnline *timeTrailLogic = new Race::GameLogicTimeTrailOnline();
+
+	const CL_String &levelName = p_gameState.getLevel();
+	loadLevel(levelName);
+
+	timeTrailLogic->setLevel(m_level);
+
+	timeTrailLogic->applyGameState(p_gameState);
+	m_logic = timeTrailLogic;
+}
+
+void RaceSceneImpl::loadLevel(const CL_String &p_levelName)
+{
+	m_level = new Race::Level();
+	const bool loaded = m_level->load(p_levelName);
+
+	G_ASSERT(loaded && "FIXME: level not found");
+
+	m_levelOwner = true;
 }
 
 void RaceSceneImpl::initCommon()
@@ -242,6 +273,12 @@ void RaceSceneImpl::destroy()
 
 	delete m_graphics;
 	m_graphics = NULL;
+
+	if (m_levelOwner) {
+		delete m_level;
+		m_level = NULL;
+		m_levelOwner = false;
+	}
 
 	m_parent->setLoaded(false);
 	m_initialized = false;

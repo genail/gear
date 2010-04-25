@@ -42,7 +42,7 @@ class Player : boost::noncopyable {
 
 	public:
 
-		explicit Player(const CL_String8 &p_name = "");
+		explicit Player(const CL_String &p_name = "");
 		virtual ~Player();
 
 

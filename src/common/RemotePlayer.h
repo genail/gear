@@ -38,7 +38,7 @@ class RemotePlayer: public Player
 {
 	public:
 
-		RemotePlayer(const CL_String8 &p_name = "");
+		explicit RemotePlayer(const CL_String &p_name = "");
 
 		virtual ~RemotePlayer();
 

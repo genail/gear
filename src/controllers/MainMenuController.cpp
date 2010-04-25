@@ -37,6 +37,7 @@
 #include "gfx/scenes/EditorScene.h"
 #include "logic/race/level/Level.h"
 #include "network/client/Client.h"
+#include "network/packets/GameState.h"
 
 
 class NetworkClientConnectRunnable : public CL_Runnable
@@ -46,11 +47,13 @@ class NetworkClientConnectRunnable : public CL_Runnable
 		CL_Signal_v0 m_finished;
 
 		volatile TGameMode m_gameMode;
+		Net::GameState m_gameState;
 
 		CL_SlotContainer m_slots;
 
 		NetworkClientConnectRunnable() :
-			m_gameModeReceived(false)
+			m_gameModeReceived(false),
+			m_gameStateReceived(false)
 		{ /* empty */ }
 
 		virtual void run() {
@@ -59,7 +62,9 @@ class NetworkClientConnectRunnable : public CL_Runnable
 
 			connectClientSlots(client);
 			client.connect();
+
 			waitForGameMode();
+			waitForGameState();
 
 			m_finished.invoke();
 		}
@@ -67,12 +72,17 @@ class NetworkClientConnectRunnable : public CL_Runnable
 	private:
 
 		volatile bool m_gameModeReceived;
+		volatile bool m_gameStateReceived;
 
 
 		void connectClientSlots(Net::Client &p_client) {
 			m_slots.connect(
 					p_client.sig_gameModeReceived(),
 					this, &NetworkClientConnectRunnable::onGameModeReceived);
+
+			m_slots.connect(
+					p_client.sig_gameStateReceived(),
+					this, &NetworkClientConnectRunnable::onGameStateReceived);
 		}
 
 		void waitForGameMode() {
@@ -85,6 +95,18 @@ class NetworkClientConnectRunnable : public CL_Runnable
 		void onGameModeReceived(TGameMode p_gameMode) {
 			m_gameMode = p_gameMode;
 			m_gameModeReceived = true;
+		}
+
+		void waitForGameState() {
+			while (!m_gameStateReceived) {
+				CL_KeepAlive::process();
+				CL_System::sleep(2);
+			}
+		}
+
+		void onGameStateReceived(const Net::GameState &p_gameState) {
+			m_gameState = p_gameState;
+			m_gameStateReceived = true;
 		}
 
 };
@@ -287,7 +309,7 @@ void MainMenuControllerImpl::startOnlineGame()
 
 	if (netClient.isConnected()) {
 		m_scene->hideMessageBox();
-		m_raceScene->initializeOnline(m_connectRunnable.m_gameMode);
+		m_raceScene->initializeOnline(m_connectRunnable.m_gameMode, m_connectRunnable.m_gameState);
 		Gfx::Stage::pushScene(m_raceScene);
 	} else {
 		m_scene->displayConnectionErrorMessageBox();

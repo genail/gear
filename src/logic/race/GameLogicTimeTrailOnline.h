@@ -32,6 +32,11 @@
 
 #include "logic/race/GameLogicTimeTrail.h"
 
+namespace Net
+{
+class GameState;
+}
+
 namespace Race
 {
 
@@ -42,6 +47,8 @@ class GameLogicTimeTrailOnline : public GameLogicTimeTrail
 
 		GameLogicTimeTrailOnline();
 		virtual ~GameLogicTimeTrailOnline();
+
+		void applyGameState(const Net::GameState &p_gameState);
 
 
 	private:

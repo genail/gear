@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,34 +41,25 @@ class GameState : public Packet {
 	public:
 
 		GameState();
-
 		virtual ~GameState();
 
-
 		virtual CL_NetGameEvent buildEvent() const;
-
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-
-		const CL_String &getLevel() const { return m_level; }
-
-		size_t getPlayerCount() const { return m_names.size(); }
-
-		const CL_String &getPlayerName(size_t p_index) const { return m_names[p_index]; }
-
-		const CarState &getCarState(size_t p_index) const { return m_carStates[p_index]; }
+		const CL_String &getLevel() const;
+		int getPlayerCount() const;
+		const CL_String &getPlayerName(int p_index) const;
+		const CarState &getCarState(int p_index) const;
 
 
 		void addPlayer(const CL_String &p_name, const CarState &p_carState);
+		void setLevel(const CL_String &p_level);
 
-		void setLevel(const CL_String &p_level) { m_level = p_level; }
 
 	private:
 
 		CL_String m_level;
-
 		std::vector<CL_String> m_names;
-
 		std::vector<CarState> m_carStates;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,20 +50,20 @@ CL_NetGameEvent GameState::buildEvent() const
 
 	event.add_argument(m_level);
 
-	const size_t playerCount = m_names.size();
+	const int playerCount = m_names.size();
 	event.add_argument(playerCount);
 
-	for (size_t i = 0; i < playerCount; ++i) {
+	for (int i = 0; i < playerCount; ++i) {
 		event.add_argument(m_names[i]);
 
 		// inline car state event arguments
 		const CarState &carState = m_carStates[i];
 		const CL_NetGameEvent carStateEvent = carState.buildEvent();
 
-		const size_t argumentCount = carStateEvent.get_argument_count();
+		const int argumentCount = carStateEvent.get_argument_count();
 		event.add_argument(argumentCount);
 
-		for (size_t j = 0; j < argumentCount; ++j) {
+		for (int j = 0; j < argumentCount; ++j) {
 			event.add_argument(carStateEvent.get_argument(j));
 		}
 	}
@@ -78,19 +78,19 @@ void GameState::parseEvent(const CL_NetGameEvent &p_event)
 	unsigned arg = 0;
 	m_level = p_event.get_argument(arg++);
 
-	const size_t playerCount = p_event.get_argument(arg++);
+	const int playerCount = p_event.get_argument(arg++);
 
 	m_names.clear();
 	m_carStates.clear();
 
-	for (size_t i = 0; i < playerCount; ++i) {
+	for (int i = 0; i < playerCount; ++i) {
 		m_names.push_back(p_event.get_argument(arg++));
 
 		// read inline car state event
-		const size_t argumentCount = p_event.get_argument(arg++);
+		const int argumentCount = p_event.get_argument(arg++);
 		CL_NetGameEvent carStateEvent(EVENT_CAR_STATE);
 
-		for (size_t j = 0; j < argumentCount; ++j) {
+		for (int j = 0; j < argumentCount; ++j) {
 			carStateEvent.add_argument(p_event.get_argument(arg++));
 		}
 
@@ -101,10 +101,35 @@ void GameState::parseEvent(const CL_NetGameEvent &p_event)
 	}
 }
 
+const CL_String &GameState::getLevel() const
+{
+	return m_level;
+}
+
+int GameState::getPlayerCount() const
+{
+	return static_cast<int>(m_names.size());
+}
+
+const CL_String &GameState::getPlayerName(int p_index) const
+{
+	return m_names[p_index];
+}
+
+const CarState &GameState::getCarState(int p_index) const
+{
+	return m_carStates[p_index];
+}
+
 void GameState::addPlayer(const CL_String &p_name, const CarState &p_carState)
 {
 	m_names.push_back(p_name);
 	m_carStates.push_back(p_carState);
+}
+
+void GameState::setLevel(const CL_String &p_level)
+{
+	m_level = p_level;
 }
 
 } // namespace

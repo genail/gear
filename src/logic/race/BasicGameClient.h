@@ -30,6 +30,11 @@
 
 #include <ClanLib/core.h>
 
+namespace Net
+{
+class GameState;
+}
+
 namespace Race
 {
 
@@ -42,6 +47,8 @@ class BasicGameClient
 
 		BasicGameClient(GameLogic *p_gameLogic);
 		virtual ~BasicGameClient();
+
+		void applyGameState(const Net::GameState &p_gameState);
 
 
 	private:

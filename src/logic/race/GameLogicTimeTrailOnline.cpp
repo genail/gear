@@ -28,6 +28,9 @@
 
 #include "GameLogicTimeTrailOnline.h"
 
+#include "logic/race/BasicGameClient.h"
+#include "network/packets/GameState.h"
+
 namespace Race
 {
 
@@ -37,11 +40,15 @@ class GameLogicTimeTrailOnlineImpl
 
 		GameLogicTimeTrailOnline *m_parent;
 
+		BasicGameClient m_basicClient;
+
 		CL_SlotContainer m_slots;
 
 
 		GameLogicTimeTrailOnlineImpl(GameLogicTimeTrailOnline *p_parent);
 		~GameLogicTimeTrailOnlineImpl();
+
+		void applyGameState(const Net::GameState &p_gameState);
 };
 
 GameLogicTimeTrailOnline::GameLogicTimeTrailOnline() :
@@ -51,7 +58,8 @@ GameLogicTimeTrailOnline::GameLogicTimeTrailOnline() :
 }
 
 GameLogicTimeTrailOnlineImpl::GameLogicTimeTrailOnlineImpl(GameLogicTimeTrailOnline *p_parent) :
-		m_parent(p_parent)
+		m_parent(p_parent),
+		m_basicClient(p_parent)
 {
 	// empty
 }
@@ -64,6 +72,16 @@ GameLogicTimeTrailOnline::~GameLogicTimeTrailOnline()
 GameLogicTimeTrailOnlineImpl::~GameLogicTimeTrailOnlineImpl()
 {
 	// empty
+}
+
+void GameLogicTimeTrailOnline::applyGameState(const Net::GameState &p_gameState)
+{
+	m_impl->applyGameState(p_gameState);
+}
+
+void GameLogicTimeTrailOnlineImpl::applyGameState(const Net::GameState &p_gameState)
+{
+	m_basicClient.applyGameState(p_gameState);
 }
 
 }

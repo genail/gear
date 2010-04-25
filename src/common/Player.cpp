@@ -54,7 +54,7 @@ class PlayerImpl
 
 };
 
-Player::Player(const CL_String8& p_name) :
+Player::Player(const CL_String& p_name) :
 	m_impl(new PlayerImpl(this, p_name))
 {
 	// empty

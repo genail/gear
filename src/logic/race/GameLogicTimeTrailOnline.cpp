@@ -48,6 +48,8 @@ class GameLogicTimeTrailOnlineImpl
 		GameLogicTimeTrailOnlineImpl(GameLogicTimeTrailOnline *p_parent);
 		~GameLogicTimeTrailOnlineImpl();
 
+		void update(unsigned p_timeElapsedMs);
+
 		void applyGameState(const Net::GameState &p_gameState);
 };
 
@@ -72,6 +74,17 @@ GameLogicTimeTrailOnline::~GameLogicTimeTrailOnline()
 GameLogicTimeTrailOnlineImpl::~GameLogicTimeTrailOnlineImpl()
 {
 	// empty
+}
+
+void GameLogicTimeTrailOnline::update(unsigned p_timeElapsedMs)
+{
+	GameLogicTimeTrail::update(p_timeElapsedMs);
+	m_impl->update(p_timeElapsedMs);
+}
+
+void GameLogicTimeTrailOnlineImpl::update(unsigned p_timeElapsedMs)
+{
+	m_basicClient.update();
 }
 
 void GameLogicTimeTrailOnline::applyGameState(const Net::GameState &p_gameState)

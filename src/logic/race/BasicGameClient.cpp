@@ -48,14 +48,20 @@ class BasicGameClientImpl
 
 		BasicGameClient *m_parent;
 		GameLogic *const m_gameLogic;
-
-		CL_SlotContainer m_slots;
+		Net::Client &m_netClient;
 
 		TNamePlayerMap m_namePlayerMap;
+		CarInputState m_lastLocalCarInputState;
+
+		CL_SlotContainer m_slots;
 
 
 		BasicGameClientImpl(BasicGameClient *p_parent, GameLogic *p_gameLogic);
 		~BasicGameClientImpl();
+
+		void update();
+		void updatePlayerCarRemoteState();
+		void sendCarState(const Race::Car &p_car);
 
 		void onPlayerJoined(const CL_String &p_name);
 		bool playerExists(const CL_String &p_name);
@@ -78,17 +84,17 @@ BasicGameClient::BasicGameClient(GameLogic *p_gameLogic) :
 
 BasicGameClientImpl::BasicGameClientImpl(BasicGameClient *p_parent, GameLogic *p_gameLogic) :
 		m_parent(p_parent),
-		m_gameLogic(p_gameLogic)
+		m_gameLogic(p_gameLogic),
+		m_netClient(Game::getInstance().getNetworkConnection())
 {
 	Game &game = Game::getInstance();
-	Net::Client &client = game.getNetworkConnection();
 
 	m_slots.connect(
-			client.sig_playerJoined(),
+			m_netClient.sig_playerJoined(),
 			this, &BasicGameClientImpl::onPlayerJoined);
 
 	m_slots.connect(
-			client.sig_playerLeaved(),
+			m_netClient.sig_playerLeaved(),
 			this, &BasicGameClientImpl::onPlayerLeaved);
 }
 
@@ -100,6 +106,45 @@ BasicGameClient::~BasicGameClient()
 BasicGameClientImpl::~BasicGameClientImpl()
 {
 	// empty
+}
+
+void BasicGameClient::update()
+{
+	m_impl->update();
+}
+
+void BasicGameClientImpl::update()
+{
+	updatePlayerCarRemoteState();
+}
+
+void BasicGameClientImpl::updatePlayerCarRemoteState()
+{
+	Game &game = Game::getInstance();
+	Player &localPlayer = game.getPlayer();
+	Race::Car &localCar = localPlayer.getCar();
+
+	const CarInputState &currentCarState = localCar.getInputState();
+	if (m_lastLocalCarInputState != currentCarState) {
+		sendCarState(localCar);
+		m_lastLocalCarInputState = currentCarState;
+	}
+}
+
+void BasicGameClientImpl::sendCarState(const Race::Car &p_car)
+{
+	CL_NetGameEvent gameStateEvent("");
+	p_car.serialize(&gameStateEvent);
+
+	const Player &carOwner = p_car.getOwnerPlayer();
+	const CL_String &carOwnerName = carOwner.getName();
+
+	Net::CarState carStatePacket;
+	carStatePacket.setSerializedData(gameStateEvent);
+	carStatePacket.setIterationId(p_car.getIterationId());
+	carStatePacket.setName(carOwnerName);
+
+	m_netClient.sendCarState(carStatePacket);
 }
 
 void BasicGameClientImpl::onPlayerJoined(const CL_String &p_name)

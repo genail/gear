@@ -48,6 +48,8 @@ class BasicGameClient
 		BasicGameClient(GameLogic *p_gameLogic);
 		virtual ~BasicGameClient();
 
+		void update();
+
 		void applyGameState(const Net::GameState &p_gameState);
 
 

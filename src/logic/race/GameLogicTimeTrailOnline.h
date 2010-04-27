@@ -48,6 +48,8 @@ class GameLogicTimeTrailOnline : public GameLogicTimeTrail
 		GameLogicTimeTrailOnline();
 		virtual ~GameLogicTimeTrailOnline();
 
+		virtual void update(unsigned p_timeElapsedMs);
+
 		void applyGameState(const Net::GameState &p_gameState);
 
 

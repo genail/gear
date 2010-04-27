@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <string.h>
 #include <ClanLib/core.h>
 #include <ClanLib/network.h>
 #include <ClanLib/display.h>
@@ -51,29 +52,37 @@ class CarImpl;
 class Bound;
 class Level;
 
+struct CarInputState
+{
+	bool accel;
+	bool brake;
+	float turn;
+
+
+	CarInputState() : accel(false), brake(false), turn(0.0f) {}
+
+	bool operator==(const CarInputState &p_other) const {
+		return memcmp(this, &p_other, sizeof(CarInputState)) == 0;
+	}
+
+	bool operator!=(const CarInputState &p_other) const {
+		return !(*this == p_other);
+	}
+};
+
 class Car : boost::noncopyable
 {
-
-	DEF_SIGNAL_1(inputChanged, const Car&);
 
 	public:
 
 		DEPRECATED(Car());
-
 		Car(Player *p_owner);
-
 		virtual ~Car();
-
 
 		const Player &getOwnerPlayer() const;
 
-
-		// attributes
-
 		bool isChoking() const;
-
 		bool isDrifting() const;
-
 		bool isLocked() const;
 
 		/** @return corpse angle starting from positive X axis CW */
@@ -82,8 +91,6 @@ class Car : boost::noncopyable
 		virtual const CL_Pointf& getPosition() const;
 
 		float getSpeed() const;
-
-		/** @return Car speed in km/s */
 		float getSpeedKMS() const;
 
 		/**
@@ -94,23 +101,15 @@ class Car : boost::noncopyable
 
 		int32_t getIterationId() const;
 
-		
-		// implementation data serialization (for network)
-
+		virtual void serialize(CL_NetGameEvent *p_data) const;
 		virtual void deserialize(const CL_NetGameEvent &p_data);
 
-		virtual void serialize(CL_NetGameEvent *p_data) const;
-
-
-		// input setters
-
 		void setAcceleration(bool p_value);
-
 		void setBrake(bool p_value);
-
 		void setLocked(bool p_locked);
-
 		void setTurn(float p_value);
+
+		const CarInputState &getInputState() const;
 
 
 		// state setters
@@ -121,7 +120,6 @@ class Car : boost::noncopyable
 		 * speed or rotation.
 		 */
 		void reset();
-
 		void resetIterationCounter();
 
 		/**
@@ -131,7 +129,6 @@ class Car : boost::noncopyable
 		 * @param p_angle Angle to set.
 		 */
 		void setAngle(const CL_Angle &p_angle);
-
 		void setPosition(const CL_Pointf &p_position);
 
 
@@ -157,21 +154,12 @@ class Car : boost::noncopyable
 		// operators
 
 		bool operator==(const Car &p_other) const;
-
 		bool operator!=(const Car &p_other) const;
 
 
 	protected:
 
-		bool isAcceleration() const;
-
-		bool isBrake() const;
-
-		float getTurn() const;
-
-
 		void setMovement(const CL_Vec2f &p_movement);
-
 		void setSpeed(float p_speed);
 
 	private:
@@ -179,7 +167,6 @@ class Car : boost::noncopyable
 		CL_SharedPtr<CarImpl> m_impl;
 
 		friend class Race::Level;
-		friend class Net::RemoteCar;
 
 #if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
 friend class Gfx::RaceGraphics;

@@ -159,7 +159,7 @@ OnlineRaceLogicImpl::OnlineRaceLogicImpl(OnlineRaceLogic *p_parent) :
 void OnlineRaceLogicImpl::connectLocalPlayerCarSlots()
 {
 	Car &car = m_localPlayer.getCar();
-	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogicImpl::onInputChange);
+//	m_slots.connect(car.sig_inputChanged(), this, &OnlineRaceLogicImpl::onInputChange);
 }
 
 void OnlineRaceLogicImpl::connectNetworkClientSlots()

@@ -51,8 +51,6 @@ const int CAR_HEIGHT = 24;
 
 class CarImpl
 {
-	IMPL_SIGNAL_1(inputChanged, const Car&)
-
 	public:
 
 		/** Base object */
@@ -86,20 +84,10 @@ class CarImpl
 
 		// input state
 
-		/** Acceleration switch */
-		bool m_inputAccel;
-
-		/** Brake switch */
-		bool m_inputBrake;
-
-		/** Current turn. -1 is maximum left, 0 is center and 1 is maximum right */
-		float m_inputTurn;
+		CarInputState m_inputState;
 
 		/** Locked state. If true then car shoudn't move. */
 		bool m_inputLocked;
-
-		/** True if input changed from last time */
-		bool m_inputChanged;
 
 
 		// physics
@@ -130,11 +118,8 @@ class CarImpl
 			m_speed(0.0f),
 			m_damage(0.0f),
 			m_chocking(false),
-			m_inputAccel(false),
-			m_inputBrake(false),
-			m_inputTurn(0.0f),
+			m_inputState(),
 			m_inputLocked(false),
-			m_inputChanged(false),
 			m_phySpeedDelta(0.0f),
 			m_phyWheelsTurn(0.0f)
 		{ init(); }
@@ -155,9 +140,6 @@ class CarImpl
 
 		CL_Angle vecToAngle(const CL_Vec2f &p_vec);
 };
-
-METH_SIGNAL_1(Car, inputChanged, const Car&)
-
 
 CL_String floatToHex(float p_num);
 
@@ -324,9 +306,9 @@ void CarImpl::update1_60() {
 	const float prevSpeed = m_speed; // for m_phySpeedDelta
 
 	// apply inputs to speed
-	if (m_inputBrake) {
+	if (m_inputState.brake) {
 		m_speed -= BRAKE_POWER;
-	} else if (m_inputAccel) {
+	} else if (m_inputState.accel) {
 		// only if not choking
 		if (!isChoking()) {
 			m_chocking = false;
@@ -337,12 +319,12 @@ void CarImpl::update1_60() {
 	}
 	
 	// rotate steering wheels
-	const float diff = m_inputTurn - m_phyWheelsTurn;
+	const float diff = m_inputState.turn - m_phyWheelsTurn;
 
 	if (fabs(diff) > WHEEL_TURN_SPEED) {
 		m_phyWheelsTurn += diff > 0.0f ? WHEEL_TURN_SPEED : -WHEEL_TURN_SPEED;
 	} else {
-		m_phyWheelsTurn = m_inputTurn;
+		m_phyWheelsTurn = m_inputState.turn;
 	}
 
 	const float absSpeed = fabs(m_speed);
@@ -434,11 +416,6 @@ void CarImpl::update1_60() {
 	// set speed delta
 	m_phySpeedDelta = m_speed - prevSpeed;
 
-	// act to input changes
-	if (m_inputChanged) {
-		INVOKE_1(inputChanged, *m_base);
-		m_inputChanged = false;
-	}
 
 #if defined(CLIENT)
 #if !defined(NDEBUG)
@@ -544,9 +521,9 @@ void Car::serialize(CL_NetGameEvent *p_event) const
 	p_event->add_argument(m_impl->m_iterId);
 
 	// save inputs
-	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputAccel));
-	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputBrake));
-	p_event->add_argument(floatToHex(m_impl->m_inputTurn));
+	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputState.accel));
+	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputState.brake));
+	p_event->add_argument(floatToHex(m_impl->m_inputState.turn));
 	p_event->add_argument(CL_NetGameEventValue(m_impl->m_inputLocked));
 
 	// corpse state
@@ -586,9 +563,9 @@ void Car::deserialize(const CL_NetGameEvent &p_event)
 	m_impl->m_iterId = p_event.get_argument(idx++);
 
 	// saved inputs
-	m_impl->m_inputAccel = p_event.get_argument(idx++);
-	m_impl->m_inputBrake = p_event.get_argument(idx++);
-	m_impl->m_inputTurn = hexToFloat(p_event.get_argument(idx++));
+	m_impl->m_inputState.accel = p_event.get_argument(idx++);
+	m_impl->m_inputState.brake = p_event.get_argument(idx++);
+	m_impl->m_inputState.turn = hexToFloat(p_event.get_argument(idx++));
 	m_impl->m_inputLocked = p_event.get_argument(idx++);
 
 	// corpse state
@@ -648,7 +625,7 @@ bool Car::isDrifting() const {
 	}
 
 	if (
-			(m_impl->m_inputAccel || m_impl->m_inputBrake)
+			(m_impl->m_inputState.accel || m_impl->m_inputState.brake)
 			&& fabs(m_impl->m_phySpeedDelta) >= ACCEL_LIMIT)
 	{
 		return true;
@@ -691,33 +668,17 @@ float Car::getSpeedKMS() const
 
 void Car::setAcceleration(bool p_value)
 {
-	if (m_impl->m_inputAccel != p_value) {
-		m_impl->m_inputChanged = true;
-	}
-
-	m_impl->m_inputAccel = p_value;
+	m_impl->m_inputState.accel = p_value;
 }
 
 void Car::setBrake(bool p_value)
 {
-	if (m_impl->m_inputBrake != p_value) {
-		m_impl->m_inputChanged = true;
-	}
-
-	m_impl->m_inputBrake = p_value;
+	m_impl->m_inputState.brake = p_value;
 }
 
 void Car::setTurn(float p_value)
 {
-//	if (fabs(p_value - m_impl->m_inputTurn) > 0.1f) {
-//		m_impl->m_inputChanged = true;
-//	}
-
-	if (p_value != m_impl->m_inputTurn) {
-		m_impl->m_inputChanged = true;
-	}
-
-	m_impl->m_inputTurn = m_impl->limit(p_value, -1.0f, 1.0f);
+	m_impl->m_inputState.turn = m_impl->limit(p_value, -1.0f, 1.0f);
 }
 
 void Car::setPosition(const CL_Pointf &p_position)
@@ -782,21 +743,6 @@ const CL_Angle &Car::getCorpseAngle() const
 	return m_impl->m_rotation;
 }
 
-bool Car::isAcceleration() const
-{
-	return m_impl->m_inputAccel;
-}
-
-bool Car::isBrake() const
-{
-	return m_impl->m_inputBrake;
-}
-
-float Car::getTurn() const
-{
-	return m_impl->m_inputTurn;
-}
-
 void Car::reset()
 {
 	m_impl->m_damage = 0.0f;
@@ -812,9 +758,9 @@ void Car::clone(const Car &p_car)
 	m_impl->m_position = p_car.m_impl->m_position;
 	m_impl->m_rotation = p_car.m_impl->m_rotation;
 	m_impl->m_speed = p_car.m_impl->m_speed;
-	m_impl->m_inputAccel = p_car.m_impl->m_inputAccel;
-	m_impl->m_inputBrake = p_car.m_impl->m_inputBrake;
-	m_impl->m_inputTurn = p_car.m_impl->m_inputTurn;
+	m_impl->m_inputState.accel = p_car.m_impl->m_inputState.accel;
+	m_impl->m_inputState.brake = p_car.m_impl->m_inputState.brake;
+	m_impl->m_inputState.turn = p_car.m_impl->m_inputState.turn;
 	m_impl->m_inputLocked = p_car.m_impl->m_inputLocked;
 	m_impl->m_phyMoveRot = p_car.m_impl->m_phyMoveRot;
 	m_impl->m_phyMoveVec = p_car.m_impl->m_phyMoveVec;
@@ -832,9 +778,9 @@ bool Car::operator==(const Car &p_other) const
 	r &= m_impl->m_position == p_other.m_impl->m_position;
 	r &= m_impl->m_rotation == p_other.m_impl->m_rotation;
 	r &= m_impl->m_speed == p_other.m_impl->m_speed;
-	r &= m_impl->m_inputAccel == p_other.m_impl->m_inputAccel;
-	r &= m_impl->m_inputBrake == p_other.m_impl->m_inputBrake;
-	r &= m_impl->m_inputTurn == p_other.m_impl->m_inputTurn;
+	r &= m_impl->m_inputState.accel == p_other.m_impl->m_inputState.accel;
+	r &= m_impl->m_inputState.brake == p_other.m_impl->m_inputState.brake;
+	r &= m_impl->m_inputState.turn == p_other.m_impl->m_inputState.turn;
 	r &= m_impl->m_inputLocked == p_other.m_impl->m_inputLocked;
 	r &= m_impl->m_phyMoveRot == p_other.m_impl->m_phyMoveRot;
 	r &= m_impl->m_phyMoveVec == p_other.m_impl->m_phyMoveVec;
@@ -862,6 +808,11 @@ int32_t Car::getIterationId() const
 const Player &Car::getOwnerPlayer() const
 {
 	return *m_impl->m_ownerPlayer;
+}
+
+const CarInputState &Car::getInputState() const
+{
+	return m_impl->m_inputState;
 }
 
 } // namespace

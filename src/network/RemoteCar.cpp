@@ -86,9 +86,11 @@ void RemoteCar::deserialize(const CL_NetGameEvent &p_data)
 	Car::deserialize(p_data);
 
 	// set new inputs also to phantom
-	m_impl->m_phantomCar.setAcceleration(isAcceleration());
-	m_impl->m_phantomCar.setBrake(isBrake());
-	m_impl->m_phantomCar.setTurn(getTurn());
+	const Race::CarInputState &inputState = getInputState();
+
+	m_impl->m_phantomCar.setAcceleration(inputState.accel);
+	m_impl->m_phantomCar.setBrake(inputState.brake);
+	m_impl->m_phantomCar.setTurn(inputState.turn);
 
 	// start passing
 	m_impl->m_passFloat.animate(0.0f, 1.0f, PASS_TIME);

@@ -49,6 +49,7 @@
 #include "gfx/race/RaceGraphics.h"
 #include "gfx/race/level/Bound.h"
 #include "gfx/race/ui/GameMenu.h"
+#include "gfx/race/ui/RaceUI.h"
 #include "gfx/race/ui/ScoreTable.h"
 #include "debug/RaceSceneKeyBindings.h"
 

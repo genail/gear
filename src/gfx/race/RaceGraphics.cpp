@@ -28,17 +28,23 @@
 
 #include "RaceGraphics.h"
 
+#include <list>
+
 #include "common.h"
 #include "common/Game.h"
 #include "common/Player.h"
 #include "common/Units.h"
 #include "gfx/DebugLayer.h"
 #include "gfx/Stage.h"
+#include "gfx/Viewport.h"
 #include "gfx/race/level/Bound.h"
 #include "gfx/race/level/Car.h"
 #include "gfx/race/level/DecorationSprite.h"
+#include "gfx/race/level/Level.h"
 #include "gfx/race/level/Sandpit.h"
 #include "gfx/race/level/Smoke.h"
+#include "gfx/race/level/TyreStripes.h"
+#include "gfx/race/ui/RaceUI.h"
 #include "gfx/race/ui/SpeedMeter.h"
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
@@ -48,7 +54,99 @@
 
 namespace Gfx {
 
+class RaceGraphicsImpl
+{
+	public:
+
+		RaceGraphics *m_parent;
+
+		bool m_loaded;
+
+		/** How player sees the scene */
+		Gfx::Viewport m_viewport;
+
+		/** Logic with data for reading only */
+		const Race::GameLogic *m_logic;
+
+		/** Level graphics */
+		Gfx::Level m_level;
+
+		/** Race scene interface */
+		Gfx::RaceUI m_raceUI;
+
+		/** FPS counter */
+		unsigned m_fps, m_nextFps;
+
+		/** Last fps count time */
+		unsigned m_lastFpsRegisterTime;
+
+		/** Logic car to gfx car mapping */
+		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMapping;
+		typedef std::pair<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMappingPair;
+		TCarMapping m_carMapping;
+
+		/** Car smoke periods */
+		typedef std::map<const Race::Car*, unsigned> TCarPeriodMap;
+		TCarPeriodMap m_carSmokePeriod;
+
+		/** Tyre stripes */
+		TyreStripes m_tyreStripes;
+
+		/** Car smoke clouds */
+		typedef std::list< CL_SharedPtr<Gfx::Smoke> > TSmokeList;
+		TSmokeList m_smokes;
+
+		/** Decorations */
+		typedef std::list< CL_SharedPtr<Gfx::DecorationSprite> > TDecorationList;
+		TDecorationList m_decorations;
+
+		/** Sandpits */
+		typedef std::list< CL_SharedPtr<Gfx::Sandpit> > TSandpitList;
+		TSandpitList m_sandpits;
+
+
+		RaceGraphicsImpl(RaceGraphics *p_parent, const Race::GameLogic *p_logic);
+		~RaceGraphicsImpl();
+
+		void draw(CL_GraphicContext &p_gc);
+		void load(CL_GraphicContext &p_gc);
+
+		void update(unsigned p_timeElapsed);
+
+		// initialize routines
+		void loadDecorations(CL_GraphicContext &p_gc);
+		void loadSandPits(CL_GraphicContext &p_gc);
+		void loadTyreStripes(CL_GraphicContext &p_gc);
+
+		// update routines
+		void updateViewport(unsigned p_timeElapsed);
+		void updateSmokes(unsigned p_timeElapsed);
+		void updateCars(unsigned p_timeElapsed);
+		void updateTyreStripes();
+
+
+		// drawing routines
+		void drawLevel(CL_GraphicContext &p_gc);
+		void drawBackBlocks(CL_GraphicContext &p_gc);
+		void drawForeBlocks(CL_GraphicContext &p_gc);
+		void drawTyreStripes(CL_GraphicContext &p_gc);
+		void drawUI(CL_GraphicContext &p_gc);
+		void drawCars(CL_GraphicContext &p_gc);
+		void drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car);
+		void drawSmokes(CL_GraphicContext &p_gc);
+		void drawSandpits(CL_GraphicContext &p_gc);
+
+		void countFps();
+};
+
 RaceGraphics::RaceGraphics(const Race::GameLogic *p_logic) :
+		m_impl(new RaceGraphicsImpl(this, p_logic))
+{
+	// empty
+}
+
+RaceGraphicsImpl::RaceGraphicsImpl(RaceGraphics *p_parent, const Race::GameLogic *p_logic) :
+		m_parent(p_parent),
 		m_loaded(false),
 		m_viewport(),
 		m_logic(p_logic),
@@ -68,7 +166,17 @@ RaceGraphics::~RaceGraphics()
 	// empty
 }
 
+RaceGraphicsImpl::~RaceGraphicsImpl()
+{
+	// empty
+}
+
 void RaceGraphics::draw(CL_GraphicContext &p_gc)
+{
+	m_impl->draw(p_gc);
+}
+
+void RaceGraphicsImpl::draw(CL_GraphicContext &p_gc)
 {
 	G_ASSERT(m_loaded);
 
@@ -116,6 +224,11 @@ void RaceGraphics::draw(CL_GraphicContext &p_gc)
 
 void RaceGraphics::load(CL_GraphicContext &p_gc)
 {
+	m_impl->load(p_gc);
+}
+
+void RaceGraphicsImpl::load(CL_GraphicContext &p_gc)
+{
 	m_raceUI.load(p_gc);
 	loadTyreStripes(p_gc);
 	loadDecorations(p_gc);
@@ -124,7 +237,7 @@ void RaceGraphics::load(CL_GraphicContext &p_gc)
 	m_loaded = true;
 }
 
-void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::loadDecorations(CL_GraphicContext &p_gc)
 {
 //	// load decorations
 //	const Race::Level &level = m_logic->getLevel();
@@ -149,7 +262,7 @@ void RaceGraphics::loadDecorations(CL_GraphicContext &p_gc)
 //	}
 }
 
-void RaceGraphics::loadSandPits(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::loadSandPits(CL_GraphicContext &p_gc)
 {
 //	const Race::Level &level = m_logic->getLevel();
 //	const unsigned sandpitCount = level.getSandpitCount();
@@ -165,19 +278,19 @@ void RaceGraphics::loadSandPits(CL_GraphicContext &p_gc)
 //	}
 }
 
-void RaceGraphics::loadTyreStripes(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::loadTyreStripes(CL_GraphicContext &p_gc)
 {
 	m_tyreStripes.load(p_gc);
 }
 
-void RaceGraphics::drawSandpits(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::drawSandpits(CL_GraphicContext &p_gc)
 {
 	foreach (CL_SharedPtr<Gfx::Sandpit> &sandpit, m_sandpits) {
 		sandpit->draw(p_gc);
 	}
 }
 
-void RaceGraphics::drawSmokes(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::drawSmokes(CL_GraphicContext &p_gc)
 {
 #if !defined(NO_SMOKES)
 	foreach(CL_SharedPtr<Gfx::Smoke> &smoke, m_smokes) {
@@ -190,7 +303,7 @@ void RaceGraphics::drawSmokes(CL_GraphicContext &p_gc)
 #endif // !NO_SMOKES
 }
 
-void RaceGraphics::drawUI(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::drawUI(CL_GraphicContext &p_gc)
 {
 	Gfx::SpeedMeter &speedMeter = m_raceUI.getSpeedMeter();
 	speedMeter.setSpeed(Game::getInstance().getPlayer().getCar().getSpeedKMS());
@@ -198,12 +311,12 @@ void RaceGraphics::drawUI(CL_GraphicContext &p_gc)
 	m_raceUI.draw(p_gc);
 }
 
-void RaceGraphics::drawTyreStripes(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::drawTyreStripes(CL_GraphicContext &p_gc)
 {
 	m_tyreStripes.draw(p_gc);
 }
 
-void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::drawLevel(CL_GraphicContext &p_gc)
 {
 	m_level.draw(p_gc);
 
@@ -265,7 +378,7 @@ void RaceGraphics::drawLevel(CL_GraphicContext &p_gc)
 #endif // !NDEBUG && DRAW_CHECKPOINTS
 }
 
-void RaceGraphics::drawBackBlocks(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::drawBackBlocks(CL_GraphicContext &p_gc)
 {
 //	const Race::Level &level = m_logic->getLevel();
 //
@@ -292,7 +405,7 @@ void RaceGraphics::drawBackBlocks(CL_GraphicContext &p_gc)
 //	}
 }
 
-void RaceGraphics::drawForeBlocks(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::drawForeBlocks(CL_GraphicContext &p_gc)
 {
 //	const Race::Level &level = m_logic->getLevel();
 //
@@ -308,7 +421,7 @@ void RaceGraphics::drawForeBlocks(CL_GraphicContext &p_gc)
 //	}
 }
 
-void RaceGraphics::drawCars(CL_GraphicContext &p_gc)
+void RaceGraphicsImpl::drawCars(CL_GraphicContext &p_gc)
 {
 	const Race::Level &level = m_logic->getLevel();
 	size_t carCount = level.getCarCount();
@@ -319,7 +432,7 @@ void RaceGraphics::drawCars(CL_GraphicContext &p_gc)
 	}
 }
 
-void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
+void RaceGraphicsImpl::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 {
 	TCarMapping::iterator itor = m_carMapping.find(&p_car);
 
@@ -347,7 +460,7 @@ void RaceGraphics::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	
 }
 
-void RaceGraphics::countFps()
+void RaceGraphicsImpl::countFps()
 {
 	const unsigned now = CL_System::get_time();
 
@@ -361,6 +474,11 @@ void RaceGraphics::countFps()
 }
 
 void RaceGraphics::update(unsigned p_timeElapsed)
+{
+	m_impl->update(p_timeElapsed);
+}
+
+void RaceGraphicsImpl::update(unsigned p_timeElapsed)
 {
 	G_ASSERT(m_loaded);
 
@@ -388,7 +506,7 @@ void RaceGraphics::update(unsigned p_timeElapsed)
 #endif // !NDEBUG
 }
 
-void RaceGraphics::updateViewport(unsigned p_timeElapsed)
+void RaceGraphicsImpl::updateViewport(unsigned p_timeElapsed)
 {
 	static const float MIN_SCALE = 0.5f;
 	static const float MAX_SCALE = 1.0f;
@@ -416,12 +534,12 @@ void RaceGraphics::updateViewport(unsigned p_timeElapsed)
 #endif
 }
 
-void RaceGraphics::updateTyreStripes()
+void RaceGraphicsImpl::updateTyreStripes()
 {
 	m_tyreStripes.update();
 }
 
-void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
+void RaceGraphicsImpl::updateSmokes(unsigned p_timeElapsed)
 {
 	// remove finished smokes and update the ongoing
 	TSmokeList::iterator itor = m_smokes.begin();
@@ -472,7 +590,7 @@ void RaceGraphics::updateSmokes(unsigned p_timeElapsed)
 	}
 }
 
-void RaceGraphics::updateCars(unsigned p_timeElapsed)
+void RaceGraphicsImpl::updateCars(unsigned p_timeElapsed)
 {
 	TCarMappingPair pair;
 	foreach(pair, m_carMapping) {
@@ -482,7 +600,7 @@ void RaceGraphics::updateCars(unsigned p_timeElapsed)
 
 Gfx::RaceUI &RaceGraphics::getUi()
 {
-	return m_raceUI;
+	return m_impl->m_raceUI;
 }
 
 }

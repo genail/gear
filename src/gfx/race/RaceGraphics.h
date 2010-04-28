@@ -28,137 +28,34 @@
 
 #pragma once
 
-#include <list>
-
 #include <ClanLib/display.h>
 
-#include "gfx/Viewport.h"
-#include "gfx/race/level/Level.h"
-#include "gfx/race/level/TyreStripes.h"
-#include "gfx/race/ui/RaceUI.h"
-
 namespace Race {
-	class Block;
-	class Car;
 	class GameLogic;
 }
 
 namespace Gfx {
 
-class Car;
-class DecorationSprite;
-class GroundBlock;
-class Sandpit;
-class Smoke;
+class RaceUI;
 
+class RaceGraphicsImpl;
 class RaceGraphics {
 
 	public:
 
 		RaceGraphics(const Race::GameLogic *p_logic);
-
 		virtual ~RaceGraphics();
 
-
 		void draw(CL_GraphicContext &p_gc);
-
 		void load(CL_GraphicContext &p_gc);
 
-
 		void update(unsigned p_timeElapsed);
-
 
 		Gfx::RaceUI &getUi();
 
 	private:
 
-		bool m_loaded;
-
-		/** How player sees the scene */
-		Gfx::Viewport m_viewport;
-
-		/** Logic with data for reading only */
-		const Race::GameLogic *m_logic;
-
-		/** Level graphics */
-		Gfx::Level m_level;
-
-		/** Race scene interface */
-		Gfx::RaceUI m_raceUI;
-
-		/** FPS counter */
-		unsigned m_fps, m_nextFps;
-
-		/** Last fps count time */
-		unsigned m_lastFpsRegisterTime;
-
-		/** Logic car to gfx car mapping */
-		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMapping;
-		typedef std::pair<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMappingPair;
-		TCarMapping m_carMapping;
-
-		/** Car smoke periods */
-		typedef std::map<const Race::Car*, unsigned> TCarPeriodMap;
-		TCarPeriodMap m_carSmokePeriod;
-
-		/** Tyre stripes */
-		TyreStripes m_tyreStripes;
-
-		/** Car smoke clouds */
-		typedef std::list< CL_SharedPtr<Gfx::Smoke> > TSmokeList;
-		TSmokeList m_smokes;
-
-		/** Decorations */
-		typedef std::list< CL_SharedPtr<Gfx::DecorationSprite> > TDecorationList;
-		TDecorationList m_decorations;
-
-		/** Sandpits */
-		typedef std::list< CL_SharedPtr<Gfx::Sandpit> > TSandpitList;
-		TSandpitList m_sandpits;
-
-
-		// initialize routines
-
-		void loadDecorations(CL_GraphicContext &p_gc);
-
-		void loadSandPits(CL_GraphicContext &p_gc);
-
-		void loadTyreStripes(CL_GraphicContext &p_gc);
-
-
-		// update routines
-
-		void updateViewport(unsigned p_timeElapsed);
-
-		void updateSmokes(unsigned p_timeElapsed);
-
-		void updateCars(unsigned p_timeElapsed);
-
-		void updateTyreStripes();
-
-
-		// drawing routines
-
-		void drawLevel(CL_GraphicContext &p_gc);
-
-		void drawBackBlocks(CL_GraphicContext &p_gc);
-
-		void drawForeBlocks(CL_GraphicContext &p_gc);
-
-		void drawTyreStripes(CL_GraphicContext &p_gc);
-
-		void drawUI(CL_GraphicContext &p_gc);
-
-		void drawCars(CL_GraphicContext &p_gc);
-
-		void drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car);
-
-		void drawSmokes(CL_GraphicContext &p_gc);
-
-		void drawSandpits(CL_GraphicContext &p_gc);
-
-
-		void countFps();
+		CL_SharedPtr<RaceGraphicsImpl> m_impl;
 };
 
 } // namespace

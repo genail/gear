@@ -52,20 +52,15 @@ class RaceUI: public Gfx::Drawable {
 	public:
 
 		RaceUI(const Race::GameLogic* p_logic, const Gfx::Viewport *p_viewport);
-
 		virtual ~RaceUI();
 
 
 		virtual void draw(CL_GraphicContext &p_gc);
-
 		virtual void load(CL_GraphicContext &p_gc);
-
 
 		void update(unsigned p_timeElapsed);
 
-
 		ScoreTable &getScoreTable();
-
 		SpeedMeter &getSpeedMeter();
 
 	private:

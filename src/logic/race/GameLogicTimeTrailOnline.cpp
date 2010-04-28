@@ -28,8 +28,13 @@
 
 #include "GameLogicTimeTrailOnline.h"
 
+#include "common/Game.h"
 #include "logic/race/BasicGameClient.h"
+#include "logic/race/Progress.h"
+#include "network/client/Client.h"
+#include "network/client/RankingClient.h"
 #include "network/packets/GameState.h"
+#include "network/packets/RankingAdvance.h"
 
 namespace Race
 {
@@ -39,8 +44,9 @@ class GameLogicTimeTrailOnlineImpl
 	public:
 
 		GameLogicTimeTrailOnline *m_parent;
-
 		BasicGameClient m_basicClient;
+
+		int m_lastLapNumber;
 
 		CL_SlotContainer m_slots;
 
@@ -49,6 +55,8 @@ class GameLogicTimeTrailOnlineImpl
 		~GameLogicTimeTrailOnlineImpl();
 
 		void update(unsigned p_timeElapsedMs);
+		void updateProgress();
+		void updateRemoteRanking();
 
 		void applyGameState(const Net::GameState &p_gameState);
 };
@@ -61,7 +69,8 @@ GameLogicTimeTrailOnline::GameLogicTimeTrailOnline() :
 
 GameLogicTimeTrailOnlineImpl::GameLogicTimeTrailOnlineImpl(GameLogicTimeTrailOnline *p_parent) :
 		m_parent(p_parent),
-		m_basicClient(p_parent)
+		m_basicClient(p_parent),
+		m_lastLapNumber(1)
 {
 	// empty
 }
@@ -85,6 +94,40 @@ void GameLogicTimeTrailOnline::update(unsigned p_timeElapsedMs)
 void GameLogicTimeTrailOnlineImpl::update(unsigned p_timeElapsedMs)
 {
 	m_basicClient.update();
+	updateProgress();
+}
+
+void GameLogicTimeTrailOnlineImpl::updateProgress()
+{
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Car &car = player.getCar();
+
+	const Progress &progress = m_parent->getProgressObject();
+	const int currentLapNumber = progress.getLapNumber(car);
+
+	if (currentLapNumber == m_lastLapNumber + 1) {
+		updateRemoteRanking();
+		m_lastLapNumber = currentLapNumber;
+	}
+}
+
+void GameLogicTimeTrailOnlineImpl::updateRemoteRanking()
+{
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Car &car = player.getCar();
+
+	const Progress &progress = m_parent->getProgressObject();
+	const int currentLapNumber = progress.getLapNumber(car);
+	const int previousLapNumber = currentLapNumber - 1;
+
+	const int lapTimeMs = progress.getLapTime(car, previousLapNumber);
+
+	Net::Client &client = game.getNetworkConnection();
+	Net::RankingClient &rankingClient = client.getRankingClient();
+
+	rankingClient.sendTimeAdvance(lapTimeMs);
 }
 
 void GameLogicTimeTrailOnline::applyGameState(const Net::GameState &p_gameState)

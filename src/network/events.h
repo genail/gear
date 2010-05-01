@@ -29,6 +29,7 @@
 #pragma once
 
 #include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
 
 // connect / disconnect procedure
@@ -62,3 +63,9 @@
 #define EVENT_RANKING_ENTRIES "ranking:entries"
 #define EVENT_RANKING_REQUEST "ranking:request"
 #define EVENT_RANKING_ADVANCE "ranking:advance"
+
+inline bool isRankingEvent(const CL_NetGameEvent &p_event)
+{
+	static const int PREFIX_LEN = strlen(EVENT_RANKING_PREFIX);
+	return p_event.get_name().substr(0, PREFIX_LEN) == EVENT_RANKING_PREFIX;
+}

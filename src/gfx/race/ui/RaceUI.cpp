@@ -41,6 +41,7 @@
 #include "logic/VoteSystem.h"
 #include "logic/race/Car.h"
 #include "logic/race/GameLogic.h"
+#include "logic/race/GameLogicTimeTrailOnline.h"
 #include "logic/race/MessageBoard.h"
 #include "logic/race/Progress.h"
 #include "math/Time.h"
@@ -74,6 +75,9 @@ class RaceUIImpl
 		Label m_bestLapTimeLabel;
 		Label m_lastLapTimeLabel;
 		Label m_currentLapTimeLabel;
+
+		Label m_bestOnlineTimeTitleLabel;
+		Label m_bestOnlineTimeLabel;
 
 		// Race logic pointer
 		const Race::GameLogic *m_logic;
@@ -133,6 +137,8 @@ RaceUIImpl::RaceUIImpl(const Race::GameLogic *p_logic, const Gfx::Viewport *p_vi
 		m_bestLapTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22),
 		m_lastLapTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22),
 		m_currentLapTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22),
+		m_bestOnlineTimeTitleLabel(CL_Pointf(), _("Best Online Lap"), Label::F_BOLD, 22),
+		m_bestOnlineTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22),
 		m_logic(p_logic),
 		m_lastState(m_logic->getRaceGameState()),
 		m_viewport(p_viewport)
@@ -166,6 +172,12 @@ void RaceUIImpl::positionLapTimeLabels()
 	y += ENTRY_HEIGHT;
 
 	m_lastLapTimeLabel.setPosition(CL_Pointf(stageWidth - TIME_MARGIN_RIGHT, y));
+	y += ENTRY_HEIGHT;
+
+	m_bestOnlineTimeTitleLabel.setPosition(CL_Pointf(stageWidth - TITLE_MARGIN_RIGHT, y));
+	y += ENTRY_HEIGHT;
+
+	m_bestOnlineTimeLabel.setPosition(CL_Pointf(stageWidth - TIME_MARGIN_RIGHT, y));
 
 
 	const float stageWidth2 = stageWidth / 2.0f;
@@ -391,6 +403,25 @@ void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 	m_bestLapTimeLabel.draw(p_gc);
 	m_lastLapTimeLabel.draw(p_gc);
 	m_currentLapTimeLabel.draw(p_gc);
+
+	if (typeid(*m_logic) == typeid(Race::GameLogicTimeTrailOnline)) {
+
+		const Race::GameLogicTimeTrailOnline *timeTrailLogic =
+				dynamic_cast<const Race::GameLogicTimeTrailOnline*>(m_logic);
+
+		if (timeTrailLogic->hasFirstPlaceRankingEntry()) {
+			const RankingEntry &rankingEntry = timeTrailLogic->getFirstPlaceRankingEntry();
+			Math::Time bestTime(rankingEntry.timeMs);
+
+			m_bestOnlineTimeLabel.setText(
+					cl_format("%1 by %2", bestTime.raceFormat(), rankingEntry.name));
+		} else {
+			m_bestOnlineTimeLabel.setText("--:--:---");
+		}
+
+		m_bestOnlineTimeTitleLabel.draw(p_gc);
+		m_bestOnlineTimeLabel.draw(p_gc);
+	}
 }
 
 void RaceUIImpl::drawCarLabels(CL_GraphicContext &p_gc)
@@ -540,6 +571,9 @@ void RaceUIImpl::loadLapTimeLabels(CL_GraphicContext &p_gc)
 	m_bestLapTimeLabel.load(p_gc);
 	m_lastLapTimeLabel.load(p_gc);
 	m_currentLapTimeLabel.load(p_gc);
+
+	m_bestOnlineTimeTitleLabel.load(p_gc);
+	m_bestOnlineTimeLabel.load(p_gc);
 }
 
 void RaceUIImpl::handleRaceGameStateChanges(Race::RaceGameState p_from, Race::RaceGameState p_to)

@@ -48,17 +48,27 @@ class GameLogicTimeTrailOnlineImpl
 
 		int m_lastLapNumber;
 
+		RankingEntry m_firstPlaceRankingEntry;
+		bool m_gotFirstPlaceRankingEntry;
+		bool m_sentRankingRequest;
+
 		CL_SlotContainer m_slots;
 
 
 		GameLogicTimeTrailOnlineImpl(GameLogicTimeTrailOnline *p_parent);
+		void connectRankingSignals();
+
 		~GameLogicTimeTrailOnlineImpl();
 
 		void update(unsigned p_timeElapsedMs);
 		void updateProgress();
 		void updateRemoteRanking();
+		void updateLocalRanking();
 
 		void applyGameState(const Net::GameState &p_gameState);
+
+		// slots
+		void onRankingEntriesReceived(const std::vector<PlacedRankingEntry> &p_entries);
 };
 
 GameLogicTimeTrailOnline::GameLogicTimeTrailOnline() :
@@ -70,9 +80,31 @@ GameLogicTimeTrailOnline::GameLogicTimeTrailOnline() :
 GameLogicTimeTrailOnlineImpl::GameLogicTimeTrailOnlineImpl(GameLogicTimeTrailOnline *p_parent) :
 		m_parent(p_parent),
 		m_basicClient(p_parent),
-		m_lastLapNumber(1)
+		m_lastLapNumber(1),
+		m_gotFirstPlaceRankingEntry(false),
+		m_sentRankingRequest(false)
 {
-	// empty
+	connectRankingSignals();
+}
+
+void GameLogicTimeTrailOnlineImpl::connectRankingSignals()
+{
+	Game &game = Game::getInstance();
+	Net::Client &client = game.getNetworkConnection();
+	Net::RankingClient &rankingClient = client.getRankingClient();
+
+	m_slots.connect(
+			rankingClient.sig_entriesReceived(),
+			this, &GameLogicTimeTrailOnlineImpl::onRankingEntriesReceived);
+}
+
+void GameLogicTimeTrailOnlineImpl::onRankingEntriesReceived(
+		const std::vector<PlacedRankingEntry> &p_entries)
+{
+	if (p_entries.size() == 1 && p_entries[0].place == 1) {
+		m_firstPlaceRankingEntry = p_entries[0];
+		m_gotFirstPlaceRankingEntry = true;
+	}
 }
 
 GameLogicTimeTrailOnline::~GameLogicTimeTrailOnline()
@@ -95,6 +127,7 @@ void GameLogicTimeTrailOnlineImpl::update(unsigned p_timeElapsedMs)
 {
 	m_basicClient.update();
 	updateProgress();
+	updateLocalRanking();
 }
 
 void GameLogicTimeTrailOnlineImpl::updateProgress()
@@ -130,6 +163,18 @@ void GameLogicTimeTrailOnlineImpl::updateRemoteRanking()
 	rankingClient.sendTimeAdvance(lapTimeMs);
 }
 
+void GameLogicTimeTrailOnlineImpl::updateLocalRanking()
+{
+	Game &game = Game::getInstance();
+	Net::Client &client = game.getNetworkConnection();
+
+	if (!m_gotFirstPlaceRankingEntry && !m_sentRankingRequest) {
+		Net::RankingClient &rankingClient = client.getRankingClient();
+		rankingClient.requestEntry(1);
+		m_sentRankingRequest = true;
+	}
+}
+
 void GameLogicTimeTrailOnline::applyGameState(const Net::GameState &p_gameState)
 {
 	m_impl->applyGameState(p_gameState);
@@ -138,6 +183,17 @@ void GameLogicTimeTrailOnline::applyGameState(const Net::GameState &p_gameState)
 void GameLogicTimeTrailOnlineImpl::applyGameState(const Net::GameState &p_gameState)
 {
 	m_basicClient.applyGameState(p_gameState);
+}
+
+bool GameLogicTimeTrailOnline::hasFirstPlaceRankingEntry() const
+{
+	return m_impl->m_gotFirstPlaceRankingEntry;
+}
+
+const RankingEntry &GameLogicTimeTrailOnline::getFirstPlaceRankingEntry() const
+{
+	G_ASSERT(hasFirstPlaceRankingEntry() && "entry not available");
+	return m_impl->m_firstPlaceRankingEntry;
 }
 
 }

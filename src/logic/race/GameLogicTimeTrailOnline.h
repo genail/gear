@@ -32,6 +32,8 @@
 
 #include "logic/race/GameLogicTimeTrail.h"
 
+class RankingEntry;
+
 namespace Net
 {
 class GameState;
@@ -52,6 +54,9 @@ class GameLogicTimeTrailOnline : public GameLogicTimeTrail
 
 		void applyGameState(const Net::GameState &p_gameState);
 
+
+		bool hasFirstPlaceRankingEntry() const;
+		const RankingEntry &getFirstPlaceRankingEntry() const;
 
 	private:
 

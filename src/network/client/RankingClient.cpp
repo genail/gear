@@ -28,9 +28,11 @@
 
 #include "RankingClient.h"
 
+#include "network/events.h"
 #include "common/Game.h"
 #include "network/client/Client.h"
 #include "network/packets/RankingAdvance.h"
+#include "network/packets/RankingEntries.h"
 #include "network/packets/RankingRequest.h"
 
 namespace Net
@@ -42,14 +44,14 @@ class RankingClientImpl
 
 		SIG_IMPL(RankingClient, entriesReceived);
 
-
 		Client *m_client;
-
 
 		RankingClientImpl(Client *p_client) :
 			m_client(p_client)
 		{ /* empty */ }
 
+		void parseEvent(const CL_NetGameEvent &p_event);
+		void parseEntriesEvent(const CL_NetGameEvent &p_event);
 };
 
 
@@ -97,6 +99,39 @@ void RankingClient::requestEntries(int p_placeFrom, int p_placeTo)
 
 	const CL_NetGameEvent netEvent = rankingRequestPacket.buildEvent();
 	m_impl->m_client->send(netEvent);
+}
+
+void RankingClient::parseEvent(const CL_NetGameEvent &p_event)
+{
+	m_impl->parseEvent(p_event);
+}
+
+void RankingClientImpl::parseEvent(const CL_NetGameEvent &p_event)
+{
+	const CL_String eventName = p_event.get_name();
+
+	if (eventName == EVENT_RANKING_ENTRIES) {
+		parseEntriesEvent(p_event);
+	} else {
+		cl_log_event(LOG_ERROR, "event remains unhandled: %1", p_event.to_string());
+	}
+}
+
+void RankingClientImpl::parseEntriesEvent(const CL_NetGameEvent &p_event)
+{
+	RankingEntries rankingEntriesPacket;
+	rankingEntriesPacket.parseEvent(p_event);
+
+	const int entryCount = rankingEntriesPacket.getEntryCount();
+	std::vector<PlacedRankingEntry> rankingEntries;
+	rankingEntries.reserve(entryCount);
+
+	for (int i = 0; i < entryCount; ++i) {
+		const PlacedRankingEntry &rankingEntry = rankingEntriesPacket.getEntry(i);
+		rankingEntries.push_back(rankingEntry);
+	}
+
+	m_sig_entriesReceived.invoke(rankingEntries);
 }
 
 }

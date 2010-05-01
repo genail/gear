@@ -167,6 +167,11 @@ void Client::onEventReceived(const CL_NetGameEvent &p_event)
 			onVoteTick(p_event);
 		}
 
+		// ranking events
+		else if (isRankingEvent(p_event)) {
+			m_rankingClient.parseEvent(p_event);
+		}
+
 		// unknown events remain unhandled
 
 		else {

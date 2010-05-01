@@ -39,17 +39,12 @@ class TimeTrailServerImpl
 	public:
 
 		TimeTrailServer *m_parent;
-
 		RankingService m_rankingServer;
 
 
 		TimeTrailServerImpl(TimeTrailServer *p_parent);
 
-
 		bool handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
-
-		bool isRankingEvent(const CL_NetGameEvent &p_event);
-
 		void handleRankingEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 };
 
@@ -87,12 +82,6 @@ bool TimeTrailServerImpl::handleEvent(CL_NetGameConnection *p_conn, const CL_Net
 	} else {
 		return false;
 	}
-}
-
-bool TimeTrailServerImpl::isRankingEvent(const CL_NetGameEvent &p_event)
-{
-	static const int PREFIX_LEN = strlen(EVENT_RANKING_PREFIX);
-	return p_event.get_name().substr(0, PREFIX_LEN) == EVENT_RANKING_PREFIX;
 }
 
 void TimeTrailServerImpl::handleRankingEvent(

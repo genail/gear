@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <ClanLib/core.h>
+#include <ClanLib/network.h>
 
 #include "common.h"
 #include "ranking/RankingEntry.h"
@@ -48,17 +49,17 @@ class RankingClient
 		RankingClient(Client *p_client);
 		virtual ~RankingClient();
 
-
 		void sendTimeAdvance(int p_lapTimeMs);
-
 		void requestEntry(int p_place);
-
 		void requestEntries(int p_placeFrom, int p_placeTo);
-
 
 	private:
 
 		CL_SharedPtr<RankingClientImpl> m_impl;
+
+		void parseEvent(const CL_NetGameEvent &p_event);
+
+		friend class Client;
 };
 
 }

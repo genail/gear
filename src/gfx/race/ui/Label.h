@@ -30,11 +30,11 @@
 
 #include <ClanLib/core.h>
 
-#include "common.h"
 #include "gfx/Drawable.h"
 
 namespace Gfx {
 
+class LabelImpl;
 class Label: public Gfx::Drawable {
 
 	public:
@@ -61,48 +61,25 @@ class Label: public Gfx::Drawable {
 
 		virtual ~Label();
 
-
-		virtual void draw(CL_GraphicContext &p_gc);
-
 		virtual void load(CL_GraphicContext &p_gc);
-
+		virtual void draw(CL_GraphicContext &p_gc);
 
 		/** Calculates height of this label in pixels */
 		float height();
-
-		/** Calculates width of this label in pixels */
-		DEPRECATED(float width());
-
 		CL_Size size(CL_GraphicContext &p_gc);
 
-
 		void setAttachPoint(int p_attachPoint);
-
 		void setColor(const CL_Colorf &p_color);
-
 		void setPosition(const CL_Pointf &p_pos);
-
 		void setText(const CL_String &p_text);
+
+		void setShadowVisible(bool p_visible);
+		void setShadowColor(const CL_Colorf &p_shadowColor);
+		void setShadowOffset(const CL_Vec2f &p_shadowOffset);
 
 	private:
 
-		CL_Pointf m_pos;
-
-		int m_attachPoint;
-
-		CL_String m_text;
-
-		const Font m_font;
-
-		const int m_size;
-
-		CL_Colorf m_color;
-
-		CL_Font *m_clFont;
-
-		CL_FontMetrics m_fontMetrics;
-
-		void calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y);
+		CL_SharedPtr<LabelImpl> m_impl;
 };
 
 }

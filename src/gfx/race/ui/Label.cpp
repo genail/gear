@@ -28,7 +28,7 @@
 
 #include "Label.h"
 
-#include <assert.h>
+#include "common/gassert.h"
 
 namespace Gfx {
 
@@ -41,44 +41,139 @@ const int Label::AP_CENTER = 16;
 const int AP_SIDES = Label::AP_LEFT | Label::AP_RIGHT;
 const int AP_TOPS = Label::AP_TOP | Label::AP_BOTTOM;
 
+class LabelImpl
+{
+	public:
+
+		Label *m_parent;
+
+		CL_Pointf m_pos;
+		int m_attachPoint;
+		CL_String m_text;
+		const Label::Font m_font;
+		const int m_size;
+		CL_Colorf m_color;
+
+		bool m_shadowVisible;
+		CL_Colorf m_shadowColor;
+		CL_Vec2f m_shadowOffset;
+
+		CL_Font *m_clFont;
+		CL_FontMetrics m_fontMetrics;
+
+
+		LabelImpl(
+				Label *p_parent,
+				const CL_Pointf &p_pos,
+				const CL_String &p_text,
+				Label::Font p_font,
+				int p_size,
+				const CL_Colorf &p_color);
+		~LabelImpl();
+
+		void load(CL_GraphicContext &p_gc);
+		void draw(CL_GraphicContext &p_gc);
+		void drawShadow(CL_GraphicContext &p_gc, const CL_Pointf &p_pos);
+
+		void calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y);
+};
+
 Label::Label(
-		const CL_Pointf &p_pos,
-		const CL_String &p_text,
-		Font p_font,
-		int p_size,
-		const CL_Colorf &p_color
-) :
+	const CL_Pointf &p_pos,
+	const CL_String &p_text,
+	Font p_font,
+	int p_size,
+	const CL_Colorf &p_color) :
+		m_impl(new LabelImpl(this, p_pos, p_text, p_font, p_size, p_color))
+{
+	// empty
+}
+
+LabelImpl::LabelImpl(
+	Label *p_parent,
+	const CL_Pointf &p_pos,
+	const CL_String &p_text,
+	Label::Font p_font,
+	int p_size,
+	const CL_Colorf &p_color) :
+		m_parent(p_parent),
 		m_pos(p_pos),
-		m_attachPoint(AP_LEFT | AP_BOTTOM),
+		m_attachPoint(Label::AP_LEFT | Label::AP_BOTTOM),
 		m_text(p_text),
 		m_font(p_font),
 		m_size(p_size),
 		m_color(p_color),
+		m_shadowVisible(false),
+		m_shadowColor(CL_Colorf::black),
+		m_shadowOffset(1.5f, 1.5f),
 		m_clFont(NULL)
 {
-		// empty
+	// empty
 }
 
 Label::~Label()
+{
+	// empty
+}
+
+LabelImpl::~LabelImpl()
 {
 	if (m_clFont) {
 		delete m_clFont;
 	}
 }
 
+void Label::load(CL_GraphicContext &p_gc)
+{
+	Drawable::load(p_gc);
+	m_impl->load(p_gc);
+}
+
+void LabelImpl::load(CL_GraphicContext &p_gc)
+{
+	CL_FontDescription desc;
+	desc.set_height(m_size);
+
+	if (m_font == Label::F_REGULAR || m_font == Label::F_BOLD) {
+		desc.set_typeface_name("tahoma");
+
+		if (m_font == Label::F_BOLD) {
+			desc.set_weight(100000);
+		}
+
+		m_clFont = new CL_Font_System(p_gc, desc);
+	} else {
+		desc.set_typeface_name("resources/pixel.ttf");
+		m_clFont = new CL_Font_Freetype(p_gc, desc);
+	}
+
+	// remember metrics
+	m_fontMetrics = m_clFont->get_font_metrics(p_gc);
+}
+
 void Label::draw(CL_GraphicContext &p_gc)
 {
-	assert(isLoaded());
+	m_impl->draw(p_gc);
+}
+
+void LabelImpl::draw(CL_GraphicContext &p_gc)
+{
+	G_ASSERT(m_parent->isLoaded());
 
 	float ax, ay;
-	const CL_Size s = size(p_gc);
+	const CL_Size s = m_parent->size(p_gc);
 
 	calculateAttachPoint(s.width, s.height, ax, ay);
 
-	const float x = m_pos.x - ax;
-	const float y = m_pos.y - ay - m_fontMetrics.get_descent();
+	CL_Pointf position;
+	position.x = m_pos.x - ax;
+	position.y = m_pos.y - ay - m_fontMetrics.get_descent();
 
-	m_clFont->draw_text(p_gc, x, y, m_text, m_color);
+	if (m_shadowVisible) {
+		drawShadow(p_gc, position);
+	}
+
+	m_clFont->draw_text(p_gc, position.x, position.y, m_text, m_color);
 
 #if !defined(NDEBUG) && defined(DRAW_LABEL_BOUNDS)
 	// draw label frame debug code
@@ -95,63 +190,39 @@ void Label::draw(CL_GraphicContext &p_gc)
 #endif // !NDEBUG && DRAW_LABEL_BOUNDS
 }
 
-void Label::load(CL_GraphicContext &p_gc)
+void LabelImpl::drawShadow(CL_GraphicContext &p_gc, const CL_Pointf &p_pos)
 {
-	Drawable::load(p_gc);
-
-	CL_FontDescription desc;
-	desc.set_height(m_size);
-
-	if (m_font == F_REGULAR || m_font == F_BOLD) {
-		desc.set_typeface_name("tahoma");
-
-		if (m_font == F_BOLD) {
-			desc.set_weight(100000);
-		}
-
-		m_clFont = new CL_Font_System(p_gc, desc);
-	} else {
-		desc.set_typeface_name("resources/pixel.ttf");
-		m_clFont = new CL_Font_Freetype(p_gc, desc);
-	}
-
-	// remember metrics
-	m_fontMetrics = m_clFont->get_font_metrics(p_gc);
+	CL_Pointf position;
+	position.x = p_pos.x + m_shadowOffset.x;
+	position.y = p_pos.y + m_shadowOffset.y;
+	m_clFont->draw_text(p_gc, position.x, position.y, m_text, m_shadowColor);
 }
 
 void Label::setColor(const CL_Colorf &p_color)
 {
-	m_color = p_color;
+	m_impl->m_color = p_color;
 }
 
 void Label::setPosition(const CL_Pointf &p_pos)
 {
-	m_pos = p_pos;
+	m_impl->m_pos = p_pos;
 }
 
 void Label::setText(const CL_String &p_text)
 {
-	m_text = p_text;
+	m_impl->m_text = p_text;
 }
 
 float Label::height()
 {
-	assert(isLoaded());
-	return m_fontMetrics.get_height();
-}
-
-float Label::width()
-{
-	assert(isLoaded());
-
-	//cl_log_event(LOG_DEBUG, "%1", m_fontMetrics.get_average_character_width());
-	return m_fontMetrics.get_average_character_width() * m_text.length() / 3;
+	G_ASSERT(isLoaded());
+	return m_impl->m_fontMetrics.get_height();
 }
 
 CL_Size Label::size(CL_GraphicContext &p_gc)
 {
-	assert(isLoaded());
-	return m_clFont->get_text_size(p_gc, m_text);
+	G_ASSERT(isLoaded());
+	return m_impl->m_clFont->get_text_size(p_gc, m_impl->m_text);
 }
 
 void Label::setAttachPoint(int p_attachPoint)
@@ -159,13 +230,13 @@ void Label::setAttachPoint(int p_attachPoint)
 	G_ASSERT(!((p_attachPoint & AP_LEFT) && (p_attachPoint & AP_RIGHT)) && "bad value");
 	G_ASSERT(!((p_attachPoint & AP_TOP) && (p_attachPoint & AP_BOTTOM)) && "bad value");
 
-	m_attachPoint = p_attachPoint;
+	m_impl->m_attachPoint = p_attachPoint;
 }
 
-void Label::calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y)
+void LabelImpl::calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y)
 {
 	if (m_attachPoint & AP_SIDES) {
-		if (m_attachPoint & AP_LEFT) {
+		if (m_attachPoint & Label::AP_LEFT) {
 			p_x = 0.0f;
 		} else {
 			p_x = p_w;
@@ -173,14 +244,14 @@ void Label::calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y)
 	}
 
 	if (m_attachPoint & AP_TOPS) {
-		if (m_attachPoint & AP_BOTTOM) {
+		if (m_attachPoint & Label::AP_BOTTOM) {
 			p_y = 0.0f;
 		} else {
 			p_y = -p_h;
 		}
 	}
 
-	if (m_attachPoint & AP_CENTER) {
+	if (m_attachPoint & Label::AP_CENTER) {
 		if (!(m_attachPoint & AP_TOPS)) {
 			p_y = -p_h / 2.0f;
 		}
@@ -189,6 +260,21 @@ void Label::calculateAttachPoint(float p_w, float p_h, float &p_x, float &p_y)
 			p_x = p_w / 2.0f;
 		}
 	}
+}
+
+void Label::setShadowVisible(bool p_visible)
+{
+	m_impl->m_shadowVisible = p_visible;
+}
+
+void Label::setShadowColor(const CL_Colorf &p_shadowColor)
+{
+	m_impl->m_shadowColor = p_shadowColor;
+}
+
+void Label::setShadowOffset(const CL_Vec2f &p_shadowOffset)
+{
+	m_impl->m_shadowOffset = p_shadowOffset;
 }
 
 } // namespace

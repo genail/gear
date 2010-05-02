@@ -72,6 +72,9 @@ RaceUITimeTrailImpl::RaceUITimeTrailImpl(
 		m_bestOnlineTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22)
 {
 	positionLapTimeLabels();
+
+	m_bestOnlineTimeTitleLabel.setShadowVisible(true);
+	m_bestOnlineTimeLabel.setShadowVisible(true);
 }
 
 void RaceUITimeTrailImpl::positionLapTimeLabels()

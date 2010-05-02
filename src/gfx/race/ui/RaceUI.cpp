@@ -31,10 +31,12 @@
 #include <map>
 
 #include "common/Game.h"
+#include "common/utils/rtti.h"
 #include "gfx/Stage.h"
 #include "gfx/Viewport.h"
 #include "gfx/race/ui/Label.h"
 #include "gfx/race/ui/PlayerList.h"
+#include "gfx/race/ui/RaceUITimeTrail.h"
 #include "gfx/race/ui/ScoreTable.h"
 #include "gfx/race/ui/SpeedMeter.h"
 #include "gfx/scenes/RaceScene.h"
@@ -59,6 +61,8 @@ class RaceUIImpl
 {
 	public:
 
+		Gfx::Drawable *m_modeBasedUI;
+
 		SpeedMeter m_speedMeter;
 		PlayerList m_playerList;
 		ScoreTable m_scoreTable;
@@ -76,9 +80,6 @@ class RaceUIImpl
 		Label m_lastLapTimeLabel;
 		Label m_currentLapTimeLabel;
 
-		Label m_bestOnlineTimeTitleLabel;
-		Label m_bestOnlineTimeLabel;
-
 		// Race logic pointer
 		const Race::GameLogic *m_logic;
 		Race::RaceGameState m_lastState;
@@ -94,9 +95,12 @@ class RaceUIImpl
 		RaceUIImpl(const Race::GameLogic *p_logic, const Gfx::Viewport *p_viewport);
 		void positionLapTimeLabels();
 
+		~RaceUIImpl();
 
 		void load(CL_GraphicContext &p_gc);
 		void loadLapTimeLabels(CL_GraphicContext &p_gc);
+
+		void draw(CL_GraphicContext &p_gc);
 
 		void watchRaceGameStateForChanges();
 		void handleRaceGameStateChanges(Race::RaceGameState p_from, Race::RaceGameState p_to);
@@ -124,6 +128,7 @@ RaceUI::RaceUI(const Race::GameLogic *p_logic, const Gfx::Viewport *p_viewport) 
 
 RaceUIImpl::RaceUIImpl(const Race::GameLogic *p_logic, const Gfx::Viewport *p_viewport)
 	:
+		m_modeBasedUI(NULL),
 		m_playerList(p_logic),
 		m_scoreTable(p_logic),
 		m_globMsgLabel(CL_Pointf(Stage::getWidth() / 2, Stage::getHeight() / 3), "", Label::F_BOLD, 36),
@@ -137,8 +142,6 @@ RaceUIImpl::RaceUIImpl(const Race::GameLogic *p_logic, const Gfx::Viewport *p_vi
 		m_bestLapTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22),
 		m_lastLapTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22),
 		m_currentLapTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22),
-		m_bestOnlineTimeTitleLabel(CL_Pointf(), _("Best Online Lap"), Label::F_BOLD, 22),
-		m_bestOnlineTimeLabel(CL_Pointf(), "", Label::F_REGULAR, 22),
 		m_logic(p_logic),
 		m_lastState(m_logic->getRaceGameState()),
 		m_viewport(p_viewport)
@@ -150,6 +153,11 @@ RaceUIImpl::RaceUIImpl(const Race::GameLogic *p_logic, const Gfx::Viewport *p_vi
 	m_countdownLabel.setAttachPoint(Label::AP_CENTER);
 
 	positionLapTimeLabels();
+
+	if (isInstance<const Race::GameLogicTimeTrailOnline>(p_logic)) {
+		m_modeBasedUI = new RaceUITimeTrail(
+				dynamic_cast<const Race::GameLogicTimeTrailOnline*>(p_logic));
+	}
 }
 
 void RaceUIImpl::positionLapTimeLabels()
@@ -172,12 +180,6 @@ void RaceUIImpl::positionLapTimeLabels()
 	y += ENTRY_HEIGHT;
 
 	m_lastLapTimeLabel.setPosition(CL_Pointf(stageWidth - TIME_MARGIN_RIGHT, y));
-	y += ENTRY_HEIGHT;
-
-	m_bestOnlineTimeTitleLabel.setPosition(CL_Pointf(stageWidth - TITLE_MARGIN_RIGHT, y));
-	y += ENTRY_HEIGHT;
-
-	m_bestOnlineTimeLabel.setPosition(CL_Pointf(stageWidth - TIME_MARGIN_RIGHT, y));
 
 
 	const float stageWidth2 = stageWidth / 2.0f;
@@ -189,6 +191,13 @@ void RaceUIImpl::positionLapTimeLabels()
 RaceUI::~RaceUI()
 {
 	// empty
+}
+
+RaceUIImpl::~RaceUIImpl()
+{
+	if (m_modeBasedUI) {
+		delete m_modeBasedUI;
+	}
 }
 
 void RaceUI::update(unsigned p_timeElapsed)
@@ -209,16 +218,25 @@ void RaceUIImpl::watchRaceGameStateForChanges()
 
 void RaceUI::draw(CL_GraphicContext &p_gc)
 {
-	m_impl->drawMeters(p_gc);
-	m_impl->drawVote(p_gc);
-	m_impl->drawMessageBoard(p_gc);
-	m_impl->drawLapLabel(p_gc);
-	m_impl->drawLapTimes(p_gc);
-	m_impl->drawCarLabels(p_gc);
-	m_impl->drawPlayerList(p_gc);
-//	m_impl->drawCountdown(p_gc); FIXME: reenable this
-	m_impl->drawGlobalMessage(p_gc);
-	m_impl->drawScoreTable(p_gc);
+	m_impl->draw(p_gc);
+}
+
+void RaceUIImpl::draw(CL_GraphicContext &p_gc)
+{
+	drawMeters(p_gc);
+	drawVote(p_gc);
+	drawMessageBoard(p_gc);
+	drawLapLabel(p_gc);
+	drawLapTimes(p_gc);
+	drawCarLabels(p_gc);
+	drawPlayerList(p_gc);
+//	drawCountdown(p_gc); FIXME: reenable this
+	drawGlobalMessage(p_gc);
+	drawScoreTable(p_gc);
+
+	if (m_modeBasedUI) {
+		m_modeBasedUI->draw(p_gc);
+	}
 }
 
 void RaceUIImpl::drawMeters(CL_GraphicContext &p_gc)
@@ -397,31 +415,11 @@ void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 	// current time
 	m_currentLapTimeLabel.setText(tcurr.raceFormat());
 
-
 	m_bestLapTimeTitleLabel.draw(p_gc);
 	m_lastLapTimeTitleLabel.draw(p_gc);
 	m_bestLapTimeLabel.draw(p_gc);
 	m_lastLapTimeLabel.draw(p_gc);
 	m_currentLapTimeLabel.draw(p_gc);
-
-	if (typeid(*m_logic) == typeid(Race::GameLogicTimeTrailOnline)) {
-
-		const Race::GameLogicTimeTrailOnline *timeTrailLogic =
-				dynamic_cast<const Race::GameLogicTimeTrailOnline*>(m_logic);
-
-		if (timeTrailLogic->hasFirstPlaceRankingEntry()) {
-			const RankingEntry &rankingEntry = timeTrailLogic->getFirstPlaceRankingEntry();
-			Math::Time bestTime(rankingEntry.timeMs);
-
-			m_bestOnlineTimeLabel.setText(
-					cl_format("%1 by %2", bestTime.raceFormat(), rankingEntry.name));
-		} else {
-			m_bestOnlineTimeLabel.setText("--:--:---");
-		}
-
-		m_bestOnlineTimeTitleLabel.draw(p_gc);
-		m_bestOnlineTimeLabel.draw(p_gc);
-	}
 }
 
 void RaceUIImpl::drawCarLabels(CL_GraphicContext &p_gc)
@@ -562,6 +560,10 @@ void RaceUIImpl::load(CL_GraphicContext &p_gc)
 	m_scoreTable.load(p_gc);
 
 	loadLapTimeLabels(p_gc);
+
+	if (m_modeBasedUI) {
+		m_modeBasedUI->load(p_gc);
+	}
 }
 
 void RaceUIImpl::loadLapTimeLabels(CL_GraphicContext &p_gc)
@@ -571,9 +573,6 @@ void RaceUIImpl::loadLapTimeLabels(CL_GraphicContext &p_gc)
 	m_bestLapTimeLabel.load(p_gc);
 	m_lastLapTimeLabel.load(p_gc);
 	m_currentLapTimeLabel.load(p_gc);
-
-	m_bestOnlineTimeTitleLabel.load(p_gc);
-	m_bestOnlineTimeLabel.load(p_gc);
 }
 
 void RaceUIImpl::handleRaceGameStateChanges(Race::RaceGameState p_from, Race::RaceGameState p_to)

@@ -47,7 +47,7 @@ class ScoreTable;
 class SpeedMeter;
 class Viewport;
 
-class RaceUI: public Gfx::Drawable {
+class RaceUI : public Gfx::Drawable {
 
 	public:
 

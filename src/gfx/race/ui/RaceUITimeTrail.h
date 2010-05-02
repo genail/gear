@@ -28,34 +28,36 @@
 
 #pragma once
 
-#include <ClanLib/display.h>
+#include <ClanLib/core.h>
 
-#include "common.h"
+#include "gfx/Drawable.h"
+
+namespace Race
+{
+class GameLogicTimeTrailOnline;
+};
 
 namespace Gfx
 {
 
-class Drawable : public boost::noncopyable {
-
+class RaceUITimeTrailImpl;
+class RaceUITimeTrail : public Gfx::Drawable
+{
 	public:
 
-		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
+		RaceUITimeTrail(const Race::GameLogicTimeTrailOnline *p_logic);
+		virtual ~RaceUITimeTrail();
 
-		bool isLoaded() const { return m_loaded; }
-
-	protected:
-
-		Drawable() :
-			m_loaded(false)
-			{}
+		virtual void load(CL_GraphicContext &p_gc);
+		virtual void draw(CL_GraphicContext &p_gc);
 
 	private:
 
-		bool m_loaded;
+		CL_SharedPtr<RaceUITimeTrailImpl> m_impl;
+
+		friend class RaceUITimeTrailImpl;
 
 };
 
-} // namespace
+}
 
-#pragma once

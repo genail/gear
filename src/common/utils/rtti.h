@@ -28,34 +28,19 @@
 
 #pragma once
 
-#include <ClanLib/display.h>
-
-#include "common.h"
-
-namespace Gfx
+template <class TargetType, class GivenType>
+bool isInstance(GivenType *p_ptr)
 {
+	try {
+		TargetType *tmp = dynamic_cast<TargetType*>(p_ptr);
+		return tmp != NULL;
+	} catch (std::bad_cast &e) {
+		return false;
+	}
+}
 
-class Drawable : public boost::noncopyable {
-
-	public:
-
-		virtual void load(CL_GraphicContext &p_gc) { m_loaded = true; }
-		virtual void draw(CL_GraphicContext &p_gc) = 0;
-
-		bool isLoaded() const { return m_loaded; }
-
-	protected:
-
-		Drawable() :
-			m_loaded(false)
-			{}
-
-	private:
-
-		bool m_loaded;
-
-};
-
-} // namespace
-
-#pragma once
+template <class TargetType, class GivenType>
+bool isInstance(GivenType p_var)
+{
+	return isInstance<TargetType>(&p_var);
+}

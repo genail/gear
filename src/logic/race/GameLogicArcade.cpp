@@ -28,6 +28,12 @@
 
 #include "GameLogicArcade.h"
 
+#include "common/gassert.h"
+#include "common/Game.h"
+#include "logic/race/Car.h"
+#include "logic/race/Progress.h"
+#include "logic/race/level/Level.h"
+
 namespace Race
 {
 
@@ -36,10 +42,19 @@ class GameLogicArcadeImpl
 	public:
 
 		GameLogicArcade *m_parent;
+		bool m_initialized;
 
 
 		GameLogicArcadeImpl(GameLogicArcade *p_parent);
 		~GameLogicArcadeImpl() {}
+		
+		void initialize();
+		void insertPlayerCar();
+		void putCarAtFirstStartPosition();
+		
+		void destroy();
+		void removePlayerCar();
+// 		
 };
 
 GameLogicArcade::GameLogicArcade() :
@@ -49,7 +64,8 @@ GameLogicArcade::GameLogicArcade() :
 }
 
 GameLogicArcadeImpl::GameLogicArcadeImpl(GameLogicArcade *p_parent) :
-		m_parent(p_parent)
+		m_parent(p_parent),
+		m_initialized(false)
 {
 	// empty
 }
@@ -62,11 +78,72 @@ GameLogicArcade::~GameLogicArcade()
 void GameLogicArcade::initialize()
 {
 	GameLogic::initialize();
+	m_impl->initialize();
+}
+
+void GameLogicArcadeImpl::initialize()
+{
+	G_ASSERT(!m_initialized);
+
+	insertPlayerCar();
+
+	m_initialized = true;
+}
+
+void GameLogicArcadeImpl::insertPlayerCar()
+{
+	Level &level = m_parent->getLevel();
+	Progress &progress = m_parent->getProgressObject();
+
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Car &car = player.getCar();
+
+	level.addCar(&car);
+	progress.addCar(&car);
+
+	putCarAtFirstStartPosition();
+}
+
+void GameLogicArcadeImpl::putCarAtFirstStartPosition()
+{
+	Level &level = m_parent->getLevel();
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Car &car = player.getCar();
+
+	CL_Pointf startPosition;
+	CL_Angle startAngle;
+
+	level.getStartPosAndRot(1, &startPosition, &startAngle);
+	car.setPosition(startPosition);
+	car.setAngle(startAngle);
 }
 
 void GameLogicArcade::destroy()
 {
 	GameLogic::destroy();
+	m_impl->destroy();
+}
+
+void GameLogicArcadeImpl::destroy()
+{
+	G_ASSERT(m_initialized);
+	removePlayerCar();
+	m_initialized = false;
+}
+
+void GameLogicArcadeImpl::removePlayerCar()
+{
+	Level &level = m_parent->getLevel();
+	Progress &progress = m_parent->getProgressObject();
+
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Car &car = player.getCar();
+
+	level.removeCar(&car);
+	progress.removeCar(&car);
 }
 
 }

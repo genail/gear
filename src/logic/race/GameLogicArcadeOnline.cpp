@@ -26,47 +26,51 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GameLogicArcade.h"
+#include "GameLogicArcadeOnline.h"
+
+#include "logic/race/BasicGameClient.h"
 
 namespace Race
 {
 
-class GameLogicArcadeImpl
+class GameLogicArcadeOnlineImpl
 {
 	public:
 
-		GameLogicArcade *m_parent;
+		GameLogicArcadeOnline *m_parent;
+		BasicGameClient m_basicClient;
 
 
-		GameLogicArcadeImpl(GameLogicArcade *p_parent);
-		~GameLogicArcadeImpl() {}
+		GameLogicArcadeOnlineImpl(GameLogicArcadeOnline *p_parent);
+		~GameLogicArcadeOnlineImpl();
 };
 
-GameLogicArcade::GameLogicArcade() :
-		m_impl(new GameLogicArcadeImpl(this))
+GameLogicArcadeOnline::GameLogicArcadeOnline() :
+		m_impl(new GameLogicArcadeOnlineImpl(this))
 {
 	// empty
 }
 
-GameLogicArcadeImpl::GameLogicArcadeImpl(GameLogicArcade *p_parent) :
-		m_parent(p_parent)
+GameLogicArcadeOnlineImpl::GameLogicArcadeOnlineImpl(GameLogicArcadeOnline *p_parent) :
+		m_parent(p_parent),
+		m_basicClient(p_parent)
 {
 	// empty
 }
 
-GameLogicArcade::~GameLogicArcade()
+GameLogicArcadeOnline::~GameLogicArcadeOnline()
 {
 	// empty
 }
 
-void GameLogicArcade::initialize()
+GameLogicArcadeOnlineImpl::~GameLogicArcadeOnlineImpl()
 {
-	GameLogic::initialize();
+	// empty
 }
 
-void GameLogicArcade::destroy()
+void GameLogicArcadeOnline::applyGameState(const Net::GameState &p_gameState)
 {
-	GameLogic::destroy();
+	m_impl->m_basicClient.applyGameState(p_gameState);
 }
 
 }

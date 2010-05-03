@@ -26,47 +26,38 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GameLogicArcade.h"
+#pragma once
+
+#include <ClanLib/core.h>
+
+#include "logic/race/GameLogicArcade.h"
+
+namespace Net
+{
+class GameState;
+}
 
 namespace Race
 {
 
-class GameLogicArcadeImpl
+class GameLogicArcadeOnlineImpl;
+class GameLogicArcadeOnline : public GameLogicArcade
 {
 	public:
 
-		GameLogicArcade *m_parent;
+		GameLogicArcadeOnline();
+		virtual ~GameLogicArcadeOnline();
 
 
-		GameLogicArcadeImpl(GameLogicArcade *p_parent);
-		~GameLogicArcadeImpl() {}
+		void applyGameState(const Net::GameState &p_gameState);
+
+	private:
+
+		CL_SharedPtr<GameLogicArcadeOnlineImpl> m_impl;
+
+		friend class GameLogicArcadeOnlineImpl;
+
 };
 
-GameLogicArcade::GameLogicArcade() :
-		m_impl(new GameLogicArcadeImpl(this))
-{
-	// empty
 }
 
-GameLogicArcadeImpl::GameLogicArcadeImpl(GameLogicArcade *p_parent) :
-		m_parent(p_parent)
-{
-	// empty
-}
-
-GameLogicArcade::~GameLogicArcade()
-{
-	// empty
-}
-
-void GameLogicArcade::initialize()
-{
-	GameLogic::initialize();
-}
-
-void GameLogicArcade::destroy()
-{
-	GameLogic::destroy();
-}
-
-}

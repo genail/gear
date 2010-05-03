@@ -141,45 +141,28 @@ class MainMenuControllerImpl
 
 
 		MainMenuControllerImpl(MainMenuScene *p_scene);
-
 		void createScenes();
-
 		void connectMainMenuSceneButtons();
-
 		void prepareConnectionThread();
 
 		~MainMenuControllerImpl();
-
 		void destroyScenes();
-
 
 		// action handlers
 
 		void onRaceStartClicked();
-
 		void displayError(const CL_String &p_text);
-
 		bool playerNameChosen() const;
-
 		void makeNetworkConnection();
-
 		void startOfflineGame();
-
 		CL_String getGameServerHost();
-
 		int getGameServerPort();
 
-
 		void onQuitClicked();
-
 		void onOptionClicked();
-
 		void onAuthorsClicked();
-
 		void onEditorClicked();
-
 		void onConnectionThreadFinished();
-
 		void startOnlineGame();
 };
 

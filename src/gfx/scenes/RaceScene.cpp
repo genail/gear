@@ -39,7 +39,7 @@
 #include "logic/VoteSystem.h"
 #include "logic/race/Block.h"
 #include "logic/race/GameLogic.h"
-#include "logic/race/GameLogicTimeTrail.h"
+#include "logic/race/GameLogicArcadeOnline.h"
 #include "logic/race/GameLogicTimeTrailOnline.h"
 #include "logic/race/ScoreTable.h"
 #include "network/events.h"
@@ -113,6 +113,7 @@ class RaceSceneImpl
 		void initializeOffline(Race::Level *p_level);
 		void initializeOnline(TGameMode p_gameMode, const Net::GameState &p_gameState);
 		void initTimeTrailOnlineLogic(const Net::GameState &p_gameState);
+		void initArcadeOnlineLogic(const Net::GameState &p_gameState);
 		void loadLevel(const CL_String &p_levelName);
 		void destroy();
 
@@ -197,7 +198,7 @@ void RaceSceneImpl::initializeOnline(TGameMode p_gameMode, const Net::GameState 
 
 	switch (p_gameMode) {
 		case GM_ARCADE:
-			G_ASSERT(0 && "not supported yet");
+			initArcadeOnlineLogic(p_gameState);
 			break;
 
 		case GM_TIME_TRAIL:
@@ -218,11 +219,23 @@ void RaceSceneImpl::initTimeTrailOnlineLogic(const Net::GameState &p_gameState)
 
 	const CL_String &levelName = p_gameState.getLevel();
 	loadLevel(levelName);
-
 	timeTrailLogic->setLevel(m_level);
 
 	timeTrailLogic->applyGameState(p_gameState);
 	m_logic = timeTrailLogic;
+}
+
+void RaceSceneImpl::initArcadeOnlineLogic(const Net::GameState &p_gameState)
+{
+	cl_log_event(LOG_DEBUG, "building ARCADE logic");
+	Race::GameLogicArcadeOnline *arcadeLogic = new Race::GameLogicArcadeOnline();
+
+	const CL_String &levelName = p_gameState.getLevel();
+	loadLevel(levelName);
+	arcadeLogic->setLevel(m_level);
+
+	arcadeLogic->applyGameState(p_gameState);
+	m_logic = arcadeLogic;
 }
 
 void RaceSceneImpl::loadLevel(const CL_String &p_levelName)

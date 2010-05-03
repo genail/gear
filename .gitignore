@@ -3,6 +3,7 @@
 *.dia.autosave
 /.cproject
 /.project
+/.kdev4/
 /.settings/
 MakeFile
 Makefile
@@ -14,6 +15,7 @@ src/server
 src/test_suite
 Testing
 gear.cfg
+gear.kdev4
 *.obj
 *.vcproj
 *.user

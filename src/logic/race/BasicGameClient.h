@@ -30,6 +30,8 @@
 
 #include <ClanLib/core.h>
 
+#include "common/types.h"
+
 namespace Net
 {
 class GameState;
@@ -51,6 +53,7 @@ class BasicGameClient
 		void update();
 
 		void applyGameState(const Net::GameState &p_gameState);
+		void callAVote(VoteType p_voteType, const CL_String &p_subject);
 
 
 	private:

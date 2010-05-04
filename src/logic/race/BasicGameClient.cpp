@@ -28,8 +28,10 @@
 
 #include "BasicGameClient.h"
 
+#include "common/loglevels.h"
 #include "common/Game.h"
 #include "common/RemotePlayer.h"
+#include "logic/VoteSystem.h"
 #include "logic/race/GameLogic.h"
 #include "logic/race/level/Level.h"
 #include "network/client/Client.h"
@@ -77,6 +79,13 @@ class BasicGameClientImpl
 		void applyGameState(const Net::GameState &p_gameState);
 		void positionLocalPlayerCar(const Net::CarState &p_carState);
 		void applyCarState(Race::Car &p_car, const Net::CarState &p_carState);
+		
+		void onVoteStated(
+				VoteType p_voteType,
+				const CL_String& p_subject,
+				unsigned p_timeLimit);
+		void onVoteTickReceived(VoteOption p_option);
+		void onVoteEnded(VoteResult p_voteResult);
 };
 
 BasicGameClient::BasicGameClient(GameLogic *p_gameLogic) :
@@ -103,6 +112,18 @@ BasicGameClientImpl::BasicGameClientImpl(BasicGameClient *p_parent, GameLogic *p
 	m_slots.connect(
 			m_netClient.sig_carStateReceived(),
 			this, &BasicGameClientImpl::onCarStateReceived);
+			
+	m_slots.connect(
+			m_netClient.sig_voteStarted(),
+			this, &BasicGameClientImpl::onVoteStated);
+			
+	m_slots.connect(
+			m_netClient.sig_voteTickReceived(),
+			this, &BasicGameClientImpl::onVoteTickReceived);
+			
+	m_slots.connect(
+			m_netClient.sig_voteEnded(),
+			this, &BasicGameClientImpl::onVoteEnded);
 }
 
 BasicGameClient::~BasicGameClient()
@@ -259,6 +280,34 @@ Race::Car &p_car, const Net::CarState &p_carState)
 {
 	CL_NetGameEvent serializedCarData = p_carState.getSerializedData();
 	p_car.deserialize(serializedCarData);
+}
+
+void BasicGameClient::callAVote(VoteType p_voteType, const CL_String &p_subject)
+{
+	m_impl->m_netClient.callAVote(p_voteType, p_subject);
+}
+
+void BasicGameClientImpl::onVoteStated(
+		VoteType p_voteType,
+		const CL_String& p_subject,
+		unsigned p_timeLimit)
+{
+	VoteSystem &voteSystem = m_gameLogic->getVoteSystem();
+	voteSystem.start(p_voteType, m_namePlayerMap.size(), p_timeLimit * 1000);
+}
+
+void BasicGameClientImpl::onVoteTickReceived(VoteOption p_option)
+{
+	VoteSystem &voteSystem = m_gameLogic->getVoteSystem();
+	voteSystem.addVote(p_option);
+}
+
+void BasicGameClientImpl::onVoteEnded(VoteResult p_voteResult)
+{
+	VoteSystem &voteSystem = m_gameLogic->getVoteSystem();
+	if (!voteSystem.isFinished()) {
+		cl_log_event(LOG_WARN, "Local vote system is acting diffrently to remote vote system. Something is wrong!");
+	}
 }
 
 }

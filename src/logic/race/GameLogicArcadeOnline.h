@@ -51,6 +51,8 @@ class GameLogicArcadeOnline : public GameLogicArcade
 		virtual void update(unsigned p_timeElapsedMs);
 
 		void applyGameState(const Net::GameState &p_gameState);
+		
+		virtual void callAVote(VoteType p_voteType, const CL_String &p_subject);
 
 	private:
 

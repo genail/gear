@@ -30,6 +30,8 @@
 
 #include <ClanLib/core.h>
 
+#include "common/types.h"
+
 class VoteSystem;
 
 namespace Race
@@ -77,6 +79,7 @@ class GameLogic
 		VoteSystem &getVoteSystem();
 		const VoteSystem &getVoteSystem() const;
 		const MessageBoard &getMessageBoard() const;
+		virtual void callAVote(VoteType p_voteType, const CL_String &p_subject);
 
 	protected:
 

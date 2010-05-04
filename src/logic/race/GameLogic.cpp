@@ -287,4 +287,9 @@ int GameLogic::getLapCount() const
 	return m_impl->m_lapCount;
 }
 
+void GameLogic::callAVote(VoteType p_voteType, const CL_String &p_subject)
+{
+	G_ASSERT(0 && "not supported by this class");
+}
+
 }

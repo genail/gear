@@ -86,4 +86,10 @@ void GameLogicArcadeOnlineImpl::update(unsigned p_timeElapsedMs)
 	m_basicClient.update();
 }
 
+void GameLogicArcadeOnline::callAVote(
+		VoteType p_voteType, const CL_String& p_subject)
+{
+	m_impl->m_basicClient.callAVote(p_voteType, p_subject);
+}
+
 }

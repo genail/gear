@@ -92,6 +92,5 @@ void GameMenuControllerImpl::onExitClicked()
 void GameMenuControllerImpl::onVoteClicked()
 {
 	m_gameMenu->setVisible(false);
-	G_ASSERT(0 && "not supported by now");
-//	(*m_raceLogic)->callAVote(VOTE_RESTART_RACE);
+	(*m_raceLogic)->callAVote(VOTE_RESTART_RACE, "");
 }

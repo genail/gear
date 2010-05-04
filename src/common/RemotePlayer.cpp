@@ -35,14 +35,22 @@ class RemotePlayerImpl
 {
 	public:
 
+		RemotePlayer *m_parent;
 		Net::RemoteCar m_remoteCar;
-//		Race::Car m_remoteCar;
 
+		RemotePlayerImpl(RemotePlayer *p_parent);
 };
 
 RemotePlayer::RemotePlayer(const CL_String &p_name) :
 	Player(p_name),
-	m_impl(new RemotePlayerImpl())
+	m_impl(new RemotePlayerImpl(this))
+{
+	// empty
+}
+
+RemotePlayerImpl::RemotePlayerImpl(RemotePlayer *p_parent) :
+	m_parent(p_parent),
+	m_remoteCar(p_parent)
 {
 	// empty
 }

@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <boost/test/unit_test.hpp>
 
+#include "common/Player.h"
 #include "logic/race/Car.h"
 
 /*
@@ -47,7 +48,8 @@ BOOST_AUTO_TEST_SUITE(CarTest)
 
 BOOST_AUTO_TEST_CASE(SerializeTest)
 {
-	Race::Car car1, car2;
+	Player player("");
+	Race::Car car1(&player), car2(&player);
 
 	BOOST_REQUIRE(car1 == car2);
 
@@ -73,7 +75,8 @@ BOOST_AUTO_TEST_CASE(SerializeTest)
 
 BOOST_AUTO_TEST_CASE(CloneTest)
 {
-	Race::Car car1, car2, car3;
+	Player player("");
+	Race::Car car1(&player), car2(&player), car3(&player);
 
 	BOOST_REQUIRE(car1 == car2);
 

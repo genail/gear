@@ -161,10 +161,10 @@ RaceUIImpl::RaceUIImpl(const Race::GameLogic *p_logic, const Gfx::Viewport *p_vi
 	m_lastLapTimeLabel.setShadowVisible(true);
 	m_currentLapTimeLabel.setShadowVisible(true);
 
-	if (isInstance<const Race::GameLogicTimeTrailOnline>(p_logic)) {
+	/*if (isInstance<const Race::GameLogicTimeTrailOnline>(p_logic)) {
 		m_modeBasedUI = new RaceUITimeTrail(
 				dynamic_cast<const Race::GameLogicTimeTrailOnline*>(p_logic));
-	}
+	}*/
 }
 
 void RaceUIImpl::positionLapTimeLabels()

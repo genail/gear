@@ -145,13 +145,6 @@ CL_String floatToHex(float p_num);
 
 float hexToFloat(const CL_String &p_str);
 
-
-Car::Car() :
-		m_impl(new CarImpl(this, NULL))
-{
-	// empty
-}
-
 Car::Car(Player *p_owner) :
 		m_impl(new CarImpl(this, p_owner))
 {

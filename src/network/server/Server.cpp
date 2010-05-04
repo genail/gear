@@ -29,6 +29,7 @@
 #include "Server.h"
 
 #include "common.h"
+#include "common/Player.h"
 #include "common/Properties.h"
 #include "logic/VoteSystem.h"
 #include "logic/race/Car.h"
@@ -68,13 +69,15 @@ class ServerImpl
 
 			bool m_gameStateSent;
 
+			CL_SharedPtr< ::Player > m_player;
 			CL_SharedPtr<Race::Car> m_car;
 
 			CarState m_lastCarState;
 
 			Player() :
 				m_gameStateSent(false),
-				m_car(new Race::Car())
+				m_player(new ::Player("")),
+				m_car(new Race::Car(m_player.get()))
 			{}
 		};
 

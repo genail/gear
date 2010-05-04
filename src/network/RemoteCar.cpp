@@ -29,6 +29,7 @@
 #include "RemoteCar.h"
 
 #include "common/workarounds.h"
+#include "common/Player.h"
 #include "math/Float.h"
 
 namespace Net
@@ -53,16 +54,23 @@ class RemoteCarImpl
 		// Smooth pass float
 		// 0.0 is old car, 1.0 is new car
 		Math::Float m_passFloat;
-
 		mutable CL_Pointf m_pos;
-
 		mutable CL_Angle m_rot;
+		
+		RemoteCarImpl(Player *p_owner);
+		
 };
 
-RemoteCar::RemoteCar() :
-	m_impl(new RemoteCarImpl())
+RemoteCar::RemoteCar(Player *p_owner) :
+	Car(p_owner),
+	m_impl(new RemoteCarImpl(p_owner))
 {
 	// empty
+}
+
+RemoteCarImpl::RemoteCarImpl(Player *p_owner) :
+	m_phantomCar(p_owner)
+{
 }
 
 RemoteCar::~RemoteCar()

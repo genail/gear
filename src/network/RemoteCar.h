@@ -33,6 +33,8 @@
 
 #include "logic/race/Car.h"
 
+class Player;
+
 namespace Net
 {
 
@@ -42,18 +44,13 @@ class RemoteCar : public Race::Car
 {
 	public:
 
-		RemoteCar();
-
+		RemoteCar(Player *p_owner);
 		virtual ~RemoteCar();
 
-
 		virtual const CL_Pointf& getPosition() const;
-
 		virtual const CL_Angle &getCorpseAngle() const;
 
-
 		virtual void deserialize(const CL_NetGameEvent &p_data);
-
 		virtual void update(unsigned int p_elapsedMS);
 
 	private:

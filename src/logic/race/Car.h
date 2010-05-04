@@ -74,8 +74,6 @@ class Car : boost::noncopyable
 {
 
 	public:
-
-		DEPRECATED(Car());
 		Car(Player *p_owner);
 		virtual ~Car();
 

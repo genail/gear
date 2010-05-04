@@ -130,6 +130,7 @@ SET(SERVER_SRCS
 
 SET(TEST_SRCS
 	# tested classes
+	common/Player.cpp
 	gfx/DebugLayer.cpp
 	gfx/Stage.cpp
 	gfx/race/ui/Label.cpp

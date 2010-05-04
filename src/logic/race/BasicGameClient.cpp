@@ -65,7 +65,7 @@ class BasicGameClientImpl
 
 		void onPlayerJoined(const CL_String &p_name);
 		bool playerExists(const CL_String &p_name);
-		void createNewPlayer(const CL_String &p_name);
+		RemotePlayer& createNewPlayer(const CL_String &p_name);
 		void addPlayerCarToLevel(RemotePlayer &p_remotePlayer);
 
 		void onPlayerLeaved(const CL_String &p_name);
@@ -73,7 +73,8 @@ class BasicGameClientImpl
 		void removePlayerCarFromLevel(RemotePlayer &p_remotePlayer);
 
 		void applyGameState(const Net::GameState &p_gameState);
-		void applyCarState(RemotePlayer &p_remotePlayer, const Net::CarState &p_carState);
+		void positionLocalPlayerCar(const Net::CarState &p_carState);
+		void applyCarState(Race::Car &p_car, const Net::CarState &p_carState);
 };
 
 BasicGameClient::BasicGameClient(GameLogic *p_gameLogic) :
@@ -161,12 +162,13 @@ bool BasicGameClientImpl::playerExists(const CL_String &p_name)
 	return m_namePlayerMap.find(p_name) != m_namePlayerMap.end();
 }
 
-void BasicGameClientImpl::createNewPlayer(const CL_String &p_name)
+RemotePlayer& BasicGameClientImpl::createNewPlayer(const CL_String &p_name)
 {
 	CL_SharedPtr<RemotePlayer> remotePlayer(new RemotePlayer(p_name));
 	m_namePlayerMap[p_name] = remotePlayer;
 
-	addPlayerCarToLevel(*remotePlayer.get());
+	addPlayerCarToLevel(*remotePlayer);
+	return *remotePlayer;
 }
 
 void BasicGameClientImpl::addPlayerCarToLevel(RemotePlayer &p_remotePlayer)
@@ -189,7 +191,7 @@ void BasicGameClientImpl::removePlayer(const CL_String &p_name)
 	CL_SharedPtr<RemotePlayer> remotePlayer = m_namePlayerMap[p_name];
 	m_namePlayerMap.erase(p_name);
 
-	removePlayerCarFromLevel(*remotePlayer.get());
+	removePlayerCarFromLevel(*remotePlayer);
 }
 
 void BasicGameClientImpl::removePlayerCarFromLevel(RemotePlayer &p_remotePlayer)
@@ -205,23 +207,41 @@ void BasicGameClient::applyGameState(const Net::GameState &p_gameState)
 
 void BasicGameClientImpl::applyGameState(const Net::GameState &p_gameState)
 {
+	Game &game = Game::getInstance();
+	Player &localPlayer = game.getPlayer();
+	const CL_String &localPlayerName = localPlayer.getName();
+	
+	
 	const int playerCount = p_gameState.getPlayerCount();
 	for (int i = 0; i < playerCount; ++i) {
 		const CL_String &playerName = p_gameState.getPlayerName(i);
-		CL_SharedPtr<RemotePlayer> remotePlayer(new RemotePlayer(playerName));
-		m_namePlayerMap[playerName] = remotePlayer;
-
+		
 		const Net::CarState &carState = p_gameState.getCarState(i);
-		applyCarState(*remotePlayer.get(), carState);
+		
+		if (playerName == localPlayerName) {
+			positionLocalPlayerCar(carState);
+		} else {
+			RemotePlayer &remotePlayer = createNewPlayer(playerName);
+			Race::Car &remotePlayerCar = remotePlayer.getCar();
+			applyCarState(remotePlayerCar, carState);
+		}
 	}
 }
 
-void BasicGameClientImpl::applyCarState(
-		RemotePlayer &p_remotePlayer, const Net::CarState &p_carState)
+void BasicGameClientImpl::positionLocalPlayerCar(const Net::CarState &p_carState)
 {
-	Race::Car &car = p_remotePlayer.getCar();
+	Game &game = Game::getInstance();
+	Player &localPlayer = game.getPlayer();
+	Race::Car &localPlayerCar = localPlayer.getCar();
+	
+	applyCarState(localPlayerCar, p_carState);
+}
+
+void BasicGameClientImpl::applyCarState(
+Race::Car &p_car, const Net::CarState &p_carState)
+{
 	CL_NetGameEvent serializedCarData = p_carState.getSerializedData();
-	car.deserialize(serializedCarData);
+	p_car.deserialize(serializedCarData);
 }
 
 }

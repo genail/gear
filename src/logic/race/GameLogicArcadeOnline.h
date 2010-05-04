@@ -48,6 +48,7 @@ class GameLogicArcadeOnline : public GameLogicArcade
 		GameLogicArcadeOnline();
 		virtual ~GameLogicArcadeOnline();
 
+		virtual void update(unsigned p_timeElapsedMs);
 
 		void applyGameState(const Net::GameState &p_gameState);
 

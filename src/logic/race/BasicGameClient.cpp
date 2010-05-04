@@ -71,6 +71,8 @@ class BasicGameClientImpl
 		void onPlayerLeaved(const CL_String &p_name);
 		void removePlayer(const CL_String &p_name);
 		void removePlayerCarFromLevel(RemotePlayer &p_remotePlayer);
+		
+		void onCarStateReceived(const Net::CarState &p_carState);
 
 		void applyGameState(const Net::GameState &p_gameState);
 		void positionLocalPlayerCar(const Net::CarState &p_carState);
@@ -97,6 +99,10 @@ BasicGameClientImpl::BasicGameClientImpl(BasicGameClient *p_parent, GameLogic *p
 	m_slots.connect(
 			m_netClient.sig_playerLeaved(),
 			this, &BasicGameClientImpl::onPlayerLeaved);
+	
+	m_slots.connect(
+			m_netClient.sig_carStateReceived(),
+			this, &BasicGameClientImpl::onCarStateReceived);
 }
 
 BasicGameClient::~BasicGameClient()
@@ -198,6 +204,17 @@ void BasicGameClientImpl::removePlayerCarFromLevel(RemotePlayer &p_remotePlayer)
 {
 	Race::Level &level = m_gameLogic->getLevel();
 	level.removeCar(&p_remotePlayer.getCar());
+}
+
+void BasicGameClientImpl::onCarStateReceived(const Net::CarState &p_carState)
+{
+	const CL_String &playerName = p_carState.getName();
+	if (playerExists(playerName)) {
+		RemotePlayer &remotePlayer = *m_namePlayerMap[playerName];
+		Race::Car &car = remotePlayer.getCar();
+		
+		applyCarState(car, p_carState);
+	}
 }
 
 void BasicGameClient::applyGameState(const Net::GameState &p_gameState)

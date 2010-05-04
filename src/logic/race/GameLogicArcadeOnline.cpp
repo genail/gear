@@ -43,6 +43,8 @@ class GameLogicArcadeOnlineImpl
 
 		GameLogicArcadeOnlineImpl(GameLogicArcadeOnline *p_parent);
 		~GameLogicArcadeOnlineImpl();
+		
+		void update(unsigned p_timeElapsedMs);
 };
 
 GameLogicArcadeOnline::GameLogicArcadeOnline() :
@@ -71,6 +73,17 @@ GameLogicArcadeOnlineImpl::~GameLogicArcadeOnlineImpl()
 void GameLogicArcadeOnline::applyGameState(const Net::GameState &p_gameState)
 {
 	m_impl->m_basicClient.applyGameState(p_gameState);
+}
+
+void GameLogicArcadeOnline::update(unsigned p_timeElapsedMs)
+{
+	GameLogicArcade::update(p_timeElapsedMs);
+	m_impl->update(p_timeElapsedMs);
+}
+
+void GameLogicArcadeOnlineImpl::update(unsigned p_timeElapsedMs)
+{
+	m_basicClient.update();
 }
 
 }

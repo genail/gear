@@ -146,4 +146,9 @@ void GameLogicArcadeImpl::removePlayerCar()
 	progress.removeCar(&car);
 }
 
+void GameLogicArcade::update(unsigned p_timeElapsedMs)
+{
+	GameLogic::update(p_timeElapsedMs);
+}
+
 }

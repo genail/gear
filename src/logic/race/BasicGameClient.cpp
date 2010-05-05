@@ -310,4 +310,14 @@ void BasicGameClientImpl::onVoteEnded(VoteResult p_voteResult)
 	}
 }
 
+void BasicGameClient::voteYes()
+{
+	m_impl->m_netClient.voteYes();
+}
+
+void BasicGameClient::voteNo()
+{
+	m_impl->m_netClient.voteNo();
+}
+
 }

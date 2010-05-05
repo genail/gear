@@ -394,17 +394,21 @@ void RaceSceneImpl::handleInput(InputState p_state, const CL_InputEvent& p_event
 		car.setBrake(pressed);
 	} else {
 
-		VoteSystem &voteSystem = m_logic->getVoteSystem();
-
+		// what the fuck?! If I don't cast this logic to const GameLogic
+		// then I'll receive errors about protected function.
+		const Race::GameLogic *constGameLogic =
+				dynamic_cast<const Race::GameLogic*>(m_logic);
+		const VoteSystem &voteSystem = constGameLogic->getVoteSystem();
+		
 		switch (p_event.id) {
 			case CL_KEY_F1:
 				if (pressed && voteSystem.isRunning()) {
-					voteSystem.addVote(VOTE_YES);
+					m_logic->voteYes();
 				}
 				break;
 			case CL_KEY_F2:
 				if (pressed && voteSystem.isRunning()) {
-					voteSystem.addVote(VOTE_NO);
+					m_logic->voteNo();
 				}
 			case CL_KEY_TAB:
 				if (pressed) {

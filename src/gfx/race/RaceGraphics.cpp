@@ -83,7 +83,7 @@ class RaceGraphicsImpl
 		/** Logic car to gfx car mapping */
 		typedef std::map<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMapping;
 		typedef std::pair<const Race::Car*, CL_SharedPtr<Gfx::Car> > TCarMappingPair;
-		TCarMapping m_carMapping;
+		TCarMapping m_carGfxMapping;
 
 		/** Car smoke periods */
 		typedef std::map<const Race::Car*, unsigned> TCarPeriodMap;
@@ -121,7 +121,8 @@ class RaceGraphicsImpl
 		// update routines
 		void updateViewport(unsigned p_timeElapsed);
 		void updateSmokes(unsigned p_timeElapsed);
-		void updateCars(unsigned p_timeElapsed);
+		void updateCarGfxs(unsigned p_timeElapsed);
+		void updateCarGfxMapping();
 		void updateTyreStripes();
 
 
@@ -434,20 +435,18 @@ void RaceGraphicsImpl::drawCars(CL_GraphicContext &p_gc)
 
 void RaceGraphicsImpl::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 {
-	TCarMapping::iterator itor = m_carMapping.find(&p_car);
-
-	CL_SharedPtr<Gfx::Car> gfxCar;
-
-	if (itor == m_carMapping.end()) {
-		gfxCar = CL_SharedPtr<Gfx::Car>(new Gfx::Car(&p_car));
-		gfxCar->load(p_gc);
-
-		m_carMapping[&p_car] = gfxCar;
-	} else {
-		gfxCar = itor->second;
+	TCarMapping::iterator itor = m_carGfxMapping.find(&p_car);
+	if (itor == m_carGfxMapping.end()) {
+		return;
 	}
 
-	gfxCar->draw(p_gc);
+	Gfx::Car &carGfx = *m_carGfxMapping[&p_car];
+
+	if (!carGfx.isLoaded()) {
+		carGfx.load(p_gc);
+	}
+
+	carGfx.draw(p_gc);
 	
 	#if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
 		const CL_Pointf &pos = p_car.getPosition();
@@ -485,7 +484,8 @@ void RaceGraphicsImpl::update(unsigned p_timeElapsed)
 	updateViewport(p_timeElapsed);
 	updateTyreStripes();
 	updateSmokes(p_timeElapsed);
-	updateCars(p_timeElapsed);
+	updateCarGfxMapping();
+	updateCarGfxs(p_timeElapsed);
 
 	m_raceUI.update(p_timeElapsed);
 
@@ -590,12 +590,36 @@ void RaceGraphicsImpl::updateSmokes(unsigned p_timeElapsed)
 	}
 }
 
-void RaceGraphicsImpl::updateCars(unsigned p_timeElapsed)
+void RaceGraphicsImpl::updateCarGfxs(unsigned p_timeElapsed)
 {
 	TCarMappingPair pair;
-	foreach(pair, m_carMapping) {
-		pair.second->update(p_timeElapsed);
+	foreach(pair, m_carGfxMapping) {
+		if (pair.second->isLoaded()) {
+			pair.second->update(p_timeElapsed);
+		}
 	}
+}
+
+void RaceGraphicsImpl::updateCarGfxMapping()
+{
+	const Race::Level &level = m_logic->getLevel();
+	const int carCount = level.getCarCount();
+
+	TCarMapping newCarGfxMapping;
+	TCarMapping::iterator itor;
+
+	for (int i = 0; i < carCount; ++i) {
+		const Race::Car &car = level.getCar(i);
+		itor = m_carGfxMapping.find(&car);
+
+		if (itor != m_carGfxMapping.end()) {
+			newCarGfxMapping[&car] = itor->second;
+		} else {
+			newCarGfxMapping[&car] = CL_SharedPtr<Gfx::Car>(new Gfx::Car(&car));
+		}
+	}
+
+	m_carGfxMapping = newCarGfxMapping;
 }
 
 Gfx::RaceUI &RaceGraphics::getUi()

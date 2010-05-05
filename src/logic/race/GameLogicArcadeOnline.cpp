@@ -92,4 +92,14 @@ void GameLogicArcadeOnline::callAVote(
 	m_impl->m_basicClient.callAVote(p_voteType, p_subject);
 }
 
+void GameLogicArcadeOnline::voteYes()
+{
+	m_impl->m_basicClient.voteYes();
+}
+
+void GameLogicArcadeOnline::voteNo()
+{
+	m_impl->m_basicClient.voteNo();
+}
+
 }

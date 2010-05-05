@@ -76,15 +76,18 @@ class GameLogic
 		RaceGameState getRaceGameState() const;
 		const Progress &getProgressObject() const;
 
-		VoteSystem &getVoteSystem();
 		const VoteSystem &getVoteSystem() const;
-		const MessageBoard &getMessageBoard() const;
 		virtual void callAVote(VoteType p_voteType, const CL_String &p_subject);
+		virtual void voteYes();
+		virtual void voteNo();
+		
+		const MessageBoard &getMessageBoard() const;
 
 	protected:
 
 		Level &getLevel();
 		Progress &getProgressObject();
+		VoteSystem &getVoteSystem();
 
 		void setRaceGameState(RaceGameState p_gameState);
 		void setLapCount(int p_lapCount);

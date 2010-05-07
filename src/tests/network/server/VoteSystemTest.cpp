@@ -69,72 +69,76 @@ BOOST_AUTO_TEST_CASE(passingVote)
 	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_PASSED);
 }
 
-//BOOST_AUTO_TEST_CASE(failingVote)
-//{
-//	Net::VoteSystem voteSystem;
-//
-//	finished = false;
-//	voteSystem.func_finished().set(&onFinished);
-//
-//	BOOST_CHECK_EQUAL(finished, false);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-//
-//	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
-//	BOOST_CHECK_EQUAL(finished, false);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-//
-//	voteSystem.addVote(VOTE_NO, 1);
-//	BOOST_CHECK_EQUAL(finished, false);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-//
-//	voteSystem.addVote(VOTE_NO, 2);
-//	BOOST_CHECK_EQUAL(finished, true);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
-//
-//	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
-//}
-//
-//BOOST_AUTO_TEST_CASE(undecidedVote)
-//{
-//	Net::VoteSystem voteSystem;
-//
-//	finished = false;
-//	voteSystem.func_finished().set(&onFinished);
-//
-//	BOOST_CHECK_EQUAL(finished, false);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-//
-//	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
-//
-//	voteSystem.addVote(VOTE_YES, 1);
-//	voteSystem.addVote(VOTE_YES, 2);
-//	voteSystem.addVote(VOTE_YES, 3);
-//	BOOST_CHECK_EQUAL(finished, false);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-//
-//	voteSystem.addVote(VOTE_NO, 4);
-//	BOOST_CHECK_EQUAL(finished, false);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-//}
-//
-//
-//BOOST_AUTO_TEST_CASE(timeLimit)
-//{
-//	Net::VoteSystem voteSystem;
-//
-//	finished = false;
-//	voteSystem.func_finished().set(&onFinished);
-//
-//	BOOST_CHECK_EQUAL(finished, false);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
-//
-//	voteSystem.start(VOTE_RESTART_RACE, 6, 50);
-//	usleep(1000 * 100);
-//	CL_KeepAlive::process();
-//
-//	BOOST_CHECK_EQUAL(finished, true);
-//	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
-//	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
-//}
+BOOST_AUTO_TEST_CASE(failingVote)
+{
+	VoteSystem voteSystem;
+
+	finished = false;
+	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.addVote(VOTE_NO, 1);
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.addVote(VOTE_NO, 2);
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.addVote(VOTE_NO, 3);
+	BOOST_CHECK_EQUAL(finished, true);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
+
+	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
+}
+
+BOOST_AUTO_TEST_CASE(undecidedVote)
+{
+	VoteSystem voteSystem;
+
+	finished = false;
+	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.start(VOTE_RESTART_RACE, 6, 1000);
+
+	voteSystem.addVote(VOTE_YES, 1);
+	voteSystem.addVote(VOTE_YES, 2);
+	voteSystem.addVote(VOTE_YES, 3);
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.addVote(VOTE_NO, 4);
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+}
+
+
+BOOST_AUTO_TEST_CASE(timeLimit)
+{
+	VoteSystem voteSystem;
+
+	finished = false;
+	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.start(VOTE_RESTART_RACE, 6, 50);
+	usleep(1000 * 100);
+	CL_KeepAlive::process();
+
+	BOOST_CHECK_EQUAL(finished, true);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
+	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_FAILED);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

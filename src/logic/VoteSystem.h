@@ -43,7 +43,7 @@ class VoteSystem : boost::noncopyable
 		VoteSystem();
 		virtual ~VoteSystem();
 
-		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs);
+		void start(VoteType p_type, int p_voterCount, int p_timeLimitMs);
 		bool addVote(VoteOption p_option, int p_voterId = -1);
 
 		bool isRunning() const;

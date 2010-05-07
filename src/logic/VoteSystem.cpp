@@ -33,11 +33,6 @@
 #include "common.h"
 #include "common/gassert.h"
 
-/** Yes to all ratio that will result in succeeded voting */
-const float PASS_RATIO = 1.0f / 2.0f + 0.001f;
-/** No to all ratio that will result in failed voting */
-const float FAIL_RATIO = PASS_RATIO;
-
 class VoteSystemImpl
 {
 	public:
@@ -54,8 +49,9 @@ class VoteSystemImpl
 		VoteType m_type;
 		CL_String m_subject;
 
-		unsigned m_voterCount;
-		unsigned m_yesCount, m_noCount;
+		int m_voterCount;
+		int m_yesCount, m_noCount;
+		int m_passCount;
 
 		/** Voting state */
 		State m_state;
@@ -73,17 +69,12 @@ class VoteSystemImpl
 		VoteSystemImpl(VoteSystem *p_parent);
 		~VoteSystemImpl() { /* empty */ }
 
-
-		void start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs);
+		void start(VoteType p_type, int p_voterCount, int p_timeLimitMs);
 		bool addVote(VoteOption p_option, int p_voterId = -1);
 
-
 		int calculateResult() const;
-
 		bool hasVoter(int p_id) const;
-
 		void onTimerExpired();
-
 
 		SIG_IMPL(VoteSystem, finished);
 };
@@ -112,12 +103,12 @@ VoteSystem::~VoteSystem()
 	// empty
 }
 
-void VoteSystem::start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs)
+void VoteSystem::start(VoteType p_type, int p_voterCount, int p_timeLimitMs)
 {
 	m_impl->start(p_type, p_voterCount, p_timeLimitMs);
 }
 
-void VoteSystemImpl::start(VoteType p_type, unsigned p_voterCount, unsigned p_timeLimitMs)
+void VoteSystemImpl::start(VoteType p_type, int p_voterCount, int p_timeLimitMs)
 {
 	m_type = p_type;
 	m_voterCount = p_voterCount;
@@ -130,11 +121,13 @@ void VoteSystemImpl::start(VoteType p_type, unsigned p_voterCount, unsigned p_ti
 	m_timer.start(p_timeLimitMs, false);
 
 	m_finishTime = CL_System::get_time() + p_timeLimitMs;
+
+	m_passCount = static_cast<int>(floor(p_voterCount / 2.0f) + 1);
 }
 
 bool VoteSystem::addVote(VoteOption p_option, int p_voterId)
 {
-	m_impl->addVote(p_option, p_voterId);
+	return m_impl->addVote(p_option, p_voterId);
 }
 
 bool VoteSystemImpl::addVote(VoteOption p_option, int p_voterId)
@@ -158,7 +151,7 @@ bool VoteSystemImpl::addVote(VoteOption p_option, int p_voterId)
 		m_result = calculateResult();
 
 		if (m_result != -1) {
-			// finished, set state and call functor
+			// finished, set state and call signal
 			m_state = S_FINISHED;
 			m_timer.stop();
 
@@ -201,23 +194,13 @@ int VoteSystem::getNoCount() const
 
 int VoteSystemImpl::calculateResult() const
 {
-	// check if passed
-	const float yesToAllRatio = m_yesCount / (float) m_voterCount;
-
-	if (yesToAllRatio >= PASS_RATIO) {
-		return (int) VOTE_PASSED;
+	if (m_yesCount >= m_passCount) {
+		return static_cast<int>(VOTE_PASSED);
+	} else if (m_noCount > m_voterCount - m_passCount) {
+		return static_cast<int>(VOTE_FAILED);
+	} else {
+		return -1;
 	}
-
-	// check if failed
-	const float noToAllRatio = m_noCount / (float) m_voterCount;
-
-	if (noToAllRatio > FAIL_RATIO) {
-		return (int) VOTE_FAILED;
-	}
-
-	// not decided yet
-	return -1;
-
 }
 
 bool VoteSystemImpl::hasVoter(int p_id) const

@@ -68,6 +68,8 @@ class GameLogic
 
 		virtual void update(unsigned p_timeElapsedMs);
 
+		virtual void restartRace() = 0;
+
 		void setLevel(Level *p_level);
 		const Level &getLevel() const;
 

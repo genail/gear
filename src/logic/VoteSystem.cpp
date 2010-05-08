@@ -145,7 +145,9 @@ bool VoteSystemImpl::addVote(VoteOption p_option, int p_voterId)
 				assert(0 && "unknown vote option");
 		}
 
-		m_voters.push_back(p_voterId);
+		if (p_voterId != -1) {
+			m_voters.push_back(p_voterId);
+		}
 
 		// calculate result
 		m_result = calculateResult();
@@ -205,6 +207,10 @@ int VoteSystemImpl::calculateResult() const
 
 bool VoteSystemImpl::hasVoter(int p_id) const
 {
+	if (p_id == -1) {
+		return false;
+	}
+
 	foreach (int id, m_voters) {
 		if (id == p_id) {
 			return true;

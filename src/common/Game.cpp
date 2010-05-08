@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,11 @@ Game &Game::getInstance()
 
 Player &Game::getPlayer() {
 	return m_player;
+}
+
+Race::Car &Game::getPlayerCar()
+{
+	return m_player.getCar();
 }
 
 Net::Client &Game::getNetworkConnection()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,28 +39,20 @@ class RaceStart: public Net::Packet {
 	public:
 
 		RaceStart();
-
 		virtual ~RaceStart();
 
-
 		virtual CL_NetGameEvent buildEvent() const;
-
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-
 		const CL_Pointf &getCarPosition() const;
-
 		const CL_Angle &getCarRotation() const;
 
-
 		void setCarPosition(const CL_Pointf &p_position);
-
 		void setCarRotation(const CL_Angle &p_rotation);
 
 	private:
 
 		CL_Pointf m_carPosition;
-
 		CL_Angle m_carRotation;
 };
 

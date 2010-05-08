@@ -37,6 +37,8 @@
 namespace Race
 {
 
+const unsigned RACE_START_DELAY = 3000;
+
 class GameLogicArcadeImpl
 {
 	public:
@@ -44,16 +46,26 @@ class GameLogicArcadeImpl
 		GameLogicArcade *m_parent;
 		bool m_initialized;
 
+		unsigned m_raceStartTime;
+
 
 		GameLogicArcadeImpl(GameLogicArcade *p_parent);
-		~GameLogicArcadeImpl() {}
+		~GameLogicArcadeImpl();
 		
+		void update(unsigned p_timeElapsedMs);
+		void updateRaceGameState();
+		void updateRaceGameStatePending();
+		void updateRaceGameStateRunning();
+		void updateRaceGameStateFinishedSingle();
+
 		void initialize();
 		void insertPlayerCar();
 		void putCarAtFirstStartPosition();
 		
 		void destroy();
 		void removePlayerCar();
+
+		void restartRace();
 // 		
 };
 
@@ -65,12 +77,18 @@ GameLogicArcade::GameLogicArcade() :
 
 GameLogicArcadeImpl::GameLogicArcadeImpl(GameLogicArcade *p_parent) :
 		m_parent(p_parent),
-		m_initialized(false)
+		m_initialized(false),
+		m_raceStartTime(0)
 {
 	// empty
 }
 
 GameLogicArcade::~GameLogicArcade()
+{
+	// empty
+}
+
+GameLogicArcadeImpl::~GameLogicArcadeImpl()
 {
 	// empty
 }
@@ -96,8 +114,7 @@ void GameLogicArcadeImpl::insertPlayerCar()
 	Progress &progress = m_parent->getProgressObject();
 
 	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-	Car &car = player.getCar();
+	Car &car = game.getPlayerCar();
 
 	level.addCar(&car);
 	progress.addCar(&car);
@@ -109,8 +126,7 @@ void GameLogicArcadeImpl::putCarAtFirstStartPosition()
 {
 	Level &level = m_parent->getLevel();
 	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-	Car &car = player.getCar();
+	Car &car = game.getPlayerCar();
 
 	CL_Pointf startPosition;
 	CL_Angle startAngle;
@@ -139,8 +155,7 @@ void GameLogicArcadeImpl::removePlayerCar()
 	Progress &progress = m_parent->getProgressObject();
 
 	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-	Car &car = player.getCar();
+	Car &car = game.getPlayerCar();
 
 	level.removeCar(&car);
 	progress.removeCar(&car);
@@ -149,6 +164,105 @@ void GameLogicArcadeImpl::removePlayerCar()
 void GameLogicArcade::update(unsigned p_timeElapsedMs)
 {
 	GameLogic::update(p_timeElapsedMs);
+	m_impl->update(p_timeElapsedMs);
+}
+
+void GameLogicArcadeImpl::update(unsigned p_timeElapsedMs)
+{
+	updateRaceGameState();
+}
+
+void GameLogicArcadeImpl::updateRaceGameState()
+{
+	updateRaceGameStatePending();
+	updateRaceGameStateRunning();
+	updateRaceGameStateFinishedSingle();
+}
+
+void GameLogicArcadeImpl::updateRaceGameStatePending()
+{
+	const RaceGameState raceGameState = m_parent->getRaceGameState();
+
+	if (raceGameState == GS_PENDING) {
+		const unsigned now = CL_System::get_time();
+		if (now >= m_raceStartTime) {
+			m_parent->setRaceGameState(GS_RUNNING);
+		}
+	}
+}
+
+void GameLogicArcadeImpl::updateRaceGameStateRunning()
+{
+	const RaceGameState raceGameState = m_parent->getRaceGameState();
+
+	if (raceGameState == GS_RUNNING) {
+		Game &game = Game::getInstance();
+		Car &localPlayerCar = game.getPlayerCar();
+
+		const Progress &progress = m_parent->getProgressObject();
+		const int localPlayerLap = progress.getLapNumber(localPlayerCar);
+
+		const int raceLapCount = m_parent->getLapCount();
+
+		if (localPlayerLap > raceLapCount) {
+			m_parent->setRaceGameState(GS_FINISHED_SINGLE);
+		}
+	}
+}
+
+void GameLogicArcadeImpl::updateRaceGameStateFinishedSingle()
+{
+	const RaceGameState raceGameState = m_parent->getRaceGameState();
+
+	if (raceGameState == GS_FINISHED_SINGLE) {
+		const Progress &progress = m_parent->getProgressObject();
+		const int raceLapCount = m_parent->getLapCount();
+
+		Level &level = m_parent->getLevel();
+		const int carCount = level.getCarCount();
+		bool finishedAll = true;
+		int lapNumber;
+
+		for (int i = 0; i < carCount; ++i) {
+			Car &car = level.getCar(i);
+			lapNumber = progress.getLapNumber(car);
+
+			if (lapNumber <= raceLapCount) {
+				finishedAll = false;
+				break;
+			}
+		}
+
+		if (finishedAll) {
+			m_parent->setRaceGameState(GS_FINISHED_ALL);
+		}
+	}
+}
+
+void GameLogicArcade::restartRace()
+{
+	m_impl->restartRace();
+}
+
+void GameLogicArcadeImpl::restartRace()
+{
+	// lock player car input
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	Race::Car &car = player.getCar();
+
+	car.setLocked(true);
+
+	// set race start time
+	m_raceStartTime = CL_System::get_time() + RACE_START_DELAY;
+
+	// change logic state
+	m_parent->setRaceGameState(GS_PENDING);
+}
+
+unsigned GameLogicArcade::getRaceStartTime() const
+{
+	return m_impl->m_raceStartTime;
 }
 
 }

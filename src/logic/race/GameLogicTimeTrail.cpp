@@ -186,4 +186,9 @@ void GameLogicTimeTrailImpl::updateProgressObject()
 	progress.update();
 }
 
+void GameLogicTimeTrail::restartRace()
+{
+	// TODO
+}
+
 }

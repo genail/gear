@@ -69,6 +69,32 @@ BOOST_AUTO_TEST_CASE(passingVote)
 	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_PASSED);
 }
 
+BOOST_AUTO_TEST_CASE(passingVote2)
+{
+	VoteSystem voteSystem;
+
+	finished = false;
+	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.start(VOTE_RESTART_RACE, 2, 1000);
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+
+	voteSystem.addVote(VOTE_YES, 1);
+	BOOST_CHECK_EQUAL(finished, false);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
+
+	voteSystem.addVote(VOTE_YES, 2);
+	BOOST_CHECK_EQUAL(finished, true);
+	BOOST_CHECK_EQUAL(voteSystem.isFinished(), true);
+
+	BOOST_CHECK_EQUAL(voteSystem.getResult(), VOTE_PASSED);
+}
+
 BOOST_AUTO_TEST_CASE(failingVote)
 {
 	VoteSystem voteSystem;

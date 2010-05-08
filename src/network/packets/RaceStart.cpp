@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,12 @@ namespace Net {
 
 RaceStart::RaceStart()
 {
+	// empty
 }
 
 RaceStart::~RaceStart()
 {
+	// empty
 }
 
 CL_NetGameEvent RaceStart::buildEvent() const

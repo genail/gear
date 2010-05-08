@@ -80,6 +80,8 @@ class BasicGameClientImpl
 		void positionLocalPlayerCar(const Net::CarState &p_carState);
 		void applyCarState(Race::Car &p_car, const Net::CarState &p_carState);
 		
+		void onRaceStartReceived(const Net::RaceStart &p_raceStart);
+
 		void onVoteStated(
 				VoteType p_voteType,
 				const CL_String& p_subject,
@@ -282,6 +284,11 @@ Race::Car &p_car, const Net::CarState &p_carState)
 	p_car.deserialize(serializedCarData);
 }
 
+void BasicGameClientImpl::onRaceStartReceived(const Net::RaceStart &p_raceStart)
+{
+
+}
+
 void BasicGameClient::callAVote(VoteType p_voteType, const CL_String &p_subject)
 {
 	m_impl->m_netClient.callAVote(p_voteType, p_subject);
@@ -293,7 +300,10 @@ void BasicGameClientImpl::onVoteStated(
 		unsigned p_timeLimit)
 {
 	VoteSystem &voteSystem = m_gameLogic->getVoteSystem();
-	voteSystem.start(p_voteType, m_namePlayerMap.size(), p_timeLimit * 1000);
+	const Race::Level &level = m_gameLogic->getLevel();
+	const int carCount = level.getCarCount();
+
+	voteSystem.start(p_voteType, carCount, p_timeLimit * 1000);
 }
 
 void BasicGameClientImpl::onVoteTickReceived(VoteOption p_option)

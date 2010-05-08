@@ -90,6 +90,17 @@ int Application::main(const std::vector<CL_String> &args)
 
 	try {
 
+		// modules setup
+		CL_Console::write_line("initializing");
+
+		CL_SetupCore 	setup_core;
+
+		CL_ConsoleLogger logger;
+		CL_SlotContainer slots;
+
+		CL_Console::write_line("loading properties");
+		Properties::load(CONFIG_FILE_CLIENT);
+
 		// app switches
 
 		// use gl1 instead of gl2
@@ -117,17 +128,6 @@ int Application::main(const std::vector<CL_String> &args)
 				}
 			}
 		}
-
-		// modules setup
-		CL_Console::write_line("initializing");
-
-		CL_SetupCore 	setup_core;
-
-		CL_ConsoleLogger logger;
-		CL_SlotContainer slots;
-
-		CL_Console::write_line("loading properties");
-		Properties::load(CONFIG_FILE_CLIENT);
 
 		// set opengl version
 		enum GLVer {

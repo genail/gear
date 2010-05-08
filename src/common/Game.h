@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@
 
 #include "Player.h"
 #include "network/client/Client.h"
+#include "logic/race/Car.h"
 #include "logic/race/level/Level.h"
 
 class Game {
@@ -41,12 +42,11 @@ class Game {
 
 		virtual ~Game();
 
-
 		static Game &getInstance();
 
 		Net::Client &getNetworkConnection();
-
 		Player &getPlayer();
+		Race::Car &getPlayerCar();
 
 	private:
 

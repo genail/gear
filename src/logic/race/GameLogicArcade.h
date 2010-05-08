@@ -48,6 +48,9 @@ class GameLogicArcade : public GameLogic
 		
 		virtual void update(unsigned p_timeElapsedMs);
 
+		virtual void restartRace();
+		unsigned getRaceStartTime() const;
+
 	private:
 
 		CL_SharedPtr<GameLogicArcadeImpl> m_impl;

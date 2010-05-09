@@ -29,10 +29,10 @@
 #pragma once
 
 template <class TargetType, class GivenType>
-bool isInstance(GivenType *p_ptr)
+bool isInstance(const GivenType *p_ptr)
 {
 	try {
-		TargetType *tmp = dynamic_cast<TargetType*>(p_ptr);
+		const TargetType *tmp = dynamic_cast<const TargetType*>(p_ptr);
 		return tmp != NULL;
 	} catch (std::bad_cast &e) {
 		return false;

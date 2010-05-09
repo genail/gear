@@ -43,6 +43,7 @@
 #include "logic/VoteSystem.h"
 #include "logic/race/Car.h"
 #include "logic/race/GameLogic.h"
+#include "logic/race/GameLogicArcade.h"
 #include "logic/race/GameLogicTimeTrailOnline.h"
 #include "logic/race/MessageBoard.h"
 #include "logic/race/Progress.h"
@@ -81,7 +82,7 @@ class RaceUIImpl
 		Label m_currentLapTimeLabel;
 
 		// Race logic pointer
-		const Race::GameLogic *m_logic;
+		const Race::GameLogic *const m_logic;
 		Race::RaceGameState m_lastState;
 
 		// Viewport pointer
@@ -237,9 +238,12 @@ void RaceUIImpl::draw(CL_GraphicContext &p_gc)
 	drawLapTimes(p_gc);
 	drawCarLabels(p_gc);
 	drawPlayerList(p_gc);
-//	drawCountdown(p_gc); FIXME: reenable this
 	drawGlobalMessage(p_gc);
 	drawScoreTable(p_gc);
+
+	if (isInstance<Race::GameLogicArcade>(m_logic)) {
+		drawCountdown(p_gc);
+	}
 
 	if (m_modeBasedUI) {
 		m_modeBasedUI->draw(p_gc);
@@ -457,9 +461,9 @@ void RaceUIImpl::drawPlayerList(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::drawCountdown(CL_GraphicContext &p_gc)
 {
-//	const unsigned startTime = m_logic->getRaceStartTime();
-	const unsigned startTime = 0;
-	G_ASSERT(0 && "disabled by now");
+	const Race::GameLogicArcade *arcadeLogic = dynamic_cast<const Race::GameLogicArcade*>(m_logic);
+
+	const unsigned startTime = arcadeLogic->getRaceStartTime();
 
 	if (startTime == 0) { // not started nor pending
 		return;

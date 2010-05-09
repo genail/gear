@@ -304,6 +304,8 @@ void BasicGameClientImpl::onRaceStartReceived(const CL_Pointf &p_position, const
 	localPlayerCar.setPosition(p_position);
 	localPlayerCar.setAngle(p_angle);
 
+	sendCarState(localPlayerCar);
+
 	m_gameLogic->restartRace();
 }
 

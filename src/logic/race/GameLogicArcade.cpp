@@ -66,6 +66,9 @@ class GameLogicArcadeImpl
 		void removePlayerCar();
 
 		void restartRace();
+
+		void lockPlayerCar();
+		void unlockPlayerCar();
 // 		
 };
 
@@ -187,6 +190,7 @@ void GameLogicArcadeImpl::updateRaceGameStatePending()
 		const unsigned now = CL_System::get_time();
 		if (now >= m_raceStartTime) {
 			m_parent->setRaceGameState(GS_RUNNING);
+			unlockPlayerCar();
 		}
 	}
 }
@@ -246,18 +250,29 @@ void GameLogicArcade::restartRace()
 
 void GameLogicArcadeImpl::restartRace()
 {
-	// lock player car input
-	Game &game = Game::getInstance();
-	Player &player = game.getPlayer();
-	Race::Car &car = player.getCar();
-
-	car.setLocked(true);
+	lockPlayerCar();
 
 	// set race start time
 	m_raceStartTime = CL_System::get_time() + RACE_START_DELAY;
 
 	// change logic state
 	m_parent->setRaceGameState(GS_PENDING);
+}
+
+void GameLogicArcadeImpl::lockPlayerCar()
+{
+	Game &game = Game::getInstance();
+	Race::Car &car = game.getPlayerCar();
+
+	car.setLocked(true);
+}
+
+void GameLogicArcadeImpl::unlockPlayerCar()
+{
+	Game &game = Game::getInstance();
+	Race::Car &car = game.getPlayerCar();
+
+	car.setLocked(false);
 }
 
 unsigned GameLogicArcade::getRaceStartTime() const

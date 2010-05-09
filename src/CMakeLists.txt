@@ -43,7 +43,6 @@ SET(COMMON_SRCS
 	logic/race/GameLogicTimeTrail.cpp
 	logic/race/MessageBoard.cpp
 	logic/race/Progress.cpp
-	logic/race/RaceLogic.cpp
 	logic/race/ScoreTable.cpp	
 	logic/race/level/Bound.cpp
 	logic/race/level/Checkpoint.cpp
@@ -108,13 +107,9 @@ SET(CLIENT_SRCS
 	gfx/scenes/MainMenuScene.cpp
 	gfx/scenes/RaceScene.cpp
 	gfx/scenes/OptionsScene.cpp
-	logic/race/ArcadeRaceLogic.cpp
 	logic/race/BasicGameClient.cpp
 	logic/race/GameLogicArcadeOnline.cpp
 	logic/race/GameLogicTimeTrailOnline.cpp
-	logic/race/OfflineRaceLogic.cpp
-	logic/race/OnlineRaceLogic.cpp
-	logic/race/TimeTrailRaceLogic.cpp
 )
 
 # Server sources

@@ -588,7 +588,7 @@ void RaceUIImpl::loadLapTimeLabels(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::handleRaceGameStateChanges(Race::RaceGameState p_from, Race::RaceGameState p_to)
 {
-	if (p_from == Race::GS_FINISHED_SINGLE && p_to == Race::GS_FINISHED_ALL) {
+	if (p_to == Race::GS_FINISHED_ALL) {
 		// finish race action, invoke table display
 		m_scoreTable.rebuild();
 		m_scoreTable.restartAnimation();

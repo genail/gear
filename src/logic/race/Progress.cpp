@@ -161,6 +161,14 @@ void Progress::reset(const Car &p_car)
 	itor->second->reset(m_impl->m_chkpts[0]);
 }
 
+void Progress::resetAllCars()
+{
+	ProgressImpl::TCarProgressPair pair;
+	foreach (pair, m_impl->m_cars) {
+		pair.second->reset(m_impl->m_chkpts[0]);
+	}
+}
+
 void Progress::resetClock()
 {
 	G_ASSERT(m_impl->m_initd);

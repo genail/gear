@@ -191,6 +191,9 @@ void GameLogicArcadeImpl::updateRaceGameStatePending()
 		if (now >= m_raceStartTime) {
 			m_parent->setRaceGameState(GS_RUNNING);
 			unlockPlayerCar();
+
+			Progress &progress = m_parent->getProgressObject();
+			progress.resetClock();
 		}
 	}
 }
@@ -252,8 +255,15 @@ void GameLogicArcadeImpl::restartRace()
 {
 	lockPlayerCar();
 
+	// reset all cars
+	Progress &progress = m_parent->getProgressObject();
+	progress.resetAllCars();
+
 	// set race start time
 	m_raceStartTime = CL_System::get_time() + RACE_START_DELAY;
+
+	// set race lap count
+	m_parent->setLapCount(3);
 
 	// change logic state
 	m_parent->setRaceGameState(GS_PENDING);

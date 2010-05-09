@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(passingVote)
 	VoteSystem voteSystem;
 
 	finished = false;
-	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+	m_slots.connect(voteSystem.sig_expired(), &onFinished);
 
 	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(passingVote2)
 	VoteSystem voteSystem;
 
 	finished = false;
-	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+	m_slots.connect(voteSystem.sig_expired(), &onFinished);
 
 	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(failingVote)
 	VoteSystem voteSystem;
 
 	finished = false;
-	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+	m_slots.connect(voteSystem.sig_expired(), &onFinished);
 
 	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(undecidedVote)
 	VoteSystem voteSystem;
 
 	finished = false;
-	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+	m_slots.connect(voteSystem.sig_expired(), &onFinished);
 
 	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(timeLimit)
 	VoteSystem voteSystem;
 
 	finished = false;
-	m_slots.connect(voteSystem.sig_finished(), &onFinished);
+	m_slots.connect(voteSystem.sig_expired(), &onFinished);
 
 	BOOST_CHECK_EQUAL(finished, false);
 	BOOST_CHECK_EQUAL(voteSystem.isFinished(), false);

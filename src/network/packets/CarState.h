@@ -41,45 +41,31 @@ class CarState : public Net::Packet {
 	public:
 
 		CarState();
-
-		virtual ~CarState() {}
-
+		virtual ~CarState();
 
 		virtual CL_NetGameEvent buildEvent() const;
-
 		virtual void parseEvent(const CL_NetGameEvent &p_event);
 
-
 		bool isAfterCollision() const;
-
 		int32_t getIterationId() const;
-
 		const CL_String &getName() const;
-
 		CL_NetGameEvent getSerializedData() const;
 
-
 		void setAfterCollision(bool p_afterCollision);
-
 		/**
 		 * Sets the physics iteration id number (beginning from 0).
 		 * Each iteration has unique id greater by one than previous iteration.
 		 * Exception when last id was is 2^31-1 then next one would be 0.
 		 */
 		void setIterationId(int32_t p_iterId);
-
 		void setName(const CL_String &p_name);
-
 		void setSerializedData(const CL_NetGameEvent &p_data);
 
 	private:
 
 		int32_t m_iterId;
-
 		CL_String m_name;
-
 		bool m_afterCollision;
-
 		CL_NetGameEvent m_serialData;
 };
 

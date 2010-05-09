@@ -124,7 +124,6 @@ class ProgressImpl
 		}
 
 		int distance(const Checkpoint &p_from, const Checkpoint &p_to) const;
-
 		bool startLinePassed(const Car *p_car);
 };
 
@@ -262,9 +261,7 @@ void Progress::removeCar(const Car *p_car)
 {
 	G_ASSERT(m_impl->m_initd);
 
-	ProgressImpl::TCarProgressMap::iterator itor =
-			m_impl->m_cars.find(p_car);
-
+	ProgressImpl::TCarProgressMap::iterator itor = m_impl->m_cars.find(p_car);
 	G_ASSERT(itor != m_impl->m_cars.end());
 
 	delete itor->second;
@@ -316,8 +313,8 @@ const Checkpoint &ProgressImpl::closestCheckpoint(const CL_Pointf &p_pos) const
 {
 	G_ASSERT(m_chkpts.size() > 0);
 
-	float dist, ndist;
-	const Checkpoint *tcp;
+	float dist = 0, ndist;
+	const Checkpoint *tcp = NULL;
 	bool first = true;
 
 	foreach (const Checkpoint &cp, m_chkpts) {

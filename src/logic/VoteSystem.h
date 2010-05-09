@@ -59,7 +59,7 @@ class VoteSystem : boost::noncopyable
 		void setVoteSubject(const CL_String &p_subject);
 		const CL_String &getVoteSubject() const;
 
-		SIG_H_0(finished);
+		SIG_H_0(expired);
 
 	private:
 

@@ -65,6 +65,8 @@ class VoteSystemImpl
 		CL_Timer m_timer;
 		unsigned m_finishTime;
 
+		SIG_IMPL(VoteSystem, expired);
+
 
 		VoteSystemImpl(VoteSystem *p_parent);
 		~VoteSystemImpl() { /* empty */ }
@@ -75,11 +77,9 @@ class VoteSystemImpl
 		int calculateResult() const;
 		bool hasVoter(int p_id) const;
 		void onTimerExpired();
-
-		SIG_IMPL(VoteSystem, finished);
 };
 
-SIG_CPP(VoteSystem, finished);
+SIG_CPP(VoteSystem, expired);
 
 VoteSystem::VoteSystem() :
 		m_impl(new VoteSystemImpl(this))
@@ -156,8 +156,6 @@ bool VoteSystemImpl::addVote(VoteOption p_option, int p_voterId)
 			// finished, set state and call signal
 			m_state = S_FINISHED;
 			m_timer.stop();
-
-			INVOKE_0(finished);
 		}
 
 		return true;
@@ -223,9 +221,8 @@ bool VoteSystemImpl::hasVoter(int p_id) const
 void VoteSystemImpl::onTimerExpired()
 {
 	if (m_state == S_RUNNING) {
-
 		m_state = S_FINISHED;
-		INVOKE_0(finished);
+		INVOKE_0(expired);
 	}
 }
 

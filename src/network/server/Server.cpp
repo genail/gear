@@ -215,7 +215,7 @@ ServerImpl::ServerImpl(Server *p_parent) :
 			this, &ServerImpl::onEventArrived
 	);
 
-	m_slots.connect(m_voteSystem.sig_finished(), this, &ServerImpl::onVoteSystemFinished);
+	m_slots.connect(m_voteSystem.sig_expired(), this, &ServerImpl::onVoteSystemFinished);
 }
 
 ServerImpl::~ServerImpl()
@@ -405,12 +405,14 @@ void ServerImpl::onVoteTick(
 	voteTick.parseEvent(p_event);
 
 	if (!m_voteSystem.isFinished()) {
-		const bool accepted =
-				m_voteSystem.addVote(voteTick.getOption(), (int) p_conn);
+		const bool accepted = m_voteSystem.addVote(voteTick.getOption(), (int) p_conn);
 
-		if (accepted && !m_voteSystem.isFinished()) {
-			// send this vote over network
+		if (accepted) {
 			sendToAll(p_event);
+		}
+
+		if (m_voteSystem.isFinished()) {
+			onVoteSystemFinished();
 		}
 	}
 }

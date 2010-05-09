@@ -33,6 +33,7 @@
 #include "common/RemotePlayer.h"
 #include "logic/VoteSystem.h"
 #include "logic/race/GameLogic.h"
+#include "logic/race/Progress.h"
 #include "logic/race/level/Level.h"
 #include "network/client/Client.h"
 #include "network/packets/GameState.h"
@@ -68,11 +69,11 @@ class BasicGameClientImpl
 		void onPlayerJoined(const CL_String &p_name);
 		bool playerExists(const CL_String &p_name);
 		RemotePlayer& createNewPlayer(const CL_String &p_name);
-		void addPlayerCarToLevel(RemotePlayer &p_remotePlayer);
+		void addPlayerCarToGame(RemotePlayer &p_remotePlayer);
 
 		void onPlayerLeaved(const CL_String &p_name);
 		void removePlayer(const CL_String &p_name);
-		void removePlayerCarFromLevel(RemotePlayer &p_remotePlayer);
+		void removePlayerCarFromGame(RemotePlayer &p_remotePlayer);
 		
 		void onCarStateReceived(const Net::CarState &p_carState);
 
@@ -80,7 +81,7 @@ class BasicGameClientImpl
 		void positionLocalPlayerCar(const Net::CarState &p_carState);
 		void applyCarState(Race::Car &p_car, const Net::CarState &p_carState);
 		
-		void onRaceStartReceived(const Net::RaceStart &p_raceStart);
+		void onRaceStartReceived(const CL_Pointf &p_position, const CL_Angle &p_angle);
 
 		void onVoteStated(
 				VoteType p_voteType,
@@ -101,8 +102,6 @@ BasicGameClientImpl::BasicGameClientImpl(BasicGameClient *p_parent, GameLogic *p
 		m_gameLogic(p_gameLogic),
 		m_netClient(Game::getInstance().getNetworkConnection())
 {
-	Game &game = Game::getInstance();
-
 	m_slots.connect(
 			m_netClient.sig_playerJoined(),
 			this, &BasicGameClientImpl::onPlayerJoined);
@@ -114,6 +113,10 @@ BasicGameClientImpl::BasicGameClientImpl(BasicGameClient *p_parent, GameLogic *p
 	m_slots.connect(
 			m_netClient.sig_carStateReceived(),
 			this, &BasicGameClientImpl::onCarStateReceived);
+
+	m_slots.connect(
+			m_netClient.sig_raceStartReceived(),
+			this, &BasicGameClientImpl::onRaceStartReceived);
 			
 	m_slots.connect(
 			m_netClient.sig_voteStarted(),
@@ -196,14 +199,19 @@ RemotePlayer& BasicGameClientImpl::createNewPlayer(const CL_String &p_name)
 	CL_SharedPtr<RemotePlayer> remotePlayer(new RemotePlayer(p_name));
 	m_namePlayerMap[p_name] = remotePlayer;
 
-	addPlayerCarToLevel(*remotePlayer);
+	addPlayerCarToGame(*remotePlayer);
 	return *remotePlayer;
 }
 
-void BasicGameClientImpl::addPlayerCarToLevel(RemotePlayer &p_remotePlayer)
+void BasicGameClientImpl::addPlayerCarToGame(RemotePlayer &p_remotePlayer)
 {
-	Race::Level &level = m_gameLogic->getLevel();
-	level.addCar(&p_remotePlayer.getCar());
+	Car &car = p_remotePlayer.getCar();
+
+	Level &level = m_gameLogic->getLevel();
+	level.addCar(&car);
+
+	Progress &progress = m_gameLogic->getProgressObject();
+	progress.addCar(&car);
 }
 
 void BasicGameClientImpl::onPlayerLeaved(const CL_String &p_name)
@@ -220,13 +228,18 @@ void BasicGameClientImpl::removePlayer(const CL_String &p_name)
 	CL_SharedPtr<RemotePlayer> remotePlayer = m_namePlayerMap[p_name];
 	m_namePlayerMap.erase(p_name);
 
-	removePlayerCarFromLevel(*remotePlayer);
+	removePlayerCarFromGame(*remotePlayer);
 }
 
-void BasicGameClientImpl::removePlayerCarFromLevel(RemotePlayer &p_remotePlayer)
+void BasicGameClientImpl::removePlayerCarFromGame(RemotePlayer &p_remotePlayer)
 {
-	Race::Level &level = m_gameLogic->getLevel();
-	level.removeCar(&p_remotePlayer.getCar());
+	Car &car = p_remotePlayer.getCar();
+
+	Level &level = m_gameLogic->getLevel();
+	level.removeCar(&car);
+
+	Progress &progress = m_gameLogic->getProgressObject();
+	progress.removeCar(&car);
 }
 
 void BasicGameClientImpl::onCarStateReceived(const Net::CarState &p_carState)
@@ -271,8 +284,7 @@ void BasicGameClientImpl::applyGameState(const Net::GameState &p_gameState)
 void BasicGameClientImpl::positionLocalPlayerCar(const Net::CarState &p_carState)
 {
 	Game &game = Game::getInstance();
-	Player &localPlayer = game.getPlayer();
-	Race::Car &localPlayerCar = localPlayer.getCar();
+	Race::Car &localPlayerCar = game.getPlayerCar();
 	
 	applyCarState(localPlayerCar, p_carState);
 }
@@ -284,9 +296,15 @@ Race::Car &p_car, const Net::CarState &p_carState)
 	p_car.deserialize(serializedCarData);
 }
 
-void BasicGameClientImpl::onRaceStartReceived(const Net::RaceStart &p_raceStart)
+void BasicGameClientImpl::onRaceStartReceived(const CL_Pointf &p_position, const CL_Angle &p_angle)
 {
+	Game &game = Game::getInstance();
+	Race::Car &localPlayerCar = game.getPlayerCar();
 
+	localPlayerCar.setPosition(p_position);
+	localPlayerCar.setAngle(p_angle);
+
+	m_gameLogic->restartRace();
 }
 
 void BasicGameClient::callAVote(VoteType p_voteType, const CL_String &p_subject)

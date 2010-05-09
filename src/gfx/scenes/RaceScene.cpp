@@ -221,7 +221,9 @@ void RaceSceneImpl::initTimeTrailOnlineLogic(const Net::GameState &p_gameState)
 	loadLevel(levelName);
 	timeTrailLogic->setLevel(m_level);
 
+	timeTrailLogic->initialize();
 	timeTrailLogic->applyGameState(p_gameState);
+
 	m_logic = timeTrailLogic;
 }
 
@@ -234,7 +236,9 @@ void RaceSceneImpl::initArcadeOnlineLogic(const Net::GameState &p_gameState)
 	loadLevel(levelName);
 	arcadeLogic->setLevel(m_level);
 
+	arcadeLogic->initialize();
 	arcadeLogic->applyGameState(p_gameState);
+
 	m_logic = arcadeLogic;
 }
 
@@ -250,7 +254,6 @@ void RaceSceneImpl::loadLevel(const CL_String &p_levelName)
 
 void RaceSceneImpl::initCommon()
 {
-	m_logic->initialize();
 	m_graphics = new Gfx::RaceGraphics(m_logic);
 
 	// bind keys

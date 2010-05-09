@@ -41,6 +41,11 @@ CarState::CarState() :
 	// empty
 }
 
+CarState::~CarState()
+{
+	// empty
+}
+
 CL_NetGameEvent CarState::buildEvent() const
 {
 	G_ASSERT(m_serialData.get_argument_count() != 0);

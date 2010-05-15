@@ -28,55 +28,26 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include <ClanLib/Core/System/sharedptr.h>
 
-#ifndef MS_DEFAULT_HOST
-#define MS_DEFAULT_HOST "torvalds.rootnode.net"
-#endif
+class PlayOnlineScene;
 
-#ifndef MS_DEFAULT_PORT
-#define MS_DEFAULT_PORT 37005
-#endif
-
-#define MS_PROTOCOL_MAJOR 1
-#define MS_PROTOCOL_MINOR 0
-
-namespace Net
-{
-
-class MasterServerImpl;
-
-class MasterServer
+class PlayOnlineSceneControllerImpl;
+class PlayOnlineSceneController
 {
 	public:
 
-		struct GameServer {
-			CL_String m_addr;
-			int m_port;
-		};
+		PlayOnlineSceneController(PlayOnlineScene *p_scene);
+		virtual ~PlayOnlineSceneController();
 
-		MasterServer(
-				const CL_String &p_host = MS_DEFAULT_HOST,
-				int p_port = MS_DEFAULT_PORT
-		);
-
-		virtual ~MasterServer();
-
-		bool registerGameServer(int p_gameServerPort);
-		bool keepAliveGameServer(int p_gameServerPort);
-
-		bool requestGameServerList();
-		int gameServerListCount() const;
-
-		const GameServer &gameServerAt(int p_index) const;
-
+		void initialize();
 
 
 	private:
 
-		CL_SharedPtr<MasterServerImpl> m_impl;
+		CL_SharedPtr<PlayOnlineSceneControllerImpl> m_impl;
+
+		friend class PlayOnlineSceneControllerImpl;
 
 };
-
-}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,33 +37,20 @@ class GuiScene: public CL_GUIComponent, public Scene {
 	public:
 
 		GuiScene(CL_GUIComponent *p_parent);
-
 		virtual ~GuiScene();
 
-
 		virtual bool isLoaded() const;
-
 		virtual SceneType getType() const;
 
-
 		virtual void draw(CL_GraphicContext &p_gc);
-
 		virtual void inputPressed(const CL_InputEvent &p_event);
-
 		virtual void inputReleased(const CL_InputEvent &p_event);
-
 		virtual void load(CL_GraphicContext &p_gc);
-
 		virtual void mouseMoved(const CL_Point &p_pos);
-
 		virtual void mouseScrolled(bool p_up);
-
 		virtual void pushed();
-
 		virtual void poped();
-
 		virtual void setActive(bool p_active);
-
 		virtual void update(unsigned p_timeElapsed);
 
 

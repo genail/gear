@@ -210,6 +210,8 @@ void MasterServerImpl::onDisconnect()
 
 void MasterServerImpl::onEventArrived(const CL_NetGameEvent &p_event)
 {
+	cl_log_event("masterserver event", "received %1", p_event.to_string());
+
 	if (p_event.get_name() == EVENT_SUCCEED) {
 		m_receivedSucceed = true;
 	} else if (p_event.get_name() == EVENT_FAILED) {
@@ -355,6 +357,7 @@ void MasterServerImpl::tryGettingGameServerList()
 	m_gotGameServerList = false;
 	m_gameServers.clear();
 
+	resetAnswer();
 	sendEvent(CL_NetGameEvent(EVENT_LISTREQUEST));
 	waitForAnswer();
 

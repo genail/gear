@@ -66,11 +66,12 @@ SET(COMMON_SRCS
 SET(CLIENT_SRCS
 	${COMMON_SRCS}
 	Application.cpp
+	controllers/AuthorsController.cpp
+	controllers/EditorController.cpp
 	controllers/GameMenuController.cpp
 	controllers/MainMenuController.cpp
 	controllers/OptionsController.cpp
-	controllers/AuthorsController.cpp
-	controllers/EditorController.cpp
+	controllers/PlayOnlineSceneController.cpp
 	debug/RaceSceneKeyBindings.cpp
 	editor/EditorManagement.cpp
 	editor/EditorTrack.cpp
@@ -105,6 +106,7 @@ SET(CLIENT_SRCS
 	gfx/scenes/AuthorsScene.cpp
 	gfx/scenes/EditorScene.cpp
 	gfx/scenes/MainMenuScene.cpp
+	gfx/scenes/PlayOnlineScene.cpp
 	gfx/scenes/RaceScene.cpp
 	gfx/scenes/OptionsScene.cpp
 	logic/race/BasicGameClient.cpp

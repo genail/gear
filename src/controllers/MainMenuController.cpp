@@ -30,11 +30,12 @@
 
 #include "common/Game.h"
 #include "gfx/Stage.h"
-#include "gfx/scenes/MainMenuScene.h"
-#include "gfx/scenes/RaceScene.h"
-#include "gfx/scenes/OptionsScene.h"
 #include "gfx/scenes/AuthorsScene.h"
 #include "gfx/scenes/EditorScene.h"
+#include "gfx/scenes/MainMenuScene.h"
+#include "gfx/scenes/OptionsScene.h"
+#include "gfx/scenes/PlayOnlineScene.h"
+#include "gfx/scenes/RaceScene.h"
 #include "logic/race/level/Level.h"
 #include "network/client/Client.h"
 #include "network/packets/GameState.h"
@@ -118,17 +119,11 @@ class MainMenuControllerImpl
 		/** This scene */
 		MainMenuScene *m_scene;
 
-		/** Next scene */
 		RaceScene *m_raceScene;
-
-		/** Next scene */
 		OptionScene *m_optionScene;
-
-		/** Next scene */
 		AuthorsScene *m_authorsScene;
-
-		/** Next scene */
 		EditorScene *m_editorScene;
+		PlayOnlineScene *m_playOnlineScene;
 
 		NetworkClientConnectRunnable m_connectRunnable;
 
@@ -164,6 +159,7 @@ class MainMenuControllerImpl
 		void onEditorClicked();
 		void onConnectionThreadFinished();
 		void startOnlineGame();
+		void onFindServersClicked();
 };
 
 MainMenuController::MainMenuController(MainMenuScene *p_scene) :
@@ -191,6 +187,7 @@ void MainMenuControllerImpl::createScenes()
 	m_optionScene = new OptionScene(m_scene->get_parent_component());
 	m_authorsScene = new AuthorsScene(m_scene->get_parent_component());
 	m_editorScene = new EditorScene(*m_scene->get_parent_component());
+	m_playOnlineScene = new PlayOnlineScene(m_scene->get_parent_component());
 }
 
 void MainMenuControllerImpl::connectMainMenuSceneButtons()
@@ -200,6 +197,7 @@ void MainMenuControllerImpl::connectMainMenuSceneButtons()
 	m_slots.connect(m_scene->sig_optionClicked(), this, &MainMenuControllerImpl::onOptionClicked);
 	m_slots.connect(m_scene->sig_authorsClicked(), this, &MainMenuControllerImpl::onAuthorsClicked);
 	m_slots.connect(m_scene->sig_editorClicked(), this, &MainMenuControllerImpl::onEditorClicked);
+	m_slots.connect(m_scene->sig_findServersClicked(), this, &MainMenuControllerImpl::onFindServersClicked);
 }
 
 void MainMenuControllerImpl::prepareConnectionThread()
@@ -221,6 +219,7 @@ void MainMenuControllerImpl::destroyScenes()
 	delete m_optionScene;
 	delete m_authorsScene;
 	delete m_editorScene;
+	delete m_playOnlineScene;
 }
 
 
@@ -337,4 +336,9 @@ void MainMenuControllerImpl::onAuthorsClicked()
 void MainMenuControllerImpl::onEditorClicked()
 {
 	Gfx::Stage::pushScene(m_editorScene);
+}
+
+void MainMenuControllerImpl::onFindServersClicked()
+{
+	Gfx::Stage::pushScene(m_playOnlineScene);
 }

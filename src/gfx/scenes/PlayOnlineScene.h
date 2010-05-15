@@ -30,53 +30,39 @@
 
 #include <ClanLib/core.h>
 
-#ifndef MS_DEFAULT_HOST
-#define MS_DEFAULT_HOST "torvalds.rootnode.net"
-#endif
+#include "gfx/GuiScene.h"
 
-#ifndef MS_DEFAULT_PORT
-#define MS_DEFAULT_PORT 37005
-#endif
-
-#define MS_PROTOCOL_MAJOR 1
-#define MS_PROTOCOL_MINOR 0
-
-namespace Net
-{
-
-class MasterServerImpl;
-
-class MasterServer
+class PlayOnlineSceneImpl;
+class PlayOnlineScene : public Gfx::GuiScene
 {
 	public:
 
-		struct GameServer {
-			CL_String m_addr;
-			int m_port;
+		struct Entry {
+			CL_String addr;
+			int port;
+			CL_String serverName;
+			CL_String gamemode;
+			CL_String mapName;
+			int playerCountCurrent;
+			int playerCountLimit;
+			int ping;
 		};
 
-		MasterServer(
-				const CL_String &p_host = MS_DEFAULT_HOST,
-				int p_port = MS_DEFAULT_PORT
-		);
+		PlayOnlineScene(CL_GUIComponent *p_parent);
+		virtual ~PlayOnlineScene();
 
-		virtual ~MasterServer();
+		virtual void draw(CL_GraphicContext &p_gc);
 
-		bool registerGameServer(int p_gameServerPort);
-		bool keepAliveGameServer(int p_gameServerPort);
+		void addServerEntry(const Entry &p_entry);
+		void clearServerEntries();
 
-		bool requestGameServerList();
-		int gameServerListCount() const;
-
-		const GameServer &gameServerAt(int p_index) const;
-
-
+		CL_Callback_v0 &refreshClicked();
 
 	private:
 
-		CL_SharedPtr<MasterServerImpl> m_impl;
+		CL_SharedPtr<PlayOnlineSceneImpl> m_impl;
+
+		friend class PlayOnlineSceneImpl;
 
 };
-
-}
 

@@ -38,37 +38,27 @@
 class MainMenuScene : public Gfx::GuiScene
 {
 		SIGNAL_0(startRaceClicked);
-
 		SIGNAL_0(quitClicked);
-
 		SIGNAL_0(optionClicked);
-
 		SIGNAL_0(authorsClicked);
-
 		SIGNAL_0(editorClicked);
+		SIGNAL_0(findServersClicked);
 
 	public:
 		MainMenuScene(CL_GUIComponent *p_parent);
-
 		virtual ~MainMenuScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
-
 		virtual void load(CL_GraphicContext &p_gc);
 
 		virtual void pushed();
 
 		CL_String getPlayerName() const { return Properties::getString(CG_PLAYER_NAME, ""); }
-
 		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
 
 		void displayError(const CL_String& p_message);
-
-
 		void displayConnectingMessageBox();
-
 		void displayConnectionErrorMessageBox();
-
 		void hideMessageBox();
 
 	private:
@@ -80,21 +70,14 @@ class MainMenuScene : public Gfx::GuiScene
 		// gui components
 
 		CL_Label m_serverLabel;
-
 		CL_LineEdit m_serverLineEdit;
-
 		CL_PushButton m_okButton;
-
+		CL_PushButton m_findServersButton;
 		CL_Label m_errorLabel;
-
 		CL_PushButton m_optionButton;
-
 		CL_PushButton m_authorsButton;
-
 		CL_PushButton m_editorButton;
-
 		CL_PushButton m_quitButton;
-
 		Gfx::MessageBox m_messageBox;
 
 
@@ -102,22 +85,17 @@ class MainMenuScene : public Gfx::GuiScene
 
 		CL_Sprite m_logoSprite;
 
-
 		//
 		// Methods
 		//
 
-
 		// action slots
 
 		void onOkClicked();
-
 		void onQuitClicked();
-
 		void onOptionClicked();
-
 		void onAuthorsClicked();
-
 		void onEditorClicked();
+		void onFindServersClicked();
 
 };

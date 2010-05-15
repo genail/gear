@@ -53,6 +53,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_serverLabel(this),
 	m_serverLineEdit(this),
 	m_okButton(this),
+	m_findServersButton(this),
 	m_errorLabel(this),
 	m_quitButton(this),
 	m_optionButton(this),
@@ -80,6 +81,10 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 
 	m_okButton.set_geometry(CL_Rect(x - BUTTON_WIDTH, y, x, y + BUTTON_HEIGHT));
 	m_okButton.set_text(_("Start Race"));
+
+	int x2 = x + BUTTON_WIDTH + 10;
+	m_findServersButton.set_geometry(CL_Rect(x2 - BUTTON_WIDTH, y, x2, y + BUTTON_HEIGHT));
+	m_findServersButton.set_text(_("Find servers"));
 
 	y += V_MARGIN;
 
@@ -111,6 +116,7 @@ MainMenuScene::MainMenuScene(CL_GUIComponent *p_parent) :
 	m_optionButton.func_clicked().set(this, &MainMenuScene::onOptionClicked);
 	m_authorsButton.func_clicked().set(this, &MainMenuScene::onAuthorsClicked);
 	m_editorButton.func_clicked().set(this, &MainMenuScene::onEditorClicked);
+	m_findServersButton.func_clicked().set(this, &MainMenuScene::onFindServersClicked);
 
 
 	m_serverLineEdit.set_text(Properties::getString(CG_LAST_HOSTNAME, ""));
@@ -169,6 +175,11 @@ void MainMenuScene::onAuthorsClicked()
 void MainMenuScene::onEditorClicked()
 {
 	INVOKE_0(editorClicked);
+}
+
+void MainMenuScene::onFindServersClicked()
+{
+	INVOKE_0(findServersClicked);
 }
 
 void MainMenuScene::displayError(const CL_String& p_message)

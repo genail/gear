@@ -28,24 +28,52 @@
 
 #include "PlayOnlineSceneController.h"
 
-#include <ClanLib/Core/Signals/callback_0.h>
-#include <ClanLib/Network/NetGame/client.h>
-#include <ClanLib/Network/NetGame/event.h>
+#include "clanlib/core/system.h"
+#include "clanlib/network/netgame.h"
 
+#include "common.h"
+#include "common/gassert.h"
+#include "network/events.h"
 #include "gfx/scenes/PlayOnlineScene.h"
 #include "network/masterserver/MasterServer.h"
+#include "network/packets/GameMode.h"
 #include "network/packets/ServerInfoRequest.h"
+#include "network/packets/ServerInfoResponse.h"
 
 class ServerInterviewer : public CL_Runnable
 {
 	public:
 		ServerInterviewer();
 
+		void setServerHost(const CL_String &p_serverHost) { m_serverHost = p_serverHost; }
+		void setServerPort(int p_serverPort) { m_serverPort = p_serverPort; }
+
 		void run();
 
+		bool isWorking() const { return m_working; }
+		bool isSucceed() const { return m_succeed; }
+
+		TGameMode getGameMode() const { return m_gameMode; }
+		const CL_String &getServerName() const { return m_serverName; }
+		const CL_String &getMapName() const { return m_mapName; }
+		int getPlayerCount() const { return m_playerCount; }
+		int getPlayerLimit() const { return m_playerLimit; }
+		int getPing() const { return m_ping; }
+
 	private:
+		CL_String m_serverHost;
+		int m_serverPort;
+
 		bool m_working;
 		bool m_succeed;
+		bool m_waitingResponse, m_waitingGameMode;
+
+		TGameMode m_gameMode;
+		CL_String m_serverName;
+		CL_String m_mapName;
+		int m_playerCount;
+		int m_playerLimit;
+		int m_ping;
 
 		void onEventReceived(const CL_NetGameEvent &p_event);
 };
@@ -67,20 +95,50 @@ void ServerInterviewer::run()
 			msClient.sig_event_received().connect(this, &ServerInterviewer::onEventReceived);
 
 	try {
-		msClient.connect(MS_DEFAULT_HOST, CL_StringHelp::int_to_text(MS_DEFAULT_PORT));
+		msClient.connect(m_serverHost, CL_StringHelp::int_to_text(m_serverPort));
+
+		m_waitingResponse = true;
+		m_waitingGameMode = true;
 
 		const unsigned before = CL_System::get_time();
 		msClient.send_event(Net::ServerInfoRequest().buildEvent());
+
+		while (m_waitingResponse || m_waitingGameMode) {
+			CL_KeepAlive::process();
+		}
+
+		if (m_succeed) {
+			const unsigned after = CL_System::get_time();
+			m_ping = static_cast<signed>(after - before);
+		}
 	} catch (CL_Exception &e) {
-		m_working = false;
 		m_succeed = false;
 	}
+
+	m_working = false;
 }
 
 void ServerInterviewer::onEventReceived(const CL_NetGameEvent &p_event)
 {
-	if (p_event.get_name() == "server_info") {
+	if (p_event.get_name() == EVENT_GAME_MODE) {
+		Net::GameMode gamemode;
+		gamemode.parseEvent(p_event);
+		m_gameMode = gamemode.getGameModeType();
+		m_waitingGameMode = false;
+
+	} else if (p_event.get_name() == EVENT_INFO_RESPONSE) {
 		m_succeed = true;
+
+		Net::ServerInfoResponse response;
+		response.parseEvent(p_event);
+
+		m_serverName = response.getServerName();
+		m_mapName = response.getMapName();
+		m_playerCount = response.getPlayerCount();
+		m_playerLimit = response.getPlayerLimit();
+
+		m_waitingResponse = false;
+
 	} else {
 		m_succeed = false;
 	}
@@ -146,11 +204,37 @@ void PlayOnlineSceneControllerImpl::onRefreshButtonClicked()
 
 	if (gotList) {
 		const int count = masterServerClient.gameServerListCount();
-		cl_log_event("a", "%1", count);
 		for (int i = 0; i < count; ++i) {
 			Net::MasterServer::GameServer gameServer = masterServerClient.gameServerAt(i);
+
+			ServerInterviewer iv;
+			iv.setServerHost(gameServer.m_addr);
+			iv.setServerPort(gameServer.m_port);
+			iv.run();
+
 			PlayOnlineScene::Entry entry;
-			entry.serverName = gameServer.m_addr;
+			if (iv.isSucceed()) {
+				entry.serverName = iv.getServerName();
+				entry.playerCountCurrent = iv.getPlayerCount();
+				entry.playerCountLimit = iv.getPlayerLimit();
+				entry.ping = iv.getPing();
+
+				TGameMode gameMode = iv.getGameMode();
+				switch (gameMode) {
+					case GM_ARCADE:
+						entry.gamemode = _("ARCADE");
+						break;
+
+					case GM_TIME_TRAIL:
+						entry.gamemode = _("TIME TRAIL");
+						break;
+
+					default:
+						G_ASSERT(0 && "unknown game mode");
+				}
+			} else {
+				entry.serverName = "??";
+			}
 
 			m_scene->addServerEntry(entry);
 		}

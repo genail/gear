@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/system.h"
 
 #include "common.h"
 #include "common/types.h"
@@ -54,6 +54,8 @@ class Server {
 
 		void start();
 		void stop();
+
+		void setServerName(const CL_String &p_serverName);
 
 
 	protected:

@@ -45,6 +45,8 @@
 #include "network/packets/PlayerJoined.h"
 #include "network/packets/PlayerLeft.h"
 #include "network/packets/RaceStart.h"
+#include "network/packets/ServerInfoRequest.h"
+#include "network/packets/ServerInfoResponse.h"
 #include "network/packets/VoteStart.h"
 #include "network/packets/VoteEnd.h"
 #include "network/packets/VoteTick.h"
@@ -87,6 +89,8 @@ class ServerImpl
 
 
 		Server *m_parent;
+
+		CL_String m_serverName;
 
 		bool m_running;
 
@@ -155,6 +159,8 @@ class ServerImpl
 
 		void onVoteTick(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
+		void onServerInfoRequest(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
+
 		//
 		// other events
 		//
@@ -180,6 +186,7 @@ Server::~Server()
 
 ServerImpl::ServerImpl(Server *p_parent) :
 		m_parent(p_parent),
+		m_serverName("unnamed"),
 		m_running(false)
 {
 	const CL_String levPath =
@@ -267,6 +274,11 @@ void ServerImpl::stopServerRegistrant()
 	m_masterServerThread.join();
 }
 
+void Server::setServerName(const CL_String &p_serverName)
+{
+	m_impl->m_serverName = p_serverName;
+}
+
 void ServerImpl::onClientConnected(CL_NetGameConnection *p_conn)
 {
 	cl_log_event(LOG_EVENT, "player %1 is connected", (unsigned) p_conn);
@@ -340,6 +352,11 @@ void ServerImpl::handleEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent
 
 		if (eventName == EVENT_CLIENT_INFO) {
 			onClientInfo(p_conn, p_event);
+		}
+
+		// master server events
+		if (eventName == EVENT_INFO_REQUEST) {
+			onServerInfoRequest(p_conn, p_event);
 		}
 
 		// race events
@@ -672,6 +689,17 @@ void ServerImpl::kick(CL_NetGameConnection *p_conn, GoodbyeReason p_reason)
 
 	send(p_conn, goodbye.buildEvent());
 	p_conn->disconnect();
+}
+
+void ServerImpl::onServerInfoRequest(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event)
+{
+	ServerInfoResponse response;
+	response.setServerName(m_serverName);
+	response.setMapName("fixme:mapname");
+	response.setPlayerCount(m_connections.size());
+	response.setPlayerLimit(99);
+
+	send(p_conn, response.buildEvent());
 }
 
 } // namespace

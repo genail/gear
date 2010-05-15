@@ -34,6 +34,7 @@
 
 #include "gfx/scenes/PlayOnlineScene.h"
 #include "network/masterserver/MasterServer.h"
+#include "network/packets/ServerInfoRequest.h"
 
 class ServerInterviewer : public CL_Runnable
 {
@@ -69,7 +70,7 @@ void ServerInterviewer::run()
 		msClient.connect(MS_DEFAULT_HOST, CL_StringHelp::int_to_text(MS_DEFAULT_PORT));
 
 		const unsigned before = CL_System::get_time();
-		msClient.send_event(CL_NetGameEvent("server_info_request"));
+		msClient.send_event(Net::ServerInfoRequest().buildEvent());
 	} catch (CL_Exception &e) {
 		m_working = false;
 		m_succeed = false;

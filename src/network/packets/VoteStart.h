@@ -28,8 +28,6 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-
 #include "Packet.h"
 #include "common/types.h"
 

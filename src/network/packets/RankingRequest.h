@@ -28,8 +28,6 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-
 #include "network/packets/Packet.h"
 
 namespace Net

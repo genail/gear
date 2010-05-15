@@ -13,7 +13,7 @@
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS >AS IS>
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -28,31 +28,29 @@
 
 #pragma once
 
-#include "network/packets/Packet.h"
-#include "ranking/RankingEntry.h"
-
-namespace Net
-{
-
-class RankingAdvance : public Net::Packet
-{
-	public:
-
-		RankingAdvance();
-		virtual ~RankingAdvance();
-
-		virtual CL_NetGameEvent buildEvent() const;
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-
-		void setRankingEntry(const RankingEntry &p_entry);
-		const RankingEntry &getRankingEntry() const;
-
-
-	private:
-
-		RankingEntry m_rankingEntry;
-};
-
-}
-
+#include <ClanLib/Core/System/databuffer.h>
+#include <ClanLib/Core/System/block_allocator.h>
+#include <ClanLib/Core/System/console_window.h>
+#include <ClanLib/Core/System/datetime.h>
+#include <ClanLib/Core/System/disposable_object.h>
+#include <ClanLib/Core/System/event.h>
+#include <ClanLib/Core/System/event_provider.h>
+#include <ClanLib/Core/System/exception.h>
+#include <ClanLib/Core/System/mutex.h>
+#include <ClanLib/Core/System/runnable.h>
+#include <ClanLib/Core/System/service.h>
+#include <ClanLib/Core/System/setup_core.h>
+#include <ClanLib/Core/System/thread.h>
+#include <ClanLib/Core/System/thread_local_storage.h>
+#include <ClanLib/Core/System/autoptr.h>
+#include <ClanLib/Core/System/weakptr.h>
+#include <ClanLib/Core/System/sharedptr.h>
+#include <ClanLib/Core/System/system.h>
+#include <ClanLib/Core/System/command_line.h>
+#include <ClanLib/Core/System/memory_pool.h>
+#include <ClanLib/Core/System/static_memory_pool.h>
+#include <ClanLib/Core/System/fixed_memory_pool.h>
+#include <ClanLib/Core/System/keep_alive.h>
+#include <ClanLib/Core/System/timer.h>
+#include <ClanLib/Core/System/registry_key.h>
+#include <ClanLib/Core/System/interlocked_variable.h>

@@ -29,9 +29,61 @@
 #include "PlayOnlineSceneController.h"
 
 #include <ClanLib/Core/Signals/callback_0.h>
+#include <ClanLib/Network/NetGame/client.h>
+#include <ClanLib/Network/NetGame/event.h>
 
 #include "gfx/scenes/PlayOnlineScene.h"
 #include "network/masterserver/MasterServer.h"
+
+class ServerInterviewer : public CL_Runnable
+{
+	public:
+		ServerInterviewer();
+
+		void run();
+
+	private:
+		bool m_working;
+		bool m_succeed;
+
+		void onEventReceived(const CL_NetGameEvent &p_event);
+};
+
+ServerInterviewer::ServerInterviewer() :
+		m_working(false),
+		m_succeed(false)
+{
+	// empty
+}
+
+void ServerInterviewer::run()
+{
+	m_working = true;
+	m_succeed = false;
+
+	CL_NetGameClient msClient;
+	CL_Slot receiverSlot =
+			msClient.sig_event_received().connect(this, &ServerInterviewer::onEventReceived);
+
+	try {
+		msClient.connect(MS_DEFAULT_HOST, CL_StringHelp::int_to_text(MS_DEFAULT_PORT));
+
+		const unsigned before = CL_System::get_time();
+		msClient.send_event(CL_NetGameEvent("server_info_request"));
+	} catch (CL_Exception &e) {
+		m_working = false;
+		m_succeed = false;
+	}
+}
+
+void ServerInterviewer::onEventReceived(const CL_NetGameEvent &p_event)
+{
+	if (p_event.get_name() == "server_info") {
+		m_succeed = true;
+	} else {
+		m_succeed = false;
+	}
+}
 
 class PlayOnlineSceneControllerImpl
 {

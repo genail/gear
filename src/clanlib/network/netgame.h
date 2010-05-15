@@ -28,31 +28,12 @@
 
 #pragma once
 
-#include "network/packets/Packet.h"
-#include "ranking/RankingEntry.h"
-
-namespace Net
-{
-
-class RankingAdvance : public Net::Packet
-{
-	public:
-
-		RankingAdvance();
-		virtual ~RankingAdvance();
-
-		virtual CL_NetGameEvent buildEvent() const;
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-
-		void setRankingEntry(const RankingEntry &p_entry);
-		const RankingEntry &getRankingEntry() const;
-
-
-	private:
-
-		RankingEntry m_rankingEntry;
-};
-
-}
-
+#include <ClanLib/Network/NetGame/client.h>
+#include <ClanLib/Network/NetGame/connection.h>
+#include <ClanLib/Network/NetGame/event.h>
+#include <ClanLib/Network/NetGame/event_dispatcher_v0.h>
+#include <ClanLib/Network/NetGame/event_dispatcher_v1.h>
+#include <ClanLib/Network/NetGame/event_dispatcher_v2.h>
+#include <ClanLib/Network/NetGame/event_dispatcher_v3.h>
+#include <ClanLib/Network/NetGame/event_value.h>
+#include <ClanLib/Network/NetGame/server.h>

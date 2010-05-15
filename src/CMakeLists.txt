@@ -32,6 +32,8 @@ SET(COMMON_SRCS
 	network/packets/RankingEntries.cpp
 	network/packets/RankingFind.cpp
 	network/packets/RankingRequest.cpp
+	network/packets/ServerInfoRequest.cpp
+	network/packets/ServerInfoResponse.cpp
 	network/packets/VoteEnd.cpp
 	network/packets/VoteStart.cpp
 	network/packets/VoteTick.cpp

@@ -26,33 +26,34 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "ServerInfoRequest.h"
 
-#include "network/packets/Packet.h"
-#include "ranking/RankingEntry.h"
+#include "common/gassert.h"s
+#include "network/events.h"
 
 namespace Net
 {
 
-class RankingAdvance : public Net::Packet
+ServerInfoRequest::ServerInfoRequest()
 {
-	public:
-
-		RankingAdvance();
-		virtual ~RankingAdvance();
-
-		virtual CL_NetGameEvent buildEvent() const;
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-
-		void setRankingEntry(const RankingEntry &p_entry);
-		const RankingEntry &getRankingEntry() const;
-
-
-	private:
-
-		RankingEntry m_rankingEntry;
-};
-
+	// empty
 }
 
+
+ServerInfoRequest::~ServerInfoRequest()
+{
+	// empty
+}
+
+
+CL_NetGameEvent ServerInfoRequest::buildEvent() const
+{
+	return CL_NetGameEvent(EVENT_INFO_REQUEST);
+}
+
+void ServerInfoRequest::parseEvent(const CL_NetGameEvent &p_event)
+{
+	G_ASSERT(p_event.get_name() == EVENT_INFO_REQUEST);
+}
+
+} // namespace

@@ -30,8 +30,6 @@
 
 #include <sys/types.h>
 
-#include <ClanLib/core.h>
-
 #include "Packet.h"
 
 namespace Net {

@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <ClanLib/network.h>
+#include "clanlib/network/netgame.h"
 
 namespace Net {
 
@@ -38,7 +38,6 @@ class Packet {
 
 		Packet() {}
 		virtual ~Packet() {}
-
 
 		virtual CL_NetGameEvent buildEvent() const = 0;
 		virtual void parseEvent(const CL_NetGameEvent &p_event) = 0;

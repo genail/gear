@@ -28,8 +28,7 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-#include <ClanLib/network.h>
+#include "clanlib/network/netgame.h"
 
 
 // connect / disconnect procedure
@@ -38,6 +37,11 @@
 #define EVENT_GAME_MODE     "game_mode"
 #define EVENT_GAME_STATE 	"game_state"
 #define EVENT_GOODBYE		"goodbye"
+
+// server query events
+
+#define EVENT_INFO_REQUEST  "info_request"
+#define EVENT_INFO_RESPONSE "info_response"
 
 // player events
 

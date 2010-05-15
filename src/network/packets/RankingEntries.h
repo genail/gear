@@ -29,7 +29,6 @@
 #pragma once
 
 #include <vector>
-#include <ClanLib/core.h>
 
 #include "network/packets/Packet.h"
 #include "ranking/RankingEntry.h"

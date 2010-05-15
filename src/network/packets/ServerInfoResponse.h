@@ -29,30 +29,41 @@
 #pragma once
 
 #include "network/packets/Packet.h"
-#include "ranking/RankingEntry.h"
 
 namespace Net
 {
 
-class RankingAdvance : public Net::Packet
+class ServerInfoResponseImpl;
+class ServerInfoResponse : public Packet
 {
 	public:
 
-		RankingAdvance();
-		virtual ~RankingAdvance();
+		ServerInfoResponse();
+		virtual ~ServerInfoResponse();
 
-		virtual CL_NetGameEvent buildEvent() const;
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
+		CL_NetGameEvent buildEvent() const;
+		void parseEvent(const CL_NetGameEvent &p_event);
 
+		void setServerName(const CL_String &p_name);
+		const CL_String &getServerName() const;
 
-		void setRankingEntry(const RankingEntry &p_entry);
-		const RankingEntry &getRankingEntry() const;
+		void setMapName(const CL_String &p_mapName);
+		const CL_String &getMapName() const;
 
+		void setPlayerCount(int p_playerCount);
+		int getPlayerCount() const;
+
+		void setPlayerLimit(int p_playerLimit);
+		int getPlayerLimit() const;
 
 	private:
 
-		RankingEntry m_rankingEntry;
+		CL_SharedPtr<ServerInfoResponseImpl> m_impl;
+
+		friend class ServerInfoResponseImpl;
+
 };
+
 
 }
 

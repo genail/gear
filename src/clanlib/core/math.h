@@ -13,7 +13,7 @@
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS <AS IS>
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -28,31 +28,34 @@
 
 #pragma once
 
-#include "network/packets/Packet.h"
-#include "ranking/RankingEntry.h"
-
-namespace Net
-{
-
-class RankingAdvance : public Net::Packet
-{
-	public:
-
-		RankingAdvance();
-		virtual ~RankingAdvance();
-
-		virtual CL_NetGameEvent buildEvent() const;
-		virtual void parseEvent(const CL_NetGameEvent &p_event);
-
-
-		void setRankingEntry(const RankingEntry &p_entry);
-		const RankingEntry &getRankingEntry() const;
-
-
-	private:
-
-		RankingEntry m_rankingEntry;
-};
-
-}
-
+#include <ClanLib/Core/Math/angle.h>
+#include <ClanLib/Core/Math/base64_encoder.h>
+#include <ClanLib/Core/Math/base64_decoder.h>
+#include <ClanLib/Core/Math/bezier_curve.h>
+#include <ClanLib/Core/Math/circle.h>
+#include <ClanLib/Core/Math/vec1.h>
+#include <ClanLib/Core/Math/vec2.h>
+#include <ClanLib/Core/Math/vec3.h>
+#include <ClanLib/Core/Math/vec4.h>
+#include <ClanLib/Core/Math/delauney_triangulator.h>
+#include <ClanLib/Core/Math/ear_clip_triangulator.h>
+#include <ClanLib/Core/Math/ear_clip_result.h>
+#include <ClanLib/Core/Math/line_math.h>
+#include <ClanLib/Core/Math/cl_math.h>
+#include <ClanLib/Core/Math/mat2.h>
+#include <ClanLib/Core/Math/mat3.h>
+#include <ClanLib/Core/Math/mat4.h>
+#include <ClanLib/Core/Math/origin.h>
+#include <ClanLib/Core/Math/outline_triangulator.h>
+#include <ClanLib/Core/Math/point.h>
+#include <ClanLib/Core/Math/pointset_math.h>
+#include <ClanLib/Core/Math/quad.h>
+#include <ClanLib/Core/Math/rect.h>
+#include <ClanLib/Core/Math/rect_packer.h>
+#include <ClanLib/Core/Math/sha1.h>
+#include <ClanLib/Core/Math/size.h>
+#include <ClanLib/Core/Math/triangle_math.h>
+#include <ClanLib/Core/Math/line.h>
+#include <ClanLib/Core/Math/line_ray.h>
+#include <ClanLib/Core/Math/line_segment.h>
+#include <ClanLib/Core/core_iostream.h>

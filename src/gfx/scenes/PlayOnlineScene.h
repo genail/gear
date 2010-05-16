@@ -56,7 +56,10 @@ class PlayOnlineScene : public Gfx::GuiScene
 		void addServerEntry(const Entry &p_entry);
 		void clearServerEntries();
 
-		CL_Callback_v0 &refreshClicked();
+		CL_Callback_v0 &refreshButtonClicked();
+		CL_Callback_v0 &mainMenuButtonClicked();
+		CL_Callback_v0 &connectButtonClicked();
+		CL_Callback_v1<const PlayOnlineScene::Entry&> &serverEntrySelected();
 
 	private:
 

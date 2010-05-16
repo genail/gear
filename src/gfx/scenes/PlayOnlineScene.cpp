@@ -48,13 +48,15 @@ class PlayOnlineSceneImpl
 		PlayOnlineScene *m_parent;
 
 		CL_Label m_sceneTitleLabel;
-		CL_ListView m_listView;
+		CL_ListView m_serverList;
 
 		CL_PushButton m_mainMenuButton;
 		CL_PushButton m_refreshButton;
 		CL_PushButton m_connectButton;
 
 		PlayOnlineSceneController m_controller;
+
+		CL_Callback_v1<const PlayOnlineScene::Entry&> m_serverEntrySelected;
 
 
 		PlayOnlineSceneImpl(PlayOnlineScene *p_parent);
@@ -65,6 +67,8 @@ class PlayOnlineSceneImpl
 
 		void addServerEntry(const PlayOnlineScene::Entry &p_entry);
 		void clearServerEntries();
+
+		void onServerListSelectionChanged(CL_ListViewSelection p_selection);
 };
 
 PlayOnlineScene::PlayOnlineScene(CL_GUIComponent *p_parent) :
@@ -77,20 +81,22 @@ PlayOnlineScene::PlayOnlineScene(CL_GUIComponent *p_parent) :
 PlayOnlineSceneImpl::PlayOnlineSceneImpl(PlayOnlineScene *p_parent) :
 		m_parent(p_parent),
 		m_sceneTitleLabel(p_parent),
-		m_listView(p_parent),
+		m_serverList(p_parent),
 		m_mainMenuButton(p_parent),
 		m_refreshButton(p_parent),
 		m_connectButton(p_parent),
 		m_controller(p_parent)
 {
 	const int stageWidth = m_parent->get_width();
-	const int stageHeight = m_parent->get_height();
 
 	m_sceneTitleLabel.set_geometry(CL_Rect(stageWidth / 2, MARGIN, stageWidth - MARGIN, 50));
 	m_sceneTitleLabel.set_text("Status text");
 
 	configureListViewWidget();
 	configureButtons();
+
+	m_serverList.func_selection_changed().set(
+			this, &PlayOnlineSceneImpl::onServerListSelectionChanged);
 }
 
 void PlayOnlineSceneImpl::configureListViewWidget()
@@ -107,12 +113,12 @@ void PlayOnlineSceneImpl::configureListViewWidget()
 	const int stageHeight = m_parent->get_height();
 	const int listWidth = stageWidth - 2 * MARGIN;
 
-	m_listView.set_geometry(CL_Rect(10, 10, stageWidth - MARGIN, stageHeight - BOTTOM_MARGIN));
-	m_listView.set_display_mode(listview_mode_details);
-	m_listView.set_select_whole_row(true);
+	m_serverList.set_geometry(CL_Rect(10, 10, stageWidth - MARGIN, stageHeight - BOTTOM_MARGIN));
+	m_serverList.set_display_mode(listview_mode_details);
+	m_serverList.set_select_whole_row(true);
 
 	// add headers
-	CL_ListViewHeader *header = m_listView.get_header();
+	CL_ListViewHeader *header = m_serverList.get_header();
 
 	CL_ListViewColumnHeader colName = header->create_column(COL_NAME, _("Server name"));
 	colName.set_width(listWidth * COL_NAME_SIZE);
@@ -133,16 +139,6 @@ void PlayOnlineSceneImpl::configureListViewWidget()
 	CL_ListViewColumnHeader colPing = header->create_column(COL_PING, _("Ping"));
 	colPing.set_width(listWidth * COL_PING_SIZE);
 	header->append(colPing);
-
-	PlayOnlineScene::Entry entry;
-	entry.serverName = "Gear Official 1";
-	entry.gamemode = "arcade";
-	entry.mapName = "fields1";
-	entry.playerCountCurrent = 6;
-	entry.playerCountLimit = 12;
-	entry.ping = 63;
-
-	addServerEntry(entry);
 }
 
 void PlayOnlineSceneImpl::configureButtons()
@@ -195,7 +191,7 @@ void PlayOnlineScene::addServerEntry(const Entry &p_entry)
 
 void PlayOnlineSceneImpl::addServerEntry(const PlayOnlineScene::Entry &p_entry)
 {
-	CL_ListViewItem item = m_listView.create_item();
+	CL_ListViewItem item = m_serverList.create_item();
 	item.set_column_text(COL_NAME, p_entry.serverName);
 	item.set_column_text(COL_GAMEMODE, p_entry.gamemode);
 	item.set_column_text(COL_MAP, p_entry.mapName);
@@ -203,8 +199,10 @@ void PlayOnlineSceneImpl::addServerEntry(const PlayOnlineScene::Entry &p_entry)
 			COL_PLAYERS, cl_format("%1/%2", p_entry.playerCountCurrent, p_entry.playerCountLimit));
 	item.set_column_text(COL_PING, CL_StringHelp::int_to_text(p_entry.ping));
 
-	CL_ListViewItem docItem = m_listView.get_document_item();
+	CL_ListViewItem docItem = m_serverList.get_document_item();
 	docItem.append_child(item);
+
+	item.set_userdata(CL_SharedPtr<PlayOnlineScene::Entry>(new PlayOnlineScene::Entry(p_entry)));
 }
 
 void PlayOnlineScene::clearServerEntries()
@@ -214,11 +212,39 @@ void PlayOnlineScene::clearServerEntries()
 
 void PlayOnlineSceneImpl::clearServerEntries()
 {
-	CL_ListViewItem docItem = m_listView.get_document_item();
+	CL_ListViewItem docItem = m_serverList.get_document_item();
 	docItem.remove_children();
 }
 
-CL_Callback_v0 &PlayOnlineScene::refreshClicked()
+void PlayOnlineSceneImpl::onServerListSelectionChanged(CL_ListViewSelection p_selection)
+{
+	CL_ListViewSelectedItem selectedItem = p_selection.get_first();
+
+	if (!selectedItem.is_null()) {
+		CL_ListViewItem item = selectedItem.get_item();
+		PlayOnlineScene::Entry *serverEntry =
+				reinterpret_cast<PlayOnlineScene::Entry*>(item.get_userdata().get());
+
+		m_serverEntrySelected.invoke(*serverEntry);
+	}
+}
+
+CL_Callback_v0 &PlayOnlineScene::refreshButtonClicked()
 {
 	return m_impl->m_refreshButton.func_clicked();
+}
+
+CL_Callback_v0 &PlayOnlineScene::mainMenuButtonClicked()
+{
+	return m_impl->m_mainMenuButton.func_clicked();
+}
+
+CL_Callback_v0 &PlayOnlineScene::connectButtonClicked()
+{
+	return m_impl->m_connectButton.func_clicked();
+}
+
+CL_Callback_v1<const PlayOnlineScene::Entry&> &PlayOnlineScene::serverEntrySelected()
+{
+	return m_impl->m_serverEntrySelected;
 }

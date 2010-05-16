@@ -34,11 +34,15 @@
 #include "common.h"
 #include "common/gassert.h"
 #include "network/events.h"
+#include "gfx/Stage.h"
 #include "gfx/scenes/PlayOnlineScene.h"
 #include "network/masterserver/MasterServer.h"
 #include "network/packets/GameMode.h"
 #include "network/packets/ServerInfoRequest.h"
 #include "network/packets/ServerInfoResponse.h"
+
+// server query response timeout
+const unsigned TIMEOUT_MS = 1000;
 
 class ServerInterviewer : public CL_Runnable
 {
@@ -67,6 +71,7 @@ class ServerInterviewer : public CL_Runnable
 		bool m_working;
 		bool m_succeed;
 		bool m_waitingResponse, m_waitingGameMode;
+		unsigned m_startTime;
 
 		TGameMode m_gameMode;
 		CL_String m_serverName;
@@ -76,6 +81,8 @@ class ServerInterviewer : public CL_Runnable
 		int m_ping;
 
 		void onEventReceived(const CL_NetGameEvent &p_event);
+
+		bool isTimeout() const;
 };
 
 ServerInterviewer::ServerInterviewer() :
@@ -100,16 +107,16 @@ void ServerInterviewer::run()
 		m_waitingResponse = true;
 		m_waitingGameMode = true;
 
-		const unsigned before = CL_System::get_time();
+		m_startTime = CL_System::get_time();
 		msClient.send_event(Net::ServerInfoRequest().buildEvent());
 
-		while (m_waitingResponse || m_waitingGameMode) {
+		while (m_waitingResponse || m_waitingGameMode || isTimeout()) {
 			CL_KeepAlive::process();
 		}
 
 		if (m_succeed) {
-			const unsigned after = CL_System::get_time();
-			m_ping = static_cast<signed>(after - before);
+			const unsigned endTime = CL_System::get_time();
+			m_ping = static_cast<signed>(endTime - m_startTime);
 		}
 	} catch (CL_Exception &e) {
 		m_succeed = false;
@@ -144,6 +151,10 @@ void ServerInterviewer::onEventReceived(const CL_NetGameEvent &p_event)
 	}
 }
 
+bool ServerInterviewer::isTimeout() const {
+	return CL_System::get_time() > m_startTime + TIMEOUT_MS;
+}
+
 class PlayOnlineSceneControllerImpl
 {
 	public:
@@ -160,6 +171,9 @@ class PlayOnlineSceneControllerImpl
 		void initialize();
 
 		void onRefreshButtonClicked();
+		void onMainMenuButtonClicked();
+		void onConnectButtonClicked();
+		void onServerEntrySelected(const PlayOnlineScene::Entry &p_serverEntry);
 };
 
 PlayOnlineSceneController::PlayOnlineSceneController(PlayOnlineScene *p_scene) :
@@ -193,7 +207,14 @@ void PlayOnlineSceneController::initialize()
 
 void PlayOnlineSceneControllerImpl::initialize()
 {
-	m_scene->refreshClicked().set(this, &PlayOnlineSceneControllerImpl::onRefreshButtonClicked);
+	m_scene->refreshButtonClicked().set(
+			this, &PlayOnlineSceneControllerImpl::onRefreshButtonClicked);
+	m_scene->mainMenuButtonClicked().set(
+			this, &PlayOnlineSceneControllerImpl::onMainMenuButtonClicked);
+	m_scene->connectButtonClicked().set(
+			this, &PlayOnlineSceneControllerImpl::onConnectButtonClicked);
+	m_scene->serverEntrySelected().set(
+			this, &PlayOnlineSceneControllerImpl::onServerEntrySelected);
 }
 
 void PlayOnlineSceneControllerImpl::onRefreshButtonClicked()
@@ -239,4 +260,20 @@ void PlayOnlineSceneControllerImpl::onRefreshButtonClicked()
 			m_scene->addServerEntry(entry);
 		}
 	}
+}
+
+void PlayOnlineSceneControllerImpl::onMainMenuButtonClicked()
+{
+	Gfx::Stage::popScene();
+}
+
+void PlayOnlineSceneControllerImpl::onConnectButtonClicked()
+{
+
+}
+
+void PlayOnlineSceneControllerImpl::onServerEntrySelected(
+		const PlayOnlineScene::Entry &p_serverEntry)
+{
+	cl_log_event(LOG_DEBUG, "serverName = %1", p_serverEntry.serverName);
 }

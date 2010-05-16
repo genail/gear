@@ -65,6 +65,8 @@ class RaceGraphicsImpl
 		/** How player sees the scene */
 		Gfx::Viewport m_viewport;
 
+		CL_Pointf m_viewportPointHelper, m_viewportPoint;
+
 		/** Logic with data for reading only */
 		const Race::GameLogic *m_logic;
 
@@ -159,7 +161,8 @@ RaceGraphicsImpl::RaceGraphicsImpl(RaceGraphics *p_parent, const Race::GameLogic
 	Game &game = Game::getInstance();
 
 	Player &player = game.getPlayer();
-	m_viewport.attachTo(&(player.getCar().getPosition()));
+	m_viewportPointHelper = player.getCar().getPosition();
+	m_viewport.attachTo(&m_viewportPoint);
 }
 
 RaceGraphics::~RaceGraphics()
@@ -527,6 +530,21 @@ void RaceGraphicsImpl::updateViewport(unsigned p_timeElapsed)
 
 	m_viewport.setScale(nextScale);
 
+	// update center point position
+
+	static const float MAX_VIEW_DELTA = 30.0f;
+
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+
+	const CL_Pointf &carPosition = player.getCar().getPosition();
+	CL_Pointf deltaPoint = carPosition - m_viewportPointHelper;
+
+	const float deltaRatio = deltaPoint.length() / MAX_VIEW_DELTA;
+	const float timeDelta = p_timeElapsed / 1000.0f;
+
+	m_viewportPointHelper += deltaPoint * (deltaRatio * timeDelta);
+	m_viewportPoint = carPosition + (carPosition - m_viewportPointHelper);
 
 
 #ifndef NDEBUG

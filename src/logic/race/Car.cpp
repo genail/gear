@@ -59,7 +59,7 @@ class CarImpl
 		Player *m_ownerPlayer;
 
 		/** This will help to keep 1/60 iteration speed */
-		unsigned m_timeFromLastUpdate;
+		float m_timeReserveMs;
 
 		/** Iteration counter */
 		int32_t m_iterId;
@@ -111,7 +111,7 @@ class CarImpl
 		CarImpl(const Car *p_base, Player *p_ownerPlayer) :
 			m_base(p_base),
 			m_ownerPlayer(p_ownerPlayer),
-			m_timeFromLastUpdate(0),
+			m_timeReserveMs(0),
 			m_iterId(-1),
 			m_position(300.0f, 300.0f),
 			m_rotation(0, cl_degrees),
@@ -178,14 +178,22 @@ Car::~Car()
 
 void Car::update(unsigned p_timeElapsed)
 {
-	m_impl->m_timeFromLastUpdate += p_timeElapsed;
+	static const float breakPoint = 1000.0f / 60.0f;
 
-	static const unsigned breakPoint = 1000 / 60;
+	//cl_log_event("a", "%1", p_timeElapsed);
+	m_impl->m_timeReserveMs += p_timeElapsed;
 
-	while (m_impl->m_timeFromLastUpdate >= breakPoint) {
+	bool first = true;
+
+	do {
+		if (!first) {
+			cl_log_event("a", "double calculation");
+		}
+
 		m_impl->update1_60();
-		m_impl->m_timeFromLastUpdate -= breakPoint;
-	}
+		m_impl->m_timeReserveMs -= breakPoint;
+		first = false;
+	} while (m_impl->m_timeReserveMs >= breakPoint);
 }
 
 void Car::updateToIteration(int32_t p_targetIterId)

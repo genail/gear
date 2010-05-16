@@ -32,6 +32,7 @@
 
 #include "common.h"
 #include "controllers/PlayOnlineSceneController.h"
+#include "gfx/widgets/Header.h"
 
 static const int MARGIN = 10;
 
@@ -47,7 +48,8 @@ class PlayOnlineSceneImpl
 
 		PlayOnlineScene *m_parent;
 
-		CL_Label m_sceneTitleLabel;
+		Gfx::Header m_sceneTitleHeader;
+		CL_Label m_statusLabel;
 		CL_ListView m_serverList;
 
 		CL_PushButton m_mainMenuButton;
@@ -80,7 +82,8 @@ PlayOnlineScene::PlayOnlineScene(CL_GUIComponent *p_parent) :
 
 PlayOnlineSceneImpl::PlayOnlineSceneImpl(PlayOnlineScene *p_parent) :
 		m_parent(p_parent),
-		m_sceneTitleLabel(p_parent),
+		m_sceneTitleHeader(p_parent),
+		m_statusLabel(p_parent),
 		m_serverList(p_parent),
 		m_mainMenuButton(p_parent),
 		m_refreshButton(p_parent),
@@ -89,8 +92,12 @@ PlayOnlineSceneImpl::PlayOnlineSceneImpl(PlayOnlineScene *p_parent) :
 {
 	const int stageWidth = m_parent->get_width();
 
-	m_sceneTitleLabel.set_geometry(CL_Rect(stageWidth / 2, MARGIN, stageWidth - MARGIN, 50));
-	m_sceneTitleLabel.set_text("Status text");
+	m_sceneTitleHeader.set_geometry(CL_Rect(10, 30, 300, 80));
+	m_sceneTitleHeader.setText(_("Play Online"));
+	m_sceneTitleHeader.setTextSize(58);
+
+	m_statusLabel.set_geometry(CL_Rect(stageWidth - 300, 80, stageWidth, 100));
+	m_statusLabel.set_text(_("Press the refresh button"));
 
 	configureListViewWidget();
 	configureButtons();
@@ -113,7 +120,7 @@ void PlayOnlineSceneImpl::configureListViewWidget()
 	const int stageHeight = m_parent->get_height();
 	const int listWidth = stageWidth - 2 * MARGIN;
 
-	m_serverList.set_geometry(CL_Rect(10, 10, stageWidth - MARGIN, stageHeight - BOTTOM_MARGIN));
+	m_serverList.set_geometry(CL_Rect(10, 100, stageWidth - MARGIN, stageHeight - BOTTOM_MARGIN));
 	m_serverList.set_display_mode(listview_mode_details);
 	m_serverList.set_select_whole_row(true);
 
@@ -214,6 +221,11 @@ void PlayOnlineSceneImpl::clearServerEntries()
 {
 	CL_ListViewItem docItem = m_serverList.get_document_item();
 	docItem.remove_children();
+}
+
+void PlayOnlineScene::setStatusText(const CL_String &p_statusText)
+{
+	m_impl->m_statusLabel.set_text(p_statusText);
 }
 
 void PlayOnlineSceneImpl::onServerListSelectionChanged(CL_ListViewSelection p_selection)

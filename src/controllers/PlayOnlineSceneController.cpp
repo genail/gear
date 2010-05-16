@@ -33,8 +33,10 @@
 
 #include "common.h"
 #include "common/gassert.h"
+#include "controllers/ConnectController.h"
 #include "network/events.h"
 #include "gfx/Stage.h"
+#include "gfx/scenes/ConnectScene.h"
 #include "gfx/scenes/PlayOnlineScene.h"
 #include "network/masterserver/MasterServer.h"
 #include "network/packets/GameMode.h"
@@ -164,6 +166,12 @@ class PlayOnlineSceneControllerImpl
 		PlayOnlineScene *m_scene;
 		Net::MasterServer masterServerClient;
 
+		CL_String m_selectedServerAddr;
+		int m_selectedServerPort;
+
+		// future scene
+		Gfx::ConnectScene m_connectScene;
+
 
 		PlayOnlineSceneControllerImpl(PlayOnlineSceneController *p_parent, PlayOnlineScene *p_scene);
 		~PlayOnlineSceneControllerImpl();
@@ -185,7 +193,9 @@ PlayOnlineSceneController::PlayOnlineSceneController(PlayOnlineScene *p_scene) :
 PlayOnlineSceneControllerImpl::PlayOnlineSceneControllerImpl(
 		PlayOnlineSceneController *p_parent, PlayOnlineScene *p_scene) :
 		m_parent(p_parent),
-		m_scene(p_scene)
+		m_scene(p_scene),
+		m_selectedServerPort(0),
+		m_connectScene(m_scene->get_parent_component())
 {
 	// empty
 }
@@ -235,6 +245,8 @@ void PlayOnlineSceneControllerImpl::onRefreshButtonClicked()
 
 			PlayOnlineScene::Entry entry;
 			if (iv.isSucceed()) {
+				entry.addr = gameServer.m_addr;
+				entry.port = gameServer.m_port;
 				entry.serverName = iv.getServerName();
 				entry.playerCountCurrent = iv.getPlayerCount();
 				entry.playerCountLimit = iv.getPlayerLimit();
@@ -259,6 +271,10 @@ void PlayOnlineSceneControllerImpl::onRefreshButtonClicked()
 
 			m_scene->addServerEntry(entry);
 		}
+
+		m_scene->setStatusText(cl_format(_("Found %1 servers"), count));
+	} else {
+		m_scene->setStatusText(_("Error retrieving server list"));
 	}
 }
 
@@ -269,11 +285,16 @@ void PlayOnlineSceneControllerImpl::onMainMenuButtonClicked()
 
 void PlayOnlineSceneControllerImpl::onConnectButtonClicked()
 {
-
+	if (!m_selectedServerAddr.empty()) {
+		Gfx::Stage::pushScene(&m_connectScene);
+		ConnectController &connectController = m_connectScene.getController();
+		connectController.makeConnection(m_selectedServerAddr, m_selectedServerPort);
+	}
 }
 
 void PlayOnlineSceneControllerImpl::onServerEntrySelected(
 		const PlayOnlineScene::Entry &p_serverEntry)
 {
-	cl_log_event(LOG_DEBUG, "serverName = %1", p_serverEntry.serverName);
+	m_selectedServerAddr = p_serverEntry.addr;
+	m_selectedServerPort = p_serverEntry.port;
 }

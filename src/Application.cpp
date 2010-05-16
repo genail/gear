@@ -129,6 +129,10 @@ int Application::main(const std::vector<CL_String> &args)
 			}
 		}
 
+		// set player name
+		Game &game = Game::getInstance();
+		game.getPlayer().setName(Properties::getString(CG_PLAYER_NAME, ""));
+
 		// set opengl version
 		enum GLVer {
 			GL1,

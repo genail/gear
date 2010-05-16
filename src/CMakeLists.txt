@@ -69,6 +69,7 @@ SET(CLIENT_SRCS
 	${COMMON_SRCS}
 	Application.cpp
 	controllers/AuthorsController.cpp
+	controllers/ConnectController.cpp
 	controllers/EditorController.cpp
 	controllers/GameMenuController.cpp
 	controllers/MainMenuController.cpp
@@ -106,11 +107,13 @@ SET(CLIENT_SRCS
 	gfx/race/ui/ScoreTable.cpp
 	gfx/race/ui/SpeedMeter.cpp
 	gfx/scenes/AuthorsScene.cpp
+	gfx/scenes/ConnectScene.cpp
 	gfx/scenes/EditorScene.cpp
 	gfx/scenes/MainMenuScene.cpp
 	gfx/scenes/PlayOnlineScene.cpp
 	gfx/scenes/RaceScene.cpp
 	gfx/scenes/OptionsScene.cpp
+	gfx/widgets/Header.cpp
 	logic/race/BasicGameClient.cpp
 	logic/race/GameLogicArcadeOnline.cpp
 	logic/race/GameLogicTimeTrailOnline.cpp

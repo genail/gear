@@ -26,48 +26,71 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "ConnectScene.h"
 
-#include <ClanLib/core.h>
+#include "controllers/ConnectController.h"
+#include "gfx/widgets/Header.h"
 
-#include "gfx/GuiScene.h"
+namespace Gfx
+{
 
-class PlayOnlineSceneImpl;
-class PlayOnlineScene : public Gfx::GuiScene
+class ConnectSceneImpl
 {
 	public:
 
-		struct Entry {
-			CL_String addr;
-			int port;
-			CL_String serverName;
-			CL_String gamemode;
-			CL_String mapName;
-			int playerCountCurrent;
-			int playerCountLimit;
-			int ping;
-		};
+		ConnectScene *m_parent;
+		ConnectController m_controller;
 
-		PlayOnlineScene(CL_GUIComponent *p_parent);
-		virtual ~PlayOnlineScene();
+		Gfx::Header m_statusHeader;
 
-		virtual void draw(CL_GraphicContext &p_gc);
-
-		void addServerEntry(const Entry &p_entry);
-		void clearServerEntries();
-
-		void setStatusText(const CL_String &p_statusText);
-
-		CL_Callback_v0 &refreshButtonClicked();
-		CL_Callback_v0 &mainMenuButtonClicked();
-		CL_Callback_v0 &connectButtonClicked();
-		CL_Callback_v1<const PlayOnlineScene::Entry&> &serverEntrySelected();
-
-	private:
-
-		CL_SharedPtr<PlayOnlineSceneImpl> m_impl;
-
-		friend class PlayOnlineSceneImpl;
-
+		ConnectSceneImpl(ConnectScene *p_parent);
+		~ConnectSceneImpl();
 };
 
+// --------------------------------------------------------
+
+ConnectScene::ConnectScene(CL_GUIComponent *p_parent) :
+		GuiScene(p_parent),
+		m_impl(new ConnectSceneImpl(this))
+{
+	// empty
+}
+
+ConnectSceneImpl::ConnectSceneImpl(ConnectScene *p_parent) :
+		m_parent(p_parent),
+		m_controller(p_parent),
+		m_statusHeader(p_parent)
+{
+	m_statusHeader.set_geometry(CL_Rect(50, 50, 300, 100));
+	m_statusHeader.setTextSize(40);
+	m_statusHeader.setTextColor(CL_Colorf::white);
+}
+
+ConnectScene::~ConnectScene()
+{
+	// empty
+}
+
+ConnectSceneImpl::~ConnectSceneImpl()
+{
+	// empty
+}
+
+// --------------------------------------------------------
+
+void ConnectScene::draw(CL_GraphicContext &p_gc)
+{
+	CL_Draw::fill(p_gc, 0, 0, get_width(), get_height(), CL_Colorf::black);
+}
+
+ConnectController &ConnectScene::getController()
+{
+	return m_impl->m_controller;
+}
+
+void ConnectScene::setStatusText(const CL_String &p_statusText)
+{
+	m_impl->m_statusHeader.setText(p_statusText);
+}
+
+} // namespace

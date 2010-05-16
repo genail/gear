@@ -53,7 +53,6 @@ class MainMenuScene : public Gfx::GuiScene
 
 		virtual void pushed();
 
-		CL_String getPlayerName() const { return Properties::getString(CG_PLAYER_NAME, ""); }
 		CL_String getServerAddr() const { return m_serverLineEdit.get_text(); }
 
 		void displayError(const CL_String& p_message);

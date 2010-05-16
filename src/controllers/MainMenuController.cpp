@@ -41,7 +41,7 @@
 #include "network/packets/GameState.h"
 
 
-class NetworkClientConnectRunnable : public CL_Runnable
+class NetworkClientConnectRunnable2 : public CL_Runnable
 {
 	public:
 
@@ -52,7 +52,7 @@ class NetworkClientConnectRunnable : public CL_Runnable
 
 		CL_SlotContainer m_slots;
 
-		NetworkClientConnectRunnable() :
+		NetworkClientConnectRunnable2() :
 			m_gameModeReceived(false),
 			m_gameStateReceived(false)
 		{ /* empty */ }
@@ -79,11 +79,11 @@ class NetworkClientConnectRunnable : public CL_Runnable
 		void connectClientSlots(Net::Client &p_client) {
 			m_slots.connect(
 					p_client.sig_gameModeReceived(),
-					this, &NetworkClientConnectRunnable::onGameModeReceived);
+					this, &NetworkClientConnectRunnable2::onGameModeReceived);
 
 			m_slots.connect(
 					p_client.sig_gameStateReceived(),
-					this, &NetworkClientConnectRunnable::onGameStateReceived);
+					this, &NetworkClientConnectRunnable2::onGameStateReceived);
 		}
 
 		void waitForGameMode() {
@@ -125,7 +125,7 @@ class MainMenuControllerImpl
 		EditorScene *m_editorScene;
 		PlayOnlineScene *m_playOnlineScene;
 
-		NetworkClientConnectRunnable m_connectRunnable;
+		NetworkClientConnectRunnable2 m_connectRunnable;
 
 		CL_Thread m_connectThread;
 
@@ -232,10 +232,6 @@ void MainMenuControllerImpl::onRaceStartClicked()
 		return;
 	}
 
-	Game &game = Game::getInstance();
-
-	game.getPlayer().setName(m_scene->getPlayerName());
-
 	// create race scene
 	if (!m_scene->getServerAddr().empty()) {
 		makeNetworkConnection();
@@ -262,7 +258,7 @@ void MainMenuControllerImpl::displayError(const CL_String &p_text)
 
 bool MainMenuControllerImpl::playerNameChosen() const
 {
-	return !m_scene->getPlayerName().empty();
+	return !Properties::getString(CG_PLAYER_NAME, "").empty();
 }
 
 void MainMenuControllerImpl::makeNetworkConnection()

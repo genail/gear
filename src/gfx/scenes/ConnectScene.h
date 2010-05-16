@@ -28,46 +28,34 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-
 #include "gfx/GuiScene.h"
 
-class PlayOnlineSceneImpl;
-class PlayOnlineScene : public Gfx::GuiScene
+class ConnectController;
+
+namespace Gfx
+{
+
+class ConnectSceneImpl;
+class ConnectScene : public GuiScene
 {
 	public:
 
-		struct Entry {
-			CL_String addr;
-			int port;
-			CL_String serverName;
-			CL_String gamemode;
-			CL_String mapName;
-			int playerCountCurrent;
-			int playerCountLimit;
-			int ping;
-		};
-
-		PlayOnlineScene(CL_GUIComponent *p_parent);
-		virtual ~PlayOnlineScene();
+		ConnectScene(CL_GUIComponent *p_parent);
+		virtual ~ConnectScene();
 
 		virtual void draw(CL_GraphicContext &p_gc);
 
-		void addServerEntry(const Entry &p_entry);
-		void clearServerEntries();
-
+		ConnectController &getController();
 		void setStatusText(const CL_String &p_statusText);
 
-		CL_Callback_v0 &refreshButtonClicked();
-		CL_Callback_v0 &mainMenuButtonClicked();
-		CL_Callback_v0 &connectButtonClicked();
-		CL_Callback_v1<const PlayOnlineScene::Entry&> &serverEntrySelected();
 
 	private:
 
-		CL_SharedPtr<PlayOnlineSceneImpl> m_impl;
+		CL_SharedPtr<ConnectSceneImpl> m_impl;
 
-		friend class PlayOnlineSceneImpl;
+		friend class ConnectSceneImpl;
 
 };
+
+} // namespace
 

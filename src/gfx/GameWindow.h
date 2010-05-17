@@ -30,10 +30,12 @@
 
 #include <list>
 
-#include <ClanLib/core.h>
 #include <ClanLib/gui.h>
+#include "clanlib/core/signals.h"
 
-namespace Gfx {
+namespace Gfx
+{
+
 class Scene;
 
 class GameWindow : public CL_GUIComponent {
@@ -72,6 +74,9 @@ class GameWindow : public CL_GUIComponent {
 		//
 
 		std::list<CL_InputEvent> m_events;
+
+		float m_timeStoreMs;
+		float m_timeBufferMs;
 
 		//
 		// methods

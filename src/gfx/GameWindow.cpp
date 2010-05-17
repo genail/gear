@@ -43,7 +43,9 @@ GameWindow::GameWindow(CL_GUIManager *p_guiMgr, CL_GUIWindowManagerTexture *p_wi
 	m_guiMgr(p_guiMgr),
 	m_ic(p_ic),
 	m_lastLogicUpdateTime(0),
-	m_lastScene(NULL)
+	m_lastScene(NULL),
+	m_timeStoreMs(0.0f),
+	m_timeBufferMs(0.0f)
 {
 	// connect keyboard
 	CL_InputDevice &keyboard = m_ic->get_keyboard();
@@ -98,10 +100,21 @@ void GameWindow::draw(CL_GraphicContext &p_gc)
 void GameWindow::updateLogic(Scene *p_scene)
 {
 
+	static const float ITERATION_TIME_MS = 1000.0f / 60.0f;
+
+	// add time delta to time buffer
+	const unsigned timeNow = CL_System::get_time();
+
+	if (m_lastLogicUpdateTime != 0) {
+		m_timeStoreMs += timeNow - m_lastLogicUpdateTime;
+	}
+
+	m_lastLogicUpdateTime = timeNow;
+
 	if (p_scene != NULL) {
+		if (p_scene->isLoaded()) {
 
-		if (p_scene->isLoaded()) { // update only when loaded
-
+			// change scene activity if new scene on top of stack
 			if (p_scene != m_lastScene) {
 
 				if (m_lastScene != NULL) {
@@ -109,42 +122,39 @@ void GameWindow::updateLogic(Scene *p_scene)
 				}
 
 				m_lastScene = p_scene;
-
 				p_scene->setActive(true);
 			}
 
-			const unsigned now = CL_System::get_time();
+#if defined(VSYNC)
+			bool iterationDone = false;
 
-			if (m_lastLogicUpdateTime == 0) {
-				p_scene->update(0);
-			} else {
-				const unsigned timeChange = now - m_lastLogicUpdateTime;
-
-#if !defined(NDEBUG)
-				// apply iteration time change
-				static float timeChangeF = 0.0f;
-				const int iterSpeed = Properties::getInt(DBG_ITER_SPEED, 100);
-
-				timeChangeF += timeChange * (iterSpeed / 100.0f);
-
-				if (timeChangeF >= 1.0f) {
-					const float total = floor(timeChangeF);
-					p_scene->update((unsigned) total);
-
-					timeChangeF -= total;
+			do {
+				if (iterationDone) {
+					cl_log_event(LOG_DEBUG, "double iteration");
 				}
-#else // !NDEBUG
-				p_scene->update(timeChange);
-#endif // NDEBUG
+
+				m_timeBufferMs += ITERATION_TIME_MS;
+				int timeDeltaMs = floor(m_timeBufferMs);
+				m_timeBufferMs -= timeDeltaMs;
+
+				p_scene->update(timeDeltaMs);
+				m_timeStoreMs -= ITERATION_TIME_MS;
+				iterationDone = true;
+			} while (m_timeStoreMs >= ITERATION_TIME_MS);
+#else // VSYNC
+			for (; m_timeStoreMs >= ITERATION_TIME_MS; m_timeStoreMs -= ITERATION_TIME_MS) {
+
+				m_timeBufferMs += ITERATION_TIME_MS;
+				int timeDeltaMs = floor(m_timeBufferMs);
+				m_timeBufferMs -= timeDeltaMs;
+
+				p_scene->update(timeDeltaMs);
 			}
+#endif // VSYNC
 
 
-			m_lastLogicUpdateTime = now;
 		}
-
 	} else {
-		// when there are no scenes on stack, then probably application
-		// should be ended
 		cl_log_event(LOG_DEBUG, "Closing application because of empty scene stack");
 		exit_with_code(EXIT_CODE_QUIT);
 	}

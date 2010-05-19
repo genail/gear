@@ -28,6 +28,7 @@
 
 #pragma once
 
+// needed for CL_VERSION
 #include <ClanLib/core.h>
 
 // this file contains workarounds to known problems in used libraries

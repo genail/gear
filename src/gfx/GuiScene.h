@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <ClanLib/gui.h>
+
 #include "Scene.h"
 
 namespace Gfx {

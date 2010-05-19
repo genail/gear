@@ -28,6 +28,8 @@
 
 #include "Properties.h"
 
+#include "clanlib/core/io.h"
+
 #include "common.h"
 
 std::map<CL_String, CL_String> Properties::m_keyValueMap;

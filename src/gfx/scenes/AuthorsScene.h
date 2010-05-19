@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,8 @@
  */
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/system.h"
+#include "clanlib/display/font.h"
 
 #include "common.h"
 #include "gfx/GuiScene.h"
@@ -35,7 +36,7 @@
 
 class AuthorsScene : public Gfx::GuiScene
 {
-        SIGNAL_0(okClicked);
+		SIGNAL_0(okClicked);
 
 	public:
 		AuthorsScene(CL_GUIComponent *p_parent);
@@ -84,7 +85,7 @@ class AuthorsScene : public Gfx::GuiScene
 
 		// action slots
 
-        void onOkClick();
+		void onOkClick();
 
 		void onTimerInterval();
 

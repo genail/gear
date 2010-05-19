@@ -30,6 +30,8 @@
 
 #include <stdlib.h>
 
+#include "clanlib/core/text.h"
+
 #include "common.h"
 
 #include "gfx/Stage.h"

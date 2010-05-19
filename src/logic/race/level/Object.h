@@ -28,8 +28,9 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-#include <ClanLib/display.h>
+#include "clanlib/core/system.h"
+#include "clanlib/core/math.h"
+#include "clanlib/display/collision.h"
 
 #include "common.h"
 

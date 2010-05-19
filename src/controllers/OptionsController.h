@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/signals.h"
 
 class OptionScene;
 
@@ -51,9 +51,9 @@ class OptionController {
 
 		// action handlers
 
-        void onOkClicked();
+		void onOkClicked();
 
-        void onCancelClicked();
+		void onCancelClicked();
 
 };
 

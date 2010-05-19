@@ -28,7 +28,8 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/system.h"
+#include "clanlib/core/math.h"
 
 
 // shitty Visual C++ hack to get numeric_limits<>::max() to work

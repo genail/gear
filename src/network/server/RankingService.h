@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
-#include <ClanLib/network.h>
+#include "clanlib/core/system.h"
+#include "clanlib/network/netgame.h"
 
 namespace Net
 {

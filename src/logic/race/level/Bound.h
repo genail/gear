@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,10 +29,11 @@
 #pragma once
 
 #include <boost/utility.hpp>
-#include <ClanLib/core.h>
+
+#include "clanlib/core/math.h"
 
 #ifdef CLIENT
-#include <ClanLib/display.h>
+#include "clanlib/display/collision.h"
 #endif // CLIENT
 
 namespace Race {

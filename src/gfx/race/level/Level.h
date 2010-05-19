@@ -28,7 +28,8 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/system.h"
+#include "clanlib/display/render.h"
 
 #include "common.h"
 #include "gfx/Drawable.h"

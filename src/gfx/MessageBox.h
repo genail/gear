@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
 #include <ClanLib/gui.h>
+#include "clanlib/core/system.h"
 
 #include "gfx/Overlay.h"
 

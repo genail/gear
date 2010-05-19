@@ -28,6 +28,8 @@
 
 #include "PlayerList.h"
 
+#include "clanlib/core/text.h"
+
 #include "common/Player.h"
 #include "gfx/race/ui/Label.h"
 #include "logic/race/Car.h"

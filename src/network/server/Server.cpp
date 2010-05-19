@@ -28,6 +28,8 @@
 
 #include "Server.h"
 
+#include "clanlib/core/io.h"
+
 #include "common.h"
 #include "common/Player.h"
 #include "common/Properties.h"

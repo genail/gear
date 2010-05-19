@@ -29,7 +29,8 @@
 #pragma once
 
 #include <vector>
-#include <ClanLib/core.h>
+#include "clanlib/core/system.h"
+#include "clanlib/core/signals.h"
 
 #include "common.h"
 #include "common/types.h"

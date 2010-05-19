@@ -28,6 +28,8 @@
 
 #include "ConnectScene.h"
 
+#include "clanlib/display/2d.h"
+
 #include "controllers/ConnectController.h"
 #include "gfx/widgets/Header.h"
 

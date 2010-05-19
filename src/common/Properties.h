@@ -29,7 +29,7 @@
 #pragma once
 
 #include <map>
-#include <ClanLib/core.h>
+#include "clanlib/core/text.h"
 
 //
 // known properties files

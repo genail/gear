@@ -29,7 +29,10 @@
 #include "MasterServer.h"
 
 #include <vector>
-#include <ClanLib/network.h>
+
+#include "clanlib/core/signals.h"
+#include "clanlib/core/text.h"
+#include "clanlib/network/netgame.h"
 
 #include "common.h"
 

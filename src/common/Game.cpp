@@ -33,11 +33,12 @@
 Game::Game() :
 	m_player()
 {
-
+	// empty
 }
 
 Game::~Game()
 {
+	// empty
 }
 
 Game &Game::getInstance()

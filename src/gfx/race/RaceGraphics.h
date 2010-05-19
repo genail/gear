@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <ClanLib/display.h>
+#include "clanlib/display/render.h"
 
 namespace Race {
 	class GameLogic;

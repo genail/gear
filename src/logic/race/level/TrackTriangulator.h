@@ -28,7 +28,9 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/system.h"
+#include "clanlib/core/math.h"
+
 
 namespace Race
 {

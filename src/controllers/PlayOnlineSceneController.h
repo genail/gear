@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <ClanLib/Core/System/sharedptr.h>
+#include "clanlib/core/system.h"
 
 class PlayOnlineScene;
 

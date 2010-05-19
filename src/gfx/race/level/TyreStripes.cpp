@@ -30,6 +30,10 @@
 
 #include <map>
 #include <list>
+#include <deque>
+
+#include "clanlib/display/2d.h"
+#include "clanlib/core/text.h"
 
 #include "common.h"
 #include "logic/race/Car.h"

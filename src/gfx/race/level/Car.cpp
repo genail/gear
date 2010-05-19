@@ -28,6 +28,8 @@
 
 #include "Car.h"
 
+#include "clanlib/display/2d.h"
+
 #include <assert.h>
 
 #include "gfx/Stage.h"

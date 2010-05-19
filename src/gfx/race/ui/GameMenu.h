@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,12 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/math.h"
+#include "clanlib/core/signals.h"
+#include "clanlib/display/render.h"
+#include "clanlib/display/2d.h"
+
 #include <ClanLib/gui.h>
-#include <ClanLib/display.h>
 
 #include "gfx/Overlay.h"
 

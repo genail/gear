@@ -27,7 +27,7 @@
  */
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/signals.h"
 
 #include "common.h"
 #include "common/Properties.h"

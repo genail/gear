@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@
 AuthorsController::AuthorsController(AuthorsScene *p_scene) :
 	m_scene(p_scene)
 {
-    m_slots.connect(m_scene->sig_okClicked(), this, &AuthorsController::onOkClicked);
+	m_slots.connect(m_scene->sig_okClicked(), this, &AuthorsController::onOkClicked);
 }
 
 AuthorsController::~AuthorsController()

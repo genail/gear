@@ -28,6 +28,8 @@
 
 #include "MainMenuController.h"
 
+#include "clanlib/core/signals.h"
+
 #include "common/Game.h"
 #include "gfx/Stage.h"
 #include "gfx/scenes/AuthorsScene.h"

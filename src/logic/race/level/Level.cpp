@@ -28,6 +28,8 @@
 
 #include "Level.h"
 
+#include "clanlib/core/xml.h"
+
 #include <assert.h>
 
 #include "common/Limits.h"

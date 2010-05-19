@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,10 @@
 
 #include "Sandpit.h"
 
-#include <ClanLib/core.h>
-#include <ClanLib/gl1.h>
+#include "clanlib/display/2d.h"
+#include "clanlib/core/math.h"
+#include "clanlib/core/text.h"
+
 #include <assert.h>
 
 #include "common.h"

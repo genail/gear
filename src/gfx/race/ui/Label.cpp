@@ -28,6 +28,8 @@
 
 #include "Label.h"
 
+#include "clanlib/display/font.h"
+
 #include "common/gassert.h"
 
 namespace Gfx {

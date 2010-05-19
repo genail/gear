@@ -28,6 +28,8 @@
 
 #include "GameWindow.h"
 
+#include "clanlib/display/window.h"
+
 #include "common.h"
 #include "gfx/Scene.h"
 #include "gfx/Stage.h"

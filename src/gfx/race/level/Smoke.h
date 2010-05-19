@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include "clanlib/display/2d.h"
+
 #include "gfx/Animation.h"
 
 #include "math/Float.h"

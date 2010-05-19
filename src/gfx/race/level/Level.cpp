@@ -28,6 +28,8 @@
 
 #include "Level.h"
 
+#include "clanlib/display/2d.h"
+
 #include <vector>
 
 #include "common/Units.h"

@@ -28,8 +28,9 @@
 
 #include <stdlib.h>
 
-#include <ClanLib/core.h>
-#include <ClanLib/display.h>
+#include "clanlib/display/2d.h"
+#include "clanlib/display/window.h"
+
 #include <ClanLib/application.h>
 #include <ClanLib/gl.h>
 #include <ClanLib/gl1.h>

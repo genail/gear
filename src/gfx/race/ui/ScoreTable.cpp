@@ -32,6 +32,9 @@
 #include <list>
 #include <math.h>
 
+#include "clanlib/core/text.h"
+#include "clanlib/display/2d.h"
+
 #include "common.h"
 #include "common/Player.h"
 #include "gfx/Stage.h"

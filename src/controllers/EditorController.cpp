@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  */
 
 #include "EditorController.h"
+
+#include "clanlib/core/signals.h"
 
 #include "common/Game.h"
 #include "gfx/Stage.h"

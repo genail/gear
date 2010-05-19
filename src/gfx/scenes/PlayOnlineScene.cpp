@@ -29,6 +29,7 @@
 #include "PlayOnlineScene.h"
 
 #include <ClanLib/gui.h>
+#include "clanlib/display/2d.h"
 
 #include "common.h"
 #include "controllers/PlayOnlineSceneController.h"

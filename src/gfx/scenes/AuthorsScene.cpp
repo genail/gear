@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,8 @@
 
 #include "AuthorsScene.h"
 
+#include "clanlib/display/2d.h"
+
 #include "common.h"
 #include "gfx/Stage.h"
 
@@ -40,11 +42,11 @@ const int V_MARGIN = 40;
 
 AuthorsScene::AuthorsScene(CL_GUIComponent *p_parent) :
 	GuiScene(p_parent),
-    m_controller(this),
+	m_controller(this),
 	m_leadProgramerLabel(this),
 	m_programersLabel(this),
 	m_graphicsLabel(this),
-    m_okButton(this),
+	m_okButton(this),
 	m_isDown(true),
 	m_isRight(true),
 	m_timer()
@@ -119,7 +121,7 @@ CL_SpanLayout AuthorsScene::getProgramersSpan()
 	type = _("Programers:\n");
 	authors = _("Robert Cebula\n");
 	authors += _("Bartosz Platak\n");
-	authors += _("Pawe³ Rybarczyk");
+	authors += _("Paweï¿½ Rybarczyk");
 	span.add_text(type, m_typeFont, m_fontColor);
 	span.add_text(authors, m_authorsFont, m_fontColor);
 
@@ -148,7 +150,7 @@ void AuthorsScene::draw(CL_GraphicContext &p_gc)
 
 void AuthorsScene::onOkClick()
 {
-    INVOKE_0(okClicked);
+	INVOKE_0(okClicked);
 }
 
 void AuthorsScene::onTimerInterval()

@@ -29,7 +29,6 @@
 #pragma once
 
 #include <vector>
-#include <assert.h>
 
 #include "Player.h"
 #include "network/client/Client.h"

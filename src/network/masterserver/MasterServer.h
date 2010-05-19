@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <ClanLib/core.h>
+#include "clanlib/core/system.h"
 
 #ifndef MS_DEFAULT_HOST
 #define MS_DEFAULT_HOST "torvalds.rootnode.net"

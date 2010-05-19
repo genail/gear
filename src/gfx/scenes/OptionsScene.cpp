@@ -28,6 +28,9 @@
 
 #include "OptionsScene.h"
 
+#include "clanlib/display/2d.h"
+#include "clanlib/display/font.h"
+
 #include "common.h"
 #include "common/Properties.h"
 #include "gfx/Stage.h"

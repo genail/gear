@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Piotr Korzuszek
+ * Copyright (c) 2009-2010, Piotr Korzuszek
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,8 @@
 
 #include <map>
 #include <vector>
-#include <ClanLib/core.h>
+
+#include "clanlib/core/system.h"
 
 namespace Race {
 

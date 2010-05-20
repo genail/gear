@@ -46,6 +46,7 @@
 #include "gfx/race/level/TyreStripes.h"
 #include "gfx/race/ui/RaceUI.h"
 #include "gfx/race/ui/SpeedMeter.h"
+#include "gfx/shaders/MotionBlurShader.h"
 #include "logic/race/Block.h"
 #include "logic/race/level/Bound.h"
 #include "logic/race/Progress.h"
@@ -66,6 +67,8 @@ class RaceGraphicsImpl
 		Gfx::Viewport m_viewport;
 
 		CL_Pointf m_viewportPointHelper, m_viewportPoint;
+
+		MotionBlurShader m_motionBlurShader;
 
 		/** Logic with data for reading only */
 		const Race::GameLogic *m_logic;
@@ -172,7 +175,9 @@ RaceGraphics::~RaceGraphics()
 
 RaceGraphicsImpl::~RaceGraphicsImpl()
 {
-	// empty
+	if (m_loaded) {
+		m_motionBlurShader.destroy();
+	}
 }
 
 void RaceGraphics::draw(CL_GraphicContext &p_gc)
@@ -237,6 +242,8 @@ void RaceGraphicsImpl::load(CL_GraphicContext &p_gc)
 	loadTyreStripes(p_gc);
 	loadDecorations(p_gc);
 	loadSandPits(p_gc);
+
+	m_motionBlurShader.initialize(p_gc);
 
 	m_loaded = true;
 }
@@ -322,6 +329,10 @@ void RaceGraphicsImpl::drawTyreStripes(CL_GraphicContext &p_gc)
 
 void RaceGraphicsImpl::drawLevel(CL_GraphicContext &p_gc)
 {
+	m_motionBlurShader.setRadius(32);
+
+	m_motionBlurShader.begin(p_gc);
+
 	m_level.draw(p_gc);
 
 //	const Race::Level &level = m_logic->getLevel();
@@ -331,6 +342,8 @@ void RaceGraphicsImpl::drawLevel(CL_GraphicContext &p_gc)
 	drawSandpits(p_gc);
 
 	drawForeBlocks(p_gc);
+
+	m_motionBlurShader.end(p_gc);
 
 //	// draw bounds
 //	const size_t boundCount = level.getBoundCount();

@@ -41,9 +41,8 @@ namespace Gfx
 {
 
 const CL_Vec4f COLOR_WHITE(1.0f, 1.0f, 1.0f, 1.0f);
-const CL_Vec4f QUAD_COLORS[] = {
-	COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE
-	};
+const CL_Vec4f QUAD_COLORS[] = { COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE };
+const CL_Vec2f QUAD_TEX_COORDS[] = { CL_Vec2f(0,0), CL_Vec2f(0,1), CL_Vec2f(1,1), CL_Vec2f(1,0) };
 
 class ShaderImpl
 {
@@ -71,7 +70,7 @@ class ShaderImpl
 		~ShaderImpl();
 
 		void initialize(CL_GraphicContext &p_gc);
-		void destroy(CL_GraphicContext &p_gc);
+		void destroy();
 
 		void begin(CL_GraphicContext &p_gc);
 		void end(CL_GraphicContext &p_gc);
@@ -90,7 +89,20 @@ ShaderImpl::ShaderImpl(Shader *p_parent) :
 		m_initialized(false),
 		m_began(false)
 {
-	// empty
+	m_boundRect.left = 0;
+	m_boundRect.top = 0;
+	m_boundRect.right = Stage::getWidth();
+	m_boundRect.bottom = Stage::getHeight();
+
+	// build quad verts
+	const int w = Gfx::Stage::getWidth();
+	const int h = Gfx::Stage::getHeight();
+
+	m_quadVerts = new CL_Vec2f[4];
+	m_quadVerts[0] = CL_Vec2f(0, 0);
+	m_quadVerts[1] = CL_Vec2f(0, h);
+	m_quadVerts[2] = CL_Vec2f(w, h);
+	m_quadVerts[3] = CL_Vec2f(w, 0);
 }
 
 Shader::~Shader()
@@ -100,7 +112,7 @@ Shader::~Shader()
 
 ShaderImpl::~ShaderImpl()
 {
-	// empty
+	delete[] m_quadVerts;
 }
 
 // --------------------------------------------------------
@@ -115,6 +127,8 @@ void ShaderImpl::initialize(CL_GraphicContext &p_gc)
 	G_ASSERT(!m_initialized);
 
 	CL_ResourceManager *resMgr = Gfx::Stage::getResourceManager();
+
+	m_program = CL_ProgramObject(p_gc);
 
 	// load vertex shader
 	const CL_String &vertShaderName = m_parent->getVertexShaderResourceName();
@@ -148,22 +162,34 @@ void ShaderImpl::initialize(CL_GraphicContext &p_gc)
 	// build frame buffer
 	m_frameBuffer = CL_FrameBuffer(p_gc);
 
+	// build quad
+	m_quad = CL_PrimitivesArray(p_gc);
+	m_quad.set_attributes(CL_PRIARR_VERTS, m_quadVerts);
+	m_quad.set_attributes(CL_PRIARR_COLORS, QUAD_COLORS);
+	m_quad.set_attributes(CL_PRIARR_TEXCOORDS, QUAD_TEX_COORDS);
+
 	m_initialized = true;
 }
 
-void Shader::destroy(CL_GraphicContext &p_gc)
+void Shader::destroy()
 {
-	m_impl->destroy(p_gc);
+	m_impl->destroy();
 }
 
-void ShaderImpl::destroy(CL_GraphicContext &p_gc)
+void ShaderImpl::destroy()
 {
 	G_ASSERT(m_initialized);
 
+	m_quad = CL_PrimitivesArray();
 	m_frameBuffer = CL_FrameBuffer();
 
 	m_program.detach(m_vertShader);
 	m_program.detach(m_fragShader);
+
+	m_vertShader = CL_ShaderObject();
+	m_fragShader = CL_ShaderObject();
+
+	m_program = CL_ProgramObject();
 
 	m_initialized = false;
 }
@@ -217,8 +243,18 @@ void ShaderImpl::end(CL_GraphicContext &p_gc)
 
 	m_parent->setUniforms(m_program);
 
-	// draw witch shader
+	// draw texture using shader
+	p_gc.set_modelview(CL_Mat4f::identity());
+
+	p_gc.set_texture(0, m_texture);
 	p_gc.set_program_object(m_program);
+
+	p_gc.draw_primitives(cl_quads, 4, m_quad);
+
+	p_gc.reset_texture(0);
+
+	// reset modelview matrix
+	p_gc.pop_modelview();
 
 	m_began = false;
 }

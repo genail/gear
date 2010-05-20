@@ -46,7 +46,7 @@ class Shader : public boost::noncopyable
 		virtual ~Shader();
 
 		void initialize(CL_GraphicContext &p_gc);
-		void destroy(CL_GraphicContext &p_gc);
+		void destroy();
 
 		void begin(CL_GraphicContext &p_gc);
 		void end(CL_GraphicContext &p_gc);

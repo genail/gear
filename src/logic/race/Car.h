@@ -99,6 +99,7 @@ class Car : boost::noncopyable
 		 */
 		float getPhyWheelTurn() const;
 		const CL_Angle &getPhyAngle() const;
+		const CL_Vec2f &getPhyMoveVector() const;
 
 		int32_t getIterationId() const;
 

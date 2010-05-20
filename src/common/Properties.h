@@ -51,6 +51,7 @@
 #define CG_SCREEN_HEIGHT "cg_screen_heght"
 #define CG_FULLSCREEN "cg_fullscreen"
 #define CG_OPENGL_VER "cg_opengl_ver"
+#define CG_USE_SHADERS "cg_use_shaders"
 
 // player settings
 #define CG_PLAYER_NAME "cg_player_name"

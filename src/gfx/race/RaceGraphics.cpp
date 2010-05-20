@@ -460,9 +460,18 @@ void RaceGraphicsImpl::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 	Race::Car &playerCar = game.getPlayerCar();
 
 	if (p_car != playerCar) {
-		const int blurRadius = static_cast<int>(p_car.getSpeed());
-		const CL_Angle &carAngle = p_car.getPhyAngle();
-		const CL_Angle blurAngle = CL_Angle::from_radians(2 * CL_PI - carAngle.to_radians());
+
+		const CL_Vec2f &playerVec = playerCar.getPhyMoveVector();
+		const CL_Vec2f &otherVec = p_car.getPhyMoveVector();
+
+		const CL_Vec2f deltaVec = otherVec - playerVec;
+		CL_Angle blurAngle = deltaVec.angle(CL_Vec2f(1, 0));
+
+		if (deltaVec.y < 0) {
+			blurAngle.set_radians(blurAngle.to_radians());
+		}
+
+		const float blurRadius = deltaVec.length() / 1.5f;
 
 		m_motionBlurShader.setRadius(blurRadius);
 		m_motionBlurShader.setAngle(blurAngle);

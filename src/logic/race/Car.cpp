@@ -816,4 +816,9 @@ const CarInputState &Car::getInputState() const
 	return m_impl->m_inputState;
 }
 
+const CL_Angle &Car::getPhyAngle() const
+{
+		return m_impl->m_phyMoveRot;
+}
+
 } // namespace

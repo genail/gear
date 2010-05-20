@@ -329,21 +329,13 @@ void RaceGraphicsImpl::drawTyreStripes(CL_GraphicContext &p_gc)
 
 void RaceGraphicsImpl::drawLevel(CL_GraphicContext &p_gc)
 {
-	m_motionBlurShader.setRadius(32);
-
-	m_motionBlurShader.begin(p_gc);
-
 	m_level.draw(p_gc);
 
 //	const Race::Level &level = m_logic->getLevel();
 
 	drawBackBlocks(p_gc);
-
 	drawSandpits(p_gc);
-
 	drawForeBlocks(p_gc);
-
-	m_motionBlurShader.end(p_gc);
 
 //	// draw bounds
 //	const size_t boundCount = level.getBoundCount();
@@ -462,8 +454,28 @@ void RaceGraphicsImpl::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 		carGfx.load(p_gc);
 	}
 
+	// draw motion blur shader if car is not player car
+
+	Game &game = Game::getInstance();
+	Race::Car &playerCar = game.getPlayerCar();
+
+	if (p_car != playerCar) {
+		const int blurRadius = static_cast<int>(p_car.getSpeed());
+		const CL_Angle &carAngle = p_car.getPhyAngle();
+		const CL_Angle blurAngle = CL_Angle::from_radians(2 * CL_PI - carAngle.to_radians());
+
+		m_motionBlurShader.setRadius(blurRadius);
+		m_motionBlurShader.setAngle(blurAngle);
+
+		m_motionBlurShader.begin(p_gc);
+	}
+
 	carGfx.draw(p_gc);
-	
+
+	if (p_car != playerCar) {
+		m_motionBlurShader.end(p_gc);
+	}
+
 	#if defined(DRAW_CAR_VECTORS) && !defined(NDEBUG)
 		const CL_Pointf &pos = p_car.getPosition();
 		p_gc.push_translate(pos.x, pos.y);

@@ -98,6 +98,7 @@ class Car : boost::noncopyable
 		 * 1.0 is maximum right
 		 */
 		float getPhyWheelTurn() const;
+		const CL_Angle &getPhyAngle() const;
 
 		int32_t getIterationId() const;
 

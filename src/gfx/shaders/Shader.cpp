@@ -100,9 +100,9 @@ ShaderImpl::ShaderImpl(Shader *p_parent) :
 
 	m_quadVerts = new CL_Vec2f[4];
 	m_quadVerts[0] = CL_Vec2f(0, 0);
-	m_quadVerts[1] = CL_Vec2f(0, h);
-	m_quadVerts[2] = CL_Vec2f(w, h);
-	m_quadVerts[3] = CL_Vec2f(w, 0);
+	m_quadVerts[1] = CL_Vec2f(0, 1);
+	m_quadVerts[2] = CL_Vec2f(1, 1);
+	m_quadVerts[3] = CL_Vec2f(1, 0);
 }
 
 Shader::~Shader()
@@ -217,7 +217,13 @@ void ShaderImpl::begin(CL_GraphicContext &p_gc)
 
 	// set proper matrix
 	p_gc.push_modelview();
-	p_gc.mult_translate(-m_drawRect.left, -m_drawRect.top);
+
+	// get scaling in count
+	const CL_Mat4f &matrix = p_gc.get_modelview();
+	const float scaleX = matrix[0];
+	const float scaleY = matrix[5];
+
+	p_gc.mult_translate(-m_drawRect.left / scaleX, -m_drawRect.top / scaleY);
 
 	m_began = true;
 }
@@ -245,13 +251,23 @@ void ShaderImpl::end(CL_GraphicContext &p_gc)
 
 	// draw texture using shader
 	p_gc.set_modelview(CL_Mat4f::identity());
+	p_gc.mult_translate(m_drawRect.left, m_drawRect.top);
+	p_gc.mult_scale(m_drawRect.get_width(), m_drawRect.get_height());
 
 	p_gc.set_texture(0, m_texture);
 	p_gc.set_program_object(m_program);
 
 	p_gc.draw_primitives(cl_quads, 4, m_quad);
 
+	p_gc.reset_program_object();
 	p_gc.reset_texture(0);
+
+#if defined(DRAW_WIREFRAME)
+	CL_Draw::line(p_gc, 0, 0, 1, 0, CL_Colorf::red);
+	CL_Draw::line(p_gc, 1, 0, 1, 1, CL_Colorf::red);
+	CL_Draw::line(p_gc, 1, 1, 0, 1, CL_Colorf::red);
+	CL_Draw::line(p_gc, 0, 1, 0, 0, CL_Colorf::red);
+#endif // DRAW_WIREFRAME
 
 	// reset modelview matrix
 	p_gc.pop_modelview();

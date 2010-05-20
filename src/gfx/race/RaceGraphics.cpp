@@ -467,6 +467,10 @@ void RaceGraphicsImpl::drawCar(CL_GraphicContext &p_gc, const Race::Car &p_car)
 		m_motionBlurShader.setRadius(blurRadius);
 		m_motionBlurShader.setAngle(blurAngle);
 
+		const CL_Pointf pos = m_viewport.toScreen(p_car.getPosition());
+		CL_Rect rect(pos.x - 50, pos.y - 50, pos.x + 50, pos.y + 50);
+		m_motionBlurShader.setBoundRect(rect);
+
 		m_motionBlurShader.begin(p_gc);
 	}
 

@@ -5,6 +5,7 @@
         </sprite>
     </section>
     <section name="race">
+    
 
 		<!-- Level apperance -->
     
@@ -268,4 +269,8 @@
         </section>
         
     </section>
+	<section name="shaders">
+		<vertex-shader name="motionblur.vert" file="shaders/motionblur.vert" />
+		<fragment-shader name="motionblur.frag" file="shaders/motionblur.frag" />
+	</section>
 </resources>

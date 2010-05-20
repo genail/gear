@@ -26,34 +26,46 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ServerInfoRequest.h"
+#pragma once
 
-#include "common/gassert.h"
-#include "network/events.h"
+#include <boost/utility.hpp>
+#include "clanlib/core/system.h"
 
-namespace Net
+class CL_GraphicContext;
+class CL_ProgramObject;
+class CL_Rect;
+
+namespace Gfx
 {
 
-ServerInfoRequest::ServerInfoRequest()
+class ShaderImpl;
+class Shader : public boost::noncopyable
 {
-	// empty
+	public:
+		Shader();
+		virtual ~Shader();
+
+		void initialize(CL_GraphicContext &p_gc);
+		void destroy(CL_GraphicContext &p_gc);
+
+		void begin(CL_GraphicContext &p_gc);
+		void end(CL_GraphicContext &p_gc);
+
+		void setBoundRect(const CL_Rect &p_boundRect);
+
+	protected:
+
+		virtual const CL_String &getFragmentShaderResourceName() = 0;
+		virtual const CL_String &getVertexShaderResourceName() = 0;
+
+		virtual const CL_Rect &getDrawRect(const CL_Rect &p_requested);
+
+		virtual void setUniforms(CL_ProgramObject &p_program);
+
+	private:
+		CL_SharedPtr<ShaderImpl> m_impl;
+		friend class ShaderImpl;
+};
+
 }
 
-
-ServerInfoRequest::~ServerInfoRequest()
-{
-	// empty
-}
-
-
-CL_NetGameEvent ServerInfoRequest::buildEvent() const
-{
-	return CL_NetGameEvent(EVENT_INFO_REQUEST);
-}
-
-void ServerInfoRequest::parseEvent(const CL_NetGameEvent &p_event)
-{
-	G_ASSERT(p_event.get_name() == EVENT_INFO_REQUEST);
-}
-
-} // namespace

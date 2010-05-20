@@ -113,6 +113,8 @@ SET(CLIENT_SRCS
 	gfx/scenes/PlayOnlineScene.cpp
 	gfx/scenes/RaceScene.cpp
 	gfx/scenes/OptionsScene.cpp
+	gfx/shaders/Shader.cpp
+	gfx/shaders/MotionBlurShader.cpp
 	gfx/widgets/Header.cpp
 	logic/race/BasicGameClient.cpp
 	logic/race/GameLogicArcadeOnline.cpp

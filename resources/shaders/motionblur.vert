@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, Piotr Korzuszek
+ * Copyright (c) 2009-2010 The Gear Team
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the <organization> nor the
+ *     * Neither the name of the Gear nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -26,34 +26,15 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ServerInfoRequest.h"
+attribute vec4 Position, Color0;
+attribute vec2 TexCoord0;
 
-#include "common/gassert.h"
-#include "network/events.h"
+varying vec4 Color;
+varying vec2 TexCoord;
 
-namespace Net
-{
-
-ServerInfoRequest::ServerInfoRequest()
-{
-	// empty
+void main(void) 
+{ 
+	gl_Position = gl_ModelViewProjectionMatrix*Position; 
+	Color = Color0; 
+	TexCoord = TexCoord0; 
 }
-
-
-ServerInfoRequest::~ServerInfoRequest()
-{
-	// empty
-}
-
-
-CL_NetGameEvent ServerInfoRequest::buildEvent() const
-{
-	return CL_NetGameEvent(EVENT_INFO_REQUEST);
-}
-
-void ServerInfoRequest::parseEvent(const CL_NetGameEvent &p_event)
-{
-	G_ASSERT(p_event.get_name() == EVENT_INFO_REQUEST);
-}
-
-} // namespace

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, Piotr Korzuszek
+ * Copyright (c) 2009-2010 The Gear Team
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the <organization> nor the
+ *     * Neither the name of the Gear nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -26,34 +26,38 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ServerInfoRequest.h"
+#include "gfx/shaders/Shader.h"
 
-#include "common/gassert.h"
-#include "network/events.h"
+class CL_Angle;
+class CL_ProgramObject;
+class CL_Rect;
 
-namespace Net
+namespace Gfx
 {
 
-ServerInfoRequest::ServerInfoRequest()
+class MotionBlurShaderImpl;
+class MotionBlurShader : public Shader
 {
-	// empty
+	public:
+		MotionBlurShader();
+		virtual ~MotionBlurShader();
+
+		void setRadius(int p_radius);
+		void setAngle(const CL_Angle &p_angle);
+
+	protected:
+
+		virtual const CL_String &getFragmentShaderResourceName();
+		virtual const CL_String &getVertexShaderResourceName();
+
+		virtual const CL_Rect &getDrawRect(const CL_Rect &p_requested);
+
+		virtual void setUniforms(CL_ProgramObject &p_program);
+
+	private:
+		CL_SharedPtr<MotionBlurShaderImpl> m_impl;
+		friend class MotionBlurShaderImpl;
+};
+
+
 }
-
-
-ServerInfoRequest::~ServerInfoRequest()
-{
-	// empty
-}
-
-
-CL_NetGameEvent ServerInfoRequest::buildEvent() const
-{
-	return CL_NetGameEvent(EVENT_INFO_REQUEST);
-}
-
-void ServerInfoRequest::parseEvent(const CL_NetGameEvent &p_event)
-{
-	G_ASSERT(p_event.get_name() == EVENT_INFO_REQUEST);
-}
-
-} // namespace

@@ -62,7 +62,7 @@ class RaceUIImpl
 {
 	public:
 
-		Gfx::Drawable *m_modeBasedUI;
+		CL_SharedPtr<Drawable> m_modeBasedUI;
 
 		SpeedMeter m_speedMeter;
 		PlayerList m_playerList;
@@ -129,7 +129,6 @@ RaceUI::RaceUI(const Race::GameLogic *p_logic, const Gfx::Viewport *p_viewport) 
 
 RaceUIImpl::RaceUIImpl(const Race::GameLogic *p_logic, const Gfx::Viewport *p_viewport)
 	:
-		m_modeBasedUI(NULL),
 		m_playerList(p_logic),
 		m_scoreTable(p_logic),
 		m_globMsgLabel(CL_Pointf(Stage::getWidth() / 2, Stage::getHeight() / 3), "", Label::F_BOLD, 36),
@@ -162,10 +161,10 @@ RaceUIImpl::RaceUIImpl(const Race::GameLogic *p_logic, const Gfx::Viewport *p_vi
 	m_lastLapTimeLabel.setShadowVisible(true);
 	m_currentLapTimeLabel.setShadowVisible(true);
 
-	/*if (isInstance<const Race::GameLogicTimeTrailOnline>(p_logic)) {
-		m_modeBasedUI = new RaceUITimeTrail(
-				dynamic_cast<const Race::GameLogicTimeTrailOnline*>(p_logic));
-	}*/
+	if (isInstance<const Race::GameLogicTimeTrailOnline>(p_logic)) {
+		m_modeBasedUI = CL_SharedPtr<Drawable>(new RaceUITimeTrail(
+				dynamic_cast<const Race::GameLogicTimeTrailOnline*>(p_logic)));
+	}
 }
 
 void RaceUIImpl::positionLapTimeLabels()
@@ -203,9 +202,7 @@ RaceUI::~RaceUI()
 
 RaceUIImpl::~RaceUIImpl()
 {
-	if (m_modeBasedUI) {
-		delete m_modeBasedUI;
-	}
+	// empty
 }
 
 void RaceUI::update(unsigned p_timeElapsed)

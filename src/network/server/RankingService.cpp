@@ -47,13 +47,9 @@ class RankingServiceImpl
 
 		LocalRanking m_localRanking;
 
-
 		void parseEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
-
 		void parseRankingFindEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
-
 		void parseRankingAdvanceEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
-
 		void parseRankingRequestEvent(CL_NetGameConnection *p_conn, const CL_NetGameEvent &p_event);
 
 		RankingEntries prepareRankingEntriesPacket(int p_placeFrom, int p_placeTo);
@@ -100,6 +96,7 @@ void RankingServiceImpl::parseRankingFindEvent(
 	const int index = m_localRanking.findEntryIndex(rankingFindPacket.getPlayerId());
 
 	RankingEntries rankingEntriesPacket;
+	rankingEntriesPacket.setToken(rankingFindPacket.getToken());
 
 	if (index != -1) {
 		RankingEntry rankingEntry = m_localRanking.getEntryAtIndex(index);
@@ -148,6 +145,7 @@ void RankingServiceImpl::parseRankingRequestEvent(
 	if (entryRequestCount <= ENTRY_COUNT_LIMIT) {
 
 		RankingEntries rankingEntriesPacket = prepareRankingEntriesPacket(placeFrom, placeTo);
+		rankingEntriesPacket.setToken(rankingRequestPacket.getToken());
 		sendPacket(p_conn, rankingEntriesPacket);
 	} else {
 		cl_log_event(LOG_WARN, "entry request count exceeds the limit (%1)", entryRequestCount);

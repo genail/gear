@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, Piotr Korzuszek
+ * Copyright (c) 2009-2010 The Gear Team
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,10 +9,10 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the <organization> nor the
+ *     * Neither the name of the Gear nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -28,42 +28,33 @@
 
 #pragma once
 
-#include <vector>
-#include "clanlib/core/signals.h"
-#include "clanlib/network/netgame.h"
-
-#include "common.h"
+#include "network/queries/Query.h"
 #include "ranking/RankingEntry.h"
+
+#include "clanlib/core/system.h"
 
 namespace Net
 {
 
-class Client;
-
-class RankingClientImpl;
-class RankingClient : boost::noncopyable
+class RankingBrowseQueryImpl;
+class RankingBrowseQuery : public Query
 {
 	public:
-		/** token, list of entries */
-		CL_Signal_v2<int, const std::vector<PlacedRankingEntry>&> sig_entriesReceived;
+		RankingBrowseQuery();
+		virtual ~RankingBrowseQuery();
 
-		RankingClient(Client *p_client);
-		virtual ~RankingClient();
+		void setRange(int p_from, int p_to);
 
-		void sendTimeAdvance(int p_lapTimeMs);
+		virtual void submit();
 
-		int requestEntry(int p_place);
-		int requestEntries(int p_placeFrom, int p_placeTo);
+		int getEntriesCount() const;
+		const PlacedRankingEntry &getEntry(int p_index) const;
 
-		int findEntry(const CL_String &p_playerId);
 
 	private:
+		CL_SharedPtr<RankingBrowseQueryImpl> m_impl;
+		friend class RankingBrowseQueryImpl;
 
-		CL_SharedPtr<RankingClientImpl> m_impl;
-
-		void parseEvent(const CL_NetGameEvent &p_event);
-
-		friend class Client;
 };
 
 }

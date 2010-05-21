@@ -36,6 +36,8 @@
 #include "network/packets/GameState.h"
 #include "network/packets/RankingAdvance.h"
 
+#include "network/queries/RankingBrowseQuery.h"
+
 namespace Race
 {
 
@@ -50,7 +52,9 @@ class GameLogicTimeTrailOnlineImpl
 
 		RankingEntry m_firstPlaceRankingEntry;
 		bool m_gotFirstPlaceRankingEntry;
-		bool m_sentRankingRequest;
+
+		Net::RankingBrowseQuery m_queryRankingBrowse;
+		bool m_firstPlaceNeedUpdate;
 
 		CL_SlotContainer m_slots;
 
@@ -66,9 +70,8 @@ class GameLogicTimeTrailOnlineImpl
 		void updateLocalRanking();
 
 		void applyGameState(const Net::GameState &p_gameState);
+		void requestFirstPlaceUpdate();
 
-		// slots
-		void onRankingEntriesReceived(const std::vector<PlacedRankingEntry> &p_entries);
 };
 
 GameLogicTimeTrailOnline::GameLogicTimeTrailOnline() :
@@ -82,29 +85,9 @@ GameLogicTimeTrailOnlineImpl::GameLogicTimeTrailOnlineImpl(GameLogicTimeTrailOnl
 		m_basicClient(p_parent),
 		m_lastLapNumber(1),
 		m_gotFirstPlaceRankingEntry(false),
-		m_sentRankingRequest(false)
+		m_firstPlaceNeedUpdate(false)
 {
-	connectRankingSignals();
-}
-
-void GameLogicTimeTrailOnlineImpl::connectRankingSignals()
-{
-	Game &game = Game::getInstance();
-	Net::Client &client = game.getNetworkConnection();
-	Net::RankingClient &rankingClient = client.getRankingClient();
-
-	m_slots.connect(
-			rankingClient.sig_entriesReceived(),
-			this, &GameLogicTimeTrailOnlineImpl::onRankingEntriesReceived);
-}
-
-void GameLogicTimeTrailOnlineImpl::onRankingEntriesReceived(
-		const std::vector<PlacedRankingEntry> &p_entries)
-{
-	if (p_entries.size() == 1 && p_entries[0].place == 1) {
-		m_firstPlaceRankingEntry = p_entries[0];
-		m_gotFirstPlaceRankingEntry = true;
-	}
+	requestFirstPlaceUpdate();
 }
 
 GameLogicTimeTrailOnline::~GameLogicTimeTrailOnline()
@@ -161,18 +144,33 @@ void GameLogicTimeTrailOnlineImpl::updateRemoteRanking()
 	Net::RankingClient &rankingClient = client.getRankingClient();
 
 	rankingClient.sendTimeAdvance(lapTimeMs);
+
+	requestFirstPlaceUpdate();
 }
 
 void GameLogicTimeTrailOnlineImpl::updateLocalRanking()
 {
-	Game &game = Game::getInstance();
-	Net::Client &client = game.getNetworkConnection();
-
-	if (!m_gotFirstPlaceRankingEntry && !m_sentRankingRequest) {
-		Net::RankingClient &rankingClient = client.getRankingClient();
-		rankingClient.requestEntry(1);
-		m_sentRankingRequest = true;
+	if (!m_firstPlaceNeedUpdate) {
+		return;
 	}
+
+	if (m_queryRankingBrowse.isDone()) {
+		const int entryCount = m_queryRankingBrowse.getEntriesCount();
+		if (entryCount == 1) {
+			m_firstPlaceRankingEntry = m_queryRankingBrowse.getEntry(0);
+			m_gotFirstPlaceRankingEntry = true;
+		}
+
+		m_firstPlaceNeedUpdate = false;
+	}
+}
+
+void GameLogicTimeTrailOnlineImpl::requestFirstPlaceUpdate()
+{
+	m_queryRankingBrowse.setRange(1, 1);
+	m_queryRankingBrowse.submit();
+
+	m_firstPlaceNeedUpdate = true;
 }
 
 void GameLogicTimeTrailOnline::applyGameState(const Net::GameState &p_gameState)

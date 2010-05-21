@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, Piotr Korzuszek
+ * Copyright (c) 2009-2010 The Gear Team
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,10 +9,10 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the <organization> nor the
+ *     * Neither the name of the Gear nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -26,45 +26,47 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "Query.h"
 
-#include <vector>
-#include "clanlib/core/signals.h"
-#include "clanlib/network/netgame.h"
-
-#include "common.h"
-#include "ranking/RankingEntry.h"
+#include "common/gassert.h"
 
 namespace Net
 {
 
-class Client;
-
-class RankingClientImpl;
-class RankingClient : boost::noncopyable
+Query::Query() :
+		m_running(false),
+		m_done(false)
 {
-	public:
-		/** token, list of entries */
-		CL_Signal_v2<int, const std::vector<PlacedRankingEntry>&> sig_entriesReceived;
-
-		RankingClient(Client *p_client);
-		virtual ~RankingClient();
-
-		void sendTimeAdvance(int p_lapTimeMs);
-
-		int requestEntry(int p_place);
-		int requestEntries(int p_placeFrom, int p_placeTo);
-
-		int findEntry(const CL_String &p_playerId);
-
-	private:
-
-		CL_SharedPtr<RankingClientImpl> m_impl;
-
-		void parseEvent(const CL_NetGameEvent &p_event);
-
-		friend class Client;
-};
-
+	// empty
 }
 
+Query::~Query()
+{
+	// empty
+}
+
+bool Query::isRunning() const
+{
+	return m_running;
+}
+
+bool Query::isDone() const
+{
+	return m_done;
+}
+
+void Query::start()
+{
+	G_ASSERT(!m_running);
+
+	m_done = false;
+	m_running = true;
+}
+
+void Query::done()
+{
+	m_done = true;
+	m_running = false;
+}
+
+}

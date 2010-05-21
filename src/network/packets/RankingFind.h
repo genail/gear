@@ -36,7 +36,6 @@ namespace Net
 class RankingFind : public Net::Packet
 {
 	public:
-
 		RankingFind();
 		virtual ~RankingFind();
 
@@ -46,10 +45,14 @@ class RankingFind : public Net::Packet
 		void setPlayerId(const CL_String &p_str);
 		const CL_String &getPlayerId() const;
 
+		int getToken() const;
+
 
 	private:
-
+		int m_token;
 		CL_String m_playerId;
+
+
 };
 
 }

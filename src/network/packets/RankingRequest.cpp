@@ -29,6 +29,7 @@
 #include "RankingRequest.h"
 
 #include "common/gassert.h"
+#include "common/Token.h"
 #include "network/events.h"
 
 namespace Net
@@ -40,21 +41,24 @@ class RankingRequestImpl
 
 		RankingRequest *m_parent;
 
+		int m_token;
+
 		int m_placeFrom;
-
 		int m_placeTo;
-
 
 		RankingRequestImpl(RankingRequest *p_parent);
 		~RankingRequestImpl() {}
 
-
 		bool isValid() const;
+
+		CL_NetGameEvent buildEvent() const;
+		void parseEvent(const CL_NetGameEvent &p_event);
 };
 
 
 RankingRequestImpl::RankingRequestImpl(RankingRequest *p_parent) :
 		m_parent(p_parent),
+		m_token(Token::next()),
 		m_placeFrom(0),
 		m_placeTo(0)
 {
@@ -74,23 +78,36 @@ RankingRequest::~RankingRequest()
 
 CL_NetGameEvent RankingRequest::buildEvent() const
 {
+	return m_impl->buildEvent();
+}
+
+CL_NetGameEvent RankingRequestImpl::buildEvent() const
+{
 	CL_NetGameEvent event(EVENT_RANKING_REQUEST);
-	event.add_argument(m_impl->m_placeFrom);
-	event.add_argument(m_impl->m_placeTo);
+	event.add_argument(m_token);
+	event.add_argument(m_placeFrom);
+	event.add_argument(m_placeTo);
 
 	return event;
 }
 
 void RankingRequest::parseEvent(const CL_NetGameEvent &p_event)
 {
-	static const unsigned ARG_COUNT = 2;
+	m_impl->parseEvent(p_event);
+}
+
+void RankingRequestImpl::parseEvent(const CL_NetGameEvent &p_event)
+{
+	static const unsigned ARG_COUNT = 3;
+
 	G_ASSERT(p_event.get_name() == EVENT_RANKING_REQUEST);
 	G_ASSERT(p_event.get_argument_count() == ARG_COUNT);
 
-	m_impl->m_placeFrom = p_event.get_argument(0);
-	m_impl->m_placeTo = p_event.get_argument(1);
+	m_token = p_event.get_argument(0);
+	m_placeFrom = p_event.get_argument(1);
+	m_placeTo = p_event.get_argument(2);
 
-	if (!m_impl->isValid()) {
+	if (!isValid()) {
 		throw CL_Exception("invalid from-to values");
 	}
 }
@@ -120,6 +137,11 @@ void RankingRequest::setPlaceTo(int p_placeTo)
 bool RankingRequestImpl::isValid() const
 {
 	return m_placeFrom > 0 && m_placeFrom <= m_placeTo;
+}
+
+int RankingRequest::getToken() const
+{
+	return m_impl->m_token;
 }
 
 }

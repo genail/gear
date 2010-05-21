@@ -51,9 +51,11 @@ class RankingEntries : public Net::Packet
 		int getEntryCount() const;
 		const PlacedRankingEntry &getEntry(int p_index) const;
 
+		void setToken(int p_token);
+		int getToken() const;
 
 	private:
-
+		int m_token;
 		std::vector<PlacedRankingEntry> m_rankingEntries;
 };
 

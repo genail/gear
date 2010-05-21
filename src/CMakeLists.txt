@@ -14,6 +14,7 @@ SET(COMMON_SRCS
 	common/Player.cpp
 	common/Properties.cpp
     common/RemotePlayer.cpp
+    common/Token.cpp
     math/Integer.cpp
     math/Time.cpp
 	network/RemoteCar.cpp
@@ -37,6 +38,9 @@ SET(COMMON_SRCS
 	network/packets/VoteEnd.cpp
 	network/packets/VoteStart.cpp
 	network/packets/VoteTick.cpp
+	network/queries/Query.cpp
+	network/queries/RankingBrowseQuery.cpp
+	network/queries/RankingFindQuery.cpp
 	logic/VoteSystem.cpp
 	logic/race/Block.cpp
 	logic/race/Car.cpp

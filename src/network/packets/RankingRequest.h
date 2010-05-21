@@ -50,6 +50,8 @@ class RankingRequest : public Net::Packet
 		void setPlaceFrom(int p_placeFrom);
 		void setPlaceTo(int p_placeTo);
 
+		int getToken() const;
+
 	private:
 
 		CL_SharedPtr<RankingRequestImpl> m_impl;

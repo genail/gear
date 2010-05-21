@@ -33,6 +33,7 @@
 #include "network/client/Client.h"
 #include "network/packets/RankingAdvance.h"
 #include "network/packets/RankingEntries.h"
+#include "network/packets/RankingFind.h"
 #include "network/packets/RankingRequest.h"
 
 namespace Net
@@ -42,24 +43,23 @@ class RankingClientImpl
 {
 	public:
 
-		SIG_IMPL(RankingClient, entriesReceived);
-
+		RankingClient *m_parent;
 		Client *m_client;
 
-		RankingClientImpl(Client *p_client) :
+		RankingClientImpl(RankingClient *p_parent, Client *p_client) :
+			m_parent(p_parent),
 			m_client(p_client)
 		{ /* empty */ }
 
 		void parseEvent(const CL_NetGameEvent &p_event);
 		void parseEntriesEvent(const CL_NetGameEvent &p_event);
+
+		int findEntry(const CL_String &p_playerId);
 };
 
 
-SIG_CPP(RankingClient, entriesReceived);
-
-
 RankingClient::RankingClient(Client *p_client) :
-		m_impl(new RankingClientImpl(p_client))
+		m_impl(new RankingClientImpl(this, p_client))
 {
 	// empty
 }
@@ -86,19 +86,37 @@ void RankingClient::sendTimeAdvance(int p_lapTimeMs)
 	m_impl->m_client->send(netEvent);
 }
 
-void RankingClient::requestEntry(int p_place)
+int RankingClient::requestEntry(int p_place)
 {
-	requestEntries(p_place, p_place);
+	return requestEntries(p_place, p_place);
 }
 
-void RankingClient::requestEntries(int p_placeFrom, int p_placeTo)
+int RankingClient::requestEntries(int p_placeFrom, int p_placeTo)
 {
-	RankingRequest rankingRequestPacket;
-	rankingRequestPacket.setPlaceFrom(p_placeFrom);
-	rankingRequestPacket.setPlaceTo(p_placeTo);
+	RankingRequest packet;
+	packet.setPlaceFrom(p_placeFrom);
+	packet.setPlaceTo(p_placeTo);
 
-	const CL_NetGameEvent netEvent = rankingRequestPacket.buildEvent();
-	m_impl->m_client->send(netEvent);
+	const CL_NetGameEvent event = packet.buildEvent();
+	m_impl->m_client->send(event);
+
+	return packet.getToken();
+}
+
+int RankingClient::findEntry(const CL_String &p_playerId)
+{
+	return m_impl->findEntry(p_playerId);
+}
+
+int RankingClientImpl::findEntry(const CL_String &p_playerId)
+{
+	RankingFind packet;
+	packet.setPlayerId(p_playerId);
+
+	const CL_NetGameEvent event = packet.buildEvent();
+	m_client->send(event);
+
+	return packet.getToken();
 }
 
 void RankingClient::parseEvent(const CL_NetGameEvent &p_event)
@@ -131,7 +149,8 @@ void RankingClientImpl::parseEntriesEvent(const CL_NetGameEvent &p_event)
 		rankingEntries.push_back(rankingEntry);
 	}
 
-	m_sig_entriesReceived.invoke(rankingEntries);
+	const int token = rankingEntriesPacket.getToken();
+	m_parent->sig_entriesReceived.invoke(token, rankingEntries);
 }
 
 }

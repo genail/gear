@@ -35,7 +35,8 @@
 namespace Net
 {
 
-RankingEntries::RankingEntries()
+RankingEntries::RankingEntries() :
+		m_token(-1)
 {
 	// empty
 }
@@ -48,6 +49,7 @@ RankingEntries::~RankingEntries()
 CL_NetGameEvent RankingEntries::buildEvent() const
 {
 	CL_NetGameEvent event(EVENT_RANKING_ENTRIES);
+	event.add_argument(m_token);
 	event.add_argument(getEntryCount());
 
 	foreach(const PlacedRankingEntry &entry, m_rankingEntries) {
@@ -65,9 +67,10 @@ void RankingEntries::parseEvent(const CL_NetGameEvent &p_event)
 	G_ASSERT(p_event.get_name() == EVENT_RANKING_ENTRIES);
 	G_ASSERT(getEntryCount() == 0);
 
-	const int entryCount = p_event.get_argument(0);
+	m_token = p_event.get_argument(0);
+	const int entryCount = p_event.get_argument(1);
 
-	int index = 1;
+	int index = 2;
 	PlacedRankingEntry entry;
 
 	for (int i = 0; i < entryCount; ++i) {
@@ -94,6 +97,16 @@ const PlacedRankingEntry &RankingEntries::getEntry(int p_index) const
 {
 	G_ASSERT(p_index >= 0 && p_index < (signed) m_rankingEntries.size());
 	return m_rankingEntries[p_index];
+}
+
+void RankingEntries::setToken(int p_token)
+{
+	m_token = p_token;
+}
+
+int RankingEntries::getToken() const
+{
+	return m_token;
 }
 
 }

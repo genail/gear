@@ -29,16 +29,18 @@
 #include "RankingFind.h"
 
 #include "common/gassert.h"
+#include "common/Token.h"
 #include "network/events.h"
 
 
-const unsigned ARGS_COUNT = 1;
+const unsigned ARGS_COUNT = 2;
 
 
 namespace Net
 {
 
-RankingFind::RankingFind()
+RankingFind::RankingFind() :
+		m_token(Token::next())
 {
 	// empty
 }
@@ -51,6 +53,7 @@ RankingFind::~RankingFind()
 CL_NetGameEvent RankingFind::buildEvent() const
 {
 	CL_NetGameEvent event(EVENT_RANKING_FIND);
+	event.add_argument(m_token);
 	event.add_argument(m_playerId);
 
 	return event;
@@ -61,7 +64,8 @@ void RankingFind::parseEvent(const CL_NetGameEvent &p_event)
 	G_ASSERT(p_event.get_name() == EVENT_RANKING_FIND);
 	G_ASSERT(p_event.get_argument_count() == ARGS_COUNT);
 
-	m_playerId = p_event.get_argument(0);
+	m_token = p_event.get_argument(0);
+	m_playerId = p_event.get_argument(1);
 }
 
 void RankingFind::setPlayerId(const CL_String &p_str)
@@ -72,6 +76,11 @@ void RankingFind::setPlayerId(const CL_String &p_str)
 const CL_String &RankingFind::getPlayerId() const
 {
 	return m_playerId;
+}
+
+int RankingFind::getToken() const
+{
+	return m_token;
 }
 
 }

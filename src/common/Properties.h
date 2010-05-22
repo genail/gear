@@ -55,6 +55,7 @@
 
 // player settings
 #define CG_PLAYER_NAME "cg_player_name"
+#define CG_PLAYER_ID "cg_player_id"
 
 // sound
 #define CG_SOUND_VOLUME "cg_sound_volume"

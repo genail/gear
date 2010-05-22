@@ -28,6 +28,7 @@
 
 #include <stdlib.h>
 
+#include "clanlib/core/math.h"
 #include "clanlib/display/2d.h"
 #include "clanlib/display/window.h"
 
@@ -83,6 +84,31 @@ class Application
 // locate your application object.
 CL_ClanApplication app(&Application::main);
 
+void initializePlayerId()
+{
+	cl_log_event("init", "initializing player's ID");
+
+	CL_String playerId = Properties::getString(CG_PLAYER_ID, "");
+	if (playerId.empty()) {
+		cl_log_event("init", "generating new player's ID");
+
+		// generating random seed
+		unsigned timeFromBoot = CL_System::get_time();
+		const CL_String exePath = CL_System::get_exe_path();
+
+		CL_String seedStr = cl_format("%1%2", timeFromBoot, exePath);
+		playerId = CL_HashFunctions::sha1(seedStr);
+
+		cl_log_event("init", "saving player ID: %1", playerId);
+		Properties::set(CG_PLAYER_ID, playerId);
+	}
+
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+	player.setId(playerId);
+
+}
+
 int Application::main(const std::vector<CL_String> &args)
 {
 
@@ -133,6 +159,9 @@ int Application::main(const std::vector<CL_String> &args)
 		// set player name
 		Game &game = Game::getInstance();
 		game.getPlayer().setName(Properties::getString(CG_PLAYER_NAME, ""));
+
+		// init player id
+		initializePlayerId();
 
 		// set opengl version
 		enum GLVer {

@@ -58,4 +58,5 @@
 #include <ClanLib/Core/Math/line.h>
 #include <ClanLib/Core/Math/line_ray.h>
 #include <ClanLib/Core/Math/line_segment.h>
+#include <ClanLib/Core/Math/hash_functions.h>
 #include <ClanLib/Core/core_iostream.h>

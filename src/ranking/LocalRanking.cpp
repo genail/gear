@@ -71,27 +71,20 @@ class LocalRankingImpl
 
 		LocalRankingImpl(const CL_String &p_dbFile);
 
+		void advanceEntry(const RankingEntry &p_entry);
+		int findEntryIndex(const CL_String &p_uid);
+
 		void prepareSchema();
-
 		int tryGettingVersion();
-
 		void buildSchema();
-
 		void buildMetaTable();
-
 		void buildRankingTable();
-
 		void createIndexes();
-
 		void insertSchemaVersion();
 
-
 		void insertEntry(const RankingEntry &p_entry);
-
 		void moveEntry(const RankingEntry &p_newEntry, int p_oldIndex);
-
 		int getEntryTime(int p_index);
-
 		RankingEntry getEntryAtIndex(int p_index);
 };
 
@@ -179,12 +172,21 @@ LocalRanking::~LocalRanking()
 
 void LocalRanking::advanceEntry(const RankingEntry &p_entry)
 {
+	m_impl->advanceEntry(p_entry);
+}
+
+void LocalRankingImpl::advanceEntry(const RankingEntry &p_entry)
+{
 	const int index = findEntryIndex(p_entry.pid);
 
 	if (index == -1) {
-		m_impl->insertEntry(p_entry);
+		insertEntry(p_entry);
 	} else {
-		m_impl->moveEntry(p_entry, index);
+		int oldTime = getEntryTime(index);
+
+		if (p_entry.timeMs < oldTime) {
+			moveEntry(p_entry, index);
+		}
 	}
 }
 
@@ -223,15 +225,20 @@ void LocalRankingImpl::moveEntry(const RankingEntry &p_newEntry, int p_oldIndex)
 
 int LocalRanking::findEntryIndex(const CL_String &p_pid)
 {
+	return m_impl->findEntryIndex(p_pid);
+}
+
+int LocalRankingImpl::findEntryIndex(const CL_String &p_pid)
+{
 	static const CL_String FIND_STATEMENT = CL_String("")
 			+ "SELECT id FROM ranking "
 			+ "WHERE pid=?1";
 
-	CL_DBCommand cmd = m_impl->m_connection.create_command(FIND_STATEMENT);
+	CL_DBCommand cmd = m_connection.create_command(FIND_STATEMENT);
 	cmd.set_input_parameter_string(1, p_pid);
 
 	try {
-		return m_impl->m_connection.execute_scalar_int(cmd);
+		return m_connection.execute_scalar_int(cmd);
 	} catch (...) {
 		return -1;
 	}

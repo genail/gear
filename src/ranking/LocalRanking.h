@@ -47,9 +47,14 @@ class LocalRanking
 		virtual ~LocalRanking();
 
 
+		/**
+		 * Advances entry up in the ranking. If there's no entry for this player, then
+		 * new entry is creates. If entry already exists, it's moved only if new time is
+		 * better than last one.
+		 */
 		void advanceEntry(const RankingEntry &p_entry);
 
-		int findEntryIndex(const CL_String &p_uid);
+		int findEntryIndex(const CL_String &p_pid);
 
 		PlacedRankingEntry getEntryAtPosition(int p_position);
 

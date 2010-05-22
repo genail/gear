@@ -145,8 +145,8 @@ void GameLogicTimeTrailImpl::resetProgressClock()
 
 void GameLogicTimeTrail::destroy()
 {
-	GameLogic::destroy();
 	m_impl->destroy();
+	GameLogic::destroy();
 }
 
 void GameLogicTimeTrailImpl::destroy()

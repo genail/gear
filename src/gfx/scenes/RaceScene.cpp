@@ -184,6 +184,8 @@ void RaceSceneImpl::initializeOffline(Race::Level *p_level)
 	m_logic = new Race::GameLogicTimeTrail();
 	m_logic->setLevel(p_level);
 
+	m_logic->initialize();
+
 	initCommon();
 }
 

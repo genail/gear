@@ -67,7 +67,6 @@ class Level : public boost::noncopyable
 
 		/** @return true if track was loaded */
 		bool load(const CL_String &p_filename);
-
 		void save(const CL_String &p_filename);
 
 		/**

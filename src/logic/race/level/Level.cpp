@@ -110,15 +110,13 @@ class LevelImpl
 
 
 		// level loading
+		bool load(const CL_String &p_filename);
+		void unload();
 
 		void loadMetaEl(const CL_DomNode &p_metaNode);
-
 		void loadTrackEl(const CL_DomNode &p_trackNode);
-
 		void loadBoundsEl(const CL_DomNode &p_boundsNode);
-
 		void loadObjectsEl(const CL_DomNode &p_objectsNode);
-
 		void loadObjectEl(const CL_DomNode &p_objNode);
 
 		std::vector<CL_Pointf> loadObjectGeom(const CL_DomNode &p_geomNode);
@@ -174,7 +172,12 @@ void Level::destroy()
 
 bool Level::load(const CL_String& p_filename)
 {
-	G_ASSERT(!isUsable() && "level is already loaded");
+	return m_impl->load(p_filename);
+}
+
+bool LevelImpl::load(const CL_String &p_filename)
+{
+	unload();
 
 	try {
 		cl_log_event(LOG_DEBUG, "loading level %1", p_filename);
@@ -185,7 +188,7 @@ bool Level::load(const CL_String& p_filename)
 
 		// load meta element
 		const CL_DomNode metaNode = root.named_item("meta");
-		m_impl->loadMetaEl(metaNode);
+		loadMetaEl(metaNode);
 
 		// gets level's content
 		const CL_DomNode contentNode = root.named_item("content");
@@ -196,23 +199,23 @@ bool Level::load(const CL_String& p_filename)
 
 		// load track
 		const CL_DomNode trackNode = contentNode.named_item("track");
-		m_impl->loadTrackEl(trackNode);
+		loadTrackEl(trackNode);
 
 		// load objects
 		const CL_DomNode objectsNode = contentNode.named_item("objects");
-		m_impl->loadObjectsEl(objectsNode);
+		loadObjectsEl(objectsNode);
 
 		// load track bounds
 		const CL_DomNode boundsNode = contentNode.named_item("bounds");
-		m_impl->loadBoundsEl(boundsNode);
+		loadBoundsEl(boundsNode);
 
 		file.close();
 
 		cl_log_event(LOG_DEBUG, "level loaded");
 
 		// run triangulator
-		m_impl->m_trackTriangulator.clear();
-		m_impl->m_trackTriangulator.triangulate(m_impl->m_track);
+		m_trackTriangulator.clear();
+		m_trackTriangulator.triangulate(m_track);
 
 		return true;
 
@@ -221,7 +224,6 @@ bool Level::load(const CL_String& p_filename)
 	}
 
 	return false;
-
 }
 
 void LevelImpl::loadMetaEl(const CL_DomNode &p_metaNode)
@@ -442,6 +444,15 @@ void LevelImpl::loadBoundsEl(const CL_DomNode &p_boundsNode)
 //			cl_log_event("race", "Unknown node '%1', ignoring", boundNode.get_node_name());
 //		}
 //	}
+}
+
+void LevelImpl::unload()
+{
+	m_track.clear();
+	m_trackTriangulator.clear();
+	m_objects.clear();
+	m_resistanceMap.clear();
+	m_startPositions.clear();
 }
 
 void Level::save(const CL_String &p_filename)

@@ -29,6 +29,7 @@
 #include "GameLogic.h"
 
 #include "common/gassert.h"
+#include "common/Game.h"
 #include "logic/VoteSystem.h"
 #include "logic/race/Car.h"
 #include "logic/race/MessageBoard.h"
@@ -76,6 +77,12 @@ class GameLogicImpl
 
 		void setLevel(Level *p_level);
 		const Level &getLevel() const;
+
+		bool hasLastLapTime() const;
+		int getLastLapTime() const;
+		bool hasBestLapTime() const;
+		int getBestLapTime() const;
+		int getCurrentLapTime() const;
 
 };
 
@@ -209,6 +216,89 @@ void GameLogicImpl::updateCollisionWithObject(
 			p_car.applyCollision(seg);
 		}
 
+	}
+}
+
+bool GameLogic::hasLastLapTime() const
+{
+	return m_impl->hasLastLapTime();
+}
+
+bool GameLogicImpl::hasLastLapTime() const
+{
+	return getLastLapTime() != 0;
+}
+
+int GameLogic::getLastLapTime() const
+{
+	return m_impl->getLastLapTime();
+}
+
+int GameLogicImpl::getLastLapTime() const
+{
+	Game &game = Game::getInstance();
+	const Car &car = game.getPlayerCar();
+	const int lapN = m_progress->getLapNumber(car);
+
+	if (lapN > 1) {
+		return m_progress->getLapTime(car, lapN - 1);
+	} else {
+		return 0;
+	}
+}
+
+bool GameLogic::hasBestLapTime() const
+{
+	return m_impl->hasBestLapTime();
+}
+
+bool GameLogicImpl::hasBestLapTime() const
+{
+	return getBestLapTime() != 0;
+}
+
+int GameLogic::getBestLapTime() const
+{
+	return m_impl->getBestLapTime();
+}
+
+int GameLogicImpl::getBestLapTime() const
+{
+	Game &game = Game::getInstance();
+	const Car &car = game.getPlayerCar();
+	const int lapN = m_progress->getLapNumber(car);
+
+	unsigned best = 0, nbest = 0;
+
+	for (int i = 1; i < lapN; ++i) {
+		if (i == 1) {
+			best = m_progress->getLapTime(car, i);
+		} else {
+			nbest = m_progress->getLapTime(car, i);
+			if (nbest < best) {
+				best = nbest;
+			}
+		}
+	}
+
+	return best;
+}
+
+int GameLogic::getCurrentLapTime() const
+{
+	return m_impl->getCurrentLapTime();
+}
+
+int GameLogicImpl::getCurrentLapTime() const
+{
+	if (m_gameState == GS_RUNNING) {
+		Game &game = Game::getInstance();
+		const Car &car = game.getPlayerCar();
+		const int lapN = m_progress->getLapNumber(car);
+
+		return m_progress->getLapTime(car, lapN);
+	} else {
+		return 0;
 	}
 }
 

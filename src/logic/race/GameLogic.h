@@ -78,6 +78,12 @@ class GameLogic
 		RaceGameState getRaceGameState() const;
 		const Progress &getProgressObject() const;
 
+		bool hasLastLapTime() const;
+		int getLastLapTime() const;
+		virtual bool hasBestLapTime() const;
+		virtual int getBestLapTime() const;
+		int getCurrentLapTime() const;
+
 		const VoteSystem &getVoteSystem() const;
 		virtual void callAVote(VoteType p_voteType, const CL_String &p_subject);
 		virtual void voteYes();

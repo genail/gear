@@ -105,7 +105,9 @@ void RankingFindQueryImpl::submit()
 	Client &client = game.getNetworkConnection();
 	RankingClient &rankingClient = client.getRankingClient();
 
-	rankingClient.sig_entriesReceived.connect(this, &RankingFindQueryImpl::onEntriesReceived);
+	m_recvSlot =
+			rankingClient.sig_entriesReceived.connect(
+					this, &RankingFindQueryImpl::onEntriesReceived);
 
 	m_token = rankingClient.findEntry(m_playerId);
 }

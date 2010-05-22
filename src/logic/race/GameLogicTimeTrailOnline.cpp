@@ -35,8 +35,8 @@
 #include "network/client/RankingClient.h"
 #include "network/packets/GameState.h"
 #include "network/packets/RankingAdvance.h"
-
 #include "network/queries/RankingBrowseQuery.h"
+#include "network/queries/RankingFindQuery.h"
 
 namespace Race
 {
@@ -52,9 +52,15 @@ class GameLogicTimeTrailOnlineImpl
 
 		RankingEntry m_firstPlaceRankingEntry;
 		bool m_gotFirstPlaceRankingEntry;
+		bool m_firstPlaceDirty;
 
 		Net::RankingBrowseQuery m_queryRankingBrowse;
-		bool m_firstPlaceNeedUpdate;
+
+		PlacedRankingEntry m_playerRankingEntry;
+		bool m_gotPlayerRankingEntry;
+		bool m_playerPlaceDirty;
+
+		Net::RankingFindQuery m_queryRankingFind;
 
 		CL_SlotContainer m_slots;
 
@@ -70,7 +76,10 @@ class GameLogicTimeTrailOnlineImpl
 		void updateLocalRanking();
 
 		void applyGameState(const Net::GameState &p_gameState);
-		void requestFirstPlaceUpdate();
+		void requestLocalRankingUpdate();
+
+		bool hasBestLapTime() const;
+		int getBestLapTime() const;
 
 };
 
@@ -85,9 +94,11 @@ GameLogicTimeTrailOnlineImpl::GameLogicTimeTrailOnlineImpl(GameLogicTimeTrailOnl
 		m_basicClient(p_parent),
 		m_lastLapNumber(1),
 		m_gotFirstPlaceRankingEntry(false),
-		m_firstPlaceNeedUpdate(false)
+		m_firstPlaceDirty(false),
+		m_gotPlayerRankingEntry(false),
+		m_playerPlaceDirty(false)
 {
-	requestFirstPlaceUpdate();
+	requestLocalRankingUpdate();
 }
 
 GameLogicTimeTrailOnline::~GameLogicTimeTrailOnline()
@@ -145,32 +156,44 @@ void GameLogicTimeTrailOnlineImpl::updateRemoteRanking()
 
 	rankingClient.sendTimeAdvance(lapTimeMs);
 
-	requestFirstPlaceUpdate();
+	requestLocalRankingUpdate();
 }
 
 void GameLogicTimeTrailOnlineImpl::updateLocalRanking()
 {
-	if (!m_firstPlaceNeedUpdate) {
-		return;
-	}
-
-	if (m_queryRankingBrowse.isDone()) {
+	if (m_firstPlaceDirty && m_queryRankingBrowse.isDone()) {
 		const int entryCount = m_queryRankingBrowse.getEntriesCount();
 		if (entryCount == 1) {
 			m_firstPlaceRankingEntry = m_queryRankingBrowse.getEntry(0);
 			m_gotFirstPlaceRankingEntry = true;
 		}
 
-		m_firstPlaceNeedUpdate = false;
+		m_firstPlaceDirty = false;
+	}
+
+	if (m_playerPlaceDirty && m_queryRankingFind.isDone()) {
+		if (m_queryRankingFind.isFound()) {
+			m_playerRankingEntry = m_queryRankingFind.getEntry();
+			m_gotPlayerRankingEntry = true;
+		}
+
+		m_playerPlaceDirty = false;
 	}
 }
 
-void GameLogicTimeTrailOnlineImpl::requestFirstPlaceUpdate()
+void GameLogicTimeTrailOnlineImpl::requestLocalRankingUpdate()
 {
 	m_queryRankingBrowse.setRange(1, 1);
 	m_queryRankingBrowse.submit();
 
-	m_firstPlaceNeedUpdate = true;
+	Game &game = Game::getInstance();
+	Player &player = game.getPlayer();
+
+	m_queryRankingFind.setPlayerId(player.getId());
+	m_queryRankingFind.submit();
+
+	m_firstPlaceDirty = true;
+	m_playerPlaceDirty = true;
 }
 
 void GameLogicTimeTrailOnline::applyGameState(const Net::GameState &p_gameState)
@@ -192,6 +215,30 @@ const RankingEntry &GameLogicTimeTrailOnline::getFirstPlaceRankingEntry() const
 {
 	G_ASSERT(hasFirstPlaceRankingEntry() && "entry not available");
 	return m_impl->m_firstPlaceRankingEntry;
+}
+
+bool GameLogicTimeTrailOnline::hasBestLapTime() const
+{
+	return m_impl->hasBestLapTime();
+}
+
+bool GameLogicTimeTrailOnlineImpl::hasBestLapTime() const
+{
+	return m_gotPlayerRankingEntry;
+}
+
+int GameLogicTimeTrailOnline::getBestLapTime() const
+{
+	return m_impl->getBestLapTime();
+}
+
+int GameLogicTimeTrailOnlineImpl::getBestLapTime() const
+{
+	if (m_gotPlayerRankingEntry) {
+		return m_playerRankingEntry.timeMs;
+	} else {
+		return 0;
+	}
 }
 
 }

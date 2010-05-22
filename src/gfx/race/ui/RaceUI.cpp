@@ -362,44 +362,9 @@ void RaceUIImpl::drawLapLabel(CL_GraphicContext &p_gc)
 
 void RaceUIImpl::drawLapTimes(CL_GraphicContext &p_gc)
 {
-	const Race::Car &car = Game::getInstance().getPlayer().getCar();
-	const Race::Progress &pr = m_logic->getProgressObject();
-	const int lap = pr.getLapNumber(car);
-
-	if (lap == 0) {
-		return;
-	}
-
-	// find best lap
-	unsigned best = 0, nbest = 0;
-
-	for (int i = 1; i < lap; ++i) {
-		if (i == 1) {
-			best = pr.getLapTime(car, i);
-		} else {
-			nbest = pr.getLapTime(car, i);
-			if (nbest < best) {
-				best = nbest;
-			}
-		}
-	}
-
-	// get current lap time
-	unsigned curr;
-
-	// display 0 time until race is started
-	if (m_logic->getRaceGameState() == Race::GS_RUNNING) {
-		curr = pr.getLapTime(car, lap);
-	} else {
-		curr = 0;
-	}
-
-	// get last lap time
-	unsigned last = 0;
-
-	if (lap > 1) {
-		last = pr.getLapTime(car, lap - 1);
-	}
+	const int best = m_logic->getBestLapTime();
+	const int curr = m_logic->getCurrentLapTime();
+	const int last = m_logic->getLastLapTime();
 
 	// display times
 	Math::Time tbest(best);
